@@ -9,45 +9,48 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 </head>
 <body>
 
     <header class="navbar">
         <div class="logo"><a href="index.html">HAMDI RIZAL</a></div>
         <nav>
-    <ul class="nav-links">
-        <li><a href="portfolio.html">Portofolio</a></li>
-        <li><a href="arena.html">Arena Interaktif</a></li>
-        <li><a href="jurnal.html">Jurnal</a></li>
-        <li><a href="auth.html" class="login-button">Login</a></li>
-    </ul>
-    <button class="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
-</nav>
+            <ul class="nav-links">
+                <li><a href="portfolio.html">Portofolio</a></li>
+                <li><a href="arena.html">Arena Interaktif</a></li>
+                <li><a href="jurnal.html">Jurnal</a></li>
+                <li><a href="auth.html" class="login-button">Login</a></li>
+            </ul>
+            <button class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
     </header>
 
     <main class="page-container">
-        <h1 class="page-title">Portofolio Profesional</h1>
-        <p class="page-subtitle">Berikut adalah beberapa proyek yang pernah saya kerjakan.</p>
+        <div data-aos="fade-down">
+            <h1 class="page-title">Portofolio Profesional</h1>
+            <p class="page-subtitle">Berikut adalah beberapa proyek yang pernah saya kerjakan.</p>
+        </div>
         
         <div class="portfolio-grid">
-            <div class="portfolio-card">
-                <img src="https://via.placeholder.com/400x250" alt="Gambar Proyek 1">
+            <div class="portfolio-card" data-aos="fade-up">
+                <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Antarmuka aplikasi dengan warna retro neon">
                 <h3>Nama Proyek Satu</h3>
                 <p>Deskripsi singkat tentang proyek ini, teknologi yang digunakan, dan peran saya di dalamnya.</p>
                 <a href="#" class="button-pintu">Lihat Detail</a>
             </div>
-            <div class="portfolio-card">
-                <img src="https://via.placeholder.com/400x250" alt="Gambar Proyek 2">
+            <div class="portfolio-card" data-aos="fade-up" data-aos-delay="100">
+                <img src="https://images.unsplash.com/photo-1587620962725-abab7fe55159?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1331&q=80" alt="Kode program di layar laptop">
                 <h3>Nama Proyek Dua</h3>
                 <p>Deskripsi singkat tentang proyek ini, teknologi yang digunakan, dan peran saya di dalamnya.</p>
                 <a href="#" class="button-pintu">Lihat Detail</a>
             </div>
-            <div class="portfolio-card">
-                <img src="https://via.placeholder.com/400x250" alt="Gambar Proyek 3">
+            <div class="portfolio-card" data-aos="fade-up" data-aos-delay="200">
+                <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Suasana ruang kerja modern dengan beberapa laptop">
                 <h3>Nama Proyek Tiga</h3>
                 <p>Deskripsi singkat tentang proyek ini, teknologi yang digunakan, dan peran saya di dalamnya.</p>
                 <a href="#" class="button-pintu">Lihat Detail</a>
@@ -56,9 +59,24 @@
     </main>
 
     <footer>
+        <div class="social-icons">
+            <a href="https://www.instagram.com/hamdirzl/" target="_blank" aria-label="Instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-instagram"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </a>
+            <a href="https://open.spotify.com/user/pw7cyaxhvilcfmrpdddu33bvu?si=9d2ef3b1e0794b83" target="_blank" aria-label="Spotify">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-music"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+            </a>
+        </div>
         <p>&copy; 2025 HAMDI RIZAL. Dibangun dengan semangat dan secangkir kopi.</p>
     </footer>
     
     <script src="js/script.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+      AOS.init({
+        duration: 800,
+        once: true,
+      });
+    </script>
 </body>
 </html>

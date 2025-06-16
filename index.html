@@ -9,85 +9,97 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 </head>
 <body>
 
     <header class="navbar">
         <div class="logo"><a href="index.html">HAMDI RIZAL</a></div>
         <nav>
-    <ul class="nav-links">
-        <li><a href="portfolio.html">Portofolio</a></li>
-        <li><a href="arena.html">Arena Interaktif</a></li>
-        <li><a href="jurnal.html">Jurnal</a></li>
-        <li><a href="auth.html" class="login-button">Login</a></li>
-    </ul>
-    <button class="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
-</nav>
+            <ul class="nav-links">
+                <li><a href="portfolio.html">Portofolio</a></li>
+                <li><a href="arena.html">Arena Interaktif</a></li>
+                <li><a href="jurnal.html">Jurnal</a></li>
+                <li><a href="auth.html" class="login-button">Login</a></li>
+            </ul>
+            <button class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
     </header>
 
     <main>
        <section class="hero">
-    <div class="hero-content">
-        <h1>Platform Kreatif & Utilitas <span>Pribadi.</span></h1>
-        <p>Selamat datang di markas digital saya. Tempat untuk bekerja, bermain, dan bertumbuh.</p>
-    </div>
-</section>
+            <div class="hero-content" data-aos="zoom-in">
+                <h1>Platform Kreatif & Utilitas <span>Pribadi.</span></h1>
+                <p>Selamat datang di markas digital saya. Tempat untuk bekerja, bermain, dan bertumbuh.</p>
+            </div>
+        </section>
 
-<section class="pintu-utama">
-    <h2 class="section-title">Jelajahi Ekosistem Saya</h2>
-    <div class="pintu-container">
-        
-        <div class="pintu">
-            <div class="pintu-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-briefcase-fill" viewBox="0 0 16 16">
-                    <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3h6v-.5A1.5 1.5 0 0 0 9.5 1h-3z"/>
-                    <path d="M0 4.5A1.5 1.5 0 0 1 1.5 3h13A1.5 1.5 0 0 1 16 4.5v1.384l-7.614 2.03a1.5 1.5 0 0 1-.772 0L0 5.884V4.5zm5 0V4h6v.5a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5z"/>
-                    <path d="M0 8.013v4.487A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V8.013l-7.614 2.03a1.5 1.5 0 0 1-.772 0L0 8.013z"/>
-                </svg>
-            </div>
-            <h3>Portofolio Profesional</h3>
-            <p>Lihat proyek dan keahlian yang telah saya kembangkan selama ini.</p>
-            <a href="portfolio.html" class="button-pintu">Lihat Portofolio</a>
-        </div>
+        <section class="pintu-utama">
+            <h2 class="section-title" data-aos="fade-up">Jelajahi Ekosistem Saya</h2>
+            <div class="pintu-container">
+                
+                <div class="pintu" data-aos="fade-up" data-aos-delay="100">
+                    <div class="pintu-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                    </div>
+                    <h3>Portofolio Profesional</h3>
+                    <p>Lihat proyek dan keahlian yang telah saya kembangkan selama ini.</p>
+                    <a href="portfolio.html" class="button-pintu">Lihat Portofolio</a>
+                </div>
 
-        <div class="pintu">
-            <div class="pintu-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-controller" viewBox="0 0 16 16">
-                    <path d="M11.5 6.027a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-1.5 1.5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2.5-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-1.5 1.5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm-6.5-3h1v1h1v1h-1v1h-1v-1H3v-1h1v-1z"/>
-                    <path d="M3.051 3.27a.5.5 0 0 1 .354-.613l1.932-.518a.5.5 0 0 1 .62.39c.655-.079 1.35-.117 2.043-.117s1.388.038 2.043.117a.5.5 0 0 1 .62-.39l1.932.518a.5.5 0 0 1 .354.613l-.518 1.932a.5.5 0 0 1-.613.354c-.18.044-.35.08-.51.114a.5.5 0 0 1-.52-.328.5.5 0 0 1-.192-.454c-.097-.243-.203-.473-.318-.693a.5.5 0 0 1 .11-.693.5.5 0 0 1 .693.11c.106.18.204.368.293.559a.5.5 0 0 1-.328.52c-.17.033-.35.065-.53.092a.5.5 0 0 1-.613-.354l-.518-1.932a.5.5 0 0 1 .354-.613l1.932-.518a.5.5 0 0 1 .62.39c.655-.079 1.35-.117 2.043-.117s1.388.038 2.043.117a.5.5 0 0 1 .62-.39l1.932.518a.5.5 0 0 1 .354.613l-.518 1.932a.5.5 0 0 1-.613.354c-.18.044-.35.08-.51.114a.5.5 0 0 1-.52-.328.5.5 0 0 1-.192-.454c-.097-.243-.203-.473-.318-.693a.5.5 0 0 1 .11-.693.5.5 0 0 1 .693.11c.106.18.204.368.293.559a.5.5 0 0 1-.328.52c-.17.033-.35.065-.53.092a.5.5 0 0 1-.613-.354l-.518-1.932z"/>
-                    <path d="M12.45 5.027a.5.5 0 0 1 .5.5v1.5a.5.5 0 0 1-1 0v-1.5a.5.5 0 0 1 .5-.5zM15 9.5a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 .5.5zm-1.5-1.5a.5.5 0 0 0-1 0v3a.5.5 0 0 0 1 0v-3z"/>
-                </svg>
+                <div class="pintu" data-aos="fade-up" data-aos-delay="200">
+                    <div class="pintu-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-play-circle">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                        </svg>
+                    </div>
+                    <h3>Arena Interaktif</h3>
+                    <p>Mainkan game buatan saya dan gunakan perkakas digital gratis.</p>
+                    <a href="arena.html" class="button-pintu">Masuk ke Arena</a>
+                </div>
+                
+                <div class="pintu" data-aos="fade-up" data-aos-delay="300">
+                    <div class="pintu-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                    </div>
+                    <h3>Jurnal Pemikiran</h3>
+                    <p>Baca tulisan dan refleksi saya tentang teknologi, kreativitas, dan kehidupan.</p>
+                    <a href="jurnal.html" class="button-pintu">Baca Jurnal</a>
+                </div>
             </div>
-            <h3>Arena Interaktif</h3>
-            <p>Mainkan game buatan saya dan gunakan perkakas digital gratis.</p>
-            <a href="arena.html" class="button-pintu">Masuk ke Arena</a>
-        </div>
-        
-        <div class="pintu">
-            <div class="pintu-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-journal-text" viewBox="0 0 16 16">
-                    <path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
-                    <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
-                    <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
-                </svg>
-            </div>
-            <h3>Jurnal Pemikiran</h3>
-            <p>Baca tulisan dan refleksi saya tentang teknologi, kreativitas, dan kehidupan.</p>
-            <a href="jurnal.html" class="button-pintu">Baca Jurnal</a>
-        </div>
-    </div>
-</section>
-    </div>
-</section>
+        </section>
+    </main>
 
     <footer>
+        <div class="social-icons">
+            <a href="https://www.instagram.com/hamdirzl/" target="_blank" aria-label="Instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-instagram"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </a>
+            <a href="https://open.spotify.com/user/pw7cyaxhvilcfmrpdddu33bvu?si=9d2ef3b1e0794b83" target="_blank" aria-label="Spotify">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-music"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+            </a>
+        </div>
         <p>&copy; 2025 HAMDI RIZAL. Dibangun dengan semangat dan secangkir kopi.</p>
     </footer>
 
     <script src="js/script.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+      AOS.init({
+        duration: 800,
+        once: true,
+      });
+    </script>
 </body>
 </html>
