@@ -8,11 +8,24 @@ console.log(`Ekosistem Digital (Client v11) dimuat! Menghubungi API di: ${API_BA
 /* === FUNGSI GLOBAL UNTUK CEK STATUS LOGIN === */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('jwt_token');
-    const loginButtons = document.querySelectorAll('a.login-button');
+    const loginLink = document.querySelector('a.login-button'); 
+    const logoutButton = document.getElementById('logout-button'); 
+
     if (token) {
-        loginButtons.forEach(button => {
-            button.textContent = 'Dasbor';
-            button.href = 'dashboard.html';
+        if(loginLink) {
+            loginLink.textContent = 'Dasbor';
+            loginLink.href = 'dashboard.html';
+        }
+    } else {
+        if (document.body.contains(document.getElementById('dashboard-main'))) {
+            window.location.href = 'auth.html';
+        }
+    }
+
+    if(logoutButton) {
+        logoutButton.addEventListener('click', () => {
+            localStorage.removeItem('jwt_token');
+            window.location.href = 'index.html';
         });
     }
 });
@@ -78,39 +91,44 @@ if (document.getElementById('login-form')) {
             authMessage.className = '';
         });
     }
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('register-email').value;
-        const password = document.getElementById('register-password').value;
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error);
-            authMessage.textContent = 'Registrasi berhasil! Silakan login.';
-            authMessage.className = 'success';
-            if (showLoginLink) showLoginLink.click();
-        } catch (error) {
-            authMessage.textContent = `Error: ${error.message}`;
-            authMessage.className = 'error';
-        }
-    });
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error);
-            localStorage.setItem('jwt_token', data.token);
-            authMessage.textContent = 'Login berhasil! Mengalihkan ke dashboard...';
-            authMessage.className = 'success';
-            setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
-        } catch (error) {
-            authMessage.textContent = `Error: ${error.message}`;
-            authMessage.className = 'error';
-        }
-    });
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error);
+                authMessage.textContent = 'Registrasi berhasil! Silakan login.';
+                authMessage.className = 'success';
+                if (showLoginLink) showLoginLink.click();
+            } catch (error) {
+                authMessage.textContent = `Error: ${error.message}`;
+                authMessage.className = 'error';
+            }
+        });
+    }
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error);
+                localStorage.setItem('jwt_token', data.token);
+                authMessage.textContent = 'Login berhasil! Mengalihkan ke dashboard...';
+                authMessage.className = 'success';
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+            } catch (error) {
+                authMessage.textContent = `Error: ${error.message}`;
+                authMessage.className = 'error';
+            }
+        });
+    }
 }
 
 
@@ -119,48 +137,51 @@ if (document.getElementById('login-form')) {
 // =================================================================
 if (document.getElementById('dashboard-main')) {
     const userEmailEl = document.getElementById('user-email');
-    const logoutButton = document.getElementById('logout-button');
     const moodForm = document.getElementById('mood-form');
     const moodHistoryList = document.getElementById('mood-history');
     const loadingMessage = document.getElementById('loading-moods');
     const moodMessage = document.getElementById('mood-message');
     const token = localStorage.getItem('jwt_token');
 
-    // Jika tidak ada token, paksa kembali ke halaman login
     if (!token) {
         window.location.href = 'auth.html';
     }
 
-    /* BAGIAN YANG HILANG & KINI DIKEMBALIKAN */
-    // Fungsi untuk mengambil dan menampilkan riwayat mood
     const fetchAndRenderMoods = async () => {
-        if (!loadingMessage) return;
+        if (!moodHistoryList) return;
         try {
-            loadingMessage.textContent = 'Memuat riwayat...';
+            if(loadingMessage) loadingMessage.textContent = 'Memuat riwayat...';
             const response = await fetch(`${API_BASE_URL}/api/moods`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+            if (response.status === 401) {
+                localStorage.removeItem('jwt_token');
+                window.location.href = 'auth.html';
+                return;
+            }
             if (!response.ok) throw new Error('Gagal mengambil data mood.');
             const moods = await response.json();
+            
             moodHistoryList.innerHTML = '';
             if (moods.length === 0) {
-                moodHistoryList.innerHTML = '<p>Anda belum memiliki catatan mood.</p>';
+                if (loadingMessage) loadingMessage.style.display = 'none';
+                moodHistoryList.innerHTML = '<li>Anda belum memiliki catatan mood.</li>';
             } else {
+                 if (loadingMessage) loadingMessage.style.display = 'none';
                 const moodEmojis = { 1: '😥', 2: '😕', 3: '😐', 4: '🙂', 5: '😁' };
                 moods.forEach(mood => {
                     const listItem = document.createElement('li');
-                    listItem.className = `mood-item level-${mood.mood_level}`;
+                    listItem.className = `mood-item`;
                     const moodDate = new Date(mood.created_at).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
-                    listItem.innerHTML = `<div class="mood-item-header"><span>Mood: ${moodEmojis[mood.mood_level]}</span><span class="mood-date">${moodDate}</span></div><p class="mood-notes">${mood.notes || '<em>Tidak ada catatan.</em>'}</p>`;
+                    listItem.innerHTML = `<div class="mood-item-header"><span>${moodEmojis[mood.mood_level]}</span><span class="mood-date">${moodDate}</span></div><p class="mood-notes">${mood.notes || '<em>Tidak ada catatan.</em>'}</p>`;
                     moodHistoryList.appendChild(listItem);
                 });
             }
         } catch (error) {
-            moodHistoryList.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+            moodHistoryList.innerHTML = `<li style="color:red;">Error: ${error.message}</li>`;
         }
     };
 
-    // Fungsi untuk mengambil profil pengguna (email)
     const fetchProfile = async () => {
         if (!userEmailEl) return;
         try {
@@ -176,12 +197,18 @@ if (document.getElementById('dashboard-main')) {
         }
     };
 
-    // Event listener untuk form mood
     if (moodForm) {
         moodForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const moodLevel = moodForm.elements['mood'].value;
             const notes = document.getElementById('mood-notes').value;
+            if(!moodLevel) {
+                if(moodMessage) {
+                    moodMessage.textContent = 'Error: Silakan pilih mood Anda.';
+                    moodMessage.className = 'error';
+                }
+                return;
+            }
             if (moodMessage) {
                 moodMessage.textContent = '';
                 moodMessage.className = '';
@@ -197,17 +224,18 @@ if (document.getElementById('dashboard-main')) {
                     throw new Error(errData.error || 'Gagal menyimpan mood.');
                 }
                 moodForm.reset();
-                fetchAndRenderMoods(); // Muat ulang riwayat setelah berhasil
+                fetchAndRenderMoods();
             } catch (error) {
-                if(moodMessage) moodMessage.textContent = `Error: ${error.message}`;
+                if(moodMessage) {
+                    moodMessage.textContent = `Error: ${error.message}`;
+                    moodMessage.className = 'error';
+                }
             }
         });
     }
 
-    // Panggil fungsi-fungsi untuk memuat data dasbor
     fetchProfile();
     fetchAndRenderMoods();
-    /* AKHIR DARI BAGIAN YANG HILANG */
 }
 
 // ==========================================================
@@ -221,3 +249,56 @@ if (hamburger && navLinks) {
         navLinks.classList.toggle('active');
     });
 }
+
+// ==========================================================
+// ===         LOGIKA UNTUK MODAL TENTANG SAYA            ===
+// ==========================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const aboutButtons = document.querySelectorAll('#about-button');
+    const modalOverlay = document.getElementById('about-modal');
+    const modalCloseButton = document.querySelector('.modal-close');
+
+    const openModal = () => {
+        if (modalOverlay) {
+            modalOverlay.classList.remove('hidden');
+        }
+    };
+
+    const closeModal = () => {
+        if (modalOverlay) {
+            modalOverlay.classList.add('hidden');
+        }
+    };
+
+    aboutButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            if (!modalOverlay) {
+                window.location.href = 'index.html#open-about';
+            } else {
+                e.preventDefault();
+                openModal();
+            }
+        });
+    });
+
+    if (window.location.hash === '#open-about') {
+        openModal();
+        history.pushState("", document.title, window.location.pathname + window.location.search);
+    }
+    
+    if (modalOverlay) {
+        modalCloseButton.addEventListener('click', closeModal);
+
+        modalOverlay.addEventListener('click', (event) => {
+            if (event.target === modalOverlay) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+    }
+});

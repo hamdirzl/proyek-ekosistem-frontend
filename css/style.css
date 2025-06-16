@@ -1,5 +1,5 @@
 /* =================================================================== */
-/* ==   V4: FINAL POLISH - MOBILE LAYOUT FIX                      == */
+/* ==   V5: ABOUT ME MODAL IMPLEMENTATION                         == */
 /* =================================================================== */
 
 /* === PENGATURAN GLOBAL: DESIGN SYSTEM === */
@@ -18,17 +18,17 @@
     --font-body: 'Inter', sans-serif;
 
     /* Skala Spasi */
-    --space-xs: 0.5rem;    /* 8px */
-    --space-sm: 1rem;      /* 16px */
-    --space-md: 1.5rem;    /* 24px */
-    --space-lg: 2.5rem;    /* 40px */
-    --space-xl: 4rem;      /* 64px */
-    --space-xxl: 6rem;     /* 96px */
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 2.5rem;
+    --space-xl: 4rem;
+    --space-xxl: 6rem;
 
     /* Tipografi Fluid */
     --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-    --font-size-h1:   clamp(2.5rem, 1.5rem + 5vw, 4.5rem); /* sedikit dikecilkan max-nya */
-    --font-size-h2:   clamp(2rem, 1.25rem + 3.75vw, 3rem); /* sedikit dikecilkan max-nya */
+    --font-size-h1:   clamp(2.5rem, 1.5rem + 5vw, 4.5rem);
+    --font-size-h2:   clamp(2rem, 1.25rem + 3.75vw, 3rem);
     --font-size-h3:   clamp(1.5rem, 1.1rem + 2vw, 2rem);
     
     /* Bayangan */
@@ -79,19 +79,16 @@ body {
 }
 .logo a:hover { color: var(--accent-color); }
 
-.nav-links { list-style: none; display: flex; align-items: center; }
-.nav-links li { margin-left: var(--space-lg); }
+.nav-links { list-style: none; display: flex; align-items: center; gap: var(--space-lg); }
+.nav-links li { margin-left: 0; } /* Dihapus karena sudah pakai gap */
 .nav-links a { 
     text-decoration: none; 
     color: var(--text-muted-color); 
     font-weight: 500; 
-    transition: color 0.3s ease, text-shadow 0.3s ease; 
-    padding-bottom: var(--space-xs);
-    border-bottom: 2px solid transparent;
+    transition: color 0.3s ease; 
 }
 .nav-links a:hover { 
     color: var(--text-color); 
-    border-bottom-color: var(--accent-color);
 }
 
 .button-pintu, .login-button { 
@@ -109,10 +106,11 @@ body {
 }
 .login-button { 
     color: #000000 !important; 
-    padding: 0.6rem 1.2rem; 
+    padding: 0.6rem 1.2rem !important; /* !important untuk menimpa gaya .nav-links a */
+    background-color: var(--accent-color) !important;
 }
 .button-pintu:hover, .login-button:hover { 
-    background: var(--accent-hover); 
+    background: var(--accent-hover) !important; 
     border-color: var(--accent-hover);
     transform: translateY(-4px) scale(1.02); 
     box-shadow: 0 8px 25px rgba(0, 245, 160, 0.3);
@@ -145,11 +143,14 @@ footer {
     line-height: 1.2; 
     letter-spacing: -1px;
 }
-.hero h1 span { 
+
+.hero h1 span {
     background: linear-gradient(45deg, var(--accent-color), #00c4ff);
     -webkit-background-clip: text;
+    background-clip: text; /* <-- TAMBAHKAN BARIS INI */
     -webkit-text-fill-color: transparent;
 }
+
 .hero p { font-size: var(--font-size-base); max-width: 90%; color: var(--text-muted-color); }
 
 .pintu-utama { padding: var(--space-xxl) clamp(var(--space-sm), 5vw, var(--space-xxl)); text-align: center; }
@@ -178,7 +179,7 @@ footer {
 .pintu .button-pintu { margin-top: auto; }
 
 /* === GAYA HALAMAN LAINNYA === */
-.page-container { max-width: 1200px; margin: var(--space-xxl) auto; padding: 0 var(--space-md); } /* [PERBAIKAN] Padding awal disesuaikan */
+.page-container { max-width: 1200px; margin: var(--space-xxl) auto; padding: 0 var(--space-md); }
 .page-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h1); color: #ffffff; margin-bottom: var(--space-sm); }
 .page-subtitle { text-align: center; font-size: var(--font-size-base); color: var(--text-muted-color); margin-bottom: var(--space-xl); max-width: 600px; margin-left: auto; margin-right: auto; }
 .section-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h2); color: #ffffff; margin-bottom: var(--space-xl); }
@@ -227,7 +228,6 @@ footer {
     margin-bottom: var(--space-lg); 
     border: 1px solid var(--border-color); 
 }
-/* [PERBAIKAN TAMPILAN MOBILE] Membuat form lebih rapi */
 #shortener-form {
     display: flex;
     flex-direction: column;
@@ -333,18 +333,18 @@ input:focus, textarea:focus {
         transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s; 
         flex-direction: column; 
         align-items: stretch; 
+        gap: 0;
     }
     .nav-links.active { opacity: 1; visibility: visible; transform: translateY(0); }
     .nav-links li { margin: 0; }
-    .nav-links a { display: block; padding: var(--space-sm) 5%; border-bottom: none; }
-    .nav-links a:hover { background-color: rgba(0, 245, 160, 0.1); color: var(--accent-color); }
-    .nav-links a.login-button { margin: var(--space-xs) 5%; width: auto; text-align: center; }
+    .nav-links a, .nav-links .nav-button { display: block; padding: var(--space-sm) 5%; border-bottom: none; width: 100%; border-radius: 0; text-align: left;}
+    .nav-links a:hover, .nav-links .nav-button:hover { background-color: rgba(0, 245, 160, 0.1); color: var(--accent-color); }
+    .nav-links a.login-button { margin: var(--space-xs) 5%; width: 90%; text-align: center; }
     
     .page-container { 
-        padding: 75px var(--space-md) 0; /* [PERBAIKAN TAMPILAN MOBILE] Padding atas untuk navbar, dan padding samping yang lebih pas */
+        padding: 75px var(--space-md) 0;
     }
 
-    /* [PERBAIKAN TAMPILAN MOBILE] Mengurangi padding internal untuk kartu di mobile */
     .tool-section, .dashboard-header, .history-section, .pintu {
         padding: var(--space-md);
     }
@@ -372,4 +372,93 @@ input:focus, textarea:focus {
 .social-icons a:hover svg {
     color: var(--accent-color);
     transform: translateY(-4px);
+}
+
+/* === GAYA TOMBOL NAVIGASI BARU === */
+.nav-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-muted-color);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.nav-button:hover {
+    color: var(--text-color);
+}
+
+/* === GAYA MODAL (POP-UP) TENTANG SAYA === */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.modal-overlay:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: var(--card-bg-color);
+    padding: var(--space-xl);
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--soft-shadow);
+    text-align: center;
+}
+
+.modal-close {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-md);
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: var(--text-muted-color);
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.modal-close:hover {
+    color: var(--text-color);
+    transform: rotate(90deg);
+}
+
+.modal-content .section-title {
+    margin-bottom: var(--space-md);
+}
+
+.about-greeting {
+    font-size: var(--font-size-h3);
+    font-family: var(--font-heading);
+    color: var(--accent-color);
+    margin-bottom: var(--space-md);
+}
+
+.modal-content p {
+    color: var(--text-muted-color);
+    line-height: 1.8;
+    margin-bottom: var(--space-md);
 }
