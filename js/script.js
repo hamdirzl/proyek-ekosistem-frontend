@@ -1,9 +1,9 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (dengan Lupa Password & Custom Slug) ==
+// ==   FILE FINAL SCRIPT.JS (dengan Fitur Admin)                 ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi.onrender.com';
 
-console.log(`Ekosistem Digital (Client v11) dimuat! Menghubungi API di: ${API_BASE_URL}`);
+console.log(`Ekosistem Digital (Client v12) dimuat! Menghubungi API di: ${API_BASE_URL}`);
 
 /* === FUNGSI GLOBAL UNTUK CEK STATUS LOGIN === */
 document.addEventListener('DOMContentLoaded', () => {
@@ -141,10 +141,10 @@ if (document.getElementById('login-form')) {
 
 
 // =================================================================
-// ===         LOGIKA UNTUK HALAMAN DASHBOARD                  ===
+// ===         LOGIKA UNTUK HALAMAN DASHBOARD (MOOD)           ===
 // =================================================================
 if (document.getElementById('dashboard-main')) {
-    // ... (kode dashboard tetap sama, tidak perlu diubah)
+    // Kode untuk Mood tracker, bisa ditambahkan di sini
 }
 
 // ==========================================================
@@ -167,26 +167,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalOverlay = document.getElementById('about-modal');
     const modalCloseButton = document.querySelector('.modal-close');
 
-    const openModal = () => {
-        if (modalOverlay) {
-            modalOverlay.classList.remove('hidden');
-        }
-    };
-
-    const closeModal = () => {
-        if (modalOverlay) {
-            modalOverlay.classList.add('hidden');
-        }
-    };
+    const openModal = () => { if (modalOverlay) modalOverlay.classList.remove('hidden'); };
+    const closeModal = () => { if (modalOverlay) modalOverlay.classList.add('hidden'); };
 
     aboutButtons.forEach(button => {
         button.addEventListener('click', (e) => {
-            if (!modalOverlay) {
-                window.location.href = 'index.html#open-about';
-            } else {
-                e.preventDefault();
-                openModal();
-            }
+            if (!modalOverlay) window.location.href = 'index.html#open-about';
+            else { e.preventDefault(); openModal(); }
         });
     });
 
@@ -197,18 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (modalOverlay) {
         modalCloseButton.addEventListener('click', closeModal);
-
-        modalOverlay.addEventListener('click', (event) => {
-            if (event.target === modalOverlay) {
-                closeModal();
-            }
-        });
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) {
-                closeModal();
-            }
-        });
+        modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) closeModal(); });
+        document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); });
     }
 });
 
@@ -216,8 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================================
 // ===         LOGIKA BARU UNTUK LUPA PASSWORD           ===
 // ==========================================================
-
-// Logika untuk halaman forgot-password.html
 const forgotForm = document.getElementById('forgot-form');
 if (forgotForm) {
     forgotForm.addEventListener('submit', async (e) => {
@@ -231,19 +206,12 @@ if (forgotForm) {
         submitButton.disabled = true;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/forgot-password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            });
+            const response = await fetch(`${API_BASE_URL}/api/forgot-password`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
             const data = await response.json();
-            
             if (!response.ok) throw new Error(data.error || 'Terjadi kesalahan');
-            
             messageDiv.textContent = data.message;
             messageDiv.className = 'success';
             forgotForm.reset();
-
         } catch (error) {
             messageDiv.textContent = `Error: ${error.message}`;
             messageDiv.className = 'error';
@@ -253,7 +221,6 @@ if (forgotForm) {
     });
 }
 
-// Logika untuk halaman reset-password.html
 const resetForm = document.getElementById('reset-form');
 if (resetForm) {
     resetForm.addEventListener('submit', async (e) => {
@@ -261,47 +228,127 @@ if (resetForm) {
         const messageDiv = document.getElementById('auth-message');
         const submitButton = resetForm.querySelector('button');
         
-        // Ambil token dari URL
         const token = new URLSearchParams(window.location.search).get('token');
         const password = document.getElementById('reset-password').value;
         const confirmPassword = document.getElementById('confirm-password').value;
 
-        if (!token) {
-            messageDiv.textContent = 'Error: Token tidak ditemukan.';
-            messageDiv.className = 'error';
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            messageDiv.textContent = 'Error: Password dan konfirmasi password tidak cocok.';
-            messageDiv.className = 'error';
-            return;
-        }
+        if (!token) { messageDiv.textContent = 'Error: Token tidak ditemukan.'; messageDiv.className = 'error'; return; }
+        if (password !== confirmPassword) { messageDiv.textContent = 'Error: Password dan konfirmasi password tidak cocok.'; messageDiv.className = 'error'; return; }
 
         messageDiv.textContent = 'Memproses...';
         messageDiv.className = '';
         submitButton.disabled = true;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/reset-password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token, password })
-            });
+            const response = await fetch(`${API_BASE_URL}/api/reset-password`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, password }) });
             const data = await response.json();
-
             if (!response.ok) throw new Error(data.error || 'Terjadi kesalahan');
-
             messageDiv.textContent = `${data.message} Anda akan diarahkan ke halaman login...`;
             messageDiv.className = 'success';
-            setTimeout(() => {
-                window.location.href = 'auth.html';
-            }, 3000);
-
+            setTimeout(() => { window.location.href = 'auth.html'; }, 3000);
         } catch (error) {
             messageDiv.textContent = `Error: ${error.message}`;
             messageDiv.className = 'error';
             submitButton.disabled = false;
         }
     });
+}
+
+// ==========================================================
+// ===         LOGIKA BARU UNTUK PANEL ADMIN              ===
+// ==========================================================
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('dashboard-main')) {
+        checkUserRoleAndSetupAdminPanel();
+    }
+});
+
+function decodeJwt(token) {
+    try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
+}
+
+async function checkUserRoleAndSetupAdminPanel() {
+    const token = localStorage.getItem('jwt_token');
+    if (!token) return;
+
+    const decodedToken = decodeJwt(token);
+    
+    if (decodedToken && decodedToken.role === 'admin') {
+        const adminSection = document.getElementById('admin-section');
+        const userEmailElement = document.getElementById('user-email');
+        if (adminSection) {
+            adminSection.classList.remove('hidden');
+            if(userEmailElement) userEmailElement.innerHTML += ' (Admin)';
+            fetchAndDisplayLinks(token);
+        }
+    }
+}
+
+async function fetchAndDisplayLinks(token) {
+    const linkList = document.getElementById('link-list');
+    const loadingMessage = document.getElementById('loading-links');
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/links`, { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!response.ok) throw new Error('Gagal mengambil data link. Pastikan Anda adalah admin.');
+        
+        const links = await response.json();
+        loadingMessage.style.display = 'none';
+        linkList.innerHTML = '';
+
+        if (links.length === 0) {
+            linkList.innerHTML = '<li><p>Belum ada link yang dibuat.</p></li>';
+            return;
+        }
+
+        links.forEach(link => {
+            const listItem = document.createElement('li');
+            listItem.className = 'mood-item';
+            listItem.id = `link-${link.slug}`;
+            listItem.innerHTML = `
+                <div class="mood-item-header">
+                    <span><strong>Slug:</strong> ${link.slug}</span>
+                    <button class="button-pintu delete-link-btn" data-slug="${link.slug}" style="background-color: #ff4d4d; border-color: #ff4d4d; padding: 5px 10px; font-size: 0.9em;">Hapus</button>
+                </div>
+                <p class="mood-notes" style="word-break: break-all;">
+                  <strong>URL Asli:</strong> <a href="${link.original_url}" target="_blank">${link.original_url}</a>
+                </p>
+                <small class="mood-date">Dibuat pada: ${new Date(link.created_at).toLocaleString('id-ID')}</small>
+            `;
+            linkList.appendChild(listItem);
+        });
+
+        document.querySelectorAll('.delete-link-btn').forEach(button => {
+            button.addEventListener('click', handleDeleteLink);
+        });
+
+    } catch (error) {
+        loadingMessage.textContent = `Error: ${error.message}`;
+        console.error(error);
+    }
+}
+
+async function handleDeleteLink(event) {
+    const slugToDelete = event.target.dataset.slug;
+    const token = localStorage.getItem('jwt_token');
+
+    if (!confirm(`Anda yakin ingin menghapus link dengan slug "${slugToDelete}"?`)) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/links/${slugToDelete}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Gagal menghapus link.');
+
+        alert(data.message);
+        const listItemToRemove = document.getElementById(`link-${slugToDelete}`);
+        if (listItemToRemove) listItemToRemove.remove();
+
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+        console.error(error);
+    }
 }
