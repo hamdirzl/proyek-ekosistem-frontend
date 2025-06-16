@@ -1,24 +1,35 @@
 /* =================================================================== */
-/* ==           REDESAIN V1: DARK MODE & NEON ACCENT              == */
-/* ==           (DENGAN PERBAIKAN BUG MOBILE INPUT)               == */
+/* ==   V3: REFINEMENT - FLUID TYPOGRAPHY & SPACING SYSTEM        == */
 /* =================================================================== */
 
-/* === PENGATURAN GLOBAL & PALET WARNA BARU (DARK MODE) === */
+/* === PENGATURAN GLOBAL: DESIGN SYSTEM === */
 :root {
-    /* Palet Warna Gelap */
+    /* Palet Warna (Tetap Sama) */
     --background-color: #121212;
     --card-bg-color: #1e1e1e;
     --text-color: #e0e0e0;
     --text-muted-color: #a0a0a0;
     --border-color: #333333;
-    
-    /* Aksen Warna Neon yang Modern */
     --accent-color: #00f5a0;
     --accent-hover: #00d98c;
     
-    /* Font */
+    /* Font (Tetap Sama) */
     --font-heading: 'Poppins', sans-serif;
     --font-body: 'Inter', sans-serif;
+
+    /* [REFINEMENT] Skala Spasi yang Konsisten */
+    --space-xs: 0.5rem;    /* 8px */
+    --space-sm: 1rem;      /* 16px */
+    --space-md: 1.5rem;    /* 24px */
+    --space-lg: 2.5rem;    /* 40px */
+    --space-xl: 4rem;      /* 64px */
+    --space-xxl: 6rem;     /* 96px */
+
+    /* [REFINEMENT] Tipografi Fluid (Ukuran Teks Adaptif) */
+    --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    --font-size-h1:   clamp(2.5rem, 1.5rem + 5vw, 5rem);
+    --font-size-h2:   clamp(2rem, 1.25rem + 3.75vw, 3.5rem);
+    --font-size-h3:   clamp(1.5rem, 1.1rem + 2vw, 2rem);
     
     /* Bayangan */
     --soft-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -33,6 +44,7 @@ body {
     background-color: var(--background-color); 
     color: var(--text-color); 
     line-height: 1.7; 
+    font-size: var(--font-size-base); /* Menggunakan ukuran font dasar yang fluid */
     -webkit-font-smoothing: antialiased; 
     -moz-osx-font-smoothing: grayscale;
     background-image: 
@@ -40,19 +52,17 @@ body {
         radial-gradient(at 80% 80%, hsla(200, 100%, 50%, 0.1) 0px, transparent 50%);
 }
 
-/* === KOMPONEN UMUM: DENGAN SENTUHAN MODERN === */
+/* === KOMPONEN UMUM === */
 
-/* NAVBAR DENGAN EFEK KACA (GLASSMORPHISM) */
 .navbar { 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    padding: 1rem 5%; 
-    position: sticky;  /* Tetap sticky di desktop */
+    padding: var(--space-sm) clamp(var(--space-sm), 5vw, var(--space-xxl)); /* Padding adaptif */
+    position: sticky;
     top: 0; 
     z-index: 1000; 
     transition: background-color 0.3s ease;
-    
     background-color: rgba(30, 30, 30, 0.7);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -70,13 +80,13 @@ body {
 .logo a:hover { color: var(--accent-color); }
 
 .nav-links { list-style: none; display: flex; align-items: center; }
-.nav-links li { margin-left: 2.5rem; }
+.nav-links li { margin-left: var(--space-lg); }
 .nav-links a { 
     text-decoration: none; 
     color: var(--text-muted-color); 
     font-weight: 500; 
     transition: color 0.3s ease, text-shadow 0.3s ease; 
-    padding-bottom: 5px;
+    padding-bottom: var(--space-xs);
     border-bottom: 2px solid transparent;
 }
 .nav-links a:hover { 
@@ -110,18 +120,18 @@ body {
 
 footer { 
     text-align: center; 
-    padding: 3rem; 
-    margin-top: 4rem; 
+    padding: var(--space-xl); 
+    margin-top: var(--space-xl); 
     background-color: var(--card-bg-color);
     color: var(--text-muted-color); 
     border-top: 1px solid var(--border-color); 
 }
 
-/* === HALAMAN UTAMA (HERO & PINTU) === */
+/* === HALAMAN UTAMA === */
 .hero { 
     display: flex; 
     align-items: center; 
-    padding: 6rem 5%; 
+    padding: var(--space-xxl) clamp(var(--space-sm), 5vw, var(--space-xxl));
     min-height: 80vh; 
     color: #ffffff; 
     background: linear-gradient(rgba(18, 18, 18, 0.8), rgba(18, 18, 18, 0.9)), url('https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80') no-repeat center center/cover; 
@@ -129,9 +139,9 @@ footer {
 .hero-content { max-width: 800px; }
 .hero h1 { 
     font-family: var(--font-heading); 
-    font-size: clamp(3rem, 6vw, 5rem);
+    font-size: var(--font-size-h1); /* Fluid */
     font-weight: 700; 
-    margin-bottom: 1rem; 
+    margin-bottom: var(--space-sm); 
     line-height: 1.2; 
     letter-spacing: -1px;
 }
@@ -140,14 +150,14 @@ footer {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-.hero p { font-size: 1.2rem; max-width: 90%; color: var(--text-muted-color); }
+.hero p { font-size: var(--font-size-base); max-width: 90%; color: var(--text-muted-color); }
 
-.pintu-utama { padding: 6rem 5%; text-align: center; }
-.pintu-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; margin-top: 3rem; }
+.pintu-utama { padding: var(--space-xxl) clamp(var(--space-sm), 5vw, var(--space-xxl)); text-align: center; }
+.pintu-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-lg); margin-top: var(--space-xl); }
 
 .pintu { 
     background-color: var(--card-bg-color); 
-    padding: 2.5rem; 
+    padding: var(--space-lg); 
     border-radius: 12px; 
     border: 1px solid var(--border-color); 
     box-shadow: var(--card-shadow);
@@ -162,19 +172,19 @@ footer {
     box-shadow: var(--soft-shadow);
     border-color: var(--accent-color);
 }
-.pintu-icon { margin-bottom: 1.5rem; color: var(--accent-color); }
-.pintu h3 { color: var(--text-color); margin-bottom: 0.75rem; font-size: 1.5rem; }
-.pintu p { color: var(--text-muted-color); flex-grow: 1; margin-bottom: 1.5rem; }
+.pintu-icon { margin-bottom: var(--space-md); color: var(--accent-color); }
+.pintu h3 { font-size: var(--font-size-h3); color: var(--text-color); margin-bottom: var(--space-xs); }
+.pintu p { color: var(--text-muted-color); flex-grow: 1; margin-bottom: var(--space-md); }
 .pintu .button-pintu { margin-top: auto; }
 
-/* === GAYA HALAMAN LAINNYA (PORTOFOLIO, JURNAL, DLL) === */
-.page-container { max-width: 1200px; margin: 5rem auto; padding: 0 2rem; }
-.page-title { text-align: center; font-family: var(--font-heading); font-size: 3rem; color: #ffffff; margin-bottom: 1.5rem; }
-.page-subtitle { text-align: center; font-size: 1.2rem; color: var(--text-muted-color); margin-bottom: 5rem; max-width: 600px; margin-left: auto; margin-right: auto; }
-.section-title { text-align: center; font-family: var(--font-heading); font-size: 2.8rem; color: #ffffff; margin-bottom: 3rem; }
+/* === GAYA HALAMAN LAINNYA === */
+.page-container { max-width: 1200px; margin: var(--space-xxl) auto; padding: 0 var(--space-lg); }
+.page-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h1); color: #ffffff; margin-bottom: var(--space-sm); }
+.page-subtitle { text-align: center; font-size: var(--font-size-base); color: var(--text-muted-color); margin-bottom: var(--space-xl); max-width: 600px; margin-left: auto; margin-right: auto; }
+.section-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h2); color: #ffffff; margin-bottom: var(--space-xl); }
 
-.portfolio-grid, .jurnal-grid { display: grid; gap: 2.5rem; }
-.portfolio-grid { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.portfolio-grid, .jurnal-grid { display: grid; gap: var(--space-lg); }
+.portfolio-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 
 .portfolio-card, .jurnal-card { 
     background: var(--card-bg-color); 
@@ -202,27 +212,27 @@ footer {
     filter: grayscale(0%);
 }
 
-.portfolio-card h3 { padding: 1.5rem 1.5rem 0.5rem 1.5rem; color: #ffffff; }
-.portfolio-card p { padding: 0 1.5rem 1.5rem 1.5rem; color: var(--text-muted-color); flex-grow: 1; }
-.portfolio-card .button-pintu { margin: 0 1.5rem 1.5rem 1.5rem; align-self: flex-start; }
+.portfolio-card h3 { font-size: var(--font-size-h3); padding: var(--space-md) var(--space-md) var(--space-xs) var(--space-md); color: #ffffff; }
+.portfolio-card p { padding: 0 var(--space-md) var(--space-md) var(--space-md); color: var(--text-muted-color); flex-grow: 1; }
+.portfolio-card .button-pintu { margin: 0 var(--space-md) var(--space-md) var(--space-md); align-self: flex-start; }
 
 .jurnal-card { display: block; }
-.jurnal-content { padding: 2.5rem; }
+.jurnal-content { padding: var(--space-lg); }
 
 /* === PERKAKAS & FORMULIR === */
 .tool-section, .dashboard-header, .history-section { 
     background-color: var(--card-bg-color); 
-    padding: 2.5rem; 
+    padding: var(--space-lg); 
     border-radius: 12px; 
-    margin-bottom: 3rem; 
+    margin-bottom: var(--space-lg); 
     border: 1px solid var(--border-color); 
 }
 input[type="url"], input[type="email"], input[type="password"], textarea { 
     width: 100%;
-    padding: 1rem; 
+    padding: var(--space-sm); 
     border: 1px solid var(--border-color); 
     border-radius: 8px; 
-    font-size: 1rem; 
+    font-size: var(--font-size-base); 
     font-family: var(--font-body); 
     background-color: #2a2a2a;
     color: var(--text-color); 
@@ -235,9 +245,9 @@ input:focus, textarea:focus {
 }
 
 .result-box { 
-    margin-top: 1.5rem; 
+    margin-top: var(--space-md); 
     background-color: #2a2a2a; 
-    padding: 1.5rem; 
+    padding: var(--space-md); 
     border-radius: 8px; 
     text-align: center; 
     font-weight: 600; 
@@ -251,48 +261,47 @@ input:focus, textarea:focus {
 .auth-container { 
     max-width: 450px; 
     margin: 0 auto; 
-    padding: 2.5rem; 
+    padding: var(--space-lg); 
     background-color: var(--card-bg-color); 
     border-radius: 12px; 
     border: 1px solid var(--border-color); 
     box-shadow: var(--soft-shadow); 
     text-align: center; 
 }
-.auth-form .form-group { margin-bottom: 1.5rem; text-align: left; }
+.auth-form .form-group { margin-bottom: var(--space-md); text-align: left; }
 .auth-form label { 
     display: block; 
     font-weight: 600; 
     color: var(--text-muted-color); 
-    margin-bottom: 0.75rem; 
+    margin-bottom: var(--space-xs); 
 }
 .auth-form input { text-align: left; }
-.auth-form button { width: 100%; padding: 0.8rem; font-size: 1.05rem; }
-.auth-toggle { color: var(--text-muted-color); font-size: 0.9rem; margin-top: 2rem; }
+.auth-form button { width: 100%; padding: 0.8rem; }
+.auth-toggle { color: var(--text-muted-color); font-size: 0.9rem; margin-top: var(--space-md); }
 .auth-toggle a { color: var(--accent-color); font-weight: 600; text-decoration: none; }
 
-#auth-message, #mood-message { padding: 1rem; border-radius: 8px; margin-top: 1.5rem; text-align: center;}
+#auth-message, #mood-message { padding: var(--space-sm); border-radius: 8px; margin-top: var(--space-md); text-align: center;}
 #auth-message.success, #mood-message.success { background-color: rgba(0, 245, 160, 0.1); color: var(--accent-color); }
 #auth-message.error, #mood-message.error { background-color: rgba(248, 215, 218, 0.1); color: #f8d7da; }
 
 /* MOOD TRACKER STYLES */
-.mood-options { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
-.mood-options label { cursor: pointer; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; transition: all 0.2s ease; }
+.mood-options { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-bottom: var(--space-sm); }
+.mood-options label { cursor: pointer; padding: var(--space-xs) var(--space-sm); border: 1px solid var(--border-color); border-radius: 8px; transition: all 0.2s ease; }
 .mood-options input[type="radio"] { display: none; }
 .mood-options input[type="radio"]:checked + label { border-color: var(--accent-color); background-color: rgba(0, 245, 160, 0.1); color: var(--text-color); }
 .mood-history-list { list-style: none; padding: 0; }
-.mood-item { background-color: #2a2a2a; padding: 1rem 1.5rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid var(--accent-color); }
-.mood-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; font-weight: bold; }
+.mood-item { background-color: #2a2a2a; padding: var(--space-sm) var(--space-md); border-radius: 8px; margin-bottom: var(--space-sm); border-left: 4px solid var(--accent-color); }
+.mood-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xs); font-weight: bold; }
 .mood-date { font-size: 0.85rem; color: var(--text-muted-color); }
 .mood-notes { color: var(--text-color); font-style: italic; }
 
-/* === HAMBURGER & RESPONSIVE (DISESUAIKAN UNTUK DARK MODE) === */
+/* === HAMBURGER & RESPONSIVE === */
 .hamburger { display: none; background: transparent; border: none; cursor: pointer; padding: 0; z-index: 1001; }
 .hamburger span { background-color: var(--text-color); display: block; width: 25px; height: 3px; margin: 5px 0; border-radius: 3px; transition: all 0.3s ease-in-out; }
 
 @media (max-width: 768px) {
-    /* [PERBAIKAN] Menonaktifkan efek sticky pada navbar di versi mobile untuk mencegah kedip */
     .navbar {
-        position: absolute; /* Mengganti 'sticky'. Ini kuncinya. */
+        position: absolute; 
         width: 100%;
     }
 
@@ -310,7 +319,7 @@ input:focus, textarea:focus {
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border-bottom: 1px solid var(--border-color);
-        padding: 1rem 0; 
+        padding: var(--space-sm) 0; 
         opacity: 0; 
         visibility: hidden; 
         transform: translateY(-10px); 
@@ -320,33 +329,27 @@ input:focus, textarea:focus {
     }
     .nav-links.active { opacity: 1; visibility: visible; transform: translateY(0); }
     .nav-links li { margin: 0; }
-    .nav-links a { display: block; padding: 1rem 5%; font-size: 1rem; border-bottom: none; }
+    .nav-links a { display: block; padding: var(--space-sm) 5%; border-bottom: none; }
     .nav-links a:hover { background-color: rgba(0, 245, 160, 0.1); color: var(--accent-color); }
-    .nav-links a.login-button { margin: 0.5rem 5%; width: auto; text-align: center; }
+    .nav-links a.login-button { margin: var(--space-xs) 5%; width: auto; text-align: center; }
     
     .page-container { 
-        margin: 2rem auto; 
-        padding: 0 1rem;
-        padding-top: 75px; /* [PERBAIKAN] Menambah padding atas karena navbar tidak lagi sticky */
+        padding-top: 75px;
     }
-    .page-title { font-size: 2.2rem; margin-bottom: 1.5rem; }
-    .auth-container { padding: 2rem 1.5rem; }
-    .pintu-utama { padding: 4rem 1rem; }
+
     .hero { 
         text-align: center; 
-        padding: 4rem 1rem; 
-        padding-top: 12rem; /* [PERBAIKAN] Menambah padding atas untuk hero di mobile */
-        min-height: auto; /* [PERBAIKAN] Menghapus min-height vh di mobile */
+        padding-top: 12rem;
+        min-height: auto;
     }
-    .hero h1 { font-size: 2.5rem; }
 }
 
 /* === GAYA IKON SOSIAL DI FOOTER === */
 .social-icons {
     display: flex;
     justify-content: center;
-    gap: 2rem; /* Jarak antar ikon */
-    margin-bottom: 1.5rem; /* Jarak ke teks copyright */
+    gap: var(--space-md); /* Jarak antar ikon */
+    margin-bottom: var(--space-md); /* Jarak ke teks copyright */
 }
 
 .social-icons a svg {
