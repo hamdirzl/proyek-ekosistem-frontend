@@ -58,6 +58,7 @@ body {
     margin-left: 2.5rem;
 }
 
+/* Aturan ini memberi gaya pada link DAN tombol di dalam navigasi */
 .nav-links a, .nav-links button {
     text-decoration: none;
     color: var(--text-color);
@@ -67,6 +68,7 @@ body {
     font-family: var(--font-family);
     background: none;
     border: none;
+    padding: 0; /* Menghapus padding default dari button */
 }
 
 .nav-links a:hover, .nav-links button:hover {
@@ -104,108 +106,26 @@ footer {
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
 }
 
-.hero h1 {
-    font-size: 3.5rem;
-    margin-bottom: 1rem;
-}
-
-.pintu-utama {
-    padding: 4rem 2rem;
-    text-align: center;
-}
-
-.pintu-container {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-}
-
-.pintu {
-    background-color: var(--card-bg-color);
-    padding: 2.5rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    width: 320px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.pintu:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-}
-
-.pintu h3 {
-    color: var(--primary-color);
-    margin-top: 0;
-    margin-bottom: 1rem;
-}
-
-.button-pintu {
-    display: inline-block;
-    margin-top: 1.5rem;
-    text-decoration: none;
-    background-color: var(--secondary-color);
-    color: white;
-    padding: 0.8rem 1.8rem;
-    border-radius: 5px;
-    font-weight: 700;
-    transition: background-color 0.3s ease;
-    border: none;
-    cursor: pointer;
-}
-
-.button-pintu:hover {
-    background-color: var(--primary-color);
-}
+.hero h1 { font-size: 3.5rem; margin-bottom: 1rem; }
+.pintu-utama { padding: 4rem 2rem; text-align: center; }
+.pintu-container { display: flex; justify-content: center; gap: 2rem; margin-top: 2rem; flex-wrap: wrap; }
+.pintu { background-color: var(--card-bg-color); padding: 2.5rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); width: 320px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.pintu:hover { transform: translateY(-10px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+.pintu h3 { color: var(--primary-color); margin-top: 0; margin-bottom: 1rem; }
+.button-pintu { display: inline-block; margin-top: 1.5rem; text-decoration: none; background-color: var(--secondary-color); color: white; padding: 0.8rem 1.8rem; border-radius: 5px; font-weight: 700; transition: background-color 0.3s ease; border: none; cursor: pointer; }
+.button-pintu:hover { background-color: var(--primary-color); }
 
 
 /* === GAYA HALAMAN-HALAMAN LAIN (UMUM) === */
-.page-container {
-    max-width: 1100px;
-    margin: 3rem auto;
-    padding: 0 2rem;
-}
-
-.page-title {
-    text-align: center;
-    font-size: 2.8rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-
-.page-subtitle {
-    text-align: center;
-    font-size: 1.1rem;
-    color: #7f8c8d;
-    margin-bottom: 4rem;
-}
-
-.section-title {
-    text-align: center;
-    font-size: 2rem;
-    color: var(--primary-color);
-    margin-bottom: 2rem;
-}
+.page-container { max-width: 1100px; margin: 3rem auto; padding: 0 2rem; }
+.page-title { text-align: center; font-size: 2.8rem; color: var(--primary-color); margin-bottom: 1rem; }
+.page-subtitle { text-align: center; font-size: 1.1rem; color: #7f8c8d; margin-bottom: 4rem; }
+.section-title { text-align: center; font-size: 2rem; color: var(--primary-color); margin-bottom: 2rem; }
 
 /* === GAYA SPESIFIK KOMPONEN === */
-
 /* Portofolio & Game Card */
-.portfolio-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-}
-.portfolio-card {
-    background: var(--card-bg-color);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    padding-bottom: 1.5rem;
-    text-align: center;
-}
+.portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+.portfolio-card { background: var(--card-bg-color); border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease; padding-bottom: 1.5rem; text-align: center; }
 .portfolio-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
 .portfolio-card img { width: 100%; height: 200px; object-fit: cover; }
 .portfolio-card h3 { color: var(--primary-color); margin: 1.5rem 1rem 0.5rem 1rem; }
@@ -215,7 +135,7 @@ footer {
 .jurnal-grid { display: grid; gap: 2.5rem; }
 .jurnal-card { display: flex; background: var(--card-bg-color); border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: box-shadow 0.3s ease; }
 .jurnal-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
-.jurnal-card img { width: 300px; height: 100%; object-fit: cover; }
+.jurnal-card img { width: 300px; height: auto; object-fit: cover; }
 .jurnal-content { padding: 2rem; }
 .jurnal-content h3 { color: var(--primary-color); margin-top: 0; }
 .post-meta { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 1rem; }
@@ -233,7 +153,7 @@ footer {
 .auth-form input { width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; font-family: var(--font-family); }
 .auth-toggle { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; }
 .auth-toggle a { color: var(--secondary-color); font-weight: 700; text-decoration: none; }
-#auth-message { text-align: center; margin-top: 1.5rem; font-weight: 700; padding: 1rem; border-radius: 5px; }
+#auth-message { text-align: center; margin-top: 1.5rem; font-weight: 700; padding: 1rem; border-radius: 5px; word-wrap: break-word; }
 #auth-message.success { background-color: #d4edda; color: #155724; }
 #auth-message.error { background-color: #f8d7da; color: #721c24; }
 
@@ -248,19 +168,15 @@ footer {
 .mood-item { background: var(--card-bg-color); border-left: 5px solid; padding: 1rem 1.5rem; margin-bottom: 1rem; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 .mood-item-header { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
 .mood-date { font-size: 0.85rem; color: #7f8c8d; }
-.mood-notes { margin-top: 0.5rem; }
-.mood-item.level-5 { border-color: #2ecc71; } /* Hijau */
-.mood-item.level-4 { border-color: #3498db; } /* Biru */
-.mood-item.level-3 { border-color: #f1c40f; } /* Kuning */
-.mood-item.level-2 { border-color: #e67e22; } /* Oranye */
-.mood-item.level-1 { border-color: #e74c3c; } /* Merah */
-
+.mood-notes { margin-top: 0.5rem; word-wrap: break-word; }
+.mood-item.level-5 { border-color: #2ecc71; }
+.mood-item.level-4 { border-color: #3498db; }
+.mood-item.level-3 { border-color: #f1c40f; }
+.mood-item.level-2 { border-color: #e67e22; }
+.mood-item.level-1 { border-color: #e74c3c; }
 
 /* === KELAS UTILITAS === */
-.hidden {
-    display: none !important;
-}
-
+.hidden { display: none !important; }
 
 /* === RESPONSIVITAS (UNTUK MOBILE) === */
 @media (max-width: 768px) {
