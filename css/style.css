@@ -149,13 +149,18 @@ input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus
 .mood-item.level-1 { border-color: #e74c3c; }
 
 
-/* === 🍔 GAYA UNTUK MENU HAMBURGER MOBILE (BARU) === */
+/* =================================================================== */
+/* ===         V4: REVISI MENU MOBILE PROFESIONAL              === */
+/* =================================================================== */
+
+/* === 🍔 GAYA UNTUK MENU HAMBURGER MOBILE === */
 .hamburger {
     display: none; /* Sembunyi di desktop */
     background: transparent;
     border: none;
     cursor: pointer;
     padding: 0;
+    z-index: 1001; /* Pastikan selalu di atas */
 }
 .hamburger span {
     display: block;
@@ -166,7 +171,9 @@ input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus
     border-radius: 3px;
     transition: all 0.3s ease-in-out;
 }
-.nav-close-button { display: none; } /* Sembunyikan tombol close di desktop */
+.nav-close-button { 
+    display: none; 
+}
 
 
 /* === 📱 ATURAN RESPONSIVE BARU UNTUK MOBILE === */
@@ -174,9 +181,88 @@ input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus
     /* Tampilkan tombol hamburger */
     .hamburger {
         display: block;
-        z-index: 1001; /* Pastikan di atas overlay */
     }
     
+    /* === DESAIN BARU UNTUK PANEL MENU === */
+    .nav-links {
+        /* TIDAK LAGI FULL SCREEN, tapi panel dari kanan */
+        position: fixed;
+        top: 0;
+        right: 0; /* Mulai dari kanan */
+        
+        /* LEBIH RAMPING */
+        width: 80%; 
+        max-width: 320px;
+        height: 100vh;
+        
+        /* KONTEN MULAI DARI ATAS & RAPI DI KIRI */
+        background-color: var(--card-bg-color);
+        flex-direction: column;
+        justify-content: flex-start; /* Mulai dari atas */
+        align-items: flex-start; /* Rata kiri */
+        padding: 6rem 2rem 2rem 2.5rem; /* Padding internal */
+
+        /* EFEK VISUAL */
+        box-shadow: -5px 0 25px rgba(0,0,0,0.2); /* Shadow di sisi kiri panel */
+        transform: translateX(100%); /* Sembunyi di luar layar kanan */
+        transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1); /* Transisi lebih halus */
+        z-index: 1000;
+    }
+    
+    /* State aktif saat menu terbuka */
+    .nav-links.nav-active {
+        transform: translateX(0); /* Geser ke dalam layar */
+    }
+
+    .nav-links li {
+        margin: 0;
+        margin-bottom: 1.5rem; /* Jarak antar link */
+        width: 100%; /* Agar link memenuhi lebar panel */
+    }
+    
+    .nav-links a {
+        /* FONT LEBIH KECIL DAN RAPI */
+        font-size: 1.2rem; /* Ukuran font lebih pas */
+        font-weight: 500;
+        padding: 0.5rem 0;
+        display: block; /* Agar bisa di-klik di seluruh area */
+    }
+
+    /* Atur ulang tombol login agar lebih pas */
+    .nav-links .login-button {
+        margin-top: 1rem;
+        text-align: center;
+        width: 100%;
+    }
+    
+    /* Tombol close di mobile */
+    .nav-close-button {
+        display: block;
+        position: absolute;
+        top: 1.5rem; /* Posisi lebih pas */
+        right: 1.5rem;
+    }
+    .nav-close-button button {
+        background: none;
+        border: none;
+        color: var(--text-muted-color);
+        font-size: 2.2rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+    .nav-close-button button:hover {
+        color: var(--text-color);
+    }
+
+    /* Perbaikan layout lainnya yang sudah ada */
+    .hero { text-align: center; padding: 4rem 5%;}
+    .hero h1 { font-size: 2.5rem; }
+    .hero-content { margin: auto; }
+    .pintu-container, .portfolio-grid { grid-template-columns: 1fr; }
+    .url-shortener-box form { flex-direction: column; }
+    .page-title { font-size: 2.5rem; }
+    .section-title { font-size: 2rem; }
+}
     /* Atur menu navigasi untuk mobile */
     .nav-links {
         position: fixed;
