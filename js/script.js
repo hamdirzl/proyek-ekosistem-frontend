@@ -1,5 +1,5 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (dengan Lupa Password)               ==
+// ==   FILE FINAL SCRIPT.JS (dengan Lupa Password & Custom Slug) ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi.onrender.com';
 
@@ -36,24 +36,32 @@ document.addEventListener('DOMContentLoaded', () => {
 const shortenerForm = document.getElementById('shortener-form');
 if (shortenerForm) {
     const longUrlInput = document.getElementById('long-url');
+    const customSlugInput = document.getElementById('custom-slug');
     const resultBox = document.getElementById('result');
+
     shortenerForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const originalUrl = longUrlInput.value;
+        const customSlug = customSlugInput.value;
         resultBox.textContent = 'Memproses...';
+
         try {
             const response = await fetch(`${API_BASE_URL}/api/shorten`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ original_url: originalUrl }),
+                body: JSON.stringify({
+                    original_url: originalUrl,
+                    custom_slug: customSlug
+                }),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Gagal mengambil data');
             resultBox.textContent = `Link pendek Anda: ${data.short_url}`;
             longUrlInput.value = '';
+            customSlugInput.value = '';
         } catch (error) {
             console.error('Terjadi Error:', error);
-            resultBox.textContent = 'Gagal terhubung ke server: ' + error.message;
+            resultBox.textContent = 'Gagal: ' + error.message;
         }
     });
 }
