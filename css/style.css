@@ -1,25 +1,26 @@
 /* =================================================================== */
 /* ==           REDESAIN V1: DARK MODE & NEON ACCENT              == */
+/* ==           (DENGAN PERBAIKAN BUG MOBILE INPUT)               == */
 /* =================================================================== */
 
 /* === PENGATURAN GLOBAL & PALET WARNA BARU (DARK MODE) === */
 :root {
     /* Palet Warna Gelap */
-    --background-color: #121212; /* Latar belakang utama yang sangat gelap */
-    --card-bg-color: #1e1e1e;    /* Warna kartu yang sedikit lebih terang */
-    --text-color: #e0e0e0;       /* Teks utama (putih pudar) */
-    --text-muted-color: #a0a0a0;  /* Teks sekunder (abu-abu) */
-    --border-color: #333333;     /* Warna batas/pemisah yang halus */
+    --background-color: #121212;
+    --card-bg-color: #1e1e1e;
+    --text-color: #e0e0e0;
+    --text-muted-color: #a0a0a0;
+    --border-color: #333333;
     
     /* Aksen Warna Neon yang Modern */
     --accent-color: #00f5a0;
     --accent-hover: #00d98c;
     
-    /* Font tetap sama, sudah bagus! */
+    /* Font */
     --font-heading: 'Poppins', sans-serif;
     --font-body: 'Inter', sans-serif;
     
-    /* Bayangan yang lebih halus untuk kedalaman */
+    /* Bayangan */
     --soft-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
@@ -34,7 +35,6 @@ body {
     line-height: 1.7; 
     -webkit-font-smoothing: antialiased; 
     -moz-osx-font-smoothing: grayscale;
-    /* EFEK LATAR BELAKANG AURORA (SUBTLE) */
     background-image: 
         radial-gradient(at 20% 20%, hsla(160, 100%, 48%, 0.1) 0px, transparent 50%),
         radial-gradient(at 80% 80%, hsla(200, 100%, 50%, 0.1) 0px, transparent 50%);
@@ -48,14 +48,13 @@ body {
     justify-content: space-between; 
     align-items: center; 
     padding: 1rem 5%; 
-    position: sticky; 
+    position: sticky;  /* Tetap sticky di desktop */
     top: 0; 
     z-index: 1000; 
     transition: background-color 0.3s ease;
     
-    /* Efek Kaca */
-    background-color: rgba(30, 30, 30, 0.7); /* Warna semi-transparan */
-    backdrop-filter: blur(10px); /* Efek blur pada konten di belakangnya */
+    background-color: rgba(30, 30, 30, 0.7);
+    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -65,7 +64,7 @@ body {
     font-size: 1.8rem; 
     font-weight: 700; 
     text-decoration: none; 
-    color: #ffffff; /* Logo lebih menonjol */
+    color: #ffffff;
     transition: color 0.3s ease; 
 }
 .logo a:hover { color: var(--accent-color); }
@@ -85,15 +84,14 @@ body {
     border-bottom-color: var(--accent-color);
 }
 
-/* Tombol dengan gaya baru */
 .button-pintu, .login-button { 
     display: inline-block; 
     background: var(--accent-color); 
-    color: #000000; /* Teks hitam agar kontras dengan hijau neon */
+    color: #000000;
     padding: 0.7rem 1.6rem; 
     border: 2px solid var(--accent-color); 
-    border-radius: 8px; /* Sedikit lebih bulat */
-    font-weight: 700; /* Lebih tebal */
+    border-radius: 8px;
+    font-weight: 700;
     font-family: var(--font-heading); 
     text-decoration: none; 
     transition: all 0.3s ease; 
@@ -131,14 +129,13 @@ footer {
 .hero-content { max-width: 800px; }
 .hero h1 { 
     font-family: var(--font-heading); 
-    font-size: clamp(3rem, 6vw, 5rem); /* Lebih besar dan responsif */
+    font-size: clamp(3rem, 6vw, 5rem);
     font-weight: 700; 
     margin-bottom: 1rem; 
     line-height: 1.2; 
-    letter-spacing: -1px; /* Spasi antar huruf sedikit dirapatkan */
+    letter-spacing: -1px;
 }
 .hero h1 span { 
-    /* Efek gradien pada teks */
     background: linear-gradient(45deg, var(--accent-color), #00c4ff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -148,7 +145,6 @@ footer {
 .pintu-utama { padding: 6rem 5%; text-align: center; }
 .pintu-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; margin-top: 3rem; }
 
-/* Desain Kartu (Pintu) yang Baru */
 .pintu { 
     background-color: var(--card-bg-color); 
     padding: 2.5rem; 
@@ -199,7 +195,7 @@ footer {
     height: 220px; 
     object-fit: cover; 
     transition: transform 0.4s ease, filter 0.4s ease; 
-    filter: grayscale(30%); /* Sedikit desaturasi untuk kesan artistik */
+    filter: grayscale(30%);
 }
 .portfolio-card:hover img, .jurnal-card:hover img { 
     transform: scale(1.05); 
@@ -209,7 +205,6 @@ footer {
 .portfolio-card h3 { padding: 1.5rem 1.5rem 0.5rem 1.5rem; color: #ffffff; }
 .portfolio-card p { padding: 0 1.5rem 1.5rem 1.5rem; color: var(--text-muted-color); flex-grow: 1; }
 .portfolio-card .button-pintu { margin: 0 1.5rem 1.5rem 1.5rem; align-self: flex-start; }
-
 
 .jurnal-card { display: block; }
 .jurnal-content { padding: 2.5rem; }
@@ -229,7 +224,7 @@ input[type="url"], input[type="email"], input[type="password"], textarea {
     border-radius: 8px; 
     font-size: 1rem; 
     font-family: var(--font-body); 
-    background-color: #2a2a2a; /* Latar input sedikit beda */
+    background-color: #2a2a2a;
     color: var(--text-color); 
     transition: border-color 0.3s ease, box-shadow 0.3s ease; 
 }
@@ -295,6 +290,12 @@ input:focus, textarea:focus {
 .hamburger span { background-color: var(--text-color); display: block; width: 25px; height: 3px; margin: 5px 0; border-radius: 3px; transition: all 0.3s ease-in-out; }
 
 @media (max-width: 768px) {
+    /* [PERBAIKAN] Menonaktifkan efek sticky pada navbar di versi mobile untuk mencegah kedip */
+    .navbar {
+        position: absolute; /* Mengganti 'sticky'. Ini kuncinya. */
+        width: 100%;
+    }
+
     .hamburger { display: block; }
     .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .hamburger.active span:nth-child(2) { opacity: 0; }
@@ -323,11 +324,20 @@ input:focus, textarea:focus {
     .nav-links a:hover { background-color: rgba(0, 245, 160, 0.1); color: var(--accent-color); }
     .nav-links a.login-button { margin: 0.5rem 5%; width: auto; text-align: center; }
     
-    .page-container { margin: 2rem auto; padding: 0 1rem; }
+    .page-container { 
+        margin: 2rem auto; 
+        padding: 0 1rem;
+        padding-top: 75px; /* [PERBAIKAN] Menambah padding atas karena navbar tidak lagi sticky */
+    }
     .page-title { font-size: 2.2rem; margin-bottom: 1.5rem; }
     .auth-container { padding: 2rem 1.5rem; }
     .pintu-utama { padding: 4rem 1rem; }
-    .hero { text-align: center; padding: 4rem 1rem; }
+    .hero { 
+        text-align: center; 
+        padding: 4rem 1rem; 
+        padding-top: 12rem; /* [PERBAIKAN] Menambah padding atas untuk hero di mobile */
+        min-height: auto; /* [PERBAIKAN] Menghapus min-height vh di mobile */
+    }
     .hero h1 { font-size: 2.5rem; }
 }
 
