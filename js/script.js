@@ -39,7 +39,7 @@ if (shortenerForm) {
 }
 
 // ==========================================================
-// ===         LOGIKA UNTUK HALAMAN AUTENTIKASI           ===
+// ===         LOGIKA UNTUK HALAMAN AUTENTIKASI (REVISI)  ===
 // ==========================================================
 if (document.getElementById('login-form')) {
     const loginSection = document.getElementById('login-section');
@@ -49,20 +49,27 @@ if (document.getElementById('login-form')) {
     const showRegisterLink = document.getElementById('show-register');
     const showLoginLink = document.getElementById('show-login');
     const authMessage = document.getElementById('auth-message');
+    const authTitle = document.getElementById('auth-title'); // Ambil elemen judul
+
     showRegisterLink.addEventListener('click', (e) => {
         e.preventDefault();
         loginSection.classList.add('hidden');
         registerSection.classList.remove('hidden');
+        authTitle.textContent = 'Registrasi'; // Ubah judul
         authMessage.textContent = '';
         authMessage.className = '';
     });
+
     showLoginLink.addEventListener('click', (e) => {
         e.preventDefault();
         registerSection.classList.add('hidden');
         loginSection.classList.remove('hidden');
+        authTitle.textContent = 'Login'; // Ubah judul
         authMessage.textContent = '';
         authMessage.className = '';
     });
+    
+    // ... sisa kode untuk submit form (login & register) tetap sama ...
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('register-email').value;
@@ -105,7 +112,6 @@ if (document.getElementById('login-form')) {
         }
     });
 }
-
 // ==========================================================
 // ===         LOGIKA UNTUK HALAMAN DASHBOARD             ===
 // ==========================================================

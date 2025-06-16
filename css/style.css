@@ -1,8 +1,8 @@
 /* =================================================================== */
-/* ==       V5: EXECUTIVE MINIMALIST DENGAN MENU DROPDOWN         == */
+/* ==       V6: FINAL DENGAN PERBAIKAN HALAMAN LOGIN              == */
 /* =================================================================== */
 
-/* === PENGATURAN GLOBAL (TETAP SAMA) === */
+/* === PENGATURAN GLOBAL === */
 :root {
     --background-color: #1A1D22;
     --card-bg-color: #242830;
@@ -19,7 +19,7 @@
 html { scroll-behavior: smooth; }
 body { font-family: var(--font-body); background-color: var(--background-color); color: var(--text-color); line-height: 1.7; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
-/* === KOMPONEN UMUM (TETAP SAMA) === */
+/* === KOMPONEN UMUM === */
 .navbar { display: flex; justify-content: space-between; align-items: center; background-color: var(--card-bg-color); padding: 1rem 5%; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 .logo a { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; text-decoration: none; color: var(--text-color); transition: color 0.3s ease; }
 .logo a:hover { color: var(--accent-color); }
@@ -32,7 +32,7 @@ body { font-family: var(--font-body); background-color: var(--background-color);
 .button-pintu:hover, .login-button:hover { background-color: var(--accent-hover); transform: translateY(-3px); box-shadow: var(--soft-shadow); }
 footer { text-align: center; padding: 3rem; margin-top: 4rem; background-color: var(--card-bg-color); color: var(--text-muted-color); border-top: 1px solid var(--border-color); }
 
-/* === SEMUA GAYA HALAMAN LAIN (TETAP SAMA) === */
+/* === GAYA HALAMAN LAINNYA === */
 .hero { display: flex; align-items: center; padding: 6rem 5%; min-height: 80vh; background: linear-gradient(rgba(26, 29, 34, 0.75), rgba(26, 29, 34, 0.95)), url('../assets/images/bg1.jpg') no-repeat center center/cover; }
 .hero-content { max-width: 750px; }
 .hero h1 { font-family: var(--font-heading); font-size: clamp(2.8rem, 5vw, 4.8rem); font-weight: 700; margin-bottom: 1rem; line-height: 1.2; }
@@ -45,7 +45,7 @@ footer { text-align: center; padding: 3rem; margin-top: 4rem; background-color: 
 .pintu h3 { font-family: var(--font-heading); color: var(--text-color); margin-bottom: 1rem; font-size: 1.5rem; }
 .pintu .button-pintu { margin-top: 1.5rem; }
 .page-container { max-width: 1200px; margin: 4rem auto; padding: 0 2rem; }
-.page-title { text-align: center; font-family: var(--font-heading); font-size: 3.5rem; color: var(--text-color); margin-bottom: 1rem; }
+.page-title { text-align: center; font-family: var(--font-heading); font-size: 2.8rem; color: var(--text-color); margin-bottom: 2rem; }
 .page-title span { color: var(--accent-color); }
 .page-subtitle { text-align: center; font-size: 1.1rem; color: var(--text-muted-color); margin-bottom: 5rem; max-width: 600px; margin-left: auto; margin-right: auto; }
 .section-title { text-align: center; font-family: var(--font-heading); font-size: 2.5rem; color: var(--text-color); margin-bottom: 3rem; }
@@ -64,22 +64,12 @@ footer { text-align: center; padding: 3rem; margin-top: 4rem; background-color: 
 .jurnal-content h3 { font-family: var(--font-heading); color: var(--text-color); margin-top: 0; font-size: 1.8rem; }
 .post-meta { font-size: 0.9rem; color: var(--text-muted-color); margin-bottom: 1rem; }
 .jurnal-content p { color: var(--text-muted-color); margin-bottom: 1.5rem; }
-@media (min-width: 768px) { .jurnal-card { grid-template-columns: 300px 1fr; } .jurnal-card img { height: 100%; } }
-.tool-section, .auth-container, .dashboard-header, .history-section { background: var(--card-bg-color); padding: 2.5rem; border-radius: 10px; margin-bottom: 3rem; border: 1px solid var(--border-color); }
+.tool-section, .dashboard-header, .history-section { background: var(--card-bg-color); padding: 2.5rem; border-radius: 10px; margin-bottom: 3rem; border: 1px solid var(--border-color); }
 .url-shortener-box form { display: flex; gap: 1rem; }
 input[type="url"], input[type="email"], input[type="password"], #mood-notes { flex-grow: 1; padding: 1rem; border: 1px solid var(--border-color); border-radius: 5px; font-size: 1rem; font-family: var(--font-body); background-color: var(--background-color); color: var(--text-color); transition: border-color 0.3s ease, box-shadow 0.3s ease; }
 input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus, #mood-notes:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.2); }
 .result-box { margin-top: 1.5rem; background: var(--background-color); padding: 1.5rem; border-radius: 5px; border: 1px solid var(--border-color); text-align: center; font-weight: 600; color: var(--accent-color); word-break: break-all; }
-.auth-container { max-width: 480px; margin: 4rem auto; }
-.auth-form .form-group { margin-bottom: 1.5rem; }
-.auth-form label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-muted-color); }
-.auth-form button { width: 100%; }
-.auth-toggle { text-align: center; margin-top: 1.5rem; color: var(--text-muted-color); }
-.auth-toggle a { color: var(--accent-color); font-weight: 600; text-decoration: none; }
 .hidden { display: none; }
-#auth-message { text-align: center; margin-top: 1.5rem; font-weight: 600; padding: 1rem; border-radius: 5px; }
-#auth-message.success { background-color: rgba(79, 195, 247, 0.1); color: var(--accent-color); }
-#auth-message.error { background-color: rgba(231, 76, 60, 0.1); color: #e74c3c; }
 .dashboard-header { text-align: center; }
 #logout-button { border: none; cursor: pointer; }
 .mood-options { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
@@ -92,108 +82,47 @@ input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus
 .mood-item-header { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
 .mood-date { font-size: 0.85rem; color: var(--text-muted-color); }
 .mood-notes { margin-top: 0.5rem; color: var(--text-muted-color); }
-.mood-item.level-5 { border-color: #2ecc71; }
-.mood-item.level-4 { border-color: #3498db; }
-.mood-item.level-3 { border-color: #f1c40f; }
-.mood-item.level-2 { border-color: #e67e22; }
-.mood-item.level-1 { border-color: #e74c3c; }
+.mood-item.level-5 { border-color: #2ecc71; } .mood-item.level-4 { border-color: #3498db; } .mood-item.level-3 { border-color: #f1c40f; } .mood-item.level-2 { border-color: #e67e22; } .mood-item.level-1 { border-color: #e74c3c; }
 
-
-/* === 🍔 GAYA UNTUK IKON HAMBURGER (TETAP SAMA) === */
-.hamburger {
-    display: none;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    z-index: 1001;
+/* === GAYA HALAMAN AUTENTIKASI (REVISI) === */
+.auth-container {
+    max-width: 450px;
+    margin: 0 auto; /* Margin atas diatur oleh .page-container dan .page-title */
+    padding: 2.5rem;
+    background-color: var(--card-bg-color);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
 }
-.hamburger span {
-    display: block;
-    width: 25px;
-    height: 3px;
-    background-color: var(--text-color);
-    margin: 5px 0;
-    border-radius: 3px;
-    transition: all 0.3s ease-in-out;
-}
+.auth-form .form-group { margin-bottom: 1.5rem; }
+.auth-form label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-muted-color); }
+.auth-form button { width: 100%; }
+.auth-toggle { text-align: center; margin-top: 1.5rem; color: var(--text-muted-color); font-size: 0.95rem; }
+.auth-toggle a { color: var(--accent-color); font-weight: 600; text-decoration: none; }
+#auth-message { text-align: center; margin-top: 1.5rem; font-weight: 600; padding: 1rem; border-radius: 5px; }
+#auth-message.success { background-color: rgba(79, 195, 247, 0.1); color: var(--accent-color); }
+#auth-message.error { background-color: rgba(231, 76, 60, 0.1); color: #e74c3c; }
 
-/* === 📱 ATURAN RESPONSIVE BARU (DROPDOWN & ANIMASI IKON) === */
+/* === GAYA MENU HAMBURGER & RESPONSIVE === */
+.hamburger { display: none; background: transparent; border: none; cursor: pointer; padding: 0; z-index: 1001; }
+.hamburger span { display: block; width: 25px; height: 3px; background-color: var(--text-color); margin: 5px 0; border-radius: 3px; transition: all 0.3s ease-in-out; }
+
 @media (max-width: 768px) {
-    /* Tampilkan ikon hamburger */
-    .hamburger {
-        display: block;
-    }
-    
-    /* ANIMASI IKON HAMBURGER MENJADI X */
-    .hamburger.active span:nth-child(1) {
-        transform: translateY(8px) rotate(45deg);
-    }
-    .hamburger.active span:nth-child(2) {
-        opacity: 0;
-    }
-    .hamburger.active span:nth-child(3) {
-        transform: translateY(-8px) rotate(-45deg);
-    }
-
-    /* === DESAIN BARU: MENU DROPDOWN === */
-    .nav-links {
-        /* Muncul tepat di bawah navbar */
-        position: absolute;
-        top: 100%; /* Posisi persis di bawah parent (.navbar) */
-        left: 0;
-        width: 100%;
-        
-        /* Layout dan Tampilan */
-        background-color: var(--card-bg-color);
-        border-bottom: 1px solid var(--border-color);
-        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-        padding: 1rem 0; /* Padding atas dan bawah */
-
-        /* Sembunyikan secara default */
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-10px); /* Efek turun sedikit */
-        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
-        
-        /* Reset dari gaya desktop */
-        flex-direction: column;
-        align-items: stretch; /* Memenuhi lebar */
-    }
-    
-    /* State aktif saat menu terbuka */
-    .nav-links.active {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-
-    .nav-links li {
-        margin: 0;
-        width: 100%;
-    }
-    
-    .nav-links a {
-        display: block;
-        padding: 1rem 5%; /* Padding sama dengan padding navbar */
-        font-size: 1rem; /* Ukuran font lebih standar */
-        font-weight: 500;
-        width: 100%;
-    }
-
-    /* Atur ulang tombol login */
-    .nav-links a.login-button {
-        margin: 0.5rem 5%; /* Beri margin */
-        width: 90%; /* Tidak 100% agar ada padding */
-        text-align: center;
-    }
-    
-    /* Perbaikan layout lainnya yang sudah ada */
+    .hamburger { display: block; }
+    .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+    .nav-links { position: absolute; top: 100%; left: 0; width: 100%; background-color: var(--card-bg-color); border-bottom: 1px solid var(--border-color); box-shadow: 0 10px 15px rgba(0,0,0,0.1); padding: 1rem 0; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s; flex-direction: column; align-items: stretch; }
+    .nav-links.active { opacity: 1; visibility: visible; transform: translateY(0); }
+    .nav-links li { margin: 0; width: 100%; }
+    .nav-links a { display: block; padding: 1rem 5%; font-size: 1rem; font-weight: 500; width: 100%; }
+    .nav-links a.login-button { margin: 0.5rem 5%; width: 90%; text-align: center; }
     .hero { text-align: center; padding: 4rem 5%; }
     .hero h1 { font-size: 2.5rem; }
     .hero-content { margin: auto; }
+    .page-container { margin: 2rem auto; } /* Kurangi margin di mobile */
+    .page-title { font-size: 2.2rem; margin-bottom: 1.5rem; }
+    .auth-container { padding: 2rem; }
     .pintu-container, .portfolio-grid { grid-template-columns: 1fr; }
     .url-shortener-box form { flex-direction: column; }
-    .page-title { font-size: 2.5rem; }
     .section-title { font-size: 2rem; }
 }
