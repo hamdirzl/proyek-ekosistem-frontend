@@ -1,5 +1,5 @@
 /* =================================================================== */
-/* ==   V7.2: FINAL HEADER FIX                                    == */
+/* ==   V7.2: FINAL DASHBOARD FIX                                    == */
 /* =================================================================== */
 
 /* === PENGATURAN GLOBAL: DESIGN SYSTEM === */
@@ -53,8 +53,6 @@ body {
     background-image: 
         radial-gradient(at 20% 20%, hsla(160, 100%, 48%, 0.1) 0px, transparent 50%),
         radial-gradient(at 80% 80%, hsla(200, 100%, 50%, 0.1) 0px, transparent 50%);
-    
-    /* [PERBAIKAN UTAMA] Memberi ruang di atas untuk header */
     padding-top: var(--navbar-height);
 }
 
@@ -247,7 +245,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-color); 
 #auth-message.error, #mood-message.error { background-color: rgba(248, 215, 218, 0.1); color: #f8d7da; }
 
 /* ============================================= */
-/* ==   GAYA BARU UNTUK HALAMAN DASBOR        == */
+/* ==   GAYA HALAMAN DASBOR (COMPACT VERSION) == */
 /* ============================================= */
 .dashboard-header {
     background-color: var(--card-bg-color);
@@ -256,8 +254,15 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-color); 
     margin-bottom: var(--space-lg);
     border: 1px solid var(--border-color);
 }
-.dashboard-header h1 { font-size: var(--font-size-h3); margin: 0; }
-.dashboard-header p { color: var(--text-muted-color); margin-top: var(--space-xs); line-height: 1.5; }
+.dashboard-header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+.dashboard-header p {
+    color: var(--text-muted-color);
+    margin-top: var(--space-xs);
+    line-height: 1.5;
+}
 
 .dashboard-grid {
     display: grid;
@@ -272,27 +277,99 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-color); 
     border: 1px solid var(--border-color);
     box-shadow: var(--card-shadow);
 }
-.dashboard-card .card-title { font-size: 1.25rem; font-family: var(--font-heading); margin-top: 0; margin-bottom: var(--space-md); color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-sm); text-align: left; }
-.mood-icon-selector { display: flex; justify-content: space-around; gap: var(--space-xs); margin-bottom: var(--space-md); }
+.dashboard-card .card-title {
+    font-size: 1.1rem;
+    font-family: var(--font-heading);
+    margin-top: 0;
+    margin-bottom: var(--space-md);
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--space-sm);
+    text-align: left;
+}
+
+.mood-icon-selector {
+    display: flex;
+    justify-content: space-around;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
+}
+
 .mood-icon-selector label { cursor: pointer; text-align: center; flex: 1; }
 .mood-icon-selector input[type="radio"] { display: none; }
-.mood-icon-wrapper { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--space-sm) var(--space-xs); border-radius: 8px; transition: all 0.2s ease-in-out; border: 2px solid transparent; }
-.mood-icon { width: 36px; height: 36px; color: var(--accent-color); opacity: 0.6; transition: all 0.2s ease-in-out; }
-.mood-icon-wrapper span { font-size: 0.75rem; color: var(--text-muted-color); font-weight: 500; }
-.mood-icon-selector label:hover .mood-icon-wrapper { background-color: rgba(255, 255, 255, 0.05); }
-.mood-icon-selector label:hover .mood-icon { opacity: 1; transform: scale(1.1); }
-.mood-icon-selector input[type="radio"]:checked + .mood-icon-wrapper { border-color: var(--accent-color); background-color: rgba(0, 245, 160, 0.1); }
-.mood-icon-selector input[type="radio"]:checked + .mood-icon-wrapper .mood-icon { opacity: 1; }
-.mood-icon-selector input[type="radio"]:checked + .mood-icon-wrapper span { color: var(--accent-color); }
-.mood-entry-card .input-label { display: block; font-weight: 500; color: var(--text-muted-color); margin-bottom: var(--space-xs); text-align: left; }
+
+.mood-icon-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    border: 2px solid transparent;
+}
+
+.mood-icon {
+    width: 32px;
+    height: 32px;
+    color: var(--accent-color);
+    opacity: 0.6;
+    transition: all 0.2s ease-in-out;
+}
+
+.mood-icon-wrapper span {
+    font-size: 0.75rem;
+    color: var(--text-muted-color);
+    font-weight: 500;
+}
+
+.mood-icon-selector label:hover .mood-icon-wrapper {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+.mood-icon-selector label:hover .mood-icon {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.mood-icon-selector input[type="radio"]:checked + .mood-icon-wrapper {
+    border-color: var(--accent-color);
+    background-color: rgba(0, 245, 160, 0.1);
+}
+.mood-icon-selector input[type="radio"]:checked + .mood-icon-wrapper .mood-icon {
+    opacity: 1;
+}
+.mood-icon-selector input[type="radio"]:checked + .mood-icon-wrapper span {
+    color: var(--accent-color);
+}
+
+.mood-entry-card .form-group {
+    margin-bottom: var(--space-md);
+}
+
+.mood-entry-card .input-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted-color);
+    margin-bottom: var(--space-xs);
+    text-align: left;
+}
+
 .mood-entry-card .button-pintu { width: 100%; margin-top: var(--space-sm); }
 #mood-history-list { list-style: none; padding: 0; margin: 0; }
-.history-mood-item { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-sm) 0; border-bottom: 1px solid var(--border-color); }
+
+.history-mood-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--border-color);
+}
 .history-mood-item:last-child { border-bottom: none; }
 .history-mood-item .mood-icon { width: 32px; height: 32px; flex-shrink: 0; opacity: 1; }
 .history-mood-item-content { flex-grow: 1; }
 .history-mood-item-content .mood-date { font-weight: 600; color: var(--text-color); font-size: 0.9rem;}
-.history-mood-item-content .mood-notes { font-size: 0.9rem; color: var(--text-muted-color); font-style: italic; margin-top: var(--space-xs); line-height: 1.4; }
+.history-mood-item-content .mood-notes { font-size: 0.9rem; color: var(--text-muted-color); font-style: italic; margin-top: 2px; line-height: 1.4; }
 .history-mood-status { text-align: center; padding: var(--space-lg) 0; color: var(--text-muted-color); font-style: italic; }
 
 /* === HAMBURGER & RESPONSIVE === */
@@ -304,7 +381,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-color); 
         grid-template-columns: 420px 1fr;
     }
     .mood-history-card {
-        max-height: 520px; /* Sesuaikan tinggi maksimum kartu riwayat */
+        max-height: 520px;
         overflow-y: auto;
     }
 }

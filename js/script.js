@@ -1,48 +1,69 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (V3 - Final Dashboard Fix)           ==
+// ==   FILE FINAL SCRIPT.JS (V4 - Robust & Stable)               ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi.onrender.com';
 
-/* === FUNGSI GLOBAL === */
+/* === FUNGSI GLOBAL YANG BERJALAN SAAT HALAMAN LOAD === */
 document.addEventListener('DOMContentLoaded', () => {
-    // Cek status login
-    const token = localStorage.getItem('jwt_token');
-    const loginLink = document.querySelector('a.login-button'); 
-    const logoutButton = document.getElementById('logout-button'); 
+    // --- Logika Umum untuk Semua Halaman ---
+    handleAuthStatus();
+    setupNavbar();
+    setupHamburgerMenu();
+    setupAboutModal();
 
-    if (token) {
-        if(loginLink) {
-            loginLink.textContent = 'Dasbor';
-            loginLink.href = 'dashboard.html';
-        }
-    } else {
-        if (document.body.classList.contains('dashboard-page')) {
-            window.location.href = 'auth.html';
-        }
+    // --- Logika Spesifik per Halaman ---
+    if (document.getElementById('shortener-form')) {
+        setupUrlShortener();
+    }
+    if (document.querySelector('.auth-container')) {
+        setupAuthForms();
+    }
+    if (document.body.classList.contains('dashboard-page')) {
+        setupDashboard();
+    }
+});
+
+/* === KUMPULAN FUNGSI SETUP === */
+
+function handleAuthStatus() {
+    const token = localStorage.getItem('jwt_token');
+    const loginLink = document.querySelector('a.login-button');
+    const logoutButton = document.getElementById('logout-button');
+
+    if (token && loginLink) {
+        loginLink.textContent = 'Dasbor';
+        loginLink.href = 'dashboard.html';
     }
 
-    if(logoutButton) {
+    if (logoutButton) {
         logoutButton.addEventListener('click', () => {
             localStorage.removeItem('jwt_token');
             window.location.href = 'index.html';
         });
     }
 
-    // Logika untuk header transparan
-    const navbar = document.querySelector('.navbar');
-    if (navbar) {
-        const handleScroll = () => {
-            if (window.scrollY > 50) {
-                navbar.classList.add('navbar-scrolled');
-            } else {
-                navbar.classList.remove('navbar-scrolled');
-            }
-        };
-        handleScroll(); // Cek saat load
-        document.addEventListener('scroll', handleScroll);
+    // Redirect jika tidak ada token di halaman yang butuh login
+    if (!token && document.body.classList.contains('dashboard-page')) {
+        window.location.href = 'auth.html';
     }
+}
 
-    // Logika untuk menu hamburger
+function setupNavbar() {
+    const navbar = document.querySelector('.navbar');
+    if (!navbar) return;
+
+    const handleScroll = () => {
+        if (window.scrollY > 50) {
+            navbar.classList.add('navbar-scrolled');
+        } else {
+            navbar.classList.remove('navbar-scrolled');
+        }
+    };
+    handleScroll(); // Cek saat load
+    document.addEventListener('scroll', handleScroll);
+}
+
+function setupHamburgerMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
     if (hamburger && navLinks) {
@@ -51,113 +72,114 @@ document.addEventListener('DOMContentLoaded', () => {
             navLinks.classList.toggle('active');
         });
     }
+}
 
-    // Logika untuk modal "Tentang Saya"
+function setupAboutModal() {
     const aboutButtons = document.querySelectorAll('#about-button');
     const modalOverlay = document.getElementById('about-modal');
-    if(modalOverlay){
-        const modalCloseButton = modalOverlay.querySelector('.modal-close');
-        const openModal = () => modalOverlay.classList.remove('hidden');
-        const closeModal = () => modalOverlay.classList.add('hidden');
-        aboutButtons.forEach(button => button.addEventListener('click', (e) => { e.preventDefault(); openModal(); }));
-        if (modalCloseButton) modalCloseButton.addEventListener('click', closeModal);
-        modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) closeModal(); });
-        document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); });
-    }
-});
+    if (!modalOverlay) return;
+    
+    const modalCloseButton = modalOverlay.querySelector('.modal-close');
+    const openModal = () => modalOverlay.classList.remove('hidden');
+    const closeModal = () => modalOverlay.classList.add('hidden');
+    
+    aboutButtons.forEach(button => button.addEventListener('click', (e) => { e.preventDefault(); openModal(); }));
+    
+    if (modalCloseButton) modalCloseButton.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) closeModal(); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); });
+}
 
-/* === LOGIKA PER HALAMAN === */
-
-// --- Halaman Arena Interaktif ---
-const shortenerForm = document.getElementById('shortener-form');
-if (shortenerForm) {
+function setupUrlShortener() {
+    const shortenerForm = document.getElementById('shortener-form');
     shortenerForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const longUrlInput = document.getElementById('long-url');
         const resultBox = document.getElementById('result');
-        const originalUrl = longUrlInput.value;
         resultBox.textContent = 'Memproses...';
         try {
-            const response = await fetch(`${API_BASE_URL}/api/shorten`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ original_url: originalUrl }),
-            });
+            const response = await fetch(`${API_BASE_URL}/api/shorten`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ original_url: longUrlInput.value }) });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Gagal mengambil data');
-            resultBox.textContent = `Link pendek Anda: ${data.short_url}`;
+            if (!response.ok) throw new Error(data.error || 'Gagal');
+            resultBox.textContent = `Link pendek: ${data.short_url}`;
             longUrlInput.value = '';
         } catch (error) {
-            console.error('Terjadi Error:', error);
-            resultBox.textContent = 'Gagal terhubung ke server: ' + error.message;
+            resultBox.textContent = `Error: ${error.message}`;
         }
     });
 }
 
-// --- Halaman Autentikasi ---
-if (document.getElementById('auth-container')) {
-    const loginSection = document.getElementById('login-section');
-    const registerSection = document.getElementById('register-section');
+function setupAuthForms() {
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
+    const forgotForm = document.getElementById('forgot-form');
+    const resetForm = document.getElementById('reset-form');
+
+    // Toggle Login/Register
     const showRegisterLink = document.getElementById('show-register');
     const showLoginLink = document.getElementById('show-login');
-    const authMessage = document.getElementById('auth-message');
-    const authTitle = document.getElementById('auth-title');
+    if (showRegisterLink && showLoginLink) {
+        const loginSection = document.getElementById('login-section');
+        const registerSection = document.getElementById('register-section');
+        const authTitle = document.getElementById('auth-title');
+        showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); loginSection.classList.add('hidden'); registerSection.classList.remove('hidden'); if (authTitle) authTitle.textContent = 'Registrasi'; });
+        showLoginLink.addEventListener('click', (e) => { e.preventDefault(); registerSection.classList.add('hidden'); loginSection.classList.remove('hidden'); if (authTitle) authTitle.textContent = 'Login'; });
+    }
 
-    if (showRegisterLink) {
-        showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); loginSection.classList.add('hidden'); registerSection.classList.remove('hidden'); if(authTitle) authTitle.textContent = 'Registrasi'; authMessage.textContent = ''; authMessage.className = ''; });
-    }
-    if (showLoginLink) {
-        showLoginLink.addEventListener('click', (e) => { e.preventDefault(); registerSection.classList.add('hidden'); loginSection.classList.remove('hidden'); if(authTitle) authTitle.textContent = 'Login'; authMessage.textContent = ''; authMessage.className = ''; });
-    }
-    if (registerForm) {
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error);
-                authMessage.textContent = 'Registrasi berhasil! Silakan login.';
-                authMessage.className = 'success';
-                if (showLoginLink) showLoginLink.click();
-            } catch (error) {
-                authMessage.textContent = `Error: ${error.message}`;
-                authMessage.className = 'error';
-            }
-        });
-    }
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error);
-                localStorage.setItem('jwt_token', data.token);
-                authMessage.textContent = 'Login berhasil! Mengalihkan ke dashboard...';
-                authMessage.className = 'success';
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
-            } catch (error) {
-                authMessage.textContent = `Error: ${error.message}`;
-                authMessage.className = 'error';
-            }
-        });
-    }
+    // Form Handlers
+    if (loginForm) handleLoginForm(loginForm);
+    if (registerForm) handleRegisterForm(registerForm);
+    if (forgotForm) handleForgotForm(forgotForm);
+    if (resetForm) handleResetForm(resetForm);
 }
 
-// --- Halaman Lupa/Reset Password ---
-const forgotForm = document.getElementById('forgot-form');
-if (forgotForm) {
-    forgotForm.addEventListener('submit', async (e) => {
+function handleLoginForm(form) {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('forgot-email').value;
+        const email = form.elements['login-email'].value;
+        const password = form.elements['login-password'].value;
         const messageDiv = document.getElementById('auth-message');
-        const submitButton = forgotForm.querySelector('button');
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+            localStorage.setItem('jwt_token', data.token);
+            messageDiv.textContent = 'Login berhasil! Mengalihkan...';
+            messageDiv.className = 'success';
+            setTimeout(() => window.location.href = 'dashboard.html', 1000);
+        } catch (error) {
+            messageDiv.textContent = `Error: ${error.message}`;
+            messageDiv.className = 'error';
+        }
+    });
+}
+
+function handleRegisterForm(form) {
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = form.elements['register-email'].value;
+        const password = form.elements['register-password'].value;
+        const messageDiv = document.getElementById('auth-message');
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+            messageDiv.textContent = 'Registrasi berhasil! Silakan login.';
+            messageDiv.className = 'success';
+            document.getElementById('show-login').click();
+        } catch (error) {
+            messageDiv.textContent = `Error: ${error.message}`;
+            messageDiv.className = 'error';
+        }
+    });
+}
+
+function handleForgotForm(form) {
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = form.elements['forgot-email'].value;
+        const messageDiv = document.getElementById('auth-message');
+        const submitButton = form.querySelector('button');
         messageDiv.textContent = 'Memproses...';
         messageDiv.className = '';
         submitButton.disabled = true;
@@ -167,7 +189,7 @@ if (forgotForm) {
             if (!response.ok) throw new Error(data.error || 'Terjadi kesalahan');
             messageDiv.textContent = data.message;
             messageDiv.className = 'success';
-            forgotForm.reset();
+            form.reset();
         } catch (error) {
             messageDiv.textContent = `Error: ${error.message}`;
             messageDiv.className = 'error';
@@ -176,18 +198,18 @@ if (forgotForm) {
         }
     });
 }
-const resetForm = document.getElementById('reset-form');
-if (resetForm) {
-    resetForm.addEventListener('submit', async (e) => {
+
+function handleResetForm(form) {
+     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const messageDiv = document.getElementById('auth-message');
-        const submitButton = resetForm.querySelector('button');
+        const submitButton = form.querySelector('button');
         const token = new URLSearchParams(window.location.search).get('token');
-        const password = document.getElementById('reset-password').value;
-        const confirmPassword = document.getElementById('confirm-password').value;
+        const password = form.elements['reset-password'].value;
+        const confirmPassword = form.elements['confirm-password'].value;
 
         if (!token) { messageDiv.textContent = 'Error: Token tidak ditemukan.'; messageDiv.className = 'error'; return; }
-        if (password !== confirmPassword) { messageDiv.textContent = 'Error: Password dan konfirmasi password tidak cocok.'; messageDiv.className = 'error'; return; }
+        if (password !== confirmPassword) { messageDiv.textContent = 'Error: Password tidak cocok.'; messageDiv.className = 'error'; return; }
 
         messageDiv.textContent = 'Memproses...';
         messageDiv.className = '';
@@ -196,9 +218,9 @@ if (resetForm) {
             const response = await fetch(`${API_BASE_URL}/api/reset-password`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, password }) });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Terjadi kesalahan');
-            messageDiv.textContent = `${data.message} Anda akan diarahkan ke halaman login...`;
+            messageDiv.textContent = `${data.message} Anda akan diarahkan...`;
             messageDiv.className = 'success';
-            setTimeout(() => { window.location.href = 'auth.html'; }, 3000);
+            setTimeout(() => window.location.href = 'auth.html', 3000);
         } catch (error) {
             messageDiv.textContent = `Error: ${error.message}`;
             messageDiv.className = 'error';
@@ -207,8 +229,7 @@ if (resetForm) {
     });
 }
 
-// --- Halaman Dashboard ---
-if (document.getElementById('dashboard-main')) {
+function setupDashboard() {
     const userEmailSpan = document.getElementById('user-email');
     const moodForm = document.getElementById('mood-form');
     const moodHistoryList = document.getElementById('mood-history-list');
@@ -227,23 +248,13 @@ if (document.getElementById('dashboard-main')) {
     };
 
     const displayMoodHistory = async () => {
-        console.log("Mulai mengambil riwayat mood...");
-        if (!token) { console.error("Token tidak ditemukan."); return; }
-        if (!moodHistoryList) { console.error("Elemen moodHistoryList tidak ditemukan."); return; }
-
         moodHistoryList.innerHTML = `<li class="history-mood-status">Memuat riwayat...</li>`;
         try {
             const response = await fetch(`${API_BASE_URL}/api/moods`, { headers: { 'Authorization': `Bearer ${token}` } });
-            console.log("Respon dari server:", response.status, response.statusText);
-
-            if (!response.ok) {
-                 if(response.status === 401 || response.status === 403){ localStorage.removeItem('jwt_token'); window.location.href = 'auth.html'; }
-                 throw new Error(`Server merespon dengan status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`Server merespon dengan status: ${response.status}`);
+            
             const moods = await response.json();
-            console.log("Data mood yang diterima:", moods);
-
-            moodHistoryList.innerHTML = '';
+            moodHistoryList.innerHTML = ''; // Kosongkan list
             if (moods.length === 0) {
                 moodHistoryList.innerHTML = `<li class="history-mood-status">Belum ada riwayat mood.</li>`;
             } else {
@@ -256,8 +267,8 @@ if (document.getElementById('dashboard-main')) {
                 });
             }
         } catch (error) {
-            console.error('Gagal total saat menampilkan riwayat mood:', error);
-            moodHistoryList.innerHTML = `<li class="history-mood-status">Gagal memuat riwayat. Coba refresh halaman.</li>`;
+            console.error('Gagal menampilkan riwayat mood:', error);
+            moodHistoryList.innerHTML = `<li class="history-mood-status">Gagal memuat riwayat.</li>`;
         }
     };
     
