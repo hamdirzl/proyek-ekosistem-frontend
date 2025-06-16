@@ -1,5 +1,5 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (V2 - Dashboard Final)               ==
+// ==   FILE FINAL SCRIPT.JS (V3 - Final Dashboard Fix)           ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi.onrender.com';
 
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loginLink.href = 'dashboard.html';
         }
     } else {
-        if (document.body.matches('body[class*="dashboard-page"]')) { // Asumsi <body> punya class="dashboard-page"
+        if (document.body.classList.contains('dashboard-page')) {
             window.location.href = 'auth.html';
         }
     }
@@ -31,18 +31,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Logika untuk header transparan
     const navbar = document.querySelector('.navbar');
     if (navbar) {
-        // Cek posisi scroll saat load
-        if (window.scrollY > 50) {
-            navbar.classList.add('navbar-scrolled');
-        }
-        // Tambah event listener
-        document.addEventListener('scroll', () => {
+        const handleScroll = () => {
             if (window.scrollY > 50) {
                 navbar.classList.add('navbar-scrolled');
             } else {
                 navbar.classList.remove('navbar-scrolled');
             }
-        });
+        };
+        handleScroll(); // Cek saat load
+        document.addEventListener('scroll', handleScroll);
     }
 
     // Logika untuk menu hamburger
@@ -60,24 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalOverlay = document.getElementById('about-modal');
     if(modalOverlay){
         const modalCloseButton = modalOverlay.querySelector('.modal-close');
-
         const openModal = () => modalOverlay.classList.remove('hidden');
         const closeModal = () => modalOverlay.classList.add('hidden');
-
-        aboutButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                openModal();
-            });
-        });
-
+        aboutButtons.forEach(button => button.addEventListener('click', (e) => { e.preventDefault(); openModal(); }));
         if (modalCloseButton) modalCloseButton.addEventListener('click', closeModal);
-        modalOverlay.addEventListener('click', (event) => {
-            if (event.target === modalOverlay) closeModal();
-        });
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal();
-        });
+        modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) closeModal(); });
+        document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); });
     }
 });
 
@@ -121,24 +106,10 @@ if (document.getElementById('auth-container')) {
     const authTitle = document.getElementById('auth-title');
 
     if (showRegisterLink) {
-        showRegisterLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginSection.classList.add('hidden');
-            registerSection.classList.remove('hidden');
-            if(authTitle) authTitle.textContent = 'Registrasi';
-            authMessage.textContent = '';
-            authMessage.className = '';
-        });
+        showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); loginSection.classList.add('hidden'); registerSection.classList.remove('hidden'); if(authTitle) authTitle.textContent = 'Registrasi'; authMessage.textContent = ''; authMessage.className = ''; });
     }
     if (showLoginLink) {
-        showLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            registerSection.classList.add('hidden');
-            loginSection.classList.remove('hidden');
-            if(authTitle) authTitle.textContent = 'Login';
-            authMessage.textContent = '';
-            authMessage.className = '';
-        });
+        showLoginLink.addEventListener('click', (e) => { e.preventDefault(); registerSection.classList.add('hidden'); loginSection.classList.remove('hidden'); if(authTitle) authTitle.textContent = 'Login'; authMessage.textContent = ''; authMessage.className = ''; });
     }
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
@@ -191,11 +162,7 @@ if (forgotForm) {
         messageDiv.className = '';
         submitButton.disabled = true;
         try {
-            const response = await fetch(`${API_BASE_URL}/api/forgot-password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            });
+            const response = await fetch(`${API_BASE_URL}/api/forgot-password`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Terjadi kesalahan');
             messageDiv.textContent = data.message;
@@ -226,11 +193,7 @@ if (resetForm) {
         messageDiv.className = '';
         submitButton.disabled = true;
         try {
-            const response = await fetch(`${API_BASE_URL}/api/reset-password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token, password })
-            });
+            const response = await fetch(`${API_BASE_URL}/api/reset-password`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, password }) });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Terjadi kesalahan');
             messageDiv.textContent = `${data.message} Anda akan diarahkan ke halaman login...`;
@@ -250,7 +213,6 @@ if (document.getElementById('dashboard-main')) {
     const moodForm = document.getElementById('mood-form');
     const moodHistoryList = document.getElementById('mood-history-list');
     const moodMessage = document.getElementById('mood-message');
-
     const token = localStorage.getItem('jwt_token');
 
     const getMoodIconSVG = (level) => {
@@ -265,56 +227,47 @@ if (document.getElementById('dashboard-main')) {
     };
 
     const displayMoodHistory = async () => {
-        if (!token) return;
-        moodHistoryList.innerHTML = `<li class="history-mood-item-status">Memuat riwayat...</li>`;
+        console.log("Mulai mengambil riwayat mood...");
+        if (!token) { console.error("Token tidak ditemukan."); return; }
+        if (!moodHistoryList) { console.error("Elemen moodHistoryList tidak ditemukan."); return; }
+
+        moodHistoryList.innerHTML = `<li class="history-mood-status">Memuat riwayat...</li>`;
         try {
-            const response = await fetch(`${API_BASE_URL}/api/moods`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetch(`${API_BASE_URL}/api/moods`, { headers: { 'Authorization': `Bearer ${token}` } });
+            console.log("Respon dari server:", response.status, response.statusText);
+
             if (!response.ok) {
-                 if(response.status === 401 || response.status === 403){
-                    localStorage.removeItem('jwt_token');
-                    window.location.href = 'auth.html';
-                 }
-                 throw new Error('Gagal mengambil data dari server.');
+                 if(response.status === 401 || response.status === 403){ localStorage.removeItem('jwt_token'); window.location.href = 'auth.html'; }
+                 throw new Error(`Server merespon dengan status: ${response.status}`);
             }
             const moods = await response.json();
-            moodHistoryList.innerHTML = '';
+            console.log("Data mood yang diterima:", moods);
 
+            moodHistoryList.innerHTML = '';
             if (moods.length === 0) {
-                moodHistoryList.innerHTML = `<li class="history-mood-item-status">Belum ada riwayat mood.</li>`;
+                moodHistoryList.innerHTML = `<li class="history-mood-status">Belum ada riwayat mood.</li>`;
             } else {
                 moods.forEach(mood => {
                     const li = document.createElement('li');
                     li.className = 'history-mood-item';
                     const date = new Date(mood.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
-                    li.innerHTML = `
-                        ${getMoodIconSVG(mood.mood_level)}
-                        <div class="history-mood-item-content">
-                            <div class="mood-date">${date}</div>
-                            ${mood.notes ? `<div class="mood-notes">"${mood.notes}"</div>` : ''}
-                        </div>
-                    `;
+                    li.innerHTML = `${getMoodIconSVG(mood.mood_level)}<div class="history-mood-item-content"><div class="mood-date">${date}</div>${mood.notes ? `<div class="mood-notes">"${mood.notes}"</div>` : ''}</div>`;
                     moodHistoryList.appendChild(li);
                 });
             }
         } catch (error) {
-            console.error('Gagal menampilkan riwayat mood:', error);
-            moodHistoryList.innerHTML = `<li class="history-mood-item-status">Gagal memuat riwayat. Coba refresh halaman.</li>`;
+            console.error('Gagal total saat menampilkan riwayat mood:', error);
+            moodHistoryList.innerHTML = `<li class="history-mood-status">Gagal memuat riwayat. Coba refresh halaman.</li>`;
         }
     };
     
     const fetchProfile = async () => {
         if (!token) return;
         try {
-            const response = await fetch(`${API_BASE_URL}/api/profile`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetch(`${API_BASE_URL}/api/profile`, { headers: { 'Authorization': `Bearer ${token}` } });
             const data = await response.json();
             if (response.ok) userEmailSpan.textContent = data.user.email;
-        } catch (error) {
-            console.error('Gagal mengambil profil:', error);
-        }
+        } catch (error) { console.error('Gagal mengambil profil:', error); }
     };
 
     moodForm.addEventListener('submit', async (e) => {
@@ -323,20 +276,13 @@ if (document.getElementById('dashboard-main')) {
         const notes = document.getElementById('mood-notes').value;
         moodMessage.textContent = '';
         moodMessage.className = '';
-
         try {
-            const response = await fetch(`${API_BASE_URL}/api/moods`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ mood_level, notes })
-            });
+            const response = await fetch(`${API_BASE_URL}/api/moods`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ mood_level, notes }) });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error);
-            
             moodMessage.textContent = 'Mood berhasil disimpan!';
             moodMessage.className = 'success';
             setTimeout(() => moodMessage.textContent = '', 3000);
-
             moodForm.reset();
             displayMoodHistory();
         } catch (error) {
