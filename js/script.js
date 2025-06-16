@@ -192,3 +192,30 @@ if (document.getElementById('dashboard-main')) {
     fetchProfile();
     fetchAndRenderMoods();
 }
+
+// ==========================================================
+// ===         LOGIKA UNTUK MENU HAMBURGER MOBILE         ===
+// ==========================================================
+const hamburger = document.querySelector('.hamburger');
+const navLinks = document.querySelector('.nav-links');
+const closeButton = document.querySelector('.nav-close-button');
+
+if (hamburger && navLinks) {
+    hamburger.addEventListener('click', () => {
+        navLinks.classList.add('nav-active');
+    });
+}
+
+if (closeButton) {
+    closeButton.addEventListener('click', () => {
+        navLinks.classList.remove('nav-active');
+    });
+}
+
+// Menutup menu jika salah satu link diklik (opsional, tapi bagus)
+const links = document.querySelectorAll('.nav-links li a');
+links.forEach(link => {
+    link.addEventListener('click', () => {
+        navLinks.classList.remove('nav-active');
+    });
+});
