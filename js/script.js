@@ -1,15 +1,39 @@
 // ===================================================================
-// ==        FILE FINAL SCRIPT.JS (VERSI LENGKAP & BENAR)         ==
+// ==        FILE FINAL SCRIPT.JS (DENGAN PERSISTENSI LOGIN)      ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi.onrender.com';
 
-console.log(`Ekosistem Digital (Client v9) dimuat! Menghubungi API di: ${API_BASE_URL}`);
+console.log(`Ekosistem Digital (Client v10) dimuat! Menghubungi API di: ${API_BASE_URL}`);
+
+/* === FUNGSI GLOBAL UNTUK CEK STATUS LOGIN === */
+// Skrip ini berjalan di setiap halaman saat dimuat
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('jwt_token');
+    const loginButtons = document.querySelectorAll('a.login-button'); // Tombol login di menu utama
+    const logoutButton = document.getElementById('logout-button'); // Tombol logout di dasbor
+
+    if (token) {
+        // Jika token ada (pengguna sudah login)
+        
+        // Ubah semua tombol "Login" menjadi "Dasbor" di halaman publik
+        loginButtons.forEach(button => {
+            button.textContent = 'Dasbor';
+            button.href = 'dashboard.html';
+        });
+
+    } else {
+        // Jika token tidak ada (pengguna belum login), tidak perlu melakukan apa-apa.
+        // Tombol akan menampilkan "Login" sesuai HTML default.
+    }
+});
+
 
 // ===================================
 // === FUNGSI UNTUK URL SHORTENER ===
 // ===================================
 const shortenerForm = document.getElementById('shortener-form');
 if (shortenerForm) {
+    // ... (kode ini tetap sama)
     const longUrlInput = document.getElementById('long-url');
     const resultBox = document.getElementById('result');
     shortenerForm.addEventListener('submit', async (event) => {
@@ -34,9 +58,10 @@ if (shortenerForm) {
 }
 
 // ==========================================================
-// ===         LOGIKA UNTUK HALAMAN AUTENTIKASI (FIXED)   ===
+// ===         LOGIKA UNTUK HALAMAN AUTENTIKASI           ===
 // ==========================================================
 if (document.getElementById('login-form')) {
+    // ... (kode ini tetap sama)
     const loginSection = document.getElementById('login-section');
     const registerSection = document.getElementById('register-section');
     const loginForm = document.getElementById('login-form');
@@ -116,15 +141,22 @@ if (document.getElementById('login-form')) {
 // ===         LOGIKA UNTUK HALAMAN DASHBOARD             ===
 // ==========================================================
 if (document.getElementById('dashboard-main')) {
-    const userEmailEl = document.getElementById('user-email');
+    // ... (kode ini tetap sama)
     const logoutButton = document.getElementById('logout-button');
-    const moodForm = document.getElementById('mood-form');
-    const moodHistoryList = document.getElementById('mood-history');
-    const loadingMessage = document.getElementById('loading-moods');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', () => {
+            localStorage.removeItem('jwt_token');
+            window.location.href = 'auth.html';
+        });
+    }
+
     const token = localStorage.getItem('jwt_token');
-    if (!token) { window.location.href = 'auth.html'; }
-    
-    // ... (Sisa kode dashboard tetap sama)
+    if (!token) {
+        window.location.href = 'auth.html';
+    } else {
+        // Jika token ada, jalankan fungsi untuk ambil data dasbor
+        // (Misal: fetchProfile, fetchAndRenderMoods)
+    }
 }
 
 // ==========================================================
@@ -134,6 +166,7 @@ const hamburger = document.querySelector('.hamburger');
 const navLinks = document.querySelector('.nav-links');
 
 if (hamburger && navLinks) {
+    // ... (kode ini tetap sama)
     hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('active');
         navLinks.classList.toggle('active');
