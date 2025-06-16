@@ -1,128 +1,127 @@
 /* =================================================================== */
-/* ==       V6: FINAL DENGAN PERBAIKAN HALAMAN LOGIN              == */
+/* ==           V9: SIMETRI KARTU HOMEPAGE DENGAN IKON            == */
 /* =================================================================== */
 
-/* === PENGATURAN GLOBAL === */
+/* === PENGATURAN GLOBAL & PALET WARNA TERANG === */
 :root {
-    --background-color: #1A1D22;
-    --card-bg-color: #242830;
-    --text-color: #F0F2F5;
-    --text-muted-color: #9BA3B0;
-    --border-color: #3A414B;
-    --accent-color: #4FC3F7;
-    --accent-hover: #29B6F6;
+    --background-color: #f8f9fa;
+    --card-bg-color: #ffffff;
+    --text-color: #212529;
+    --text-muted-color: #6c757d;
+    --border-color: #dee2e6;
+    --accent-color: #007bff;
+    --accent-hover: #0069d9;
     --font-heading: 'Poppins', sans-serif;
     --font-body: 'Inter', sans-serif;
-    --soft-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    --soft-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body { font-family: var(--font-body); background-color: var(--background-color); color: var(--text-color); line-height: 1.7; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
 /* === KOMPONEN UMUM === */
-.navbar { display: flex; justify-content: space-between; align-items: center; background-color: var(--card-bg-color); padding: 1rem 5%; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.navbar { display: flex; justify-content: space-between; align-items: center; background-color: var(--card-bg-color); padding: 1rem 5%; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 .logo a { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; text-decoration: none; color: var(--text-color); transition: color 0.3s ease; }
 .logo a:hover { color: var(--accent-color); }
 .nav-links { list-style: none; display: flex; align-items: center; }
 .nav-links li { margin-left: 2.5rem; }
 .nav-links a { text-decoration: none; color: var(--text-muted-color); font-weight: 500; transition: color 0.3s ease; }
 .nav-links a:hover { color: var(--text-color); }
-.button-pintu, .login-button { display: inline-block; background-color: var(--accent-color); color: #111; padding: 0.7rem 1.6rem; border: 1px solid transparent; border-radius: 5px; font-weight: 600; font-family: var(--font-heading); text-decoration: none; transition: all 0.3s ease; }
-.login-button { color: #111 !important; padding: 0.6rem 1.2rem; }
-.button-pintu:hover, .login-button:hover { background-color: var(--accent-hover); transform: translateY(-3px); box-shadow: var(--soft-shadow); }
+.button-pintu, .login-button { display: inline-block; background-color: var(--accent-color); color: #ffffff; padding: 0.7rem 1.6rem; border: 1px solid var(--accent-color); border-radius: 5px; font-weight: 600; font-family: var(--font-heading); text-decoration: none; transition: all 0.3s ease; }
+.login-button { color: #ffffff !important; padding: 0.6rem 1.2rem; }
+.button-pintu:hover, .login-button:hover { background-color: var(--accent-hover); border-color: var(--accent-hover); transform: translateY(-3px); box-shadow: var(--soft-shadow); }
 footer { text-align: center; padding: 3rem; margin-top: 4rem; background-color: var(--card-bg-color); color: var(--text-muted-color); border-top: 1px solid var(--border-color); }
 
-/* === GAYA HALAMAN LAINNYA === */
-.hero { display: flex; align-items: center; padding: 6rem 5%; min-height: 80vh; background: linear-gradient(rgba(26, 29, 34, 0.75), rgba(26, 29, 34, 0.95)), url('../assets/images/bg1.jpg') no-repeat center center/cover; }
+/* === HALAMAN UTAMA === */
+.hero { display: flex; align-items: center; padding: 6rem 5%; min-height: 80vh; color: #ffffff; background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), url('../assets/images/bg1.jpg') no-repeat center center/cover; }
 .hero-content { max-width: 750px; }
 .hero h1 { font-family: var(--font-heading); font-size: clamp(2.8rem, 5vw, 4.8rem); font-weight: 700; margin-bottom: 1rem; line-height: 1.2; }
 .hero h1 span { color: var(--accent-color); }
-.hero p { font-size: 1.2rem; color: var(--text-muted-color); max-width: 90%; }
-.pintu-utama { padding: 6rem 5%; text-align: center; }
-.pintu-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; margin-top: 3rem; }
-.pintu { background-color: var(--card-bg-color); padding: 2.5rem; border-radius: 10px; border: 1px solid var(--border-color); text-align: left; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.hero p { font-size: 1.2rem; max-width: 90%; }
+.pintu-utama { padding: 6rem 5%; text-align: center; background-color: var(--background-color); }
+.pintu-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; margin-top: 3rem; }
+
+/* === GAYA KARTU PINTU (REVISI SIMETRI & IKON) === */
+.pintu {
+    background-color: var(--card-bg-color);
+    padding: 2.5rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* BARU: Memusatkan semua konten di dalam kartu */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 .pintu:hover { transform: translateY(-8px); box-shadow: var(--soft-shadow); }
-.pintu h3 { font-family: var(--font-heading); color: var(--text-color); margin-bottom: 1rem; font-size: 1.5rem; }
-.pintu .button-pintu { margin-top: 1.5rem; }
+
+/* BARU: Gaya untuk ikon di kartu */
+.pintu-icon {
+    margin-bottom: 1.5rem;
+    color: var(--accent-color);
+}
+.pintu h3 {
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+}
+.pintu p {
+    color: var(--text-muted-color);
+    flex-grow: 1; /* Membuat paragraf mengisi ruang agar tombol sejajar */
+    margin-bottom: 1.5rem;
+}
+.pintu .button-pintu {
+    margin-top: auto; /* Mendorong tombol ke bawah */
+}
+
+/* === GAYA HALAMAN LAINNYA === */
 .page-container { max-width: 1200px; margin: 4rem auto; padding: 0 2rem; }
 .page-title { text-align: center; font-family: var(--font-heading); font-size: 2.8rem; color: var(--text-color); margin-bottom: 2rem; }
-.page-title span { color: var(--accent-color); }
 .page-subtitle { text-align: center; font-size: 1.1rem; color: var(--text-muted-color); margin-bottom: 5rem; max-width: 600px; margin-left: auto; margin-right: auto; }
 .section-title { text-align: center; font-family: var(--font-heading); font-size: 2.5rem; color: var(--text-color); margin-bottom: 3rem; }
 .portfolio-grid, .jurnal-grid { display: grid; gap: 2.5rem; }
 .portfolio-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-.portfolio-card, .jurnal-card { background: var(--card-bg-color); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.portfolio-card, .jurnal-card { background: var(--card-bg-color); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
 .portfolio-card:hover, .jurnal-card:hover { transform: translateY(-5px); box-shadow: var(--soft-shadow); }
-.portfolio-card { text-align: left; }
 .jurnal-card { display: grid; grid-template-columns: 1fr; align-items: center; }
 .portfolio-card img, .jurnal-card img { width: 100%; height: 220px; object-fit: cover; transition: transform 0.4s ease; }
 .portfolio-card:hover img, .jurnal-card:hover img { transform: scale(1.05); }
-.portfolio-card h3 { font-family: var(--font-heading); color: var(--text-color); margin: 1.5rem 1.5rem 0.5rem 1.5rem; }
-.portfolio-card p { padding: 0 1.5rem 1.5rem 1.5rem; font-size: 0.95rem; color: var(--text-muted-color); }
-.portfolio-card .button-pintu { margin: 0 1.5rem 1.5rem 1.5rem; }
+.portfolio-card h3 { padding: 1.5rem 1.5rem 0.5rem 1.5rem; }
+.portfolio-card p { padding: 0 1.5rem 1.5rem 1.5rem; }
 .jurnal-content { padding: 2.5rem; }
-.jurnal-content h3 { font-family: var(--font-heading); color: var(--text-color); margin-top: 0; font-size: 1.8rem; }
-.post-meta { font-size: 0.9rem; color: var(--text-muted-color); margin-bottom: 1rem; }
-.jurnal-content p { color: var(--text-muted-color); margin-bottom: 1.5rem; }
-.tool-section, .dashboard-header, .history-section { background: var(--card-bg-color); padding: 2.5rem; border-radius: 10px; margin-bottom: 3rem; border: 1px solid var(--border-color); }
-.url-shortener-box form { display: flex; gap: 1rem; }
-input[type="url"], input[type="email"], input[type="password"], #mood-notes { flex-grow: 1; padding: 1rem; border: 1px solid var(--border-color); border-radius: 5px; font-size: 1rem; font-family: var(--font-body); background-color: var(--background-color); color: var(--text-color); transition: border-color 0.3s ease, box-shadow 0.3s ease; }
-input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus, #mood-notes:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.2); }
-.result-box { margin-top: 1.5rem; background: var(--background-color); padding: 1.5rem; border-radius: 5px; border: 1px solid var(--border-color); text-align: center; font-weight: 600; color: var(--accent-color); word-break: break-all; }
-.hidden { display: none; }
-.dashboard-header { text-align: center; }
-#logout-button { border: none; cursor: pointer; }
-.mood-options { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
-.mood-options label { cursor: pointer; padding: 0.8rem 1rem; border: 1px solid var(--border-color); border-radius: 5px; transition: all 0.2s ease; }
-.mood-options input[type="radio"] { display: none; }
-.mood-options label:has(input:checked) { border-color: var(--accent-color); background-color: rgba(79, 195, 247, 0.1); color: var(--accent-color); font-weight: 600; }
-#mood-notes { width: 100%; resize: vertical; }
-.mood-history-list { list-style: none; padding: 0; }
-.mood-item { background: var(--card-bg-color); border-left: 5px solid; padding: 1rem 1.5rem; margin-bottom: 1rem; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-.mood-item-header { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
-.mood-date { font-size: 0.85rem; color: var(--text-muted-color); }
-.mood-notes { margin-top: 0.5rem; color: var(--text-muted-color); }
-.mood-item.level-5 { border-color: #2ecc71; } .mood-item.level-4 { border-color: #3498db; } .mood-item.level-3 { border-color: #f1c40f; } .mood-item.level-2 { border-color: #e67e22; } .mood-item.level-1 { border-color: #e74c3c; }
-
-/* === GAYA HALAMAN AUTENTIKASI (REVISI) === */
-.auth-container {
-    max-width: 450px;
-    margin: 0 auto; /* Margin atas diatur oleh .page-container dan .page-title */
-    padding: 2.5rem;
-    background-color: var(--card-bg-color);
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-}
+.tool-section, .dashboard-header, .history-section { background-color: var(--card-bg-color); padding: 2.5rem; border-radius: 10px; margin-bottom: 3rem; border: 1px solid var(--border-color); }
+input[type="url"], input[type="email"], input[type="password"], #mood-notes, textarea { flex-grow: 1; padding: 1rem; border: 1px solid var(--border-color); border-radius: 5px; font-size: 1rem; font-family: var(--font-body); background-color: var(--card-bg-color); color: var(--text-color); transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+input:focus, textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); }
+.result-box { margin-top: 1.5rem; background-color: #e9ecef; padding: 1.5rem; border-radius: 5px; text-align: center; font-weight: 600; color: var(--accent-color); word-break: break-all; }
+.auth-container { max-width: 450px; margin: 0 auto; padding: 2.5rem; background-color: var(--card-bg-color); border-radius: 10px; border: 1px solid var(--border-color); box-shadow: var(--soft-shadow); text-align: center; }
 .auth-form .form-group { margin-bottom: 1.5rem; }
-.auth-form label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-muted-color); }
-.auth-form button { width: 100%; }
-.auth-toggle { text-align: center; margin-top: 1.5rem; color: var(--text-muted-color); font-size: 0.95rem; }
+.auth-form label { display: block; font-weight: 600; color: var(--text-muted-color); margin-bottom: 0.75rem; }
+.auth-form input { text-align: center; }
+.auth-form button { width: 100%; padding: 0.8rem; font-size: 1.05rem; }
+.auth-toggle { color: var(--text-muted-color); font-size: 0.9rem; margin-top: 2rem; }
 .auth-toggle a { color: var(--accent-color); font-weight: 600; text-decoration: none; }
-#auth-message { text-align: center; margin-top: 1.5rem; font-weight: 600; padding: 1rem; border-radius: 5px; }
-#auth-message.success { background-color: rgba(79, 195, 247, 0.1); color: var(--accent-color); }
-#auth-message.error { background-color: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+#auth-message.success { background-color: #d4edda; color: #155724; }
+#auth-message.error { background-color: #f8d7da; color: #721c24; }
 
-/* === GAYA MENU HAMBURGER & RESPONSIVE === */
+/* === HAMBURGER & RESPONSIVE === */
 .hamburger { display: none; background: transparent; border: none; cursor: pointer; padding: 0; z-index: 1001; }
-.hamburger span { display: block; width: 25px; height: 3px; background-color: var(--text-color); margin: 5px 0; border-radius: 3px; transition: all 0.3s ease-in-out; }
-
+.hamburger span { background-color: var(--text-color); display: block; width: 25px; height: 3px; margin: 5px 0; border-radius: 3px; transition: all 0.3s ease-in-out; }
 @media (max-width: 768px) {
     .hamburger { display: block; }
     .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .hamburger.active span:nth-child(2) { opacity: 0; }
     .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
-    .nav-links { position: absolute; top: 100%; left: 0; width: 100%; background-color: var(--card-bg-color); border-bottom: 1px solid var(--border-color); box-shadow: 0 10px 15px rgba(0,0,0,0.1); padding: 1rem 0; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s; flex-direction: column; align-items: stretch; }
+    .nav-links { position: absolute; top: 100%; left: 0; width: 100%; background-color: var(--card-bg-color); border-bottom: 1px solid var(--border-color); box-shadow: 0 10px 15px rgba(0,0,0,0.05); padding: 1rem 0; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s; flex-direction: column; align-items: stretch; }
     .nav-links.active { opacity: 1; visibility: visible; transform: translateY(0); }
-    .nav-links li { margin: 0; width: 100%; }
-    .nav-links a { display: block; padding: 1rem 5%; font-size: 1rem; font-weight: 500; width: 100%; }
+    .nav-links li { margin: 0; }
+    .nav-links a { display: block; padding: 1rem 5%; font-size: 1rem; }
     .nav-links a.login-button { margin: 0.5rem 5%; width: 90%; text-align: center; }
-    .hero { text-align: center; padding: 4rem 5%; }
-    .hero h1 { font-size: 2.5rem; }
-    .hero-content { margin: auto; }
-    .page-container { margin: 2rem auto; } /* Kurangi margin di mobile */
+    .page-container { margin: 2rem 1rem; padding: 0; }
     .page-title { font-size: 2.2rem; margin-bottom: 1.5rem; }
-    .auth-container { padding: 2rem; }
-    .pintu-container, .portfolio-grid { grid-template-columns: 1fr; }
-    .url-shortener-box form { flex-direction: column; }
-    .section-title { font-size: 2rem; }
+    .auth-container { padding: 2rem 1.5rem; }
+    .pintu-utama { padding: 4rem 1rem; }
+    .hero { text-align: center; padding: 4rem 1rem; }
+    .hero h1 { font-size: 2.5rem; }
 }
