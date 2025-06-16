@@ -5,65 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login & Registrasi - HAMDI RIZAL</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <header class="navbar">
         <div class="logo"><a href="index.html">HAMDI RIZAL</a></div>
         <nav>
-    <ul class="nav-links">
-        <li><a href="portfolio.html">Portofolio</a></li>
-        <li><a href="arena.html">Arena Interaktif</a></li>
-        <li><a href="jurnal.html">Jurnal</a></li>
-        <li><a href="auth.html" class="login-button">Login</a></li>
-    </ul>
-    <button class="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
-</nav>
+            <ul class="nav-links">
+                <li><a href="portfolio.html">Portofolio</a></li>
+                <li><a href="arena.html">Arena Interaktif</a></li>
+                <li><a href="jurnal.html">Jurnal</a></li>
+                <li><a href="auth.html" class="login-button">Login</a></li>
+            </ul>
+            <button class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
     </header>
 
     <main class="page-container">
-    
-    <h1 id="auth-title" class="page-title">Login</h1>
-
-    <div class="auth-container">
-        
-        <div id="login-section">
-            <form id="login-form" class="auth-form">
-                <div class="form-group">
-                    <label for="login-email">Email</label>
-                    <input type="email" id="login-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" required>
-                </div>
-                <button type="submit" class="button-pintu">Login</button>
-            </form>
-            <p class="auth-toggle">Belum punya akun? <a href="#" id="show-register">Registrasi di sini</a></p>
+        <h1 id="auth-title" class="page-title">Login</h1>
+        <div class="auth-container">
+            <div id="login-section">
+                <form id="login-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="button-pintu">Login</button>
+                </form>
+                <p class="auth-toggle">Belum punya akun? <a href="#" id="show-register">Registrasi di sini</a></p>
+            </div>
+            <div id="register-section" class="hidden">
+                <form id="register-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password (min. 6 karakter)</label>
+                        <input type="password" id="register-password" required>
+                    </div>
+                    <button type="submit" class="button-pintu">Registrasi</button>
+                </form>
+                 <p class="auth-toggle">Sudah punya akun? <a href="#" id="show-login">Login di sini</a></p>
+            </div>
+            <div id="auth-message"></div>
         </div>
-
-        <div id="register-section" class="hidden">
-            <form id="register-form" class="auth-form">
-                <div class="form-group">
-                    <label for="register-email">Email</label>
-                    <input type="email" id="register-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="register-password">Password (min. 6 karakter)</label>
-                    <input type="password" id="register-password" required>
-                </div>
-                <button type="submit" class="button-pintu">Registrasi</button>
-            </form>
-             <p class="auth-toggle">Sudah punya akun? <a href="#" id="show-login">Login di sini</a></p>
-        </div>
-        
-        <div id="auth-message"></div>
-    </div>
-</main>
+    </main>
 
     <footer>
         <p>&copy; 2025 HAMDI RIZAL. Dibangun dengan semangat dan secangkir kopi.</p>
