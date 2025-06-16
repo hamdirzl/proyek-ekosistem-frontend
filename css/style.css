@@ -1,8 +1,8 @@
 /* =================================================================== */
-/* ==   V3: "EXECUTIVE MINIMALIST" DENGAN MOBILE NAVIGATION       == */
+/* ==       V5: EXECUTIVE MINIMALIST DENGAN MENU DROPDOWN         == */
 /* =================================================================== */
 
-/* === ✨ PENGATURAN GLOBAL & VARIABEL DESAIN === */
+/* === PENGATURAN GLOBAL (TETAP SAMA) === */
 :root {
     --background-color: #1A1D22;
     --card-bg-color: #242830;
@@ -15,72 +15,25 @@
     --font-body: 'Inter', sans-serif;
     --soft-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body {
-    font-family: var(--font-body);
-    background-color: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.7;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
+body { font-family: var(--font-body); background-color: var(--background-color); color: var(--text-color); line-height: 1.7; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
-/* === ✨ KOMPONEN UMUM (NAVBAR & FOOTER) === */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: var(--card-bg-color);
-    padding: 1rem 5%;
-    border-bottom: 1px solid var(--border-color);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.logo a {
-    font-family: var(--font-heading);
-    font-size: 1.8rem;
-    font-weight: 700;
-    text-decoration: none;
-    color: var(--text-color);
-    transition: color 0.3s ease;
-}
+/* === KOMPONEN UMUM (TETAP SAMA) === */
+.navbar { display: flex; justify-content: space-between; align-items: center; background-color: var(--card-bg-color); padding: 1rem 5%; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.logo a { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; text-decoration: none; color: var(--text-color); transition: color 0.3s ease; }
 .logo a:hover { color: var(--accent-color); }
-
 .nav-links { list-style: none; display: flex; align-items: center; }
 .nav-links li { margin-left: 2.5rem; }
 .nav-links a { text-decoration: none; color: var(--text-muted-color); font-weight: 500; transition: color 0.3s ease; }
 .nav-links a:hover { color: var(--text-color); }
-
-.button-pintu, .login-button {
-    display: inline-block;
-    background-color: var(--accent-color);
-    color: #111;
-    padding: 0.7rem 1.6rem;
-    border: 1px solid transparent;
-    border-radius: 5px;
-    font-weight: 600;
-    font-family: var(--font-heading);
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
+.button-pintu, .login-button { display: inline-block; background-color: var(--accent-color); color: #111; padding: 0.7rem 1.6rem; border: 1px solid transparent; border-radius: 5px; font-weight: 600; font-family: var(--font-heading); text-decoration: none; transition: all 0.3s ease; }
 .login-button { color: #111 !important; padding: 0.6rem 1.2rem; }
 .button-pintu:hover, .login-button:hover { background-color: var(--accent-hover); transform: translateY(-3px); box-shadow: var(--soft-shadow); }
-
 footer { text-align: center; padding: 3rem; margin-top: 4rem; background-color: var(--card-bg-color); color: var(--text-muted-color); border-top: 1px solid var(--border-color); }
 
-/* === HALAMAN UTAMA (INDEX.HTML) === */
-.hero {
-    display: flex;
-    align-items: center;
-    padding: 6rem 5%;
-    min-height: 80vh;
-    background: linear-gradient(rgba(26, 29, 34, 0.75), rgba(26, 29, 34, 0.95)), url('../assets/images/bg1.jpg') no-repeat center center/cover;
-}
+/* === SEMUA GAYA HALAMAN LAIN (TETAP SAMA) === */
+.hero { display: flex; align-items: center; padding: 6rem 5%; min-height: 80vh; background: linear-gradient(rgba(26, 29, 34, 0.75), rgba(26, 29, 34, 0.95)), url('../assets/images/bg1.jpg') no-repeat center center/cover; }
 .hero-content { max-width: 750px; }
 .hero h1 { font-family: var(--font-heading); font-size: clamp(2.8rem, 5vw, 4.8rem); font-weight: 700; margin-bottom: 1rem; line-height: 1.2; }
 .hero h1 span { color: var(--accent-color); }
@@ -91,9 +44,6 @@ footer { text-align: center; padding: 3rem; margin-top: 4rem; background-color: 
 .pintu:hover { transform: translateY(-8px); box-shadow: var(--soft-shadow); }
 .pintu h3 { font-family: var(--font-heading); color: var(--text-color); margin-bottom: 1rem; font-size: 1.5rem; }
 .pintu .button-pintu { margin-top: 1.5rem; }
-
-/* === GAYA HALAMAN-HALAMAN LAIN === */
-/* ... (semua gaya lain dari file sebelumnya tetap sama, saya singkat di sini agar tidak terlalu panjang, tapi di file Anda harus lengkap) ... */
 .page-container { max-width: 1200px; margin: 4rem auto; padding: 0 2rem; }
 .page-title { text-align: center; font-family: var(--font-heading); font-size: 3.5rem; color: var(--text-color); margin-bottom: 1rem; }
 .page-title span { color: var(--accent-color); }
@@ -149,18 +99,14 @@ input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus
 .mood-item.level-1 { border-color: #e74c3c; }
 
 
-/* =================================================================== */
-/* ===         V4: REVISI MENU MOBILE PROFESIONAL              === */
-/* =================================================================== */
-
-/* === 🍔 GAYA UNTUK MENU HAMBURGER MOBILE === */
+/* === 🍔 GAYA UNTUK IKON HAMBURGER (TETAP SAMA) === */
 .hamburger {
-    display: none; /* Sembunyi di desktop */
+    display: none;
     background: transparent;
     border: none;
     cursor: pointer;
     padding: 0;
-    z-index: 1001; /* Pastikan selalu di atas */
+    z-index: 1001;
 }
 .hamburger span {
     display: block;
@@ -171,149 +117,80 @@ input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus
     border-radius: 3px;
     transition: all 0.3s ease-in-out;
 }
-.nav-close-button { 
-    display: none; 
-}
 
-
-/* === 📱 ATURAN RESPONSIVE BARU UNTUK MOBILE === */
+/* === 📱 ATURAN RESPONSIVE BARU (DROPDOWN & ANIMASI IKON) === */
 @media (max-width: 768px) {
-    /* Tampilkan tombol hamburger */
+    /* Tampilkan ikon hamburger */
     .hamburger {
         display: block;
     }
     
-    /* === DESAIN BARU UNTUK PANEL MENU === */
-    .nav-links {
-        /* TIDAK LAGI FULL SCREEN, tapi panel dari kanan */
-        position: fixed;
-        top: 0;
-        right: 0; /* Mulai dari kanan */
-        
-        /* LEBIH RAMPING */
-        width: 80%; 
-        max-width: 320px;
-        height: 100vh;
-        
-        /* KONTEN MULAI DARI ATAS & RAPI DI KIRI */
-        background-color: var(--card-bg-color);
-        flex-direction: column;
-        justify-content: flex-start; /* Mulai dari atas */
-        align-items: flex-start; /* Rata kiri */
-        padding: 6rem 2rem 2rem 2.5rem; /* Padding internal */
+    /* ANIMASI IKON HAMBURGER MENJADI X */
+    .hamburger.active span:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    .hamburger.active span:nth-child(2) {
+        opacity: 0;
+    }
+    .hamburger.active span:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
 
-        /* EFEK VISUAL */
-        box-shadow: -5px 0 25px rgba(0,0,0,0.2); /* Shadow di sisi kiri panel */
-        transform: translateX(100%); /* Sembunyi di luar layar kanan */
-        transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1); /* Transisi lebih halus */
-        z-index: 1000;
+    /* === DESAIN BARU: MENU DROPDOWN === */
+    .nav-links {
+        /* Muncul tepat di bawah navbar */
+        position: absolute;
+        top: 100%; /* Posisi persis di bawah parent (.navbar) */
+        left: 0;
+        width: 100%;
+        
+        /* Layout dan Tampilan */
+        background-color: var(--card-bg-color);
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        padding: 1rem 0; /* Padding atas dan bawah */
+
+        /* Sembunyikan secara default */
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px); /* Efek turun sedikit */
+        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+        
+        /* Reset dari gaya desktop */
+        flex-direction: column;
+        align-items: stretch; /* Memenuhi lebar */
     }
     
     /* State aktif saat menu terbuka */
-    .nav-links.nav-active {
-        transform: translateX(0); /* Geser ke dalam layar */
+    .nav-links.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
     }
 
     .nav-links li {
         margin: 0;
-        margin-bottom: 1.5rem; /* Jarak antar link */
-        width: 100%; /* Agar link memenuhi lebar panel */
+        width: 100%;
     }
     
     .nav-links a {
-        /* FONT LEBIH KECIL DAN RAPI */
-        font-size: 1.2rem; /* Ukuran font lebih pas */
+        display: block;
+        padding: 1rem 5%; /* Padding sama dengan padding navbar */
+        font-size: 1rem; /* Ukuran font lebih standar */
         font-weight: 500;
-        padding: 0.5rem 0;
-        display: block; /* Agar bisa di-klik di seluruh area */
+        width: 100%;
     }
 
-    /* Atur ulang tombol login agar lebih pas */
-    .nav-links .login-button {
-        margin-top: 1rem;
+    /* Atur ulang tombol login */
+    .nav-links a.login-button {
+        margin: 0.5rem 5%; /* Beri margin */
+        width: 90%; /* Tidak 100% agar ada padding */
         text-align: center;
-        width: 100%;
     }
     
-    /* Tombol close di mobile */
-    .nav-close-button {
-        display: block;
-        position: absolute;
-        top: 1.5rem; /* Posisi lebih pas */
-        right: 1.5rem;
-    }
-    .nav-close-button button {
-        background: none;
-        border: none;
-        color: var(--text-muted-color);
-        font-size: 2.2rem;
-        cursor: pointer;
-        transition: color 0.3s ease;
-    }
-    .nav-close-button button:hover {
-        color: var(--text-color);
-    }
-
     /* Perbaikan layout lainnya yang sudah ada */
-    .hero { text-align: center; padding: 4rem 5%;}
+    .hero { text-align: center; padding: 4rem 5%; }
     .hero h1 { font-size: 2.5rem; }
-    .hero-content { margin: auto; }
-    .pintu-container, .portfolio-grid { grid-template-columns: 1fr; }
-    .url-shortener-box form { flex-direction: column; }
-    .page-title { font-size: 2.5rem; }
-    .section-title { font-size: 2rem; }
-}
-    /* Atur menu navigasi untuk mobile */
-    .nav-links {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background-color: var(--card-bg-color);
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        transform: translateX(100%); /* Mulai dari luar layar kanan */
-        transition: transform 0.3s ease-in-out;
-        z-index: 1000;
-    }
-    
-    /* State aktif saat menu terbuka */
-    .nav-links.nav-active {
-        transform: translateX(0);
-    }
-
-    .nav-links li {
-        margin: 1.5rem 0;
-        transform: scale(0);
-        transition: transform 0.3s ease-in-out;
-    }
-    .nav-links.nav-active li {
-        transform: scale(1);
-    }
-    
-    .nav-links a {
-        font-size: 1.5rem;
-    }
-    
-    /* Tombol close di mobile */
-    .nav-close-button {
-        display: block;
-        position: absolute;
-        top: 2rem;
-        right: 5%;
-    }
-    .nav-close-button button {
-        background: none;
-        border: none;
-        color: var(--text-color);
-        font-size: 2.5rem;
-        cursor: pointer;
-    }
-
-    /* Perbaikan layout lainnya */
-    .hero { text-align: center; }
     .hero-content { margin: auto; }
     .pintu-container, .portfolio-grid { grid-template-columns: 1fr; }
     .url-shortener-box form { flex-direction: column; }
