@@ -1,7 +1,7 @@
 // ===================================================================
 // ==   FILE FINAL SCRIPT.JS (DENGAN PERBAIKAN LOGIKA DASHBOARD)    ==
 // ===================================================================
-const API_BASE_URL = 'https://hamdirzl.my.id';
+const API_BASE_URL = 'https://api.hamdirzl.my.id';
 
 console.log(`Ekosistem Digital (Client v11) dimuat! Menghubungi API di: ${API_BASE_URL}`);
 
