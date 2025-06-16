@@ -37,34 +37,66 @@
             <p>Selamat datang kembali, <strong id="user-email">...</strong>!</p>
         </div>
 
-        <section class="tool-section" data-aos="fade-up">
-            <h2 class="section-title">Bagaimana Perasaanmu Hari Ini?</h2>
-            <form id="mood-form" class="auth-form">
-                <div class="form-group">
-                    <label>Pilih Mood:</label>
-                    <div class="mood-options">
-                        <input type="radio" name="mood" value="5" id="mood-5" required><label for="mood-5">😁 Sangat Baik</label>
-                        <input type="radio" name="mood" value="4" id="mood-4"><label for="mood-4">🙂 Baik</label>
-                        <input type="radio" name="mood" value="3" id="mood-3"><label for="mood-3">😐 Biasa Saja</label>
-                        <input type="radio" name="mood" value="2" id="mood-2"><label for="mood-2">😕 Kurang Baik</label>
-                        <input type="radio" name="mood" value="1" id="mood-1"><label for="mood-1">😥 Buruk</label>
+        <div class="dashboard-grid">
+            <section class="dashboard-card mood-entry-card" data-aos="fade-up">
+                <h2 class="card-title">Bagaimana Perasaanmu Hari Ini?</h2>
+                <form id="mood-form">
+                    <div class="form-group">
+                        <div class="mood-icon-selector">
+                            <label>
+                                <input type="radio" name="mood" value="5" required>
+                                <div class="mood-icon-wrapper">
+                                    <svg class="mood-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2-6h4v-2h-4v2zm-4-4h12v-2H6v2z" opacity="0"/><path d="M12 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10zm0-18c-4.411 0-8 3.589-8 8s3.589 8 8 8 8-3.589 8-8-3.589-8-8-8z"/><path d="M9.5 15c.828 0 1.5-.672 1.5-1.5S10.328 12 9.5 12s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm5 0c.828 0 1.5-.672 1.5-1.5S15.328 12 14.5 12s-1.5.672-1.5 1.5.672 1.5 1.5 1.5z"/><path d="M12 18.5c2.271 0 4.219-1.328 5.293-3.268l-1.809-.884C14.732 15.82 13.468 16.5 12 16.5s-2.732-.68-3.484-2.152l-1.809.884C7.781 17.172 9.729 18.5 12 18.5z" fill="currentColor"/></svg>
+                                    <span>Sangat Baik</span>
+                                </div>
+                            </label>
+                            <label>
+                                <input type="radio" name="mood" value="4">
+                                <div class="mood-icon-wrapper">
+                                    <svg class="mood-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2-6h4v-2h-4v2zm-4-4h12v-2H6v2z" opacity="0"/><path d="M12 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10zm0-18c-4.411 0-8 3.589-8 8s3.589 8 8 8 8-3.589 8-8-3.589-8-8-8z"/><path d="M9.5 15c.828 0 1.5-.672 1.5-1.5S10.328 12 9.5 12s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm5 0c.828 0 1.5-.672 1.5-1.5S15.328 12 14.5 12s-1.5.672-1.5 1.5.672 1.5 1.5 1.5z"/><path d="M8 17h8v2H8z" fill="currentColor"/></svg>
+                                    <span>Baik</span>
+                                </div>
+                            </label>
+                            <label>
+                                <input type="radio" name="mood" value="3">
+                                <div class="mood-icon-wrapper">
+                                    <svg class="mood-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2-6h4v-2h-4v2zm-4-4h12v-2H6v2z" opacity="0"/><path d="M12 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10zm0-18c-4.411 0-8-3.589-8 8s3.589 8 8 8 8-3.589 8-8-3.589-8-8-8z"/><path d="M15.5 12c.828 0 1.5.672 1.5 1.5S16.328 15 15.5 15s-1.5-.672-1.5-1.5.672-1.5 1.5-1.5zm-7 0c.828 0 1.5.672 1.5 1.5S9.328 15 8.5 15s-1.5-.672-1.5-1.5S7.672 12 8.5 12z"/><path d="M16 17H8v2h8z" transform="rotate(180 12 18)" fill="currentColor"/></svg>
+                                    <span>Biasa Saja</span>
+                                </div>
+                            </label>
+                            <label>
+                                <input type="radio" name="mood" value="2">
+                                <div class="mood-icon-wrapper">
+                                    <svg class="mood-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2-6h4v-2h-4v2zm-4-4h12v-2H6v2z" opacity="0"/><path d="M12 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10zm0-18c-4.411 0-8-3.589-8 8s3.589 8 8 8 8-3.589 8-8-3.589-8-8-8z"/><path d="M12 18.5c-2.271 0-4.219-1.328-5.293-3.268l1.809-.884C9.268 15.82 10.532 16.5 12 16.5s2.732-.68 3.484-2.152l1.809.884C16.219 17.172 14.271 18.5 12 18.5z" transform="rotate(180 12 15.67)" fill="currentColor"/><path d="M9.5 12c.828 0 1.5.672 1.5 1.5S10.328 15 9.5 15s-1.5-.672-1.5-1.5.672-1.5 1.5-1.5zm5 0c.828 0 1.5.672 1.5 1.5S15.328 15 14.5 15s-1.5-.672-1.5-1.5.672-1.5 1.5-1.5z"/></svg>
+                                    <span>Kurang Baik</span>
+                                </div>
+                            </label>
+                            <label>
+                                <input type="radio" name="mood" value="1">
+                                <div class="mood-icon-wrapper">
+                                    <svg class="mood-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2-6h4v-2h-4v2zm-4-4h12v-2H6v2z" opacity="0"/><path d="M12 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10zm0-18c-4.411 0-8-3.589-8 8s3.589 8 8 8 8-3.589 8-8-3.589-8-8-8z"/><path d="M14.5 15c-.828 0-1.5-.672-1.5-1.5S13.672 12 14.5 12s1.5.672 1.5 1.5-.672 1.5-1.5 1.5zm-5 0c-.828 0-1.5-.672-1.5-1.5S8.672 12 9.5 12s1.5.672 1.5 1.5-.672 1.5-1.5 1.5z"/><path d="M12 16.5c2.271 0 4.219-1.328 5.293-3.268l-1.809-.884C14.732 13.82 13.468 14.5 12 14.5s-2.732-.68-3.484-2.152l-1.809.884C7.781 15.172 9.729 16.5 12 16.5z" fill="currentColor"/></svg>
+                                    <span>Buruk</span>
+                                </div>
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="mood-notes">Catatan (opsional):</label>
-                    <textarea id="mood-notes" rows="3"></textarea>
-                </div>
-                <button type="submit" class="button-pintu">Simpan Mood</button>
-            </form>
-            <div id="mood-message"></div>
-        </section>
+                    <div class="form-group">
+                        <label for="mood-notes" class="input-label">Catatan (opsional):</label>
+                        <textarea id="mood-notes" rows="3" placeholder="Tuliskan apa yang kamu rasakan..."></textarea>
+                    </div>
+                    <button type="submit" class="button-pintu">Simpan Mood</button>
+                    <div id="mood-message"></div>
+                </form>
+            </section>
 
-        <section class="history-section" data-aos="fade-up" data-aos-delay="100">
-            <h2 class="section-title">Riwayat Mood Anda</h2>
-            <ul id="mood-history" class="mood-history-list">
-                <p id="loading-moods">Memuat riwayat...</p>
-            </ul>
-        </section>
+            <section class="dashboard-card mood-history-card" data-aos="fade-up" data-aos-delay="100">
+                <h2 class="card-title">Riwayat Mood</h2>
+                <div id="mood-history-container">
+                    <p id="loading-moods">Memuat riwayat...</p>
+                    <ul id="mood-history-list"></ul>
+                </div>
+            </section>
+        </div>
 
     </main>
 

@@ -512,3 +512,174 @@ input:focus, textarea:focus {
     box-shadow: 0 4px 15px rgba(0, 245, 160, 0.2);
     transform: translateY(-2px) scale(1.02);
 }
+
+/* ============================================= */
+/* ==   GAYA BARU UNTUK HALAMAN DASBOR        == */
+/* ============================================= */
+
+/* Layout Grid Utama */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Default satu kolom untuk mobile */
+    gap: var(--space-lg);
+}
+
+/* Penyesuaian untuk layar lebih besar (desktop) */
+@media (min-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr); /* Dua kolom untuk desktop */
+    }
+}
+
+/* Gaya Kartu Dasbor */
+.dashboard-card {
+    background-color: var(--card-bg-color);
+    padding: var(--space-lg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+}
+
+.dashboard-card .card-title {
+    font-size: 1.5rem;
+    font-family: var(--font-heading);
+    margin-bottom: var(--space-lg);
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--space-sm);
+}
+
+/* Pemilih Mood dengan Ikon */
+.mood-icon-selector {
+    display: flex;
+    justify-content: space-around;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.mood-icon-selector label {
+    cursor: pointer;
+    text-align: center;
+}
+
+.mood-icon-selector input[type="radio"] {
+    display: none; /* Sembunyikan radio button asli */
+}
+
+.mood-icon-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    border: 2px solid transparent;
+}
+
+.mood-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--text-muted-color);
+    transition: all 0.2s ease-in-out;
+}
+
+.mood-icon-wrapper span {
+    font-size: 0.85rem;
+    color: var(--text-muted-color);
+    font-weight: 500;
+}
+
+/* Efek saat hover */
+.mood-icon-selector label:hover .mood-icon {
+    transform: scale(1.1);
+    color: var(--text-color);
+}
+
+/* Efek saat dipilih */
+.mood-icon-selector input[type="radio"]:checked + .mood-icon-wrapper {
+    border-color: var(--accent-color);
+    background-color: rgba(0, 245, 160, 0.05);
+}
+
+.mood-icon-selector input[type="radio"]:checked + .mood-icon-wrapper .mood-icon,
+.mood-icon-selector input[type="radio"]:checked + .mood-icon-wrapper span {
+    color: var(--accent-color);
+}
+
+/* Penyesuaian label textarea */
+.mood-entry-card .input-label {
+    display: block;
+    font-weight: 500;
+    color: var(--text-muted-color);
+    margin-bottom: var(--space-xs);
+    text-align: left;
+}
+
+.mood-entry-card .button-pintu {
+    width: 100%;
+    margin-top: var(--space-sm);
+}
+
+/* Penataan Riwayat Mood */
+#mood-history-container {
+    max-height: 450px; /* Batasi tinggi dan beri scroll jika perlu */
+    overflow-y: auto;
+    padding-right: var(--space-sm); /* Ruang untuk scrollbar */
+}
+
+/* Custom scrollbar */
+#mood-history-container::-webkit-scrollbar {
+  width: 6px;
+}
+#mood-history-container::-webkit-scrollbar-track {
+  background: var(--card-bg-color);
+}
+#mood-history-container::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 6px;
+}
+#mood-history-container::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+
+#mood-history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.history-mood-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.history-mood-item:last-child {
+    border-bottom: none;
+}
+
+.history-mood-item .mood-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0; /* Agar ikon tidak menyusut */
+}
+
+.history-mood-item-content {
+    flex-grow: 1;
+}
+
+.history-mood-item-content .mood-date {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.history-mood-item-content .mood-notes {
+    font-size: 0.9rem;
+    color: var(--text-muted-color);
+    font-style: italic;
+    margin-top: var(--space-xs);
+}
