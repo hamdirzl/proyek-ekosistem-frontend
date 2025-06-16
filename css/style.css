@@ -1,10 +1,10 @@
 /* =================================================================== */
-/* ==   V3: REFINEMENT - FLUID TYPOGRAPHY & SPACING SYSTEM        == */
+/* ==   V4: FINAL POLISH - MOBILE LAYOUT FIX                      == */
 /* =================================================================== */
 
 /* === PENGATURAN GLOBAL: DESIGN SYSTEM === */
 :root {
-    /* Palet Warna (Tetap Sama) */
+    /* Palet Warna */
     --background-color: #121212;
     --card-bg-color: #1e1e1e;
     --text-color: #e0e0e0;
@@ -13,11 +13,11 @@
     --accent-color: #00f5a0;
     --accent-hover: #00d98c;
     
-    /* Font (Tetap Sama) */
+    /* Font */
     --font-heading: 'Poppins', sans-serif;
     --font-body: 'Inter', sans-serif;
 
-    /* [REFINEMENT] Skala Spasi yang Konsisten */
+    /* Skala Spasi */
     --space-xs: 0.5rem;    /* 8px */
     --space-sm: 1rem;      /* 16px */
     --space-md: 1.5rem;    /* 24px */
@@ -25,10 +25,10 @@
     --space-xl: 4rem;      /* 64px */
     --space-xxl: 6rem;     /* 96px */
 
-    /* [REFINEMENT] Tipografi Fluid (Ukuran Teks Adaptif) */
+    /* Tipografi Fluid */
     --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-    --font-size-h1:   clamp(2.5rem, 1.5rem + 5vw, 5rem);
-    --font-size-h2:   clamp(2rem, 1.25rem + 3.75vw, 3.5rem);
+    --font-size-h1:   clamp(2.5rem, 1.5rem + 5vw, 4.5rem); /* sedikit dikecilkan max-nya */
+    --font-size-h2:   clamp(2rem, 1.25rem + 3.75vw, 3rem); /* sedikit dikecilkan max-nya */
     --font-size-h3:   clamp(1.5rem, 1.1rem + 2vw, 2rem);
     
     /* Bayangan */
@@ -44,7 +44,7 @@ body {
     background-color: var(--background-color); 
     color: var(--text-color); 
     line-height: 1.7; 
-    font-size: var(--font-size-base); /* Menggunakan ukuran font dasar yang fluid */
+    font-size: var(--font-size-base);
     -webkit-font-smoothing: antialiased; 
     -moz-osx-font-smoothing: grayscale;
     background-image: 
@@ -58,7 +58,7 @@ body {
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    padding: var(--space-sm) clamp(var(--space-sm), 5vw, var(--space-xxl)); /* Padding adaptif */
+    padding: var(--space-sm) clamp(var(--space-sm), 5vw, var(--space-xxl));
     position: sticky;
     top: 0; 
     z-index: 1000; 
@@ -139,7 +139,7 @@ footer {
 .hero-content { max-width: 800px; }
 .hero h1 { 
     font-family: var(--font-heading); 
-    font-size: var(--font-size-h1); /* Fluid */
+    font-size: var(--font-size-h1);
     font-weight: 700; 
     margin-bottom: var(--space-sm); 
     line-height: 1.2; 
@@ -178,7 +178,7 @@ footer {
 .pintu .button-pintu { margin-top: auto; }
 
 /* === GAYA HALAMAN LAINNYA === */
-.page-container { max-width: 1200px; margin: var(--space-xxl) auto; padding: 0 var(--space-lg); }
+.page-container { max-width: 1200px; margin: var(--space-xxl) auto; padding: 0 var(--space-md); } /* [PERBAIKAN] Padding awal disesuaikan */
 .page-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h1); color: #ffffff; margin-bottom: var(--space-sm); }
 .page-subtitle { text-align: center; font-size: var(--font-size-base); color: var(--text-muted-color); margin-bottom: var(--space-xl); max-width: 600px; margin-left: auto; margin-right: auto; }
 .section-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h2); color: #ffffff; margin-bottom: var(--space-xl); }
@@ -227,6 +227,13 @@ footer {
     margin-bottom: var(--space-lg); 
     border: 1px solid var(--border-color); 
 }
+/* [PERBAIKAN TAMPILAN MOBILE] Membuat form lebih rapi */
+#shortener-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
 input[type="url"], input[type="email"], input[type="password"], textarea { 
     width: 100%;
     padding: var(--space-sm); 
@@ -334,12 +341,17 @@ input:focus, textarea:focus {
     .nav-links a.login-button { margin: var(--space-xs) 5%; width: auto; text-align: center; }
     
     .page-container { 
-        padding-top: 75px;
+        padding: 75px var(--space-md) 0; /* [PERBAIKAN TAMPILAN MOBILE] Padding atas untuk navbar, dan padding samping yang lebih pas */
     }
 
+    /* [PERBAIKAN TAMPILAN MOBILE] Mengurangi padding internal untuk kartu di mobile */
+    .tool-section, .dashboard-header, .history-section, .pintu {
+        padding: var(--space-md);
+    }
+    
     .hero { 
         text-align: center; 
-        padding-top: 12rem;
+        padding: 12rem var(--space-md) var(--space-xl) var(--space-md);
         min-height: auto;
     }
 }
@@ -348,16 +360,16 @@ input:focus, textarea:focus {
 .social-icons {
     display: flex;
     justify-content: center;
-    gap: var(--space-md); /* Jarak antar ikon */
-    margin-bottom: var(--space-md); /* Jarak ke teks copyright */
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
 }
 
 .social-icons a svg {
-    color: var(--text-muted-color); /* Warna ikon default */
+    color: var(--text-muted-color);
     transition: all 0.3s ease;
 }
 
 .social-icons a:hover svg {
-    color: var(--accent-color); /* Warna ikon saat disentuh */
-    transform: translateY(-4px); /* Efek ikon sedikit terangkat */
+    color: var(--accent-color);
+    transform: translateY(-4px);
 }
