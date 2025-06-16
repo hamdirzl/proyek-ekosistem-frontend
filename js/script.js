@@ -3,7 +3,6 @@
 // ===================================================================
 
 // --- PERUBAHAN PENTING UNTUK DEPLOYMENT ---
-// Ganti URL di bawah ini dengan URL backend Render Anda yang sebenarnya.
 const API_BASE_URL = 'https://server-pribadi-hamdi.onrender.com';
 
 console.log(`Ekosistem Digital v3.0 (Live) dimuat! Menghubungi API di: ${API_BASE_URL}`);
@@ -11,18 +10,16 @@ console.log(`Ekosistem Digital v3.0 (Live) dimuat! Menghubungi API di: ${API_BAS
 // ===================================
 // === FUNGSI UNTUK URL SHORTENER ===
 // ===================================
-
 const shortenerForm = document.getElementById('shortener-form');
 if (shortenerForm) {
     const longUrlInput = document.getElementById('long-url');
     const resultBox = document.getElementById('result');
-
     shortenerForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const originalUrl = longUrlInput.value;
         resultBox.textContent = 'Memproses...';
         try {
-            // Perhatikan: 'http://localhost:3000' diganti dengan `${API_BASE_URL}`
+            // PERBAIKAN KRUSIAL: Menggunakan API_BASE_URL di sini juga
             const response = await fetch(`${API_BASE_URL}/api/shorten`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -30,8 +27,6 @@ if (shortenerForm) {
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Gagal mengambil data');
-            
-            // Di versi live, kita tidak menampilkan slug localhost lagi
             resultBox.textContent = `Link pendek Anda: ${data.short_url}`;
             resultBox.style.color = 'var(--secondary-color)';
             longUrlInput.value = '';
@@ -46,7 +41,6 @@ if (shortenerForm) {
 // ==========================================================
 // ===         LOGIKA UNTUK HALAMAN AUTENTIKASI           ===
 // ==========================================================
-
 if (document.getElementById('login-form')) {
     const loginSection = document.getElementById('login-section');
     const registerSection = document.getElementById('register-section');
@@ -55,7 +49,6 @@ if (document.getElementById('login-form')) {
     const showRegisterLink = document.getElementById('show-register');
     const showLoginLink = document.getElementById('show-login');
     const authMessage = document.getElementById('auth-message');
-
     showRegisterLink.addEventListener('click', (e) => {
         e.preventDefault();
         loginSection.classList.add('hidden');
@@ -70,7 +63,6 @@ if (document.getElementById('login-form')) {
         authMessage.textContent = '';
         authMessage.className = '';
     });
-
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('register-email').value;
@@ -91,7 +83,6 @@ if (document.getElementById('login-form')) {
             authMessage.className = 'error';
         }
     });
-
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value;
@@ -118,7 +109,6 @@ if (document.getElementById('login-form')) {
 // ==========================================================
 // ===         LOGIKA UNTUK HALAMAN DASHBOARD             ===
 // ==========================================================
-
 if (document.getElementById('dashboard-main')) {
     const userEmailEl = document.getElementById('user-email');
     const logoutButton = document.getElementById('logout-button');
@@ -127,9 +117,7 @@ if (document.getElementById('dashboard-main')) {
     const loadingMessage = document.getElementById('loading-moods');
     const moodMessage = document.getElementById('mood-message');
     const token = localStorage.getItem('jwt_token');
-
     if (!token) { window.location.href = 'auth.html'; }
-
     const fetchAndRenderMoods = async () => {
         try {
             loadingMessage.textContent = 'Memuat riwayat...';
@@ -155,7 +143,6 @@ if (document.getElementById('dashboard-main')) {
             moodHistoryList.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
         }
     };
-    
     const fetchProfile = async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/api/profile`, {
@@ -169,7 +156,6 @@ if (document.getElementById('dashboard-main')) {
             window.location.href = 'auth.html';
         }
     };
-
     moodForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const moodLevel = moodForm.elements['mood'].value;
@@ -199,12 +185,10 @@ if (document.getElementById('dashboard-main')) {
             moodMessage.className = 'error';
         }
     });
-
     logoutButton.addEventListener('click', () => {
         localStorage.removeItem('jwt_token');
         window.location.href = 'auth.html';
     });
-
     fetchProfile();
     fetchAndRenderMoods();
 }
