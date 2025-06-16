@@ -1,7 +1,7 @@
 // ===================================================================
 // ==   FILE FINAL SCRIPT.JS (DENGAN PERBAIKAN LOGIKA DASHBOARD)    ==
 // ===================================================================
-const API_BASE_URL = 'https://server-pribadi-hamdi.onrender.com';
+const API_BASE_URL = 'https://hamdirzl.my.id';
 
 console.log(`Ekosistem Digital (Client v11) dimuat! Menghubungi API di: ${API_BASE_URL}`);
 
