@@ -1,5 +1,5 @@
 /* ===================================================================
-   ==       FILE FINAL STYLE.CSS (untuk Seluruh Halaman)        ==
+   ==    FILE FINAL STYLE.CSS (v2 - dengan Perbaikan Tombol Login)    ==
    =================================================================== */
 
 /* === PENGATURAN GLOBAL & VARIABEL WARNA === */
@@ -58,7 +58,6 @@ body {
     margin-left: 2.5rem;
 }
 
-/* Aturan ini memberi gaya pada link DAN tombol di dalam navigasi */
 .nav-links a, .nav-links button {
     text-decoration: none;
     color: var(--text-color);
@@ -68,7 +67,7 @@ body {
     font-family: var(--font-family);
     background: none;
     border: none;
-    padding: 0; /* Menghapus padding default dari button */
+    padding: 0;
 }
 
 .nav-links a:hover, .nav-links button:hover {
@@ -76,7 +75,8 @@ body {
     cursor: pointer;
 }
 
-.login-button {
+/* PERBAIKAN DI SINI: Selektor diubah agar lebih spesifik */
+.nav-links .login-button {
     background-color: var(--secondary-color);
     color: white !important;
     padding: 0.6rem 1.2rem;
@@ -84,7 +84,7 @@ body {
     transition: background-color 0.3s ease;
 }
 
-.login-button:hover {
+.nav-links .login-button:hover {
     background-color: #2980b9;
     color: white !important;
 }
@@ -123,7 +123,6 @@ footer {
 .section-title { text-align: center; font-size: 2rem; color: var(--primary-color); margin-bottom: 2rem; }
 
 /* === GAYA SPESIFIK KOMPONEN === */
-/* Portofolio & Game Card */
 .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
 .portfolio-card { background: var(--card-bg-color); border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease; padding-bottom: 1.5rem; text-align: center; }
 .portfolio-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
@@ -131,7 +130,6 @@ footer {
 .portfolio-card h3 { color: var(--primary-color); margin: 1.5rem 1rem 0.5rem 1rem; }
 .portfolio-card p { padding: 0 1.5rem; font-size: 0.95rem; }
 
-/* Jurnal Card */
 .jurnal-grid { display: grid; gap: 2.5rem; }
 .jurnal-card { display: flex; background: var(--card-bg-color); border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: box-shadow 0.3s ease; }
 .jurnal-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
@@ -140,13 +138,11 @@ footer {
 .jurnal-content h3 { color: var(--primary-color); margin-top: 0; }
 .post-meta { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 1rem; }
 
-/* Arena & Perkakas */
 .tool-section { background: var(--card-bg-color); padding: 2.5rem; border-radius: 10px; margin-bottom: 4rem; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
 .url-shortener-box form { display: flex; gap: 1rem; }
 .url-shortener-box input[type="url"] { flex-grow: 1; padding: 1rem; border: 1px solid #bdc3c7; border-radius: 5px; font-size: 1rem; font-family: var(--font-family); }
 .result-box { margin-top: 1.5rem; background: var(--background-color); padding: 1rem; border-radius: 5px; min-height: 2rem; text-align: center; font-weight: 700; color: var(--secondary-color); }
 
-/* Halaman Autentikasi */
 .auth-container { max-width: 450px; margin: 2rem auto; padding: 2.5rem; background-color: var(--card-bg-color); border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
 .auth-form .form-group { margin-bottom: 1.5rem; }
 .auth-form label { display: block; margin-bottom: 0.5rem; font-weight: 700; }
@@ -157,7 +153,6 @@ footer {
 #auth-message.success { background-color: #d4edda; color: #155724; }
 #auth-message.error { background-color: #f8d7da; color: #721c24; }
 
-/* Halaman Dashboard */
 .dashboard-header { text-align: center; margin-bottom: 3rem; padding: 2rem; background: var(--card-bg-color); border-radius: 10px; }
 .mood-options { display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 1rem; }
 .mood-options label { cursor: pointer; padding: 0.5rem; border-radius: 5px; transition: background-color 0.2s; }
