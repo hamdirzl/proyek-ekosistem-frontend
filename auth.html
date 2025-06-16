@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Registrasi - [Nama Anda]</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo"><a href="index.html">[Nama Anda]</a></div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="portfolio.html">Portofolio</a></li>
+                <li><a href="arena.html">Arena Interaktif</a></li>
+                <li><a href="jurnal.html">Jurnal</a></li>
+                <li><a href="auth.html" class="login-button">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="page-container">
+        <div class="auth-container">
+            <div id="login-section">
+                <h2 class="section-title">Login</h2>
+                <form id="login-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="button-pintu">Login</button>
+                </form>
+                <p class="auth-toggle">Belum punya akun? <a href="#" id="show-register">Registrasi di sini</a></p>
+            </div>
+
+            <div id="register-section" class="hidden">
+                <h2 class="section-title">Registrasi</h2>
+                <form id="register-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password (min. 6 karakter)</label>
+                        <input type="password" id="register-password" required>
+                    </div>
+                    <button type="submit" class="button-pintu">Registrasi</button>
+                </form>
+                 <p class="auth-toggle">Sudah punya akun? <a href="#" id="show-login">Login di sini</a></p>
+            </div>
+            
+            <div id="auth-message"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 [Nama Anda]. Dibangun dengan semangat dan secangkir kopi.</p>
+    </footer>
+    
+    <script src="js/script.js"></script>
+</body>
+</html>
