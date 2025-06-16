@@ -1,5 +1,5 @@
 /* =================================================================== */
-/* ==   V5: ABOUT ME MODAL IMPLEMENTATION                         == */
+/* ==   V6: ABOUT ME MODAL REFINEMENT                             == */
 /* =================================================================== */
 
 /* === PENGATURAN GLOBAL: DESIGN SYSTEM === */
@@ -80,7 +80,7 @@ body {
 .logo a:hover { color: var(--accent-color); }
 
 .nav-links { list-style: none; display: flex; align-items: center; gap: var(--space-lg); }
-.nav-links li { margin-left: 0; } /* Dihapus karena sudah pakai gap */
+.nav-links li { margin-left: 0; }
 .nav-links a { 
     text-decoration: none; 
     color: var(--text-muted-color); 
@@ -106,7 +106,7 @@ body {
 }
 .login-button { 
     color: #000000 !important; 
-    padding: 0.6rem 1.2rem !important; /* !important untuk menimpa gaya .nav-links a */
+    padding: 0.6rem 1.2rem !important;
     background-color: var(--accent-color) !important;
 }
 .button-pintu:hover, .login-button:hover { 
@@ -143,14 +143,12 @@ footer {
     line-height: 1.2; 
     letter-spacing: -1px;
 }
-
-.hero h1 span {
+.hero h1 span { 
     background: linear-gradient(45deg, var(--accent-color), #00c4ff);
     -webkit-background-clip: text;
-    background-clip: text; /* <-- TAMBAHKAN BARIS INI */
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-
 .hero p { font-size: var(--font-size-base); max-width: 90%; color: var(--text-muted-color); }
 
 .pintu-utama { padding: var(--space-xxl) clamp(var(--space-sm), 5vw, var(--space-xxl)); text-align: center; }
@@ -354,6 +352,20 @@ input:focus, textarea:focus {
         padding: 12rem var(--space-md) var(--space-xl) var(--space-md);
         min-height: auto;
     }
+
+    /* [PERBAIKAN] Penyesuaian Modal untuk Mobile */
+    .modal-content {
+        padding: var(--space-md);
+        padding-top: var(--space-xl); /* Beri ruang untuk tombol close */
+    }
+
+    .modal-content .section-title {
+        font-size: 1.75rem;
+    }
+
+    .about-greeting {
+        font-size: 1.25rem;
+    }
 }
 
 /* === GAYA IKON SOSIAL DI FOOTER === */
@@ -392,7 +404,7 @@ input:focus, textarea:focus {
     color: var(--text-color);
 }
 
-/* === GAYA MODAL (POP-UP) TENTANG SAYA === */
+/* === GAYA MODAL (POP-UP) TENTANG SAYA (DISEMPURNAKAN) === */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -417,7 +429,7 @@ input:focus, textarea:focus {
 
 .modal-content {
     background: var(--card-bg-color);
-    padding: var(--space-xl);
+    padding: var(--space-lg); /* [PERBAIKAN] Padding dikecilkan */
     border-radius: 12px;
     max-width: 600px;
     width: 90%;
@@ -447,11 +459,12 @@ input:focus, textarea:focus {
 }
 
 .modal-content .section-title {
+    font-size: var(--font-size-h3); /* [PERBAIKAN] Judul modal dikecilkan */
     margin-bottom: var(--space-md);
 }
 
 .about-greeting {
-    font-size: var(--font-size-h3);
+    font-size: calc(var(--font-size-base) * 1.2); /* [PERBAIKAN] Sapaan dikecilkan */
     font-family: var(--font-heading);
     color: var(--accent-color);
     margin-bottom: var(--space-md);
@@ -460,5 +473,5 @@ input:focus, textarea:focus {
 .modal-content p {
     color: var(--text-muted-color);
     line-height: 1.8;
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm); /* [PERBAIKAN] Jarak antar paragraf dirapatkan */
 }
