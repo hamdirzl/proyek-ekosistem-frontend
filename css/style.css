@@ -59,10 +59,15 @@ body {
     justify-content: space-between; 
     align-items: center; 
     padding: var(--space-sm) clamp(var(--space-sm), 5vw, var(--space-xxl));
-    position: sticky;
+    position: fixed;
     top: 0; 
+    left: 0;
+    width: 100%;
     z-index: 1000; 
-    transition: background-color 0.3s ease;
+    transition: background-color 0.4s ease, backdrop-filter 0.4s ease;
+}
+
+.navbar-scrolled {
     background-color: rgba(30, 30, 30, 0.7);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -175,6 +180,10 @@ footer {
 .pintu h3 { font-size: var(--font-size-h3); color: var(--text-color); margin-bottom: var(--space-xs); }
 .pintu p { color: var(--text-muted-color); flex-grow: 1; margin-bottom: var(--space-md); }
 .pintu .button-pintu { margin-top: auto; }
+
+.pintu-utama .section-title {
+    font-size: clamp(1.8rem, 1.1rem + 3.5vw, 2.5rem);
+}
 
 /* === GAYA HALAMAN LAINNYA === */
 .page-container { max-width: 1200px; margin: var(--space-xxl) auto; padding: 0 var(--space-md); }
@@ -351,11 +360,16 @@ input:focus, textarea:focus {
         text-align: center; 
         padding: 12rem var(--space-md) var(--space-xl) var(--space-md);
         min-height: auto;
+        background-position: center 70%;
     }
 
     .hero-content .hero-button {
         padding: 0.8rem 1.6rem; 
         font-size: 1rem;
+    }
+
+    .pintu-utama .section-title {
+        font-size: 1.8rem;
     }
 
     .modal-content {
