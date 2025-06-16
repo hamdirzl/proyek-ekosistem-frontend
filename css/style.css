@@ -1,4 +1,8 @@
-/* === PENGATURAN GLOBAL & VARIABEL === */
+/* ===================================================================
+   ==       FILE FINAL STYLE.CSS (untuk Seluruh Halaman)        ==
+   =================================================================== */
+
+/* === PENGATURAN GLOBAL & VARIABEL WARNA === */
 :root {
     --primary-color: #2c3e50;    /* Biru Laut Dalam */
     --secondary-color: #3498db;  /* Biru Langit */
@@ -23,6 +27,7 @@ body {
     line-height: 1.7;
 }
 
+
 /* === KOMPONEN UMUM (NAVBAR & FOOTER) === */
 .navbar {
     display: flex;
@@ -46,21 +51,27 @@ body {
 .nav-links {
     list-style: none;
     display: flex;
+    align-items: center;
 }
 
 .nav-links li {
     margin-left: 2.5rem;
 }
 
-.nav-links a {
+.nav-links a, .nav-links button {
     text-decoration: none;
     color: var(--text-color);
     font-weight: 400;
     transition: color 0.3s ease;
+    font-size: 1rem;
+    font-family: var(--font-family);
+    background: none;
+    border: none;
 }
 
-.nav-links a:hover {
+.nav-links a:hover, .nav-links button:hover {
     color: var(--secondary-color);
+    cursor: pointer;
 }
 
 .login-button {
@@ -73,6 +84,7 @@ body {
 
 .login-button:hover {
     background-color: #2980b9;
+    color: white !important;
 }
 
 footer {
@@ -83,12 +95,13 @@ footer {
     color: white;
 }
 
+
 /* === GAYA HALAMAN UTAMA (INDEX.HTML) === */
 .hero {
     text-align: center;
     padding: 5rem 2rem;
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://via.placeholder.com/1500x500') no-repeat center center/cover;
     color: white;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
 }
 
 .hero h1 {
@@ -139,6 +152,8 @@ footer {
     border-radius: 5px;
     font-weight: 700;
     transition: background-color 0.3s ease;
+    border: none;
+    cursor: pointer;
 }
 
 .button-pintu:hover {
@@ -146,7 +161,7 @@ footer {
 }
 
 
-/* === GAYA HALAMAN-HALAMAN LAIN === */
+/* === GAYA HALAMAN-HALAMAN LAIN (UMUM) === */
 .page-container {
     max-width: 1100px;
     margin: 3rem auto;
@@ -174,13 +189,14 @@ footer {
     margin-bottom: 2rem;
 }
 
-/* GAYA PORTFOLIO & GAME CARD */
+/* === GAYA SPESIFIK KOMPONEN === */
+
+/* Portofolio & Game Card */
 .portfolio-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
 }
-
 .portfolio-card {
     background: var(--card-bg-color);
     border-radius: 10px;
@@ -190,258 +206,68 @@ footer {
     padding-bottom: 1.5rem;
     text-align: center;
 }
-.portfolio-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-}
+.portfolio-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+.portfolio-card img { width: 100%; height: 200px; object-fit: cover; }
+.portfolio-card h3 { color: var(--primary-color); margin: 1.5rem 1rem 0.5rem 1rem; }
+.portfolio-card p { padding: 0 1.5rem; font-size: 0.95rem; }
 
-.portfolio-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
+/* Jurnal Card */
+.jurnal-grid { display: grid; gap: 2.5rem; }
+.jurnal-card { display: flex; background: var(--card-bg-color); border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: box-shadow 0.3s ease; }
+.jurnal-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+.jurnal-card img { width: 300px; height: 100%; object-fit: cover; }
+.jurnal-content { padding: 2rem; }
+.jurnal-content h3 { color: var(--primary-color); margin-top: 0; }
+.post-meta { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 1rem; }
 
-.portfolio-card h3 {
-    color: var(--primary-color);
-    margin: 1.5rem 1rem 0.5rem 1rem;
-}
+/* Arena & Perkakas */
+.tool-section { background: var(--card-bg-color); padding: 2.5rem; border-radius: 10px; margin-bottom: 4rem; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+.url-shortener-box form { display: flex; gap: 1rem; }
+.url-shortener-box input[type="url"] { flex-grow: 1; padding: 1rem; border: 1px solid #bdc3c7; border-radius: 5px; font-size: 1rem; font-family: var(--font-family); }
+.result-box { margin-top: 1.5rem; background: var(--background-color); padding: 1rem; border-radius: 5px; min-height: 2rem; text-align: center; font-weight: 700; color: var(--secondary-color); }
 
-.portfolio-card p {
-    padding: 0 1.5rem;
-    font-size: 0.95rem;
-}
+/* Halaman Autentikasi */
+.auth-container { max-width: 450px; margin: 2rem auto; padding: 2.5rem; background-color: var(--card-bg-color); border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+.auth-form .form-group { margin-bottom: 1.5rem; }
+.auth-form label { display: block; margin-bottom: 0.5rem; font-weight: 700; }
+.auth-form input { width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; font-family: var(--font-family); }
+.auth-toggle { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; }
+.auth-toggle a { color: var(--secondary-color); font-weight: 700; text-decoration: none; }
+#auth-message { text-align: center; margin-top: 1.5rem; font-weight: 700; padding: 1rem; border-radius: 5px; }
+#auth-message.success { background-color: #d4edda; color: #155724; }
+#auth-message.error { background-color: #f8d7da; color: #721c24; }
 
-/* GAYA JURNAL CARD */
-.jurnal-grid {
-    display: grid;
-    gap: 2.5rem;
-}
-
-.jurnal-card {
-    display: flex;
-    background: var(--card-bg-color);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    transition: box-shadow 0.3s ease;
-}
-.jurnal-card:hover {
-    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-}
-
-.jurnal-card img {
-    width: 300px;
-    height: 100%;
-    object-fit: cover;
-}
-
-.jurnal-content {
-    padding: 2rem;
-}
-.jurnal-content h3 {
-    color: var(--primary-color);
-    margin-top: 0;
-}
-.post-meta {
-    font-size: 0.8rem;
-    color: #7f8c8d;
-    margin-bottom: 1rem;
-}
-
-/* GAYA ARENA & PERKAKAS */
-.tool-section {
-    background: var(--card-bg-color);
-    padding: 2rem;
-    border-radius: 10px;
-    margin-bottom: 4rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-}
-
-.url-shortener-box form {
-    display: flex;
-    gap: 1rem;
-}
-.url-shortener-box input[type="url"] {
-    flex-grow: 1;
-    padding: 1rem;
-    border: 1px solid #bdc3c7;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-family: var(--font-family);
-}
-.result-box {
-    margin-top: 1.5rem;
-    background: var(--background-color);
-    padding: 1rem;
-    border-radius: 5px;
-    min-height: 2rem;
-    text-align: center;
-    font-weight: 700;
-    color: var(--secondary-color);
-}
-
-/* === RESPONSIVITAS (UNTUK MOBILE) === */
-@media (max-width: 768px) {
-    .nav-links {
-        display: none; /* Sembunyikan untuk versi mobile simpel, bisa diganti menu hamburger nanti */
-    }
-    .hero h1 {
-        font-size: 2.5rem;
-    }
-    .pintu-container, .portfolio-grid {
-        flex-direction: column;
-        align-items: center;
-    }
-    .jurnal-card {
-        flex-direction: column;
-    }
-    .jurnal-card img {
-        width: 100%;
-        height: 200px;
-    }
-    .url-shortener-box form {
-        flex-direction: column;
-    }
-}
-/* === GAYA UNTUK HALAMAN AUTENTIKASI === */
-
-.auth-container {
-    max-width: 450px;
-    margin: 2rem auto;
-    padding: 2.5rem;
-    background-color: var(--card-bg-color);
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-}
-
-.auth-form .form-group {
-    margin-bottom: 1.5rem;
-}
-
-.auth-form label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 700;
-}
-
-.auth-form input {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-family: var(--font-family);
-}
-
-.auth-form button {
-    width: 100%;
-    border: none;
-    cursor: pointer;
-}
-
-.auth-toggle {
-    text-align: center;
-    margin-top: 1.5rem;
-    font-size: 0.9rem;
-}
-
-.auth-toggle a {
-    color: var(--secondary-color);
-    font-weight: 700;
-    text-decoration: none;
-}
-
-.hidden {
-    display: none;
-}
-
-#auth-message {
-    text-align: center;
-    margin-top: 1.5rem;
-    font-weight: 700;
-    padding: 1rem;
-    border-radius: 5px;
-}
-
-#auth-message.success {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-#auth-message.error {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-/* === GAYA UNTUK HALAMAN DASHBOARD === */
-.dashboard-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding: 2rem;
-    background: var(--card-bg-color);
-    border-radius: 10px;
-}
-
-#logout-button {
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    font-family: var(--font-family);
-}
-
-.mood-options {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-}
-
-.mood-options label {
-    cursor: pointer;
-    padding: 0.5rem;
-}
-
-#mood-notes {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-family: var(--font-family);
-    resize: vertical;
-}
-
-.mood-history-list {
-    list-style: none;
-    padding: 0;
-}
-
-.mood-item {
-    background: var(--card-bg-color);
-    border-left: 5px solid;
-    padding: 1rem 1.5rem;
-    margin-bottom: 1rem;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.mood-item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 700;
-}
-.mood-date {
-    font-size: 0.85rem;
-    color: #7f8c8d;
-}
-.mood-notes {
-    margin-top: 0.5rem;
-}
-
-/* Warna untuk setiap level mood */
+/* Halaman Dashboard */
+.dashboard-header { text-align: center; margin-bottom: 3rem; padding: 2rem; background: var(--card-bg-color); border-radius: 10px; }
+.mood-options { display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 1rem; }
+.mood-options label { cursor: pointer; padding: 0.5rem; border-radius: 5px; transition: background-color 0.2s; }
+.mood-options label:hover { background-color: #ecf0f1; }
+.mood-options input { margin-right: 0.5em; }
+#mood-notes { width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; font-family: var(--font-family); resize: vertical; }
+.mood-history-list { list-style: none; padding: 0; }
+.mood-item { background: var(--card-bg-color); border-left: 5px solid; padding: 1rem 1.5rem; margin-bottom: 1rem; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.mood-item-header { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+.mood-date { font-size: 0.85rem; color: #7f8c8d; }
+.mood-notes { margin-top: 0.5rem; }
 .mood-item.level-5 { border-color: #2ecc71; } /* Hijau */
 .mood-item.level-4 { border-color: #3498db; } /* Biru */
 .mood-item.level-3 { border-color: #f1c40f; } /* Kuning */
 .mood-item.level-2 { border-color: #e67e22; } /* Oranye */
 .mood-item.level-1 { border-color: #e74c3c; } /* Merah */
+
+
+/* === KELAS UTILITAS === */
+.hidden {
+    display: none !important;
+}
+
+
+/* === RESPONSIVITAS (UNTUK MOBILE) === */
+@media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hero h1 { font-size: 2.5rem; }
+    .pintu-container, .portfolio-grid { flex-direction: column; align-items: center; }
+    .jurnal-card { flex-direction: column; }
+    .jurnal-card img { width: 100%; height: 200px; }
+    .url-shortener-box form { flex-direction: column; }
+}
