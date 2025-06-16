@@ -1,447 +1,389 @@
-/* === PENGATURAN GLOBAL & VARIABEL === */
+/* =================================================================== */
+/* ==       DESAIN BARU V2: "EXECUTIVE MINIMALIST" THEME          == */
+/* =================================================================== */
+
+/* === ✨ PENGATURAN GLOBAL & VARIABEL DESAIN BARU === */
 :root {
-    --primary-color: #2c3e50;    /* Biru Laut Dalam */
-    --secondary-color: #3498db;  /* Biru Langit */
-    --accent-color: #e74c3c;     /* Merah Bata */
-    --background-color: #f4f6f9; /* Abu-abu Sangat Cerah */
-    --text-color: #34495e;       /* Abu-abu Gelap */
-    --card-bg-color: #ffffff;    /* Putih */
-    --font-family: 'Poppins', sans-serif;
+    --background-color: #1A1D22;      /* Abu-abu Gelap (lebih lembut dari sebelumnya) */
+    --card-bg-color: #242830;         /* Abu-abu untuk Kartu, kontras halus */
+    --text-color: #F0F2F5;            /* Putih Gading */
+    --text-muted-color: #9BA3B0;      /* Abu-abu terang untuk Teks Sekunder */
+    --border-color: #3A414B;          /* Border yang sangat subtil */
+    
+    /* WARNA BARU: Mengganti hijau neon dengan biru profesional yang elegan */
+    --accent-color: #4FC3F7;          /* Biru Langit Cerah */
+    --accent-hover: #29B6F6;          /* Biru yang sedikit lebih gelap saat hover */
+
+    --font-heading: 'Poppins', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    /* SHADOW BARU: Bayangan halus dan berlapis untuk kesan premium */
+    --soft-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Reset dasar untuk konsistensi browser */
+/* Reset dasar & pengaturan body */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+html { scroll-behavior: smooth; }
+
 body {
-    font-family: var(--font-family);
+    font-family: var(--font-body);
     background-color: var(--background-color);
     color: var(--text-color);
     line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* === KOMPONEN UMUM (NAVBAR & FOOTER) === */
+/* === ✨ KOMPONEN UMUM (NAVBAR & FOOTER) YANG ELEGAN === */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--card-bg-color);
+    background-color: var(--card-bg-color); /* Warna navbar sedikit beda dari body */
     padding: 1rem 5%;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
     z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .logo a {
+    font-family: var(--font-heading);
     font-size: 1.8rem;
     font-weight: 700;
     text-decoration: none;
-    color: var(--primary-color);
+    color: var(--text-color);
+    transition: color 0.3s ease;
 }
+.logo a:hover { color: var(--accent-color); }
 
 .nav-links {
     list-style: none;
     display: flex;
+    align-items: center;
 }
-
-.nav-links li {
-    margin-left: 2.5rem;
-}
+.nav-links li { margin-left: 2.5rem; }
 
 .nav-links a {
     text-decoration: none;
-    color: var(--text-color);
-    font-weight: 400;
+    color: var(--text-muted-color);
+    font-weight: 500;
     transition: color 0.3s ease;
 }
+.nav-links a:hover { color: var(--text-color); }
 
-.nav-links a:hover {
-    color: var(--secondary-color);
+/* Tombol dengan gaya yang lebih profesional */
+.button-pintu, .login-button {
+    display: inline-block;
+    background-color: var(--accent-color);
+    color: #111; /* Teks gelap di atas tombol terang */
+    padding: 0.7rem 1.6rem;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    text-decoration: none;
+    /* EFEK BARU: Menghapus shadow tegas, menggunakan transisi & shadow halus */
+    transition: all 0.3s ease;
 }
 
 .login-button {
-    background-color: var(--secondary-color);
-    color: white !important;
+    color: #111 !important;
     padding: 0.6rem 1.2rem;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
 }
 
-.login-button:hover {
-    background-color: #2980b9;
+.button-pintu:hover, .login-button:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-3px);
+    box-shadow: var(--soft-shadow);
 }
 
 footer {
     text-align: center;
-    padding: 2rem;
-    margin-top: 3rem;
-    background-color: var(--primary-color);
-    color: white;
+    padding: 3rem;
+    margin-top: 4rem;
+    background-color: var(--card-bg-color);
+    color: var(--text-muted-color);
+    border-top: 1px solid var(--border-color);
 }
 
-/* === GAYA HALAMAN UTAMA (INDEX.HTML) === */
+/* === ✨ GAYA HALAMAN UTAMA (INDEX.HTML) YANG BERSIH === */
+/* Ganti dengan kode ini */
 .hero {
-    text-align: center;
-    padding: 5rem 2rem;
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://via.placeholder.com/1500x500') no-repeat center center/cover;
-    color: white;
+    display: flex;
+    align-items: center;
+    padding: 6rem 5%;
+    min-height: 80vh;
+
+    /* Mengatur gambar latar dan overlay */
+    background: 
+        /* Lapisan 1: Overlay Gelap untuk Keterbacaan Teks */
+        linear-gradient(rgba(26, 29, 34, 0.75), rgba(26, 29, 34, 0.95)),
+
+        /* Lapisan 2: Gambar Latar Anda */
+        url('../assets/images/bg1.jpg') no-repeat center center/cover;
 }
+
+.hero-content { max-width: 750px; }
 
 .hero h1 {
-    font-size: 3.5rem;
+    font-family: var(--font-heading);
+    font-size: clamp(2.8rem, 5vw, 4.8rem);
+    font-weight: 700;
     margin-bottom: 1rem;
+    line-height: 1.2;
+}
+.hero h1 span { color: var(--accent-color); }
+
+.hero p {
+    font-size: 1.2rem;
+    color: var(--text-muted-color);
+    max-width: 90%;
 }
 
 .pintu-utama {
-    padding: 4rem 2rem;
+    padding: 6rem 5%;
     text-align: center;
 }
 
 .pintu-container {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+    margin-top: 3rem;
 }
 
+/* DESAIN KARTU BARU: Shadow halus, tidak lagi neo-brutalist */
 .pintu {
     background-color: var(--card-bg-color);
     padding: 2.5rem;
     border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    width: 320px;
+    border: 1px solid var(--border-color);
+    text-align: left;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .pintu:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    transform: translateY(-8px);
+    box-shadow: var(--soft-shadow);
 }
-
 .pintu h3 {
-    color: var(--primary-color);
-    margin-top: 0;
+    font-family: var(--font-heading);
+    color: var(--text-color);
     margin-bottom: 1rem;
+    font-size: 1.5rem;
 }
+.pintu .button-pintu { margin-top: 1.5rem; }
 
-.button-pintu {
-    display: inline-block;
-    margin-top: 1.5rem;
-    text-decoration: none;
-    background-color: var(--secondary-color);
-    color: white;
-    padding: 0.8rem 1.8rem;
-    border-radius: 5px;
-    font-weight: 700;
-    transition: background-color 0.3s ease;
-}
-
-.button-pintu:hover {
-    background-color: var(--primary-color);
-}
-
-
-/* === GAYA HALAMAN-HALAMAN LAIN === */
+/* === ✨ GAYA HALAMAN-HALAMAN LAIN YANG DISEMPURNAKAN === */
 .page-container {
-    max-width: 1100px;
-    margin: 3rem auto;
+    max-width: 1200px;
+    margin: 4rem auto;
     padding: 0 2rem;
 }
 
 .page-title {
     text-align: center;
-    font-size: 2.8rem;
-    color: var(--primary-color);
+    font-family: var(--font-heading);
+    font-size: 3.5rem;
+    color: var(--text-color);
     margin-bottom: 1rem;
 }
+.page-title span { color: var(--accent-color); }
 
 .page-subtitle {
     text-align: center;
     font-size: 1.1rem;
-    color: #7f8c8d;
-    margin-bottom: 4rem;
+    color: var(--text-muted-color);
+    margin-bottom: 5rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
-
 .section-title {
     text-align: center;
-    font-size: 2rem;
-    color: var(--primary-color);
-    margin-bottom: 2rem;
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    color: var(--text-color);
+    margin-bottom: 3rem;
 }
 
-/* GAYA PORTFOLIO & GAME CARD */
-.portfolio-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-}
-
-.portfolio-card {
-    background: var(--card-bg-color);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    padding-bottom: 1.5rem;
-    text-align: center;
-}
-.portfolio-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-}
-
-.portfolio-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
-
-.portfolio-card h3 {
-    color: var(--primary-color);
-    margin: 1.5rem 1rem 0.5rem 1rem;
-}
-
-.portfolio-card p {
-    padding: 0 1.5rem;
-    font-size: 0.95rem;
-}
-
-/* GAYA JURNAL CARD */
-.jurnal-grid {
+/* GAYA PORTFOLIO & JURNAL CARD YANG ELEGAN */
+.portfolio-grid, .jurnal-grid {
     display: grid;
     gap: 2.5rem;
 }
+.portfolio-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 
-.jurnal-card {
-    display: flex;
+.portfolio-card, .jurnal-card {
     background: var(--card-bg-color);
     border-radius: 10px;
+    border: 1px solid var(--border-color);
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    transition: box-shadow 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.jurnal-card:hover {
-    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+.portfolio-card:hover, .jurnal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--soft-shadow);
 }
+.portfolio-card { text-align: left; }
+.jurnal-card { display: grid; grid-template-columns: 1fr; align-items: center; }
 
-.jurnal-card img {
-    width: 300px;
-    height: 100%;
+.portfolio-card img, .jurnal-card img {
+    width: 100%;
+    height: 220px;
     object-fit: cover;
+    transition: transform 0.4s ease;
 }
+.portfolio-card:hover img, .jurnal-card:hover img { transform: scale(1.05); }
 
-.jurnal-content {
-    padding: 2rem;
+.portfolio-card h3 {
+    font-family: var(--font-heading);
+    color: var(--text-color);
+    margin: 1.5rem 1.5rem 0.5rem 1.5rem;
 }
+.portfolio-card p {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+    font-size: 0.95rem;
+    color: var(--text-muted-color);
+}
+.portfolio-card .button-pintu { margin: 0 1.5rem 1.5rem 1.5rem; }
+
+.jurnal-content { padding: 2.5rem; }
 .jurnal-content h3 {
-    color: var(--primary-color);
+    font-family: var(--font-heading);
+    color: var(--text-color);
     margin-top: 0;
+    font-size: 1.8rem;
 }
 .post-meta {
-    font-size: 0.8rem;
-    color: #7f8c8d;
+    font-size: 0.9rem;
+    color: var(--text-muted-color);
     margin-bottom: 1rem;
 }
+.jurnal-content p { color: var(--text-muted-color); margin-bottom: 1.5rem; }
 
-/* GAYA ARENA & PERKAKAS */
-.tool-section {
+@media (min-width: 768px) {
+    .jurnal-card { grid-template-columns: 300px 1fr; }
+    .jurnal-card img { height: 100%; }
+}
+
+/* === ✨ GAYA FORM (AUTH, ARENA, DASHBOARD) YANG BERSIH === */
+.tool-section, .auth-container, .dashboard-header, .history-section {
     background: var(--card-bg-color);
-    padding: 2rem;
+    padding: 2.5rem;
     border-radius: 10px;
-    margin-bottom: 4rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    margin-bottom: 3rem;
+    border: 1px solid var(--border-color);
 }
 
-.url-shortener-box form {
-    display: flex;
-    gap: 1rem;
-}
-.url-shortener-box input[type="url"] {
+.url-shortener-box form { display: flex; gap: 1rem; }
+
+input[type="url"], input[type="email"], input[type="password"], #mood-notes {
     flex-grow: 1;
     padding: 1rem;
-    border: 1px solid #bdc3c7;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
     font-size: 1rem;
-    font-family: var(--font-family);
+    font-family: var(--font-body);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
+input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus, #mood-notes:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.2);
+}
+
 .result-box {
     margin-top: 1.5rem;
     background: var(--background-color);
-    padding: 1rem;
+    padding: 1.5rem;
     border-radius: 5px;
-    min-height: 2rem;
+    border: 1px solid var(--border-color);
     text-align: center;
-    font-weight: 700;
-    color: var(--secondary-color);
+    font-weight: 600;
+    color: var(--accent-color);
+    word-break: break-all;
 }
 
-/* === RESPONSIVITAS (UNTUK MOBILE) === */
-@media (max-width: 768px) {
-    .nav-links {
-        display: none; /* Sembunyikan untuk versi mobile simpel, bisa diganti menu hamburger nanti */
-    }
-    .hero h1 {
-        font-size: 2.5rem;
-    }
-    .pintu-container, .portfolio-grid {
-        flex-direction: column;
-        align-items: center;
-    }
-    .jurnal-card {
-        flex-direction: column;
-    }
-    .jurnal-card img {
-        width: 100%;
-        height: 200px;
-    }
-    .url-shortener-box form {
-        flex-direction: column;
-    }
-}
-/* === GAYA UNTUK HALAMAN AUTENTIKASI === */
-
-.auth-container {
-    max-width: 450px;
-    margin: 2rem auto;
-    padding: 2.5rem;
-    background-color: var(--card-bg-color);
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-}
-
-.auth-form .form-group {
-    margin-bottom: 1.5rem;
-}
-
+/* === ✨ HALAMAN AUTENTIKASI & DASHBOARD YANG LEBIH RAPI === */
+.auth-container { max-width: 480px; margin: 4rem auto; }
+.auth-form .form-group { margin-bottom: 1.5rem; }
 .auth-form label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: 700;
+    font-weight: 600;
+    color: var(--text-muted-color);
 }
+.auth-form button { width: 100%; }
+.auth-toggle { text-align: center; margin-top: 1.5rem; color: var(--text-muted-color); }
+.auth-toggle a { color: var(--accent-color); font-weight: 600; text-decoration: none; }
 
-.auth-form input {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-family: var(--font-family);
-}
-
-.auth-form button {
-    width: 100%;
-    border: none;
-    cursor: pointer;
-}
-
-.auth-toggle {
-    text-align: center;
-    margin-top: 1.5rem;
-    font-size: 0.9rem;
-}
-
-.auth-toggle a {
-    color: var(--secondary-color);
-    font-weight: 700;
-    text-decoration: none;
-}
-
-.hidden {
-    display: none;
-}
-
+.hidden { display: none; }
 #auth-message {
     text-align: center;
     margin-top: 1.5rem;
-    font-weight: 700;
+    font-weight: 600;
     padding: 1rem;
     border-radius: 5px;
 }
+#auth-message.success { background-color: rgba(79, 195, 247, 0.1); color: var(--accent-color); }
+#auth-message.error { background-color: rgba(231, 76, 60, 0.1); color: #e74c3c; }
 
-#auth-message.success {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-#auth-message.error {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-/* === GAYA UNTUK HALAMAN DASHBOARD === */
-.dashboard-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding: 2rem;
-    background: var(--card-bg-color);
-    border-radius: 10px;
-}
-
-#logout-button {
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    font-family: var(--font-family);
-}
-
-.mood-options {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-}
-
+.dashboard-header { text-align: center; }
+#logout-button { border: none; cursor: pointer; }
+.mood-options { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
 .mood-options label {
     cursor: pointer;
-    padding: 0.5rem;
-}
-
-#mood-notes {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #ccc;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
-    font-size: 1rem;
-    font-family: var(--font-family);
-    resize: vertical;
+    transition: all 0.2s ease;
 }
-
-.mood-history-list {
-    list-style: none;
-    padding: 0;
+.mood-options input[type="radio"] { display: none; }
+.mood-options label:has(input:checked) {
+    border-color: var(--accent-color);
+    background-color: rgba(79, 195, 247, 0.1);
+    color: var(--accent-color);
+    font-weight: 600;
 }
+#mood-notes { width: 100%; resize: vertical; }
 
+.mood-history-list { list-style: none; padding: 0; }
 .mood-item {
     background: var(--card-bg-color);
     border-left: 5px solid;
     padding: 1rem 1.5rem;
     margin-bottom: 1rem;
     border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
+.mood-item-header { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+.mood-date { font-size: 0.85rem; color: var(--text-muted-color); }
+.mood-notes { margin-top: 0.5rem; color: var(--text-muted-color); }
 
-.mood-item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 700;
-}
-.mood-date {
-    font-size: 0.85rem;
-    color: #7f8c8d;
-}
-.mood-notes {
-    margin-top: 0.5rem;
-}
+.mood-item.level-5 { border-color: #2ecc71; }
+.mood-item.level-4 { border-color: #3498db; }
+.mood-item.level-3 { border-color: #f1c40f; }
+.mood-item.level-2 { border-color: #e67e22; }
+.mood-item.level-1 { border-color: #e74c3c; }
 
-/* Warna untuk setiap level mood */
-.mood-item.level-5 { border-color: #2ecc71; } /* Hijau */
-.mood-item.level-4 { border-color: #3498db; } /* Biru */
-.mood-item.level-3 { border-color: #f1c40f; } /* Kuning */
-.mood-item.level-2 { border-color: #e67e22; } /* Oranye */
-.mood-item.level-1 { border-color: #e74c3c; } /* Merah */
+/* === ✨ RESPONSIVITAS === */
+@media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hero { text-align: center; }
+    .hero-content { margin: auto; }
+    .pintu-container, .portfolio-grid { grid-template-columns: 1fr; }
+    .url-shortener-box form { flex-direction: column; }
+    .page-title { font-size: 2.5rem; }
+    .section-title { font-size: 2rem; }
+}
