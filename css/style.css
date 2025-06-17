@@ -249,7 +249,6 @@ input:focus, textarea:focus {
     box-shadow: 0 0 0 3px rgba(0, 245, 160, 0.2); 
 }
 
-/* KODE BARU UNTUK IKON MATA PASSWORD */
 .password-container {
     position: relative;
 }
@@ -268,23 +267,9 @@ input:focus, textarea:focus {
 .password-container .toggle-password:hover {
     color: var(--text-color);
 }
-/* AKHIR KODE BARU */
-
-
-.result-box { 
-    margin-top: var(--space-md); 
-    background-color: #2a2a2a; 
-    padding: var(--space-md); 
-    border-radius: 8px; 
-    text-align: center; 
-    font-weight: 600; 
-    color: var(--accent-color); 
-    word-break: break-all; 
-    border: 1px dashed var(--accent-color);
-}
 
 /* === HALAMAN AUTENTIKASI & DASHBOARD === */
-.hidden { display: none; }
+.hidden { display: none !important; }
 .auth-container { 
     max-width: 450px; 
     margin: 0 auto; 
@@ -311,11 +296,6 @@ input:focus, textarea:focus {
 #auth-message.success, #mood-message.success { background-color: rgba(0, 245, 160, 0.1); color: var(--accent-color); }
 #auth-message.error, #mood-message.error { background-color: rgba(248, 215, 218, 0.1); color: #f8d7da; }
 
-/* MOOD TRACKER STYLES */
-.mood-options { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-bottom: var(--space-sm); }
-.mood-options label { cursor: pointer; padding: var(--space-xs) var(--space-sm); border: 1px solid var(--border-color); border-radius: 8px; transition: all 0.2s ease; }
-.mood-options input[type="radio"] { display: none; }
-.mood-options input[type="radio"]:checked + label { border-color: var(--accent-color); background-color: rgba(0, 245, 160, 0.1); color: var(--text-color); }
 .mood-history-list { list-style: none; padding: 0; }
 .mood-item { background-color: #2a2a2a; padding: var(--space-sm) var(--space-md); border-radius: 8px; margin-bottom: var(--space-sm); border-left: 4px solid var(--accent-color); }
 .mood-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xs); font-weight: bold; }
@@ -369,7 +349,6 @@ input:focus, textarea:focus {
         padding: var(--space-md);
     }
     
-    /* PERBAIKAN TAMPILAN MOBILE HERO SECTION */
     .hero { 
         padding: 8rem var(--space-md) 6rem var(--space-md);
         min-height: 70vh;
@@ -383,7 +362,7 @@ input:focus, textarea:focus {
 
     .modal-content {
         padding: var(--space-md);
-        padding-top: var(--space-xl); /* Beri ruang untuk tombol close */
+        padding-top: var(--space-xl);
     }
 
     .modal-content .section-title {
@@ -431,7 +410,7 @@ input:focus, textarea:focus {
     color: var(--text-color);
 }
 
-/* === GAYA MODAL (POP-UP) TENTANG SAYA (DISEMPURNAKAN) === */
+/* === GAYA MODAL (POP-UP) TENTANG SAYA === */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -502,9 +481,10 @@ input:focus, textarea:focus {
     line-height: 1.8;
     margin-bottom: var(--space-sm);
 }
-/* === GAYA UNTUK FITUR SALIN LINK === */
+
+/* GAYA UNTUK FITUR SALIN LINK */
 .result-box {
-    display: none; /* Sembunyi secara default, tampil via JS */
+    display: none;
     justify-content: space-between;
     align-items: center;
     border: 1px dashed var(--accent-color);
