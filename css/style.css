@@ -158,12 +158,18 @@ footer {
     color: #ffffff; 
     background: linear-gradient(rgba(18, 18, 18, 0.8), rgba(18, 18, 18, 0.9)), url('https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80') no-repeat center center/cover; 
 }
-.hero-content { max-width: 850px; } 
+.hero-content { 
+    max-width: 850px; 
+    display: flex; /* Mengatur display flex untuk konten hero */
+    flex-direction: column; /* Menjadikannya kolom */
+    align-items: center; /* Memusatkan item secara horizontal */
+    gap: var(--space-md); /* Menambahkan jarak antar elemen */
+} 
 .hero h1 { 
     font-family: var(--font-heading); 
     font-size: var(--font-size-h1);
     font-weight: 700; 
-    margin-bottom: var(--space-md); 
+    margin-bottom: var(--space-xs); /* Kurangi margin bawah karena ada gap */
     line-height: 1.2; 
     letter-spacing: -1px;
 }
@@ -179,7 +185,32 @@ footer {
     margin-left: auto; 
     margin-right: auto;
     color: var(--text-muted-color); 
+    margin-bottom: var(--space-md); /* Menambahkan sedikit margin bawah untuk tombol */
 }
+
+/* Gaya baru untuk tombol highlight */
+.button-highlight {
+    display: inline-block;
+    background: linear-gradient(90deg, #00f5a0, #00c4ff); /* Warna gradasi yang menarik */
+    color: #121212; /* Teks gelap agar kontras */
+    padding: 0.5rem 1.2rem; /* Ukuran tombol lebih kecil */
+    border: none; /* Tanpa border */
+    border-radius: 6px; /* Sudut sedikit membulat */
+    font-weight: 600; /* Font yang cukup tebal */
+    font-family: var(--font-body); /* Font body */
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 245, 160, 0.2); /* Bayangan lembut */
+    font-size: 0.95rem; /* Ukuran font lebih kecil */
+    margin-top: var(--space-sm); /* Jarak dari paragraf di atasnya */
+}
+
+.button-highlight:hover {
+    transform: translateY(-3px); /* Efek angkat saat hover */
+    box-shadow: 0 8px 20px rgba(0, 245, 160, 0.3); /* Bayangan lebih dalam */
+    opacity: 0.9; /* Sedikit transparan saat hover */
+}
+
 
 .pintu-utama { padding: var(--space-xl) clamp(var(--space-md), 5vw, var(--space-xl)); } 
 .section-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h2); color: #ffffff; margin-bottom: var(--space-xl); }
