@@ -1,7 +1,7 @@
 // ===================================================================
 // ==   FILE FINAL SCRIPT.JS (Lengkap dengan semua fitur)         ==
 // ===================================================================
-const API_BASE_URL = 'https://server-pribadi-hamdi.onrender.com';
+const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
 
