@@ -45,23 +45,23 @@
         <section class="tool-selection" data-aos="fade-up" data-aos-delay="200">
             <h2 class="section-title">Pilih Perkakas</h2>
             <div class="tool-buttons-container">
-                <button id="show-shortener" class="button-pintu tool-selector-button">Peramping Tautan</button>
+                <button id="show-shortener" class="button-pintu tool-selector-button">URL Shortener</button>
                 <button id="show-converter" class="button-pintu tool-selector-button">Media Converter</button>
-                <button id="show-image-merger" class="button-pintu tool-selector-button">Gabung Gambar ke PDF</button>
+                <button id="show-image-merger" class="button-pintu tool-selector-button">Image to PDF</button>
             </div>
         </section>
 
         <div id="shortener-wrapper" class="hidden">
             <section class="tool-section" data-aos="fade-up">
-                <h2 class="section-title">Perkakas: Peramping Tautan</h2>
+                <h2 class="section-title">Tool: URL Shortener</h2>
                 <form id="shortener-form">
-                    <input type="url" id="long-url" placeholder="Masukkan URL panjang Anda di sini..." required>
-                    <input type="text" id="custom-slug" placeholder="Nama kustom (opsional)..." pattern="[a-zA-Z0-9-]+" title="Hanya boleh huruf, angka, dan tanda hubung (-)">
-                    <button type="submit" class="button-pintu">Rampingkan!</button>
+                    <input type="url" id="long-url" placeholder="Enter your long URL here..." required>
+                    <input type="text" id="custom-slug" placeholder="Custom name (optional)..." pattern="[a-zA-Z0-9-]+" title="Only letters, numbers, and hyphens allowed">
+                    <button type="submit" class="button-pintu">Shorten!</button>
                 </form>
                 <div class="result-box" id="result">
                     <span id="short-url-text"></span> 
-                    <button id="copy-button" aria-label="Salin Tautan">
+                    <button id="copy-button" aria-label="Copy Link">
                         <svg id="copy-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                         <svg id="check-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check" style="display: none;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </button>
@@ -70,26 +70,26 @@
         </div>
         
         <section id="history-section" class="history-section hidden" data-aos="fade-up">
-            <h2 class="section-title">Riwayat Tautan Anda</h2>
-            <p id="loading-history">Memuat riwayat...</p>
+            <h2 class="section-title">Your Link History</h2>
+            <p id="loading-history">Loading history...</p>
             <ul id="link-history-list" class="mood-history-list"></ul>
         </section>
 
         <section id="converter-wrapper" class="tool-section hidden" data-aos="fade-up">
-            <h2 class="section-title">Perkakas: Media Converter</h2>
+            <h2 class="section-title">Tool: Media Converter</h2>
             <form id="converter-form" enctype="multipart/form-data">
-                <div class="form-group"><label for="file-input" style="display: block; margin-bottom: 0.5rem;">Pilih File</label><input type="file" id="file-input" name="file" required style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; background-color: #2a2a2a; color: var(--text-color);"></div>
-                <div class="form-group" style="margin-top: 1rem;"><label for="output-format" style="display: block; margin-bottom: 0.5rem;">Konversi Ke:</label><select id="output-format" name="outputFormat" required style="width: 100%; padding: var(--space-sm); border: 1px solid var(--border-color); border-radius: 8px; font-size: var(--font-size-base); font-family: var(--font-body); background-color: #2a2a2a; color: var(--text-color);"><option value="pdf">PDF</option><option value="docx">DOCX (Word Document)</option><option value="pptx">PPTX (PowerPoint)</option><option value="odt">ODT (OpenDocument Text)</option><option value="jpg">JPG</option><option value="png">PNG</option></select></div>
-                <button type="submit" class="button-pintu" style="margin-top: 1.5rem; width: 100%;">Konversi!</button>
+                <div class="form-group"><label for="file-input" style="display: block; margin-bottom: 0.5rem;">Select File</label><input type="file" id="file-input" name="file" required style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; background-color: #2a2a2a; color: var(--text-color);"></div>
+                <div class="form-group" style="margin-top: 1rem;"><label for="output-format" style="display: block; margin-bottom: 0.5rem;">Convert To:</label><select id="output-format" name="outputFormat" required style="width: 100%; padding: var(--space-sm); border: 1px solid var(--border-color); border-radius: 8px; font-size: var(--font-size-base); font-family: var(--font-body); background-color: #2a2a2a; color: var(--text-color);"><option value="pdf">PDF</option><option value="docx">DOCX (Word Document)</option><option value="pptx">PPTX (PowerPoint)</option><option value="odt">ODT (OpenDocument Text)</option><option value="jpg">JPG</option><option value="png">PNG</option></select></div>
+                <button type="submit" class="button-pintu" style="margin-top: 1.5rem; width: 100%;">Convert!</button>
             </form>
             <div id="converter-message" style="margin-top: 1rem;"></div>
         </section>
         
         <section id="image-merger-wrapper" class="tool-section hidden" data-aos="fade-up">
-            <h2 class="section-title">Perkakas: Gabung Gambar ke PDF</h2>
+            <h2 class="section-title">Tool: Merge Images to PDF</h2>
             <form id="image-merger-form" enctype="multipart/form-data">
-                <div class="form-group"><label for="image-files-input" style="display: block; margin-bottom: 0.5rem;">Pilih Gambar (JPG/PNG, bisa lebih dari satu)</label><input type="file" id="image-files-input" name="files" required multiple accept="image/png, image/jpeg" style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; background-color: #2a2a2a; color: var(--text-color);"></div>
-                <button type="submit" class="button-pintu" style="margin-top: 1.5rem; width: 100%;">Gabungkan ke PDF!</button>
+                <div class="form-group"><label for="image-files-input" style="display: block; margin-bottom: 0.5rem;">Select Images (JPG/PNG, multiple allowed)</label><input type="file" id="image-files-input" name="files" required multiple accept="image/png, image/jpeg" style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; background-color: #2a2a2a; color: var(--text-color);"></div>
+                <button type="submit" class="button-pintu" style="margin-top: 1.5rem; width: 100%;">Merge to PDF!</button>
             </form>
             <div id="image-merger-message" style="margin-top: 1rem;"></div>
         </section>
