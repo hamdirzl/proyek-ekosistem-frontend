@@ -1,36 +1,134 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (dengan Password Toggle)             ==
+// ==   FILE FINAL SCRIPT.JS (Lengkap dengan semua fitur)         ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi.onrender.com';
 
-console.log(`Ekosistem Digital (Client v14) dimuat! Menghubungi API di: ${API_BASE_URL}`);
+console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
 
-/* === FUNGSI GLOBAL UNTUK CEK STATUS LOGIN === */
+/* === FUNGSI GLOBAL === */
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('jwt_token');
-    const loginLink = document.querySelector('a.login-button'); 
-    const logoutButton = document.getElementById('logout-button'); 
 
+    // Cek status login umum untuk navigasi
+    const loginLink = document.querySelector('a.login-button'); 
     if (token) {
         if(loginLink) {
             loginLink.textContent = 'Dasbor';
             loginLink.href = 'dashboard.html';
         }
-    } else {
-        if (document.body.contains(document.getElementById('dashboard-main'))) {
-            window.location.href = 'auth.html';
-        }
     }
 
-    if(logoutButton) {
-        logoutButton.addEventListener('click', () => {
-            localStorage.removeItem('jwt_token');
-            window.location.href = 'index.html';
-        });
+    // Logika khusus untuk halaman tertentu
+    if (document.body.contains(document.getElementById('dashboard-main'))) {
+        if (!token) {
+            window.location.href = 'auth.html';
+            return;
+        }
+        const logoutButton = document.getElementById('logout-button');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', () => {
+                localStorage.removeItem('jwt_token');
+                window.location.href = 'index.html';
+            });
+        }
+        populateUserInfo();
+        checkUserRoleAndSetupAdminPanel();
     }
+
+    if (document.body.contains(document.getElementById('shortener-wrapper'))) {
+        setupArenaPage();
+    }
+    
+    // Setup elemen UI umum
+    setupAboutModal();
+    setupMobileMenu();
+    setupAllPasswordToggles();
 });
 
-// === FUNGSI UNTUK URL SHORTENER (DENGAN FITUR SALIN) ===
+function decodeJwt(token) {
+    try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
+}
+
+// ===================================
+// === LOGIKA UNTUK HALAMAN ARENA ===
+// ===================================
+function setupArenaPage() {
+    const token = localStorage.getItem('jwt_token');
+    const shortenerWrapper = document.getElementById('shortener-wrapper');
+    const loginPrompt = document.getElementById('login-prompt');
+    const historySection = document.getElementById('history-section');
+
+    if (token) {
+        shortenerWrapper.classList.remove('hidden');
+        historySection.classList.remove('hidden');
+        loginPrompt.classList.add('hidden');
+        fetchUserLinkHistory(token);
+    } else {
+        shortenerWrapper.classList.add('hidden');
+        historySection.classList.add('hidden');
+        loginPrompt.classList.remove('hidden');
+    }
+}
+
+async function fetchUserLinkHistory(token) {
+    const historyList = document.getElementById('link-history-list');
+    const loadingMessage = document.getElementById('loading-history');
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/user/links`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Gagal mengambil riwayat.');
+        
+        const links = await response.json();
+        
+        if (links.length === 0) {
+            loadingMessage.textContent = 'Anda belum memiliki riwayat tautan.';
+        } else {
+            loadingMessage.style.display = 'none';
+            historyList.innerHTML = '';
+            links.forEach(link => renderLinkItem(link, historyList));
+        }
+
+    } catch (error) {
+        loadingMessage.textContent = `Error: ${error.message}`;
+    }
+}
+
+function renderLinkItem(link, container, prepend = false) {
+    // Anda bisa mengganti ini dengan domain Anda jika berbeda
+    const baseUrl = 'https://link.hamdirzl.my.id';
+    const shortUrl = `${baseUrl}/${link.slug}`;
+
+    const listItem = document.createElement('li');
+    listItem.className = 'mood-item';
+    listItem.innerHTML = `
+        <div class="mood-item-header" style="align-items: center;">
+            <strong style="font-size: 1.1em; color: var(--accent-color);">${shortUrl}</strong>
+            <button class="button-pintu copy-history-btn" data-url="${shortUrl}" style="padding: 5px 10px; font-size: 0.9em;">Salin</button>
+        </div>
+        <p class="mood-notes" style="word-break: break-all;">
+            URL Asli: <a href="${link.original_url}" target="_blank">${link.original_url}</a>
+        </p>
+        <small class="mood-date">Dibuat pada: ${new Date(link.created_at).toLocaleString('id-ID')}</small>
+    `;
+
+    if (prepend) {
+        container.prepend(listItem);
+    } else {
+        container.appendChild(listItem);
+    }
+    
+    const copyBtn = listItem.querySelector('.copy-history-btn');
+    copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(copyBtn.dataset.url).then(() => {
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'Tersalin!';
+            setTimeout(() => { copyBtn.textContent = originalText; }, 2000);
+        });
+    });
+}
+
 const shortenerForm = document.getElementById('shortener-form');
 if (shortenerForm) {
     const longUrlInput = document.getElementById('long-url');
@@ -43,8 +141,13 @@ if (shortenerForm) {
 
     shortenerForm.addEventListener('submit', async (event) => {
         event.preventDefault();
+        const token = localStorage.getItem('jwt_token');
+        if (!token) {
+            alert('Sesi Anda telah berakhir. Silakan login kembali.');
+            window.location.href = 'auth.html';
+            return;
+        }
 
-        // Tampilkan pesan proses di dalam result-box
         resultBox.style.display = 'block';
         resultText.textContent = 'Memproses...';
         copyButton.style.display = 'none';
@@ -55,7 +158,10 @@ if (shortenerForm) {
         try {
             const response = await fetch(`${API_BASE_URL}/api/shorten`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({
                     original_url: originalUrl,
                     custom_slug: customSlug
@@ -64,36 +170,42 @@ if (shortenerForm) {
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Gagal mengambil data');
             
-            // Tampilkan hasil dan tombol salin
             resultBox.style.display = 'flex';
             copyButton.style.display = 'flex';
             resultText.textContent = data.short_url;
             longUrlInput.value = '';
             customSlugInput.value = '';
 
+            const historyList = document.getElementById('link-history-list');
+            const loadingMessage = document.getElementById('loading-history');
+            if(loadingMessage.textContent.includes('belum memiliki')) {
+                loadingMessage.style.display = 'none';
+                historyList.innerHTML = '';
+            }
+            renderLinkItem(data.link_data, historyList, true);
+
         } catch (error) {
             console.error('Terjadi Error:', error);
             resultText.textContent = 'Gagal: ' + error.message;
-            copyButton.style.display = 'none'; // Sembunyikan tombol jika error
+            copyButton.style.display = 'none';
         }
     });
 
-    copyButton.addEventListener('click', () => {
-        navigator.clipboard.writeText(resultText.textContent).then(() => {
-            // Beri feedback visual setelah berhasil menyalin
-            copyIcon.style.display = 'none';
-            checkIcon.style.display = 'block';
-
-            // Kembalikan ke ikon semula setelah 2 detik
-            setTimeout(() => {
-                copyIcon.style.display = 'block';
-                checkIcon.style.display = 'none';
-            }, 2000);
-        }).catch(err => {
-            console.error('Gagal menyalin ke clipboard:', err);
-            alert('Gagal menyalin link.');
+    if (copyButton) {
+        copyButton.addEventListener('click', () => {
+            navigator.clipboard.writeText(resultText.textContent).then(() => {
+                copyIcon.style.display = 'none';
+                checkIcon.style.display = 'block';
+                setTimeout(() => {
+                    copyIcon.style.display = 'block';
+                    checkIcon.style.display = 'none';
+                }, 2000);
+            }).catch(err => {
+                console.error('Gagal menyalin ke clipboard:', err);
+                alert('Gagal menyalin link.');
+            });
         });
-    });
+    }
 }
 
 // ==========================================================
@@ -119,6 +231,7 @@ if (document.getElementById('login-form')) {
             authMessage.className = '';
         });
     }
+
     if (showLoginLink) {
         showLoginLink.addEventListener('click', (e) => {
             e.preventDefault();
@@ -129,11 +242,13 @@ if (document.getElementById('login-form')) {
             authMessage.className = '';
         });
     }
+
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('register-email').value;
             const password = document.getElementById('register-password').value;
+            authMessage.textContent = 'Memproses...';
             try {
                 const response = await fetch(`${API_BASE_URL}/api/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
                 const data = await response.json();
@@ -153,6 +268,7 @@ if (document.getElementById('login-form')) {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
+             authMessage.textContent = 'Memproses...';
             try {
                 const response = await fetch(`${API_BASE_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
                 const data = await response.json();
@@ -170,50 +286,7 @@ if (document.getElementById('login-form')) {
 }
 
 // ==========================================================
-// ===         LOGIKA UNTUK MENU DROPDOWN MOBILE          ===
-// ==========================================================
-const hamburger = document.querySelector('.hamburger');
-const navLinks = document.querySelector('.nav-links');
-if (hamburger && navLinks) {
-    hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navLinks.classList.toggle('active');
-    });
-}
-
-// ==========================================================
-// ===         LOGIKA UNTUK MODAL TENTANG SAYA            ===
-// ==========================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const aboutButtons = document.querySelectorAll('#about-button');
-    const modalOverlay = document.getElementById('about-modal');
-    const modalCloseButton = document.querySelector('.modal-close');
-
-    const openModal = () => { if (modalOverlay) modalOverlay.classList.remove('hidden'); };
-    const closeModal = () => { if (modalOverlay) modalOverlay.classList.add('hidden'); };
-
-    aboutButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            if (!modalOverlay) window.location.href = 'index.html#open-about';
-            else { e.preventDefault(); openModal(); }
-        });
-    });
-
-    if (window.location.hash === '#open-about') {
-        openModal();
-        history.pushState("", document.title, window.location.pathname + window.location.search);
-    }
-    
-    if (modalOverlay) {
-        modalCloseButton.addEventListener('click', closeModal);
-        modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) closeModal(); });
-        document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); });
-    }
-});
-
-
-// ==========================================================
-// ===         LOGIKA UNTUK LUPA PASSWORD                 ===
+// ===         LOGIKA UNTUK LUPA & RESET PASSWORD         ===
 // ==========================================================
 const forgotForm = document.getElementById('forgot-form');
 if (forgotForm) {
@@ -279,21 +352,9 @@ if (resetForm) {
 // ==========================================================
 // ===   LOGIKA UNTUK DASHBOARD (INFO USER & PANEL ADMIN) ===
 // ==========================================================
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('dashboard-main')) {
-        populateUserInfo();
-        checkUserRoleAndSetupAdminPanel();
-    }
-});
-
-function decodeJwt(token) {
-    try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
-}
-
 function populateUserInfo() {
     const token = localStorage.getItem('jwt_token');
     if (!token) return;
-
     const decodedToken = decodeJwt(token);
     if (decodedToken && decodedToken.email) {
         const userEmailElement = document.getElementById('user-email');
@@ -306,9 +367,7 @@ function populateUserInfo() {
 async function checkUserRoleAndSetupAdminPanel() {
     const token = localStorage.getItem('jwt_token');
     if (!token) return;
-
     const decodedToken = decodeJwt(token);
-    
     if (decodedToken && decodedToken.role === 'admin') {
         const adminSection = document.getElementById('admin-section');
         const userEmailElement = document.getElementById('user-email');
@@ -323,7 +382,6 @@ async function checkUserRoleAndSetupAdminPanel() {
 async function fetchAndDisplayLinks(token) {
     const linkList = document.getElementById('link-list');
     const loadingMessage = document.getElementById('loading-links');
-
     try {
         const response = await fetch(`${API_BASE_URL}/api/links`, { headers: { 'Authorization': `Bearer ${token}` } });
         if (!response.ok) throw new Error('Gagal mengambil data link. Pastikan Anda adalah admin.');
@@ -389,35 +447,70 @@ async function handleDeleteLink(event) {
     }
 }
 
+
 // ==========================================================
-// ===     LOGIKA UNTUK TOGGLE PASSWORD VISIBILITY        ===
+// ===         LOGIKA UNTUK ELEMEN UI UMUM                ===
 // ==========================================================
-document.addEventListener('DOMContentLoaded', () => {
-    // Icons SVG
+function setupMobileMenu() {
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    if (hamburger && navLinks) {
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+    }
+}
+
+function setupAboutModal() {
+    const aboutButtons = document.querySelectorAll('#about-button');
+    const modalOverlay = document.getElementById('about-modal');
+    
+    if (!modalOverlay) return; // Keluar jika modal tidak ada di halaman ini
+    
+    const modalCloseButton = modalOverlay.querySelector('.modal-close');
+
+    const openModal = () => modalOverlay.classList.remove('hidden');
+    const closeModal = () => modalOverlay.classList.add('hidden');
+
+    aboutButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal();
+        });
+    });
+    
+    if (modalCloseButton) {
+        modalCloseButton.addEventListener('click', closeModal);
+    }
+    
+    modalOverlay.addEventListener('click', (event) => { 
+        if (event.target === modalOverlay) closeModal(); 
+    });
+    
+    document.addEventListener('keydown', (event) => { 
+        if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); 
+    });
+}
+
+function setupAllPasswordToggles() {
     const eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
     const eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
 
-    // Helper function to set up a toggle
     const setupPasswordToggle = (toggleId, passwordId) => {
         const toggleElement = document.getElementById(toggleId);
         const passwordElement = document.getElementById(passwordId);
-
         if (toggleElement && passwordElement) {
             toggleElement.addEventListener('click', () => {
-                if (passwordElement.type === 'password') {
-                    passwordElement.type = 'text';
-                    toggleElement.innerHTML = eyeOffIcon;
-                } else {
-                    passwordElement.type = 'password';
-                    toggleElement.innerHTML = eyeIcon;
-                }
+                const isPassword = passwordElement.type === 'password';
+                passwordElement.type = isPassword ? 'text' : 'password';
+                toggleElement.innerHTML = isPassword ? eyeOffIcon : eyeIcon;
             });
         }
     };
 
-    // Set up for all password fields
     setupPasswordToggle('toggle-login-password', 'login-password');
     setupPasswordToggle('toggle-register-password', 'register-password');
     setupPasswordToggle('toggle-reset-password', 'reset-password');
     setupPasswordToggle('toggle-confirm-password', 'confirm-password');
-});
+}
