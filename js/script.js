@@ -410,7 +410,7 @@ async function fetchUserLinkHistory(token) {
             loadingMessage.textContent = 'Anda belum memiliki riwayat tautan.';
         } else {
             loadingMessage.style.display = 'none';
-            links.forEach(link => renderUserLinkItem(link, historyList, token)); // Menggunakan renderUserLinkItem
+            links.forEach(link => renderUserLinkItem(link, historyList, token)); 
         }
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
@@ -426,7 +426,7 @@ function renderUserLinkItem(link, container, token) {
     const shortUrl = `https://link.hamdirzl.my.id/${link.slug}`;
     const listItem = document.createElement('li');
     listItem.className = 'mood-item';
-    listItem.id = `user-link-${link.slug}`; // Memberi ID unik untuk kemudahan penghapusan DOM
+    listItem.id = `user-link-${link.slug}`; 
 
     listItem.innerHTML = `
         <div class="mood-item-header">
@@ -444,7 +444,7 @@ function renderUserLinkItem(link, container, token) {
     listItem.querySelector('.copy-history-btn').addEventListener('click', (e) => {
         navigator.clipboard.writeText(e.currentTarget.dataset.url).then(() => {
             const originalSvg = e.currentTarget.innerHTML;
-            e.currentTarget.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00f5a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>`; // Icon centang hijau
+            e.currentTarget.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00f5a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>`; 
             setTimeout(() => { e.currentTarget.innerHTML = originalSvg; }, 2000);
         });
     });
@@ -602,8 +602,9 @@ function setupMobileMenu() {
         hamburger.addEventListener('click', () => {
             hamburger.classList.toggle('active');
             navLinks.classList.toggle('active');
-            // Menambahkan/menghapus kelas menu-open pada body untuk mencegah scrolling di belakang menu
+            // Menambahkan/menghapus kelas menu-open pada elemen body dan html
             document.body.classList.toggle('menu-open'); 
+            document.documentElement.classList.toggle('menu-open'); 
         });
     }
 }

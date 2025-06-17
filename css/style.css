@@ -39,6 +39,7 @@
     --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* Global reset and foundational styles */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
@@ -54,6 +55,12 @@ body {
         radial-gradient(at 20% 20%, hsla(160, 100%, 48%, 0.08) 0px, transparent 50%),
         radial-gradient(at 80% 80%, hsla(200, 100%, 50%, 0.08) 0px, transparent 50%);
 }
+
+/* New global overflow-x hidden to prevent horizontal scroll/whitespace */
+html, body {
+    overflow-x: hidden; 
+}
+
 
 /* === KOMPONEN UMUM === */
 
@@ -74,7 +81,7 @@ body {
 
 .logo a { 
     font-family: var(--font-heading); 
-    font-size: 1.5rem; /* REFINEMENT: Sedikit mengurangi ukuran logo agar lebih elegan */
+    font-size: 1.5rem; 
     font-weight: 700; 
     text-decoration: none; 
     color: #ffffff;
@@ -92,7 +99,7 @@ body {
     padding: var(--space-xs) 0;
     position: relative;
 }
-.nav-links a::after { /* REFINEMENT: Menambahkan garis bawah halus pada hover untuk navigasi */
+.nav-links a::after { 
     content: '';
     position: absolute;
     width: 0;
@@ -124,7 +131,6 @@ body {
     padding: 0.6rem 1.2rem !important;
     background-color: var(--accent-color) !important;
 }
-/* REFINEMENT: Efek hover tombol dibuat lebih halus */
 .button-pintu:hover, .login-button:hover { 
     background: var(--accent-hover) !important; 
     border-color: var(--accent-hover);
@@ -145,14 +151,14 @@ footer {
 .hero { 
     display: flex; 
     align-items: center; 
-    justify-content: center; /* REFINEMENT: Menengahkan konten hero */
-    text-align: center; /* REFINEMENT: Menengahkan teks hero */
+    justify-content: center; 
+    text-align: center; 
     padding: var(--space-xl) clamp(var(--space-md), 5vw, var(--space-xl));
     min-height: 80vh; 
     color: #ffffff; 
     background: linear-gradient(rgba(18, 18, 18, 0.8), rgba(18, 18, 18, 0.9)), url('https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80') no-repeat center center/cover; 
 }
-.hero-content { max-width: 850px; } /* REFINEMENT: Menyesuaikan lebar max */
+.hero-content { max-width: 850px; } 
 .hero h1 { 
     font-family: var(--font-heading); 
     font-size: var(--font-size-h1);
@@ -169,13 +175,13 @@ footer {
 }
 .hero p { 
     font-size: var(--font-size-base); 
-    max-width: 600px;  /* REFINEMENT: Memberi lebar max agar paragraf tidak terlalu lebar */
+    max-width: 600px;  
     margin-left: auto; 
     margin-right: auto;
     color: var(--text-muted-color); 
 }
 
-.pintu-utama { padding: var(--space-xl) clamp(var(--space-md), 5vw, var(--space-xl)); } /* REFINEMENT: Menyesuaikan padding */
+.pintu-utama { padding: var(--space-xl) clamp(var(--space-md), 5vw, var(--space-xl)); } 
 .section-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h2); color: #ffffff; margin-bottom: var(--space-xl); }
 
 .pintu-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-lg); margin-top: var(--space-xl); }
@@ -193,7 +199,7 @@ footer {
     align-items: center; 
 }
 .pintu:hover { 
-    transform: translateY(-6px); /* REFINEMENT: Efek hover lebih halus */
+    transform: translateY(-6px); 
     box-shadow: var(--soft-shadow);
     border-color: var(--border-hover-color);
 }
@@ -203,7 +209,7 @@ footer {
 .pintu .button-pintu { margin-top: auto; }
 
 /* === GAYA HALAMAN LAINNYA (PORTOFOLIO, JURNAL, DLL) === */
-.page-container { max-width: 1200px; margin: 0 auto; padding: var(--space-xl) var(--space-md); } /* REFINEMENT: Padding vertikal disesuaikan */
+.page-container { max-width: 1200px; margin: 0 auto; padding: var(--space-xl) var(--space-md); } 
 .page-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h1); color: #ffffff; margin-bottom: var(--space-sm); }
 .page-subtitle { text-align: center; font-size: var(--font-size-base); color: var(--text-muted-color); margin-bottom: var(--space-xl); max-width: 600px; margin-left: auto; margin-right: auto; }
 
@@ -221,7 +227,7 @@ footer {
     flex-direction: column;
 }
 .portfolio-card:hover, .jurnal-card:hover, .game-section .portfolio-card:hover { 
-    transform: translateY(-6px); /* REFINEMENT: Efek hover lebih halus */
+    transform: translateY(-6px); 
     box-shadow: var(--soft-shadow);
 }
 .portfolio-card img, .jurnal-card img, .game-section .portfolio-card img { 
@@ -229,14 +235,13 @@ footer {
     height: 220px; 
     object-fit: cover; 
     transition: transform 0.4s ease;
-    filter: brightness(0.8); /* REFINEMENT: Efek gambar sedikit lebih gelap */
+    filter: brightness(0.8); 
 }
 .portfolio-card:hover img, .jurnal-card:hover img, .game-section .portfolio-card:hover img { 
     transform: scale(1.05); 
     filter: brightness(1);
 }
 
-/* REFINEMENT: Menyatukan padding untuk semua card content */
 .portfolio-card .card-content, .jurnal-content, .game-section .card-content {
     padding: var(--space-md);
     display: flex;
@@ -271,7 +276,7 @@ footer {
     border: 1px solid var(--border-color); 
 }
 #shortener-form {
-    display: grid; /* REFINEMENT: Menggunakan grid untuk layout form yang lebih baik */
+    display: grid; 
     grid-template-columns: 1fr auto;
     gap: var(--space-sm);
     align-items: end;
@@ -324,7 +329,7 @@ input:focus, textarea:focus, select:focus {
 .auth-form .form-group { margin-bottom: var(--space-md); text-align: left; }
 .auth-form label { 
     display: block; 
-    font-weight: 500; /* REFINEMENT: Mengurangi ketebalan font agar lebih rapi */
+    font-weight: 500; 
     color: var(--text-muted-color); 
     margin-bottom: var(--space-xs); 
 }
@@ -342,75 +347,75 @@ input:focus, textarea:focus, select:focus {
 .mood-history-list {
     list-style: none;
     padding: 0;
-    margin-top: var(--space-md); /* Beri jarak dari judul */
+    margin-top: var(--space-md); 
 }
 
 .mood-item {
-    background-color: var(--card-bg-color); /* Ubah dari #2a2a2a ke var */
-    padding: var(--space-sm) var(--space-md); /* Kurangi padding */
+    background-color: var(--card-bg-color); 
+    padding: var(--space-sm) var(--space-md); 
     border-radius: 8px;
     margin-bottom: var(--space-sm);
-    border: 1px solid var(--border-color); /* Tambahkan border konsisten */
+    border: 1px solid var(--border-color); 
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    display: flex; /* Gunakan flexbox untuk tata letak internal */
-    flex-direction: column; /* Tumpuk item secara vertikal */
-    gap: var(--space-xs); /* Jarak antar elemen di dalam item */
+    display: flex; 
+    flex-direction: column; 
+    gap: var(--space-xs); 
 }
 
 .mood-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    border-color: var(--accent-color); /* Aksen pada hover */
+    border-color: var(--accent-color); 
 }
 
 .mood-item-header {
     display: flex;
-    flex-wrap: wrap; /* Izinkan wrap pada layar kecil */
+    flex-wrap: wrap; 
     justify-content: space-between;
-    align-items: center; /* Pusatkan secara vertikal */
-    gap: var(--space-xs); /* Kurangi gap */
-    font-weight: 500; /* Sedikit lebih ringan */
+    align-items: center; 
+    gap: var(--space-xs); 
+    font-weight: 500; 
 }
 
 .mood-item-header strong {
-    font-size: 0.95rem; /* Ukuran font untuk URL pendek */
+    font-size: 0.95rem; 
     color: var(--accent-color);
-    word-break: break-all; /* Pastikan URL panjang pecah baris */
-    flex-grow: 1; /* Biarkan mengisi ruang */
-    margin-right: var(--space-sm); /* Beri sedikit jarak ke tombol */
+    word-break: break-all; 
+    flex-grow: 1; 
+    margin-right: var(--space-sm); 
 }
 
 .mood-item .mood-notes {
-    font-size: 0.85rem; /* Ukuran font untuk URL asli */
+    font-size: 0.85rem; 
     color: var(--text-muted-color);
-    margin-bottom: 0; /* Hapus margin bottom */
+    margin-bottom: 0; 
 }
 
 .mood-item .mood-date {
-    font-size: 0.75rem; /* Ukuran font untuk tanggal */
+    font-size: 0.75rem; 
     color: var(--text-muted-color);
-    text-align: right; /* Rata kanan tanggal */
-    width: 100%; /* Ambil lebar penuh */
-    margin-top: var(--space-xs); /* Jarak dari URL asli */
+    text-align: right; 
+    width: 100%; 
+    margin-top: var(--space-xs); 
 }
 
 .mood-item-actions {
     display: flex;
-    gap: 5px; /* Jarak antar tombol ikon */
-    flex-shrink: 0; /* Jangan biarkan menyusut */
+    gap: 5px; 
+    flex-shrink: 0; 
 }
 
 .mood-icon-button {
-    background: var(--background-color); /* Latar belakang gelap */
+    background: var(--background-color); 
     border: 1px solid var(--border-color);
-    border-radius: 6px; /* Sudut sedikit melengkung */
-    padding: 6px; /* Padding untuk ukuran tombol */
+    border-radius: 6px; 
+    padding: 6px; 
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    line-height: 1; /* Penting untuk centering SVG */
+    line-height: 1; 
 }
 
 .mood-icon-button:hover {
@@ -420,22 +425,21 @@ input:focus, textarea:focus, select:focus {
 }
 
 .mood-icon-button svg {
-    width: 16px; /* Ukuran ikon */
-    height: 16px; /* Ukuran ikon */
-    color: var(--text-muted-color); /* Warna ikon default */
+    width: 16px; 
+    height: 16px; 
+    color: var(--text-muted-color); 
     transition: color 0.2s ease;
 }
 
 .mood-icon-button:hover svg {
-    color: var(--accent-color); /* Warna ikon saat hover */
+    color: var(--accent-color); 
 }
 
-/* Gaya khusus untuk tombol hapus (opsional, jika ingin warna merah) */
 .mood-icon-button.delete-button:hover {
-    border-color: #ff4d4d; /* Warna border merah saat hover */
+    border-color: #ff4d4d; 
 }
 .mood-icon-button.delete-button:hover svg {
-    color: #ff4d4d; /* Warna ikon merah saat hover */
+    color: #ff4d4d; 
 }
 
 
@@ -452,41 +456,35 @@ input:focus, textarea:focus, select:focus {
     .nav-links { 
         position: fixed; 
         top: 0; 
-        right: 0; /* Pastikan selalu dari kanan */
-        bottom: 0; /* Membentang penuh tinggi viewport */
-        width: 85%; /* Menambah lebar agar menutupi lebih banyak layar */
-        max-width: 350px; /* Mungkin naikkan sedikit max-width, atau tetap di 300px jika dirasa pas */
-        height: 100vh; /* Pastikan tinggi penuh viewport */
+        right: 0; 
+        bottom: 0; 
+        width: 85%; 
+        max-width: 350px; 
+        height: 100vh; 
         background-color: rgba(18, 18, 18, 0.98); 
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         padding-top: var(--space-xxl); 
         opacity: 0; 
         visibility: hidden; 
-        transform: translateX(100%); /* Sembunyikan ke kanan */
-        transition: all 0.4s ease; 
+        transform: translateX(100%); 
+        transition: transform 0.4s ease, opacity 0.4s ease, visibility 0.4s ease; 
         flex-direction: column; 
         align-items: flex-start; 
         justify-content: flex-start;
         gap: var(--space-sm);
         box-shadow: -5px 0 15px rgba(0,0,0,0.3);
-        z-index: 1000; /* Pastikan z-index tinggi, ini sudah ada */
+        z-index: 1000; 
     }
     .nav-links.active { 
         opacity: 1; 
         visibility: visible; 
         transform: translateX(0); 
-        z-index: 1000; /* Pastikan z-index tetap tinggi saat aktif */
     }
     
-    /* Penting: Atur body dan html untuk mencegah scrolling */
-    body.menu-open {
-        overflow: hidden; /* Mencegah scrolling pada body */
-        height: 100vh; /* Membatasi tinggi body agar tidak bisa digulir */
-    }
-    html.menu-open {
-        overflow: hidden; /* Mencegah scrolling pada html */
-        height: 100vh; /* Membatasi tinggi html agar tidak bisa digulir */
+    /* Penting: Atur body dan html untuk mencegah scrolling vertikal saat menu terbuka */
+    body.menu-open, html.menu-open {
+        overflow: hidden; 
     }
 
     .nav-links li { 
@@ -515,13 +513,12 @@ input:focus, textarea:focus, select:focus {
     
     /* Penyesuaian khusus untuk history item di mobile */
     .mood-item-header { flex-direction: column; align-items: flex-start; }
-    .mood-item-actions { width: 100%; justify-content: flex-end; } /* Posisikan tombol kanan bawah jika header wrap */
-    .mood-item-header strong { margin-right: 0; } /* Hapus margin kanan jika wrap */
+    .mood-item-actions { width: 100%; justify-content: flex-end; } 
+    .mood-item-header strong { margin-right: 0; } 
 }
 
 @media (max-width: 480px) {
     .tool-selector-button { width: 100%; }
-    /* Pastikan pengaturan di sini sudah optimal */
 }
 
 
@@ -575,7 +572,7 @@ input:focus, textarea:focus, select:focus {
     border: 1px dashed var(--accent-color); background-color: #2a2a2a;
     padding: var(--space-sm) var(--space-md); margin-top: var(--space-md);
     border-radius: 8px;
-    flex-wrap: wrap; /* REFINEMENT: agar bisa wrap di mobile */
+    flex-wrap: wrap; 
     gap: var(--space-sm);
 }
 #short-url-text {
