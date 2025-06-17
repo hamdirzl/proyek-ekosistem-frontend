@@ -221,24 +221,27 @@ function showToolSection(sectionIdToShow, token) {
     const allToolSections = [
         document.getElementById('shortener-wrapper'),
         document.getElementById('converter-wrapper'),
-        document.getElementById('image-merger-wrapper'),
-        document.getElementById('history-section') // Riwayat tautan akan selalu muncul bersama shortener, tetapi juga disembunyikan/ditampilkan oleh fungsi ini
+        document.getElementById('image-merger-wrapper')
     ];
+    const historySection = document.getElementById('history-section'); // Ambil riwayat secara terpisah
 
     allToolSections.forEach(section => {
         if (section && section.id === sectionIdToShow) {
             section.classList.remove('hidden');
-            // Jika shortener ditampilkan, tampilkan juga riwayat
-            if (sectionIdToShow === 'shortener-wrapper') {
-                document.getElementById('history-section')?.classList.remove('hidden');
-                fetchUserLinkHistory(token); // Muat ulang riwayat saat shortener ditampilkan
-            } else {
-                document.getElementById('history-section')?.classList.add('hidden');
-            }
         } else {
             section?.classList.add('hidden');
         }
     });
+
+    // Logika khusus untuk history section: hanya tampilkan jika shortener-wrapper yang aktif
+    if (historySection) {
+        if (sectionIdToShow === 'shortener-wrapper') {
+            historySection.classList.remove('hidden');
+            fetchUserLinkHistory(token); // Muat ulang riwayat saat shortener ditampilkan
+        } else {
+            historySection.classList.add('hidden');
+        }
+    }
 
     // Gulir ke bagian yang ditampilkan (opsional, untuk UX yang lebih baik)
     const targetSection = document.getElementById(sectionIdToShow);
@@ -407,25 +410,31 @@ async function fetchUserLinkHistory(token) {
             loadingMessage.textContent = 'Anda belum memiliki riwayat tautan.';
         } else {
             loadingMessage.style.display = 'none';
-            links.forEach(link => renderLinkItem(link, historyList));
+            links.forEach(link => renderUserLinkItem(link, historyList, token)); // Menggunakan renderUserLinkItem
         }
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
     }
 }
 
-function renderLinkItem(link, container) {
+// Fungsi baru untuk merender item tautan pengguna dengan tombol hapus
+function renderUserLinkItem(link, container, token) {
     const shortUrl = `https://link.hamdirzl.my.id/${link.slug}`;
     const listItem = document.createElement('li');
     listItem.className = 'mood-item';
+    listItem.id = `user-link-${link.slug}`; // Memberi ID unik untuk kemudahan penghapusan DOM
     listItem.innerHTML = `
         <div class="mood-item-header" style="align-items: center;">
-            <strong style="font-size: 1.1em; color: var(--accent-color);">${shortUrl}</strong>
-            <button class="button-pintu copy-history-btn" data-url="${shortUrl}" style="padding: 5px 10px; font-size: 0.9em;">Salin</button>
+            <strong style="font-size: 1.1em; color: var(--accent-color); word-break: break-all;">${shortUrl}</strong>
+            <div style="display: flex; gap: 5px;">
+                <button class="button-pintu copy-history-btn" data-url="${shortUrl}" style="padding: 5px 10px; font-size: 0.9em;">Salin</button>
+                <button class="button-pintu delete-user-link-btn" data-slug="${link.slug}" style="background-color: #ff4d4d; border-color: #ff4d4d; padding: 5px 10px; font-size: 0.9em;">Hapus</button>
+            </div>
         </div>
         <p class="mood-notes" style="word-break: break-all;">URL Asli: <a href="${link.original_url}" target="_blank">${link.original_url}</a></p>
         <small class="mood-date">Dibuat pada: ${new Date(link.created_at).toLocaleString('id-ID')}</small>`;
     container.appendChild(listItem);
+
     listItem.querySelector('.copy-history-btn').addEventListener('click', (e) => {
         navigator.clipboard.writeText(e.target.dataset.url).then(() => {
             const originalText = e.target.textContent;
@@ -433,7 +442,40 @@ function renderLinkItem(link, container) {
             setTimeout(() => { e.target.textContent = originalText; }, 2000);
         });
     });
+
+    listItem.querySelector('.delete-user-link-btn').addEventListener('click', (e) => handleDeleteUserLink(e, token));
 }
+
+async function handleDeleteUserLink(event, token) {
+    const slugToDelete = event.target.dataset.slug;
+
+    if (!confirm(`Anda yakin ingin menghapus tautan dengan slug "${slugToDelete}" dari riwayat Anda?`)) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/links/${slugToDelete}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || 'Gagal menghapus tautan.');
+        }
+
+        alert(data.message);
+        // Hapus item dari DOM
+        const listItemToRemove = document.getElementById(`user-link-${slugToDelete}`);
+        if (listItemToRemove) listItemToRemove.remove();
+
+        // Opsional: Muat ulang riwayat jika daftar kosong atau perlu refresh
+        fetchUserLinkHistory(token);
+
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+        console.error('Error saat menghapus tautan pengguna:', error);
+    }
+}
+
 
 // ==========================================================
 // ===         LOGIKA UNTUK HALAMAN AUTENTIKASI           ===
