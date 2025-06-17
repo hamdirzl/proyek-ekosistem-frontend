@@ -683,3 +683,134 @@ input:focus, textarea:focus, select:focus {
     min-width: 180px; padding: 1rem 1.5rem; font-size: 1.1rem;
     font-weight: 700; cursor: pointer;
 }
+
+/* === QR CODE GENERATOR LAYOUT & SYMMETRY === */
+#qr-generator-wrapper .tool-section {
+    max-width: 600px; /* Batasi lebar untuk tampilan yang lebih rapi */
+    margin: var(--space-lg) auto; /* Pusatkan elemen */
+    padding: var(--space-lg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg-color);
+    box-shadow: var(--card-shadow);
+}
+
+#qr-generator-form {
+    display: grid;
+    grid-template-columns: 1fr; /* Satu kolom untuk input */
+    gap: var(--space-md); /* Jarak antar grup form */
+}
+
+#qr-generator-form .form-group {
+    margin-bottom: 0; /* Reset margin-bottom default dari form-group */
+}
+
+#qr-generator-form label {
+    font-size: var(--font-size-base); /* Ukuran font label yang konsisten */
+    margin-bottom: var(--space-xs); /* Jarak kecil antara label dan input */
+    color: var(--text-muted-color); /* Warna label */
+    font-weight: 500;
+}
+
+#qr-generator-form input[type="text"],
+#qr-generator-form select,
+#qr-generator-form input[type="color"] {
+    width: 100%;
+    padding: var(--space-sm);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #2a2a2a;
+    color: var(--text-color);
+    font-size: var(--font-size-base);
+    font-family: var(--font-body);
+}
+
+/* Khusus untuk input type="color" agar terlihat rapi */
+#qr-generator-form input[type="color"] {
+    height: 48px; /* Sesuaikan tinggi dengan input teks */
+    padding: 0; /* Hapus padding default */
+    border: 1px solid var(--border-color); /* Pertahankan border */
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: transparent; /* Ubah background agar tidak ada kotak ganda */
+}
+#qr-generator-form input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+#qr-generator-form input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 6px; /* Agar swatches juga membulat */
+}
+
+
+#qr-generator-form button {
+    grid-column: 1 / -1; /* Pastikan tombol span seluruh lebar grid */
+    margin-top: var(--space-md); /* Jarak dari elemen di atasnya */
+    width: 100%; /* Pastikan tombol mengisi lebar penuh */
+    padding: 0.9rem; /* Padding yang konsisten dengan tombol lain */
+    box-shadow: 0 2px 8px rgba(0, 245, 160, 0.2); /* Shadow konsisten */
+}
+
+#qr-code-message {
+    text-align: center;
+    margin-top: var(--space-md);
+    padding: var(--space-sm);
+    border-radius: 8px;
+}
+
+#qr-code-message.success {
+    background-color: rgba(0, 245, 160, 0.1);
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+}
+
+#qr-code-message.error {
+    background-color: rgba(248, 87, 87, 0.1);
+    color: #f89696;
+    border: 1px solid #f85757;
+}
+
+#qr-code-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md); /* Jarak antara gambar dan tombol download */
+    margin-top: var(--space-xl); /* Jarak dari form di atasnya */
+}
+
+#qr-code-image {
+    max-width: 250px; /* Pertahankan ukuran maksimal */
+    width: 100%; /* Agar responsif dalam batas max-width */
+    height: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 12px; /* Border radius konsisten */
+    box-shadow: var(--card-shadow); /* Shadow konsisten */
+}
+
+#download-qr-button {
+    padding: 0.7rem 1.6rem; /* Padding konsisten dengan button-pintu */
+    border: 2px solid var(--accent-color); /* Border konsisten */
+    border-radius: 8px; /* Border radius konsisten */
+    background: none; /* Tanpa background default */
+    color: var(--accent-color); /* Warna teks accent */
+    font-weight: 700; /* Font weight konsisten */
+    font-family: var(--font-heading); /* Font heading untuk tombol */
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 245, 160, 0.1); /* Shadow lebih lembut */
+}
+
+#download-qr-button:hover {
+    background: var(--accent-color); /* Background penuh saat hover */
+    color: #000000; /* Teks gelap saat hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 245, 160, 0.25);
+}
+
+/* Responsif untuk form QR Generator */
+@media (max-width: 480px) {
+    #qr-generator-form {
+        grid-template-columns: 1fr; /* Pastikan satu kolom di layar sangat kecil */
+    }
+}
