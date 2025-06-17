@@ -454,7 +454,7 @@ input:focus, textarea:focus, select:focus {
         top: 0; 
         left: auto; /* Reset left */
         right: 0; /* Mulai dari kanan */
-        width: 70%; /* Lebar menu saat terbuka */
+        width: 85%; /* Menambah lebar agar menutupi lebih banyak layar */
         max-width: 300px; /* Batasi lebar maksimum */
         bottom: 0; /* Pastikan tinggi penuh viewport */
         height: 100vh;
@@ -508,14 +508,18 @@ input:focus, textarea:focus, select:focus {
     #shortener-form {
         grid-template-columns: 1fr; /* REFINEMENT: Form menjadi 1 kolom di mobile */
     }
-}
 
-@media (max-width: 480px) {
-    .tool-selector-button { width: 100%; }
+    /* Penyesuaian khusus untuk history item di mobile */
     .mood-item-header { flex-direction: column; align-items: flex-start; }
     .mood-item-actions { width: 100%; justify-content: flex-end; } /* Posisikan tombol kanan bawah jika header wrap */
     .mood-item-header strong { margin-right: 0; } /* Hapus margin kanan jika wrap */
 }
+
+@media (max-width: 480px) {
+    .tool-selector-button { width: 100%; }
+    /* Pastikan pengaturan di sini sudah optimal */
+}
+
 
 /* === GAYA IKON SOSIAL DI FOOTER === */
 .social-icons { display: flex; justify-content: center; gap: var(--space-md); margin-bottom: var(--space-md); }

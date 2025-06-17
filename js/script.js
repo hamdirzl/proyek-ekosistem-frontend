@@ -602,6 +602,8 @@ function setupMobileMenu() {
         hamburger.addEventListener('click', () => {
             hamburger.classList.toggle('active');
             navLinks.classList.toggle('active');
+            // Menambahkan/menghapus kelas menu-open pada body untuk mencegah scrolling di belakang menu
+            document.body.classList.toggle('menu-open'); 
         });
     }
 }
