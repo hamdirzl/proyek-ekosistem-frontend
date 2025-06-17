@@ -151,6 +151,8 @@ async function handleDeleteLink(event) {
 // ===================================
 // === LOGIKA HALAMAN TOOLS        ===
 // ===================================
+// script.js
+
 function setupToolsPage(token) {
     const wrappers = [
         document.getElementById('shortener-wrapper'),
@@ -161,19 +163,55 @@ function setupToolsPage(token) {
     const loginPrompt = document.getElementById('login-prompt');
 
     if (token) {
+        // Jika login, tampilkan semua perkakas dan sembunyikan pesan login
         wrappers.forEach(el => el && el.classList.remove('hidden'));
         if (loginPrompt) loginPrompt.classList.add('hidden');
 
+        // Pasang semua event listener untuk form yang ada
         attachShortenerListener(token);
         attachConverterListener(token);
         attachImageMergerListener(token);
+
+        // Ambil riwayat tautan
         fetchUserLinkHistory(token);
     } else {
+        // Jika tidak login, sembunyikan semua perkakas dan tampilkan pesan login
         wrappers.forEach(el => el && el.classList.add('hidden'));
         if (loginPrompt) loginPrompt.classList.remove('hidden');
     }
-}
 
+    // =================================================================
+    // ==   KODE BARU DITAMBAHKAN DI SINI   ==
+    // =================================================================
+    // Logika untuk menonaktifkan opsi konversi yang tidak andal
+    const fileInput = document.getElementById('file-input');
+    const outputFormatSelect = document.getElementById('output-format');
+
+    if (fileInput && outputFormatSelect) {
+        fileInput.addEventListener('change', () => {
+            if (!fileInput.files || fileInput.files.length === 0) return;
+
+            const fileName = fileInput.files[0].name.toLowerCase();
+            const docxOption = outputFormatSelect.querySelector('option[value="docx"]');
+
+            if (fileName.endsWith('.pdf')) {
+                // Jika file adalah PDF, nonaktifkan opsi DOCX
+                if (docxOption) {
+                    docxOption.disabled = true;
+                    // Jika opsi DOCX sedang terpilih, ganti ke pilihan default (PDF)
+                    if (outputFormatSelect.value === 'docx') {
+                        outputFormatSelect.value = 'pdf'; 
+                    }
+                }
+            } else {
+                // Jika file bukan PDF, aktifkan kembali opsi DOCX
+                if (docxOption) {
+                    docxOption.disabled = false;
+                }
+            }
+        });
+    }
+}
 function attachShortenerListener(token) {
     const form = document.getElementById('shortener-form');
     if (!form) return;
