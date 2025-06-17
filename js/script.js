@@ -590,6 +590,7 @@ function attachAudioCutterListener(token) {
         if (wavesurfer) {
             wavesurfer.destroy();
             console.log("Destroyed old WaveSurfer instance.");
+            currentRegion = null; // Pastikan region juga direset
         }
         wavesurfer = WaveSurfer.create({
             container: waveformContainer,
@@ -602,9 +603,8 @@ function attachAudioCutterListener(token) {
             height: 120,
             backend: 'WebAudio',
             responsive: true,
-            // Optmized rendering for larger files
-            pixelRatio: 1, // Lower pixelRatio for faster rendering, might be slightly less crisp
-            minPxPerSec: 20, // Adjust this based on desired zoom level, smaller values load faster initially
+            pixelRatio: 1,
+            minPxPerSec: 20,
             plugins: [
                 WaveSurfer.Regions.create({
                     regionsMinLength: 0.1,
@@ -642,8 +642,8 @@ function attachAudioCutterListener(token) {
                 console.log("Existing region updated.");
             }
             cutAudioSubmitButton.disabled = false;
-            playPauseButton.disabled = false; // Enable play/pause
-            stopButton.disabled = false; // Enable stop
+            playPauseButton.disabled = false;
+            stopButton.disabled = false;
             messageDiv.textContent = 'Audio loaded and waveform ready! Drag to select a segment.';
             messageDiv.className = 'success';
         });
@@ -695,14 +695,14 @@ function attachAudioCutterListener(token) {
             audioFileInfo.textContent = `Loading "${audioInput.files[0].name}"... ${percents}%`;
             messageDiv.textContent = `Loading audio: ${percents}%...`;
             messageDiv.className = '';
-            cutAudioSubmitButton.disabled = true; // Disable until fully loaded
-            playPauseButton.disabled = true; // Disable during loading
-            stopButton.disabled = true; // Disable during loading
+            cutAudioSubmitButton.disabled = true;
+            playPauseButton.disabled = true;
+            stopButton.disabled = true;
             console.log(`Audio loading progress: ${percents}%`);
         });
 
         const updateRegionFromInputs = () => {
-            if (currentRegion && wavesurfer.isReady) {
+            if (currentRegion && wavesurfer.isReady()) { // Periksa juga isReady()
                 const newStart = parseFloat(startTimeInput.value);
                 const newEnd = parseFloat(endTimeInput.value);
 
@@ -713,6 +713,8 @@ function attachAudioCutterListener(token) {
                     messageDiv.textContent = 'Invalid time input. Please check values.';
                     messageDiv.className = 'error';
                 }
+            } else {
+                console.warn("WaveSurfer not ready or no currentRegion to update from inputs.");
             }
         };
 
@@ -742,7 +744,7 @@ function attachAudioCutterListener(token) {
             return;
         }
 
-        audioFileInfo.textContent = `Processing "${file.name}"...`; // Initial processing message
+        audioFileInfo.textContent = `Processing "${file.name}"...`;
         messageDiv.textContent = 'Decoding audio...';
         messageDiv.className = '';
         cutAudioSubmitButton.disabled = true;
@@ -750,7 +752,7 @@ function attachAudioCutterListener(token) {
         stopButton.disabled = true;
 
         if (waveformContainer) {
-            waveformContainer.innerHTML = ''; // Clear previous waveform
+            waveformContainer.innerHTML = '';
         }
 
         initializeWaveSurfer();
@@ -759,22 +761,24 @@ function attachAudioCutterListener(token) {
     });
 
     playPauseButton.addEventListener('click', () => {
-        if (wavesurfer && wavesurfer.isReady()) { // Check if wavesurfer is ready
+        if (wavesurfer && wavesurfer.isReady()) {
             wavesurfer.playPause();
-            console.log("Play/Pause clicked.");
+            console.log("Play/Pause clicked. Current time:", wavesurfer.getCurrentTime());
         } else {
-            messageDiv.textContent = 'Audio not ready yet. Please wait.';
+            messageDiv.textContent = 'Audio not ready yet. Please wait for waveform to load.';
             messageDiv.className = 'error';
+            console.warn("Play/Pause clicked before WaveSurfer was ready.");
         }
     });
 
     stopButton.addEventListener('click', () => {
-        if (wavesurfer && wavesurfer.isReady()) { // Check if wavesurfer is ready
+        if (wavesurfer && wavesurfer.isReady()) {
             wavesurfer.stop();
             console.log("Stop clicked.");
         } else {
-            messageDiv.textContent = 'Audio not ready yet. Please wait.';
+            messageDiv.textContent = 'Audio not ready yet. Please wait for waveform to load.';
             messageDiv.className = 'error';
+            console.warn("Stop clicked before WaveSurfer was ready.");
         }
     });
 
@@ -788,7 +792,7 @@ function attachAudioCutterListener(token) {
         if (wavesurfer && wavesurfer.isReady()) {
             wavesurfer.stop();
         } else {
-            messageDiv.textContent = 'Audio not loaded or waveform not ready.';
+            messageDiv.textContent = 'Audio not loaded or waveform not ready. Please select a file and wait for it to load.';
             messageDiv.className = 'error';
             return;
         }
