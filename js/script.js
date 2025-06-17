@@ -164,7 +164,8 @@ function setupToolsPage(token) {
         document.getElementById('converter-wrapper'),
         document.getElementById('image-merger-wrapper'),
         document.getElementById('qr-generator-wrapper'),
-        document.getElementById('image-compressor-wrapper') // BARIS INI DITAMBAHKAN
+        document.getElementById('image-compressor-wrapper'),
+        document.getElementById('audio-cutter-wrapper') // BARIS INI DITAMBAHKAN
     ];
     const loginPrompt = document.getElementById('login-prompt');
     const toolSelectionSection = document.querySelector('.tool-selection'); 
@@ -179,13 +180,15 @@ function setupToolsPage(token) {
         document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper', token));
         document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper', token));
         document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper', token));
-        document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper', token)); // BARIS INI DITAMBAHKAN
+        document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper', token));
+        document.getElementById('show-audio-cutter')?.addEventListener('click', () => showToolSection('audio-cutter-wrapper', token)); // BARIS INI DITAMBAHKAN
 
         attachShortenerListener(token);
         attachConverterListener(token);
         attachImageMergerListener(token);
         attachQrCodeGeneratorListener(token);
-        attachImageCompressorListener(token); // BARIS INI DITAMBAHKAN
+        attachImageCompressorListener(token);
+        attachAudioCutterListener(token); // BARIS INI DITAMBAHKAN
 
     } else {
         if (loginPrompt) loginPrompt.classList.remove('hidden');
@@ -224,7 +227,8 @@ function showToolSection(sectionIdToShow, token) {
         document.getElementById('converter-wrapper'),
         document.getElementById('image-merger-wrapper'),
         document.getElementById('qr-generator-wrapper'),
-        document.getElementById('image-compressor-wrapper') // BARIS INI DITAMBAHKAN
+        document.getElementById('image-compressor-wrapper'),
+        document.getElementById('audio-cutter-wrapper') // BARIS INI DITAMBAHKAN
     ];
     const historySection = document.getElementById('history-section'); 
 
@@ -460,7 +464,7 @@ function attachQrCodeGeneratorListener(token) {
     });
 }
 
-// === FUNGSI BARU: IMAGE COMPRESSOR CLIENT-SIDE LOGIC ===
+// === FUNGSI IMAGE COMPRESSOR CLIENT-SIDE LOGIC ===
 function attachImageCompressorListener(token) {
     const form = document.getElementById('image-compressor-form');
     if (!form) return;
@@ -549,6 +553,82 @@ function attachImageCompressorListener(token) {
             messageDiv.className = 'error';
             compressedImagePreview.style.display = 'none';
             downloadButton.style.display = 'none';
+        }
+    });
+}
+
+// === FUNGSI BARU: AUDIO CUTTER CLIENT-SIDE LOGIC ===
+function attachAudioCutterListener(token) {
+    const form = document.getElementById('audio-cutter-form');
+    if (!form) return;
+
+    const audioInput = document.getElementById('audio-input');
+    const startTimeInput = document.getElementById('start-time');
+    const endTimeInput = document.getElementById('end-time');
+    const messageDiv = document.getElementById('audio-cutter-message');
+    const cutAudioPreview = document.getElementById('cut-audio-preview');
+    const downloadButton = document.getElementById('download-cut-audio-button');
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        messageDiv.textContent = 'Cutting audio, please wait...';
+        messageDiv.className = '';
+        cutAudioPreview.style.display = 'none';
+        downloadButton.style.display = 'none';
+
+        const file = audioInput.files[0];
+        if (!file) {
+            messageDiv.textContent = 'Please select an audio file.';
+            messageDiv.className = 'error';
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('audio', file);
+        formData.append('startTime', startTimeInput.value);
+        formData.append('endTime', endTimeInput.value);
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/cut-audio`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: response.statusText }));
+                throw new Error(errorData.error || 'Failed to cut audio.');
+            }
+
+            const audioBlob = await response.blob();
+            const fileName = response.headers.get('Content-Disposition')?.match(/filename="(.+)"/)?.[1] || `cut_audio.${file.name.split('.').pop() || 'mp3'}`;
+
+            const audioUrl = URL.createObjectURL(audioBlob);
+            cutAudioPreview.src = audioUrl;
+            cutAudioPreview.style.display = 'block';
+            
+            downloadButton.onclick = () => {
+                const link = document.createElement('a');
+                link.href = audioUrl;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(audioUrl); // Clean up the object URL
+            };
+            downloadButton.style.display = 'block';
+
+            messageDiv.textContent = 'Audio cut successfully!';
+            messageDiv.className = 'success';
+
+        } catch (error) {
+            messageDiv.textContent = `Error: ${error.message}`;
+            messageDiv.className = 'error';
+            cutAudioPreview.style.display = 'none';
+            downloadButton.style.display = 'none';
+            console.error("Audio Cutter Frontend Error:", error);
         }
     });
 }
@@ -806,14 +886,12 @@ if (resetForm) {
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
-    // Membuat tombol close SVG secara dinamis jika belum ada di HTML
     let navCloseButton = document.getElementById('nav-close-button');
     if (!navCloseButton) {
         navCloseButton = document.createElement('button');
         navCloseButton.id = 'nav-close-button';
         navCloseButton.classList.add('nav-close-button');
         navCloseButton.setAttribute('aria-label', 'Tutup menu');
-        // Menggunakan ikon SVG 'x' dari feather icons
         navCloseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
         navLinks.prepend(navCloseButton);
     }
@@ -833,7 +911,6 @@ function setupMobileMenu() {
         navCloseButton.addEventListener('click', toggleMenu);
     }
 
-    // Close menu when clicking outside (on the overlay itself)
     if (navLinks) {
         navLinks.addEventListener('click', (event) => {
             if (event.target === navLinks) {
@@ -866,7 +943,7 @@ function setupAboutModal() {
         modalCloseButton.addEventListener('click', closeModal);
     }
     
-    modalOverlay.addEventListener('click', (event) => { 
+modalOverlay.addEventListener('click', (event) => { 
         if (event.target === modalOverlay) closeModal(); 
     });
     
