@@ -251,9 +251,17 @@ function setupConverterPage() {
                 body: formData
             });
 
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Terjadi kesalahan di server.');
+                // Coba baca error sebagai JSON, jika gagal, baca sebagai teks biasa.
+                let errorMessage;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || 'Terjadi kesalahan di server.';
+                } catch (jsonError) {
+                    errorMessage = await response.text(); // Fallback ke teks jika bukan JSON
+                }
+                throw new Error(errorMessage);
             }
 
             const blob = await response.blob();
