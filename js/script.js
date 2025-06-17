@@ -557,7 +557,7 @@ function attachImageCompressorListener(token) {
     });
 }
 
-// === FUNGSI AUDIO CUTTER CLIENT-SIDE LOGIC ===
+// === FUNGSI AUDIO CUTTER CLIENT-SIDE LOGIC (dengan WaveSurfer.js) ===
 function attachAudioCutterListener(token) {
     const form = document.getElementById('audio-cutter-form');
     if (!form) return;
@@ -565,15 +565,138 @@ function attachAudioCutterListener(token) {
     const audioInput = document.getElementById('audio-input');
     const startTimeInput = document.getElementById('start-time');
     const endTimeInput = document.getElementById('end-time');
-    const audioFileInfo = document.getElementById('audio-file-info'); // BARIS INI DITAMBAHKAN
-    const previewAudioButton = document.getElementById('preview-audio-button'); // BARIS INI DITAMBAHKAN
+    const audioFileInfo = document.getElementById('audio-file-info');
+    const waveformContainer = document.getElementById('waveform');
+    const playPauseButton = document.getElementById('waveform-play-pause-button');
+    const stopButton = document.getElementById('waveform-stop-button');
+    const cutAudioSubmitButton = form.querySelector('button[type="submit"]'); // Tombol "Cut Audio"
     const messageDiv = document.getElementById('audio-cutter-message');
     const cutAudioPreview = document.getElementById('cut-audio-preview');
     const downloadButton = document.getElementById('download-cut-audio-button');
 
-    let audioContext; // Menyimpan AudioContext
-    let currentAudioBuffer; // Menyimpan buffer audio yang dimuat
-    let previewSource; // Menyimpan AudioBufferSourceNode untuk preview
+    let wavesurfer = null;
+    let currentRegion = null; // Untuk menyimpan region yang sedang dipilih
+
+    // Inisialisasi WaveSurfer.js saat audio cutter section pertama kali ditampilkan
+    // atau ketika ada file baru yang dipilih
+    const initializeWaveSurfer = () => {
+        if (wavesurfer) {
+            wavesurfer.destroy(); // Hancurkan instance lama jika ada
+        }
+        wavesurfer = WaveSurfer.create({
+            container: waveformContainer,
+            waveColor: 'rgba(0, 245, 160, 0.5)', // Warna gelombang utama (accent-color transparan)
+            progressColor: 'var(--accent-color)', // Warna progres (accent-color penuh)
+            cursorColor: 'var(--text-muted-color)', // Warna kursor
+            barWidth: 2,
+            barRadius: 2,
+            barGap: 1,
+            height: 120,
+            backend: 'WebAudio', // Menggunakan Web Audio API
+            responsive: true,
+            plugins: [
+                WaveSurfer.Regions.create({
+                    regionsMinLength: 0.1, // Minimal panjang region
+                    regions: [
+                        // Contoh region awal (opsional)
+                        // {
+                        //     start: 0,
+                        //     end: 10,
+                        //     loop: false,
+                        //     color: 'rgba(255, 0, 0, 0.1)',
+                        //     drag: true,
+                        //     resize: true,
+                        // }
+                    ],
+                    dragSelection: { // Memungkinkan pemilihan dengan drag
+                        slop: 5,
+                        opacity: 0.2,
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                })
+            ]
+        });
+
+        // Event listener untuk WaveSurfer
+        wavesurfer.on('ready', () => {
+            const duration = wavesurfer.getDuration();
+            audioFileInfo.textContent = `File: "${audioInput.files[0].name}" | Duration: ${formatTime(duration)}`;
+            endTimeInput.value = duration.toFixed(1); // Set end time to full duration by default
+            startTimeInput.value = 0; // Set start time to 0 by default
+
+            // Buat region default mencakup seluruh audio
+            if (wavesurfer.regions.list && Object.keys(wavesurfer.regions.list).length === 0) {
+                currentRegion = wavesurfer.regions.add({
+                    start: 0,
+                    end: duration,
+                    loop: false,
+                    color: 'rgba(0, 255, 0, 0.1)', // Warna region default
+                    drag: true,
+                    resize: true,
+                    id: 'default-region'
+                });
+            }
+            cutAudioSubmitButton.disabled = false; // Aktifkan tombol cut setelah audio siap
+        });
+
+        wavesurfer.on('error', (err) => {
+            messageDiv.textContent = `WaveSurfer Error: ${err.message}`;
+            messageDiv.className = 'error';
+            console.error('WaveSurfer error:', err);
+            cutAudioSubmitButton.disabled = true; // Nonaktifkan jika ada error
+        });
+
+        // Event listener untuk regions (saat region dibuat, diubah, atau diklik)
+        wavesurfer.on('region-updated', (region) => {
+            currentRegion = region;
+            startTimeInput.value = region.start.toFixed(1);
+            endTimeInput.value = region.end.toFixed(1);
+        });
+
+        // Region created on drag selection
+        wavesurfer.on('region-created', (region) => {
+            // Hapus region sebelumnya jika ada untuk memastikan hanya ada satu yang aktif
+            Object.values(wavesurfer.regions.list).forEach(r => {
+                if (r.id !== region.id) {
+                    wavesurfer.regions.remove(r.id);
+                }
+            });
+            currentRegion = region;
+            startTimeInput.value = region.start.toFixed(1);
+            endTimeInput.value = region.end.toFixed(1);
+        });
+
+        // Saat region diklik, putar segmen tersebut
+        wavesurfer.on('region-click', (region, mouseEvent) => {
+            mouseEvent.stopPropagation(); // Mencegah klik pada region memicu klik pada WaveSurfer itu sendiri
+            region.play();
+            messageDiv.textContent = `Playing selected region...`;
+            messageDiv.className = '';
+        });
+
+        wavesurfer.on('region-out', (region) => {
+            // Jika pemutaran region selesai, atau kursor keluar dari region yang diputar, stop
+            if (region.isPlaying()) {
+                wavesurfer.stop();
+            }
+        });
+
+        // Synchronize manual input with region
+        const updateRegionFromInputs = () => {
+            if (currentRegion) {
+                const newStart = parseFloat(startTimeInput.value);
+                const newEnd = parseFloat(endTimeInput.value);
+
+                if (!isNaN(newStart) && !isNaN(newEnd) && newStart < newEnd && newEnd <= wavesurfer.getDuration()) {
+                    currentRegion.update({ start: newStart, end: newEnd });
+                }
+            }
+        };
+
+        startTimeInput.addEventListener('change', updateRegionFromInputs);
+        endTimeInput.addEventListener('change', updateRegionFromInputs);
+    };
+
 
     // Helper to format seconds into MM:SS
     const formatTime = (seconds) => {
@@ -582,84 +705,45 @@ function attachAudioCutterListener(token) {
         return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
-    // Fungsi untuk memuat file audio dan mendapatkan durasi
+    // Fungsi untuk memuat file audio ke WaveSurfer.js
     audioInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
         if (!file) {
             audioFileInfo.textContent = '';
-            // Reset player and buttons if file is cleared
+            // Hancurkan wavesurfer jika tidak ada file
+            if (wavesurfer) {
+                wavesurfer.destroy();
+                wavesurfer = null;
+            }
+            cutAudioSubmitButton.disabled = true;
             cutAudioPreview.pause();
             cutAudioPreview.src = '';
             cutAudioPreview.style.display = 'none';
-            previewAudioButton.disabled = true;
             downloadButton.style.display = 'none';
             return;
         }
 
         audioFileInfo.textContent = `Loading "${file.name}"...`;
-        previewAudioButton.disabled = true; // Disable preview while loading
+        cutAudioSubmitButton.disabled = true; // Disable cut button while loading
 
-        try {
-            const arrayBuffer = await file.arrayBuffer();
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            currentAudioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        initializeWaveSurfer(); // Inisialisasi ulang WaveSurfer.js
+        wavesurfer.loadBlob(file); // Muat file dari Blob
+    });
 
-            const duration = currentAudioBuffer.duration;
-            audioFileInfo.textContent = `File: "${file.name}" | Duration: ${formatTime(duration)}`;
-            endTimeInput.value = duration; // Set end time to full duration by default
-            
-            previewAudioButton.disabled = false; // Enable preview once loaded
-
-        } catch (error) {
-            audioFileInfo.textContent = `Error loading audio: ${error.message}`;
-            messageDiv.textContent = `Error loading audio: ${error.message}`;
-            messageDiv.className = 'error';
-            console.error("Audio loading error:", error);
-            previewAudioButton.disabled = true;
+    // Kontrol pemutaran WaveSurfer.js
+    playPauseButton.addEventListener('click', () => {
+        if (wavesurfer) {
+            wavesurfer.playPause();
         }
     });
 
-    // Fungsi untuk preview segmen audio
-    previewAudioButton.addEventListener('click', () => {
-        if (!currentAudioBuffer || !audioContext) {
-            messageDiv.textContent = 'Please load an audio file first.';
-            messageDiv.className = 'error';
-            return;
+    stopButton.addEventListener('click', () => {
+        if (wavesurfer) {
+            wavesurfer.stop();
         }
-
-        const startTime = parseFloat(startTimeInput.value);
-        const endTime = parseFloat(endTimeInput.value);
-
-        if (isNaN(startTime) || isNaN(endTime) || startTime < 0 || endTime <= startTime || endTime > currentAudioBuffer.duration) {
-            messageDiv.textContent = 'Invalid start/end time for preview.';
-            messageDiv.className = 'error';
-            return;
-        }
-        
-        // Stop any currently playing preview
-        if (previewSource) {
-            previewSource.stop();
-            previewSource.disconnect();
-        }
-
-        previewSource = audioContext.createBufferSource();
-        previewSource.buffer = currentAudioBuffer;
-        previewSource.connect(audioContext.destination);
-        previewSource.start(0, startTime, endTime - startTime); // (when, offset, duration)
-
-        messageDiv.textContent = `Playing preview from ${formatTime(startTime)} to ${formatTime(endTime)}...`;
-        messageDiv.className = '';
-
-        // Stop preview after it finishes
-        previewSource.onended = () => {
-            messageDiv.textContent = 'Preview finished.';
-            messageDiv.className = 'success';
-        };
     });
 
-
+    // Handler form submit untuk memotong audio (tetap sama, mengambil dari input fields)
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         messageDiv.textContent = 'Cutting audio, please wait...';
@@ -667,11 +751,9 @@ function attachAudioCutterListener(token) {
         cutAudioPreview.style.display = 'none';
         downloadButton.style.display = 'none';
         
-        // Stop any playing preview before cutting
-        if (previewSource) {
-            previewSource.stop();
-            previewSource.disconnect();
-            previewSource = null;
+        // Stop any playing audio before cutting
+        if (wavesurfer) {
+            wavesurfer.stop();
         }
 
         const file = audioInput.files[0];
@@ -684,7 +766,7 @@ function attachAudioCutterListener(token) {
         const startTime = parseFloat(startTimeInput.value);
         const endTime = parseFloat(endTimeInput.value);
 
-        if (isNaN(startTime) || isNaN(endTime) || startTime < 0 || endTime <= startTime || endTime > currentAudioBuffer.duration) {
+        if (isNaN(startTime) || isNaN(endTime) || startTime < 0 || endTime <= startTime || endTime > wavesurfer.getDuration()) { // Gunakan wavesurfer.getDuration()
             messageDiv.textContent = 'Invalid start/end time. Please ensure End Time is greater than Start Time and within total duration.';
             messageDiv.className = 'error';
             return;

@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="stylesheet" href="https://unpkg.com/wavesurfer.js/dist/plugins/regions.css" />
 </head>
 <body>
 
@@ -169,17 +170,25 @@
                     <div class="form-group">
                         <label for="audio-input">Select Audio File (MP3, WAV, etc.)</label>
                         <input type="file" id="audio-input" name="audio" required accept="audio/*">
-                        <p id="audio-file-info" style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 0.5rem;"></p> </div>
+                        <p id="audio-file-info" style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 0.5rem;"></p>
+                    </div>
+
+                    <div id="waveform" style="width: 100%; height: 120px; background-color: #333; margin: var(--space-md) 0; border-radius: 8px; overflow: hidden;"></div>
+                    
+                    <div style="display: flex; justify-content: center; gap: var(--space-sm); margin-bottom: var(--space-md);">
+                        <button type="button" id="waveform-play-pause-button" class="button-pintu" style="background-color: var(--text-muted-color); border-color: var(--text-muted-color);">Play / Pause</button>
+                        <button type="button" id="waveform-stop-button" class="button-pintu" style="background-color: #cc3333; border-color: #cc3333;">Stop</button>
+                    </div>
+
                     <div class="form-group">
                         <label for="start-time">Start Time (seconds)</label>
                         <input type="number" id="start-time" step="0.1" min="0" value="0" required>
                     </div>
                     <div class="form-group">
                         <label for="end-time">End Time (seconds)</label>
-                        <input type="number" id="end-time" step="0.1" min="0" value="10" required>
+                        <input type="number" id="end-time" step="0.1" min="0" value="0" required>
                     </div>
-                    <div class="form-group"> <button type="button" id="preview-audio-button" class="button-pintu" style="width: 100%; background-color: var(--text-muted-color); border-color: var(--text-muted-color);">Preview Segment</button>
-                    </div>
+                    
                     <button type="submit" class="button-pintu">Cut Audio</button>
                 </form>
                 <div id="audio-cutter-message" style="margin-top: 1rem;"></div>
@@ -201,6 +210,8 @@
     
     <script src="js/script.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="https://unpkg.com/wavesurfer.js"></script>
+    <script src="https://unpkg.com/wavesurfer.js/dist/plugins/regions.js"></script>
     <script>AOS.init({duration: 800, once: true});</script>
 </body>
 </html>
