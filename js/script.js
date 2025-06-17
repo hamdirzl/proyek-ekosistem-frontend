@@ -569,7 +569,7 @@ function attachAudioCutterListener(token) {
     const waveformContainer = document.getElementById('waveform');
     const playPauseButton = document.getElementById('waveform-play-pause-button');
     const stopButton = document.getElementById('waveform-stop-button');
-    const cutAudioSubmitButton = form.querySelector('button[type="submit"]'); // Tombol "Cut Audio"
+    const cutAudioSubmitButton = form.querySelector('button[type="submit"]');
     const messageDiv = document.getElementById('audio-cutter-message');
     const cutAudioPreview = document.getElementById('cut-audio-preview');
     const downloadButton = document.getElementById('download-cut-audio-button');
@@ -586,8 +586,10 @@ function attachAudioCutterListener(token) {
 
     // Fungsi untuk menginisialisasi WaveSurfer.js
     const initializeWaveSurfer = () => {
+        console.log("Initializing WaveSurfer...");
         if (wavesurfer) {
-            wavesurfer.destroy(); // Hancurkan instance lama jika ada
+            wavesurfer.destroy();
+            console.log("Destroyed old WaveSurfer instance.");
         }
         wavesurfer = WaveSurfer.create({
             container: waveformContainer,
@@ -600,6 +602,9 @@ function attachAudioCutterListener(token) {
             height: 120,
             backend: 'WebAudio',
             responsive: true,
+            // Optmized rendering for larger files
+            pixelRatio: 1, // Lower pixelRatio for faster rendering, might be slightly less crisp
+            minPxPerSec: 20, // Adjust this based on desired zoom level, smaller values load faster initially
             plugins: [
                 WaveSurfer.Regions.create({
                     regionsMinLength: 0.1,
@@ -611,15 +616,16 @@ function attachAudioCutterListener(token) {
                 })
             ]
         });
+        console.log("WaveSurfer instance created.");
 
         // Event listener untuk WaveSurfer
         wavesurfer.on('ready', () => {
+            console.log("WaveSurfer is ready!");
             const duration = wavesurfer.getDuration();
             audioFileInfo.textContent = `File: "${audioInput.files[0].name}" | Duration: ${formatTime(duration)}`;
             endTimeInput.value = duration.toFixed(1);
             startTimeInput.value = 0;
 
-            // Pastikan hanya ada satu region default yang mencakup seluruh audio jika belum ada
             if (!currentRegion && Object.keys(wavesurfer.regions.list).length === 0) {
                 currentRegion = wavesurfer.regions.add({
                     start: 0,
@@ -630,31 +636,36 @@ function attachAudioCutterListener(token) {
                     resize: true,
                     id: 'default-region'
                 });
+                console.log("Default region added.");
             } else if (currentRegion) {
-                 // Jika sudah ada region, update start/end timesnya
                 currentRegion.update({ start: 0, end: duration });
+                console.log("Existing region updated.");
             }
             cutAudioSubmitButton.disabled = false;
-            messageDiv.textContent = 'Audio loaded and waveform ready!';
+            playPauseButton.disabled = false; // Enable play/pause
+            stopButton.disabled = false; // Enable stop
+            messageDiv.textContent = 'Audio loaded and waveform ready! Drag to select a segment.';
             messageDiv.className = 'success';
         });
 
         wavesurfer.on('error', (err) => {
-            messageDiv.textContent = `WaveSurfer Error: ${err.message}`;
-            messageDiv.className = 'error';
             console.error('WaveSurfer error:', err);
+            messageDiv.textContent = `WaveSurfer Error: ${err.message}. Please try a different audio file or format.`;
+            messageDiv.className = 'error';
             cutAudioSubmitButton.disabled = true;
+            playPauseButton.disabled = true;
+            stopButton.disabled = true;
+            audioFileInfo.textContent = `Error loading file.`;
         });
 
-        // Event listener untuk regions (saat region dibuat, diubah, atau diklik)
         wavesurfer.on('region-updated', (region) => {
             currentRegion = region;
             startTimeInput.value = region.start.toFixed(1);
             endTimeInput.value = region.end.toFixed(1);
+            console.log(`Region updated: Start ${region.start.toFixed(1)}, End ${region.end.toFixed(1)}`);
         });
 
         wavesurfer.on('region-created', (region) => {
-            // Hapus region sebelumnya jika ada untuk memastikan hanya ada satu yang aktif
             Object.values(wavesurfer.regions.list).forEach(r => {
                 if (r.id !== region.id) {
                     wavesurfer.regions.remove(r.id);
@@ -663,6 +674,7 @@ function attachAudioCutterListener(token) {
             currentRegion = region;
             startTimeInput.value = region.start.toFixed(1);
             endTimeInput.value = region.end.toFixed(1);
+            console.log(`Region created: Start ${region.start.toFixed(1)}, End ${region.end.toFixed(1)}`);
         });
 
         wavesurfer.on('region-click', (region, mouseEvent) => {
@@ -670,6 +682,7 @@ function attachAudioCutterListener(token) {
             region.play();
             messageDiv.textContent = `Playing selected region...`;
             messageDiv.className = '';
+            console.log(`Playing region from ${region.start.toFixed(1)} to ${region.end.toFixed(1)}`);
         });
 
         wavesurfer.on('region-out', (region) => {
@@ -678,21 +691,27 @@ function attachAudioCutterListener(token) {
             }
         });
 
-        // Event loading progress
         wavesurfer.on('loading', (percents, xhr) => {
             audioFileInfo.textContent = `Loading "${audioInput.files[0].name}"... ${percents}%`;
             messageDiv.textContent = `Loading audio: ${percents}%...`;
             messageDiv.className = '';
+            cutAudioSubmitButton.disabled = true; // Disable until fully loaded
+            playPauseButton.disabled = true; // Disable during loading
+            stopButton.disabled = true; // Disable during loading
+            console.log(`Audio loading progress: ${percents}%`);
         });
 
-        // Synchronize manual input with region
         const updateRegionFromInputs = () => {
-            if (currentRegion && wavesurfer.isReady) { // Pastikan wavesurfer sudah siap
+            if (currentRegion && wavesurfer.isReady) {
                 const newStart = parseFloat(startTimeInput.value);
                 const newEnd = parseFloat(endTimeInput.value);
 
                 if (!isNaN(newStart) && !isNaN(newEnd) && newStart < newEnd && newEnd <= wavesurfer.getDuration()) {
                     currentRegion.update({ start: newStart, end: newEnd });
+                    console.log(`Region updated from inputs: Start ${newStart.toFixed(1)}, End ${newEnd.toFixed(1)}`);
+                } else {
+                    messageDiv.textContent = 'Invalid time input. Please check values.';
+                    messageDiv.className = 'error';
                 }
             }
         };
@@ -701,8 +720,6 @@ function attachAudioCutterListener(token) {
         endTimeInput.addEventListener('change', updateRegionFromInputs);
     };
 
-
-    // Fungsi untuk memuat file audio ke WaveSurfer.js
     audioInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
         if (!file) {
@@ -710,44 +727,57 @@ function attachAudioCutterListener(token) {
             if (wavesurfer) {
                 wavesurfer.destroy();
                 wavesurfer = null;
-                currentRegion = null; // Reset region
+                currentRegion = null;
             }
             cutAudioSubmitButton.disabled = true;
+            playPauseButton.disabled = true;
+            stopButton.disabled = true;
             cutAudioPreview.pause();
             cutAudioPreview.src = '';
             cutAudioPreview.style.display = 'none';
             downloadButton.style.display = 'none';
-            messageDiv.textContent = ''; // Clear message
+            messageDiv.textContent = '';
             messageDiv.className = '';
+            console.log("No file selected, WaveSurfer destroyed.");
             return;
         }
 
-        audioFileInfo.textContent = `Loading "${file.name}"...`;
+        audioFileInfo.textContent = `Processing "${file.name}"...`; // Initial processing message
+        messageDiv.textContent = 'Decoding audio...';
+        messageDiv.className = '';
         cutAudioSubmitButton.disabled = true;
+        playPauseButton.disabled = true;
+        stopButton.disabled = true;
 
-        // Kosongkan WaveSurfer container sebelum memuat yang baru
         if (waveformContainer) {
-            waveformContainer.innerHTML = '';
+            waveformContainer.innerHTML = ''; // Clear previous waveform
         }
 
         initializeWaveSurfer();
         wavesurfer.loadBlob(file);
+        console.log("Loading file into WaveSurfer:", file.name);
     });
 
-    // Kontrol pemutaran WaveSurfer.js
     playPauseButton.addEventListener('click', () => {
-        if (wavesurfer && wavesurfer.isReady) {
+        if (wavesurfer && wavesurfer.isReady()) { // Check if wavesurfer is ready
             wavesurfer.playPause();
+            console.log("Play/Pause clicked.");
+        } else {
+            messageDiv.textContent = 'Audio not ready yet. Please wait.';
+            messageDiv.className = 'error';
         }
     });
 
     stopButton.addEventListener('click', () => {
-        if (wavesurfer && wavesurfer.isReady) {
+        if (wavesurfer && wavesurfer.isReady()) { // Check if wavesurfer is ready
             wavesurfer.stop();
+            console.log("Stop clicked.");
+        } else {
+            messageDiv.textContent = 'Audio not ready yet. Please wait.';
+            messageDiv.className = 'error';
         }
     });
 
-    // Handler form submit untuk memotong audio
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         messageDiv.textContent = 'Cutting audio, please wait...';
@@ -755,9 +785,12 @@ function attachAudioCutterListener(token) {
         cutAudioPreview.style.display = 'none';
         downloadButton.style.display = 'none';
         
-        // Stop any playing audio before cutting
-        if (wavesurfer && wavesurfer.isReady) {
+        if (wavesurfer && wavesurfer.isReady()) {
             wavesurfer.stop();
+        } else {
+            messageDiv.textContent = 'Audio not loaded or waveform not ready.';
+            messageDiv.className = 'error';
+            return;
         }
 
         const file = audioInput.files[0];
@@ -767,7 +800,6 @@ function attachAudioCutterListener(token) {
             return;
         }
 
-        // Ambil waktu dari input fields, yang sudah disinkronkan dengan region WaveSurfer
         const startTime = parseFloat(startTimeInput.value);
         const endTime = parseFloat(endTimeInput.value);
 
@@ -856,7 +888,7 @@ async function fetchUserLinkHistory(token) {
 
 // Tambahkan definisi ikon SVG
 const copyIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
-const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 S0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
 
 // Fungsi baru untuk merender item tautan pengguna dengan tombol hapus
 function renderUserLinkItem(link, container, token) {
