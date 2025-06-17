@@ -1,5 +1,5 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (100% LENGKAP DAN UTUH)              ==
+// ==   FILE SCRIPT.JS (VERSI FINAL LENGKAP)                        ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Setup elemen UI umum yang ada di semua halaman
     setupAboutModal();
-    setupMobileMenu();
+    setupMobileMenu(); // Fungsi ini telah diperbarui
     setupAllPasswordToggles();
 });
 
@@ -97,7 +97,7 @@ async function fetchAndDisplayLinks(token) {
 
         links.forEach(link => {
             const listItem = document.createElement('li');
-            listItem.className = 'mood-item';
+            listItem.className = 'mood-item'; // Menggunakan style lama untuk panel admin
             listItem.id = `link-${link.slug}`;
             listItem.innerHTML = `
                 <div class="mood-item-header">
@@ -153,77 +153,54 @@ async function handleDeleteLink(event) {
 // ===================================
 
 function setupToolsPage(token) {
-    const wrappers = [ // Semua wrapper perkakas dan riwayat
+    const wrappers = [
         document.getElementById('shortener-wrapper'),
         document.getElementById('history-section'),
         document.getElementById('converter-wrapper'),
         document.getElementById('image-merger-wrapper')
     ];
     const loginPrompt = document.getElementById('login-prompt');
-    const toolSelectionSection = document.querySelector('.tool-selection'); // Bagian baru untuk tombol pilihan
+    const toolSelectionSection = document.querySelector('.tool-selection');
 
-    // Sembunyikan semua perkakas dan riwayat secara default saat halaman dimuat
     wrappers.forEach(el => el && el.classList.add('hidden'));
 
     if (token) {
-        // Jika login, tampilkan bagian pilihan perkakas dan sembunyikan pesan login
         if (loginPrompt) loginPrompt.classList.add('hidden');
         if (toolSelectionSection) toolSelectionSection.classList.remove('hidden');
 
-        // Pasang event listener untuk tombol-tombol pilihan perkakas
         document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper', token));
         document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper', token));
         document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper', token));
 
-        // Inisialisasi listener form (mereka hanya akan aktif jika wrapper-nya terlihat)
         attachShortenerListener(token);
         attachConverterListener(token);
         attachImageMergerListener(token);
 
     } else {
-        // Jika tidak login, sembunyikan semua perkakas, sembunyikan pilihan perkakas, dan tampilkan pesan login
         if (loginPrompt) loginPrompt.classList.remove('hidden');
         if (toolSelectionSection) toolSelectionSection.classList.add('hidden');
     }
-
-    // Logika untuk menonaktifkan opsi konversi yang tidak andal
+    
+    // Nonaktifkan opsi konversi tidak andal
     const fileInput = document.getElementById('file-input');
     const outputFormatSelect = document.getElementById('output-format');
-
     if (fileInput && outputFormatSelect) {
         fileInput.addEventListener('change', () => {
             if (!fileInput.files || fileInput.files.length === 0) return;
-
             const fileName = fileInput.files[0].name.toLowerCase();
             const docxOption = outputFormatSelect.querySelector('option[value="docx"]');
-
-            if (fileName.endsWith('.pdf')) {
-                // Jika file adalah PDF, nonaktifkan opsi DOCX
-                if (docxOption) {
-                    docxOption.disabled = true;
-                    // Jika opsi DOCX sedang terpilih, ganti ke pilihan default (PDF)
-                    if (outputFormatSelect.value === 'docx') {
-                        outputFormatSelect.value = 'pdf'; 
-                    }
-                }
-            } else {
-                // Jika file bukan PDF, aktifkan kembali opsi DOCX
-                if (docxOption) {
-                    docxOption.disabled = false;
-                }
-            }
+            if (docxOption) docxOption.disabled = fileName.endsWith('.pdf');
         });
     }
 }
 
-// Fungsi baru untuk menampilkan bagian perkakas tertentu dan menyembunyikan yang lain
 function showToolSection(sectionIdToShow, token) {
     const allToolSections = [
         document.getElementById('shortener-wrapper'),
         document.getElementById('converter-wrapper'),
         document.getElementById('image-merger-wrapper')
     ];
-    const historySection = document.getElementById('history-section'); // Ambil riwayat secara terpisah
+    const historySection = document.getElementById('history-section');
 
     allToolSections.forEach(section => {
         if (section && section.id === sectionIdToShow) {
@@ -233,17 +210,15 @@ function showToolSection(sectionIdToShow, token) {
         }
     });
 
-    // Logika khusus untuk history section: hanya tampilkan jika shortener-wrapper yang aktif
     if (historySection) {
         if (sectionIdToShow === 'shortener-wrapper') {
             historySection.classList.remove('hidden');
-            fetchUserLinkHistory(token); // Muat ulang riwayat saat shortener ditampilkan
+            fetchUserLinkHistory(token);
         } else {
             historySection.classList.add('hidden');
         }
     }
 
-    // Gulir ke bagian yang ditampilkan (opsional, untuk UX yang lebih baik)
     const targetSection = document.getElementById(sectionIdToShow);
     if (targetSection) {
         targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -254,17 +229,15 @@ function attachShortenerListener(token) {
     const form = document.getElementById('shortener-form');
     if (!form) return;
 
-    const longUrlInput = document.getElementById('long-url');
-    const customSlugInput = document.getElementById('custom-slug');
-    const resultBox = document.getElementById('result');
-    const resultText = document.getElementById('short-url-text');
-    const copyButton = document.getElementById('copy-button');
-    const copyIcon = document.getElementById('copy-icon');
-    const checkIcon = document.getElementById('check-icon');
-
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
-        resultBox.style.display = 'block';
+        const longUrlInput = document.getElementById('long-url');
+        const customSlugInput = document.getElementById('custom-slug');
+        const resultBox = document.getElementById('result');
+        const resultText = document.getElementById('short-url-text');
+        const copyButton = document.getElementById('copy-button');
+        
+        resultBox.style.display = 'flex';
         resultText.textContent = 'Memproses...';
         copyButton.style.display = 'none';
 
@@ -277,12 +250,10 @@ function attachShortenerListener(token) {
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Gagal mengambil data');
             
-            resultBox.style.display = 'flex';
             copyButton.style.display = 'flex';
             resultText.textContent = data.short_url;
             longUrlInput.value = '';
             customSlugInput.value = '';
-
             fetchUserLinkHistory(token); 
 
         } catch (error) {
@@ -291,8 +262,12 @@ function attachShortenerListener(token) {
         }
     });
 
+    const copyButton = document.getElementById('copy-button');
     if (copyButton) {
         copyButton.addEventListener('click', () => {
+            const resultText = document.getElementById('short-url-text');
+            const copyIcon = document.getElementById('copy-icon');
+            const checkIcon = document.getElementById('check-icon');
             navigator.clipboard.writeText(resultText.textContent).then(() => {
                 copyIcon.style.display = 'none'; checkIcon.style.display = 'block';
                 setTimeout(() => { copyIcon.style.display = 'block'; checkIcon.style.display = 'none'; }, 2000);
@@ -304,7 +279,6 @@ function attachShortenerListener(token) {
 function attachConverterListener(token) {
     const form = document.getElementById('converter-form');
     if (!form) return;
-
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         const formData = new FormData(form);
@@ -318,12 +292,10 @@ function attachConverterListener(token) {
             const response = await fetch(`${API_BASE_URL}/api/convert`, {
                 method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData
             });
-
             if (!response.ok) {
                 let errorData = await response.json().catch(() => ({ error: response.statusText }));
                 throw new Error(errorData.error || 'Gagal memproses file.');
             }
-
             const blob = await response.blob();
             const contentDisposition = response.headers.get('content-disposition');
             let fileName = contentDisposition?.match(/filename="(.+)"/)?.[1] || 'converted-file';
@@ -349,39 +321,30 @@ function attachConverterListener(token) {
 function attachImageMergerListener(token) {
     const form = document.getElementById('image-merger-form');
     if (!form) return;
-
     const messageDiv = document.getElementById('image-merger-message');
     const fileInput = document.getElementById('image-files-input');
-
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (fileInput.files.length === 0) {
             messageDiv.textContent = 'Error: Silakan pilih setidaknya satu gambar.';
-            messageDiv.className = 'error';
-            return;
+            messageDiv.className = 'error'; return;
         }
-        
         const formData = new FormData(form);
         const submitButton = form.querySelector('button');
         messageDiv.textContent = 'Mengunggah dan menggabungkan gambar...';
         messageDiv.className = '';
         submitButton.disabled = true;
-
         try {
             const response = await fetch(`${API_BASE_URL}/api/convert/images-to-pdf`, {
                 method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Gagal memproses file.');
-            }
+            if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error || 'Gagal memproses file.'); }
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none'; a.href = url; a.download = 'hasil-gabungan.pdf';
             document.body.appendChild(a); a.click();
             window.URL.revokeObjectURL(url); a.remove();
-            
             messageDiv.textContent = 'Berhasil! PDF Anda sedang diunduh.';
             messageDiv.className = 'success';
             form.reset();
@@ -398,7 +361,6 @@ async function fetchUserLinkHistory(token) {
     const historyList = document.getElementById('link-history-list');
     const loadingMessage = document.getElementById('loading-history');
     if (!historyList || !loadingMessage) return;
-
     loadingMessage.textContent = 'Memuat riwayat...';
     try {
         const response = await fetch(`${API_BASE_URL}/api/user/links`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -410,36 +372,43 @@ async function fetchUserLinkHistory(token) {
             loadingMessage.textContent = 'Anda belum memiliki riwayat tautan.';
         } else {
             loadingMessage.style.display = 'none';
-            links.forEach(link => renderUserLinkItem(link, historyList, token)); // Menggunakan renderUserLinkItem
+            links.forEach(link => renderUserLinkItem(link, historyList, token));
         }
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
     }
 }
 
-// Fungsi baru untuk merender item tautan pengguna dengan tombol hapus
 function renderUserLinkItem(link, container, token) {
     const shortUrl = `https://link.hamdirzl.my.id/${link.slug}`;
+    const copyIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+    const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+    const checkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
     const listItem = document.createElement('li');
-    listItem.className = 'mood-item';
-    listItem.id = `user-link-${link.slug}`; // Memberi ID unik untuk kemudahan penghapusan DOM
+    listItem.className = 'history-item'; // Class baru untuk styling
+    listItem.id = `user-link-${link.slug}`;
     listItem.innerHTML = `
-        <div class="mood-item-header" style="align-items: center;">
-            <strong style="font-size: 1.1em; color: var(--accent-color); word-break: break-all;">${shortUrl}</strong>
-            <div style="display: flex; gap: 5px;">
-                <button class="button-pintu copy-history-btn" data-url="${shortUrl}" style="padding: 5px 10px; font-size: 0.9em;">Salin</button>
-                <button class="button-pintu delete-user-link-btn" data-slug="${link.slug}" style="background-color: #ff4d4d; border-color: #ff4d4d; padding: 5px 10px; font-size: 0.9em;">Hapus</button>
-            </div>
+        <div class="history-item-urls">
+            <a href="${shortUrl}" target="_blank" class="history-item-short">${shortUrl.replace('https://','')}</a>
+            <span class="history-item-original">${link.original_url}</span>
         </div>
-        <p class="mood-notes" style="word-break: break-all;">URL Asli: <a href="${link.original_url}" target="_blank">${link.original_url}</a></p>
-        <small class="mood-date">Dibuat pada: ${new Date(link.created_at).toLocaleString('id-ID')}</small>`;
+        <div class="history-item-actions">
+            <button class="history-action-btn copy-history-btn" data-url="${shortUrl}" title="Salin Tautan">
+                ${copyIconSvg}
+            </button>
+            <button class="history-action-btn delete-user-link-btn" data-slug="${link.slug}" title="Hapus Tautan">
+                ${trashIconSvg}
+            </button>
+        </div>`;
     container.appendChild(listItem);
 
-    listItem.querySelector('.copy-history-btn').addEventListener('click', (e) => {
-        navigator.clipboard.writeText(e.target.dataset.url).then(() => {
-            const originalText = e.target.textContent;
-            e.target.textContent = 'Tersalin!';
-            setTimeout(() => { e.target.textContent = originalText; }, 2000);
+    const copyButton = listItem.querySelector('.copy-history-btn');
+    copyButton.addEventListener('click', (e) => {
+        const button = e.currentTarget;
+        navigator.clipboard.writeText(button.dataset.url).then(() => {
+            button.innerHTML = checkIconSvg;
+            setTimeout(() => { button.innerHTML = copyIconSvg; }, 2000);
         });
     });
 
@@ -447,7 +416,7 @@ function renderUserLinkItem(link, container, token) {
 }
 
 async function handleDeleteUserLink(event, token) {
-    const slugToDelete = event.target.dataset.slug;
+    const slugToDelete = event.currentTarget.dataset.slug;
 
     if (!confirm(`Anda yakin ingin menghapus tautan dengan slug "${slugToDelete}" dari riwayat Anda?`)) return;
 
@@ -456,23 +425,20 @@ async function handleDeleteUserLink(event, token) {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
-
         const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'Gagal menghapus tautan.');
-        }
-
+        if (!response.ok) throw new Error(data.error || 'Gagal menghapus tautan.');
         alert(data.message);
-        // Hapus item dari DOM
-        const listItemToRemove = document.getElementById(`user-link-${slugToDelete}`);
-        if (listItemToRemove) listItemToRemove.remove();
-
-        // Opsional: Muat ulang riwayat jika daftar kosong atau perlu refresh
-        fetchUserLinkHistory(token);
-
+        document.getElementById(`user-link-${slugToDelete}`)?.remove();
+        
+        // Tampilkan pesan jika riwayat menjadi kosong
+        const historyList = document.getElementById('link-history-list');
+        if (historyList && historyList.children.length === 0) {
+            const loadingMessage = document.getElementById('loading-history');
+            loadingMessage.style.display = 'block';
+            loadingMessage.textContent = 'Anda belum memiliki riwayat tautan.';
+        }
     } catch (error) {
         alert(`Error: ${error.message}`);
-        console.error('Error saat menghapus tautan pengguna:', error);
     }
 }
 
@@ -490,66 +456,58 @@ function setupAuthPage() {
     const authMessage = document.getElementById('auth-message');
     const authTitle = document.getElementById('auth-title');
 
-    if (showRegisterLink) {
-        showRegisterLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginSection.classList.add('hidden');
-            registerSection.classList.remove('hidden');
-            if(authTitle) authTitle.textContent = 'Registrasi';
-            authMessage.textContent = ''; authMessage.className = '';
-        });
-    }
+    showRegisterLink?.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginSection.classList.add('hidden');
+        registerSection.classList.remove('hidden');
+        if(authTitle) authTitle.textContent = 'Registrasi';
+        authMessage.textContent = ''; authMessage.className = '';
+    });
 
-    if (showLoginLink) {
-        showLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            registerSection.classList.add('hidden');
-            loginSection.classList.remove('hidden');
-            if(authTitle) authTitle.textContent = 'Login';
-            authMessage.textContent = ''; authMessage.className = '';
-        });
-    }
+    showLoginLink?.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerSection.classList.add('hidden');
+        loginSection.classList.remove('hidden');
+        if(authTitle) authTitle.textContent = 'Login';
+        authMessage.textContent = ''; authMessage.className = '';
+    });
 
-    if (registerForm) {
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            authMessage.textContent = 'Memproses...';
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error);
-                authMessage.textContent = 'Registrasi berhasil! Silakan login.';
-                authMessage.className = 'success';
-                if (showLoginLink) showLoginLink.click();
-            } catch (error) {
-                authMessage.textContent = `Error: ${error.message}`;
-                authMessage.className = 'error';
-            }
-        });
-    }
+    registerForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        authMessage.textContent = 'Memproses...';
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+            authMessage.textContent = 'Registrasi berhasil! Silakan login.';
+            authMessage.className = 'success';
+            showLoginLink?.click();
+        } catch (error) {
+            authMessage.textContent = `Error: ${error.message}`;
+            authMessage.className = 'error';
+        }
+    });
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            authMessage.textContent = 'Memproses...';
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error);
-                localStorage.setItem('jwt_token', data.token);
-                authMessage.textContent = 'Login berhasil! Mengalihkan ke dashboard...';
-                authMessage.className = 'success';
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
-            } catch (error) {
-                authMessage.textContent = `Error: ${error.message}`;
-                authMessage.className = 'error';
-            }
-        });
-    }
+    loginForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        authMessage.textContent = 'Memproses...';
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+            localStorage.setItem('jwt_token', data.token);
+            authMessage.textContent = 'Login berhasil! Mengalihkan ke dashboard...';
+            authMessage.className = 'success';
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+        } catch (error) {
+            authMessage.textContent = `Error: ${error.message}`;
+            authMessage.className = 'error';
+        }
+    });
 }
 
 // ==========================================================
@@ -562,11 +520,9 @@ if (forgotForm) {
         const email = document.getElementById('forgot-email').value;
         const messageDiv = document.getElementById('auth-message');
         const submitButton = forgotForm.querySelector('button');
-
         messageDiv.textContent = 'Memproses...';
         messageDiv.className = '';
         submitButton.disabled = true;
-
         try {
             const response = await fetch(`${API_BASE_URL}/api/forgot-password`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
             const data = await response.json();
@@ -592,14 +548,11 @@ if (resetForm) {
         const token = new URLSearchParams(window.location.search).get('token');
         const password = document.getElementById('reset-password').value;
         const confirmPassword = document.getElementById('confirm-password').value;
-
         if (!token) { messageDiv.textContent = 'Error: Token tidak ditemukan.'; messageDiv.className = 'error'; return; }
         if (password !== confirmPassword) { messageDiv.textContent = 'Error: Password dan konfirmasi password tidak cocok.'; messageDiv.className = 'error'; return; }
-
         messageDiv.textContent = 'Memproses...';
         messageDiv.className = '';
         submitButton.disabled = true;
-
         try {
             const response = await fetch(`${API_BASE_URL}/api/reset-password`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, password }) });
             const data = await response.json();
@@ -617,54 +570,75 @@ if (resetForm) {
 
 
 // ==========================================================
-// ===         LOGIKA UNTUK ELEMEN UI UMUM                ===
+// ===         ELEMEN UI UMUM & LOGIKA MENU BARU          ===
 // ==========================================================
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
-    if (hamburger && navLinks) {
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
+    const body = document.body;
+
+    if (navLinks && !navLinks.querySelector('.nav-close-btn')) {
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '&times;';
+        closeBtn.className = 'nav-close-btn';
+        navLinks.prepend(closeBtn);
     }
+    
+    const closeBtn = document.querySelector('.nav-close-btn');
+
+    const toggleMenu = (forceClose = false) => {
+        const isActive = navLinks.classList.contains('active');
+        if (forceClose || isActive) {
+            hamburger.classList.remove('active');
+            navLinks.classList.remove('active');
+            body.classList.remove('menu-open');
+        } else {
+            hamburger.classList.add('active');
+            navLinks.classList.add('active');
+            body.classList.add('menu-open');
+        }
+    };
+
+    hamburger?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+    });
+
+    closeBtn?.addEventListener('click', () => toggleMenu(true));
+    
+    body.addEventListener('click', (e) => {
+        if (body.classList.contains('menu-open') && !navLinks.contains(e.target)) {
+            toggleMenu(true);
+        }
+    });
+
+    navLinks?.querySelectorAll('a, button').forEach(link => {
+        link.addEventListener('click', () => {
+            if (body.classList.contains('menu-open')) {
+                toggleMenu(true)
+            }
+        });
+    });
 }
 
 function setupAboutModal() {
     const aboutButtons = document.querySelectorAll('#about-button');
     const modalOverlay = document.getElementById('about-modal');
-    
     if (!modalOverlay) return; 
-    
     const modalCloseButton = modalOverlay.querySelector('.modal-close');
-
     const openModal = () => modalOverlay.classList.remove('hidden');
     const closeModal = () => modalOverlay.classList.add('hidden');
-
     aboutButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            openModal();
-        });
+        button.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
     });
-    
-    if (modalCloseButton) {
-        modalCloseButton.addEventListener('click', closeModal);
-    }
-    
-    modalOverlay.addEventListener('click', (event) => { 
-        if (event.target === modalOverlay) closeModal(); 
-    });
-    
-    document.addEventListener('keydown', (event) => { 
-        if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); 
-    });
+    if (modalCloseButton) modalCloseButton.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) closeModal(); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); });
 }
 
 function setupAllPasswordToggles() {
     const eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
     const eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
-
     const setupPasswordToggle = (toggleId, passwordId) => {
         const toggleElement = document.getElementById(toggleId);
         const passwordElement = document.getElementById(passwordId);
@@ -676,7 +650,6 @@ function setupAllPasswordToggles() {
             });
         }
     };
-
     setupPasswordToggle('toggle-login-password', 'login-password');
     setupPasswordToggle('toggle-register-password', 'register-password');
     setupPasswordToggle('toggle-reset-password', 'reset-password');
