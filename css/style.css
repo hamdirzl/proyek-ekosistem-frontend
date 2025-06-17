@@ -451,13 +451,13 @@ input:focus, textarea:focus, select:focus {
 .nav-close-button {
     display: none; /* Hidden by default for desktop */
     position: absolute;
-    top: var(--space-sm); /* Adjusted for better spacing */
+    top: var(--space-md);
     left: var(--space-md); /* Position from the left inside the slide-in menu */
     background: none;
     border: none;
     font-size: 2.5rem; /* Large size for easy tapping */
     font-weight: 300;
-    color: #e0e0e0; /* Make it clearly visible */
+    color: var(--text-muted-color);
     cursor: pointer;
     line-height: 1;
     transition: color 0.3s ease, transform 0.3s ease;
@@ -465,7 +465,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 .nav-close-button:hover {
-    color: var(--accent-color); /* Change color on hover */
+    color: var(--text-color);
     transform: rotate(90deg);
 }
 
@@ -487,14 +487,12 @@ input:focus, textarea:focus, select:focus {
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         padding-top: var(--space-xxl); /* Push content down from top */
-        padding-left: 0; /* Ensure no default padding interfering with symmetry */
-        padding-right: 0; /* Ensure no default padding interfering with symmetry */
         opacity: 0; 
         visibility: hidden; 
         transform: translateX(100%); 
         transition: transform 0.4s ease, opacity 0.4s ease, visibility 0.4s ease; 
         flex-direction: column; 
-        align-items: center; /* Center items for symmetry */
+        align-items: flex-start; /* Align text to left */
         justify-content: flex-start;
         gap: var(--space-sm);
         box-shadow: -5px 0 15px rgba(0,0,0,0.3);
@@ -514,12 +512,13 @@ input:focus, textarea:focus, select:focus {
     .nav-links li { 
         margin: 0; 
         width: 100%; 
-        text-align: center; /* Center text for symmetry */
-        padding: var(--space-sm) var(--space-lg); /* Consistent padding for list items */
+        text-align: left; /* Ensure text alignment */
+        padding-left: var(--space-lg); /* Consistent padding for list items */
+        padding-right: var(--space-lg); /* Consistent padding for list items */
     }
     .nav-links a, .nav-links .nav-button { 
         display: block; 
-        /* padding dikelola oleh `li` untuk konsistensi */
+        padding: var(--space-sm) 0; /* Adjust padding within list items */
         width: 100%; 
         border-radius: 0; 
         font-size: 1.1rem; 
@@ -528,11 +527,11 @@ input:focus, textarea:focus, select:focus {
     .nav-links a::after { display: none; } /* Hide underline on mobile menu items */
     
     .nav-links a.login-button { 
-        margin: var(--space-md) var(--space-lg); 
-        width: calc(100% - (var(--space-lg) * 2)); 
+        margin: var(--space-md) var(--space-lg); /* Adjusted margin for consistency */
+        width: calc(100% - (var(--space-lg) * 2)); /* Make button span full width minus padding */
         text-align: center; 
         font-size: 1.0rem; 
-        align-self: center; /* Center the login button as well */
+        align-self: flex-start; /* Keep aligned with other text */
     }
 
     /* Show close button on mobile */

@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Setup elemen UI umum yang ada di semua halaman
     setupAboutModal();
-    setupMobileMenu(); 
+    setupMobileMenu(); // Perubahan ada di sini
     setupAllPasswordToggles();
 });
 
@@ -605,13 +605,12 @@ function setupMobileMenu() {
 
     // Close menu when clicking outside (on the overlay itself)
     // This assumes navLinks covers most of the right side.
-    // We add a specific click listener for the navLinks *container* to prevent closing
-    // when clicking on actual menu items.
+    // A more robust solution might involve a separate overlay div.
+    // For now, let's make sure clicking navLinks itself (if active) closes it,
+    // but only if the click is directly on the .nav-links area and not its children.
     if (navLinks) {
         navLinks.addEventListener('click', (event) => {
-            // Only toggle if the click is directly on the .nav-links container itself,
-            // not on its children (e.g., actual menu links or buttons inside).
-            if (event.target === navLinks) { 
+            if (event.target === navLinks) { // Only close if the click is on the navLinks div itself
                 toggleMenu();
             }
         });
