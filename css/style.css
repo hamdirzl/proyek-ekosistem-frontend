@@ -232,7 +232,7 @@ footer {
     gap: var(--space-sm);
 }
 
-input[type="url"], input[type="email"], input[type="password"], textarea { 
+input[type="url"], input[type="email"], input[type="password"], input[type="text"], textarea { 
     width: 100%;
     padding: var(--space-sm); 
     border: 1px solid var(--border-color); 
@@ -248,6 +248,28 @@ input:focus, textarea:focus {
     border-color: var(--accent-color); 
     box-shadow: 0 0 0 3px rgba(0, 245, 160, 0.2); 
 }
+
+/* KODE BARU UNTUK IKON MATA PASSWORD */
+.password-container {
+    position: relative;
+}
+
+.password-container .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--text-muted-color);
+    display: flex;
+    align-items: center;
+}
+
+.password-container .toggle-password:hover {
+    color: var(--text-color);
+}
+/* AKHIR KODE BARU */
+
 
 .result-box { 
     margin-top: var(--space-md); 
