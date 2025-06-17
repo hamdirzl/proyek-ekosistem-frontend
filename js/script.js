@@ -1,9 +1,9 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (dengan Fitur Admin)                 ==
+// ==   FILE FINAL SCRIPT.JS (Tanpa Fitur Mood Tracker)           ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi.onrender.com';
 
-console.log(`Ekosistem Digital (Client v12) dimuat! Menghubungi API di: ${API_BASE_URL}`);
+console.log(`Ekosistem Digital (Client v13) dimuat! Menghubungi API di: ${API_BASE_URL}`);
 
 /* === FUNGSI GLOBAL UNTUK CEK STATUS LOGIN === */
 document.addEventListener('DOMContentLoaded', () => {
@@ -139,14 +139,6 @@ if (document.getElementById('login-form')) {
     }
 }
 
-
-// =================================================================
-// ===         LOGIKA UNTUK HALAMAN DASHBOARD (MOOD)           ===
-// =================================================================
-if (document.getElementById('dashboard-main')) {
-    // Kode untuk Mood tracker, bisa ditambahkan di sini
-}
-
 // ==========================================================
 // ===         LOGIKA UNTUK MENU DROPDOWN MOBILE          ===
 // ==========================================================
@@ -191,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // ==========================================================
-// ===         LOGIKA BARU UNTUK LUPA PASSWORD           ===
+// ===         LOGIKA UNTUK LUPA PASSWORD                 ===
 // ==========================================================
 const forgotForm = document.getElementById('forgot-form');
 if (forgotForm) {
@@ -255,16 +247,30 @@ if (resetForm) {
 }
 
 // ==========================================================
-// ===         LOGIKA BARU UNTUK PANEL ADMIN              ===
+// ===   LOGIKA UNTUK DASHBOARD (INFO USER & PANEL ADMIN) ===
 // ==========================================================
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('dashboard-main')) {
+        populateUserInfo();
         checkUserRoleAndSetupAdminPanel();
     }
 });
 
 function decodeJwt(token) {
     try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
+}
+
+function populateUserInfo() {
+    const token = localStorage.getItem('jwt_token');
+    if (!token) return;
+
+    const decodedToken = decodeJwt(token);
+    if (decodedToken && decodedToken.email) {
+        const userEmailElement = document.getElementById('user-email');
+        if (userEmailElement) {
+            userEmailElement.textContent = decodedToken.email;
+        }
+    }
 }
 
 async function checkUserRoleAndSetupAdminPanel() {
