@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Setup elemen UI umum yang ada di semua halaman
     setupAboutModal();
-    setupMobileMenu(); // Perubahan ada di sini
+    setupMobileMenu();
     setupAllPasswordToggles();
 });
 
@@ -163,7 +163,8 @@ function setupToolsPage(token) {
         document.getElementById('history-section'),
         document.getElementById('converter-wrapper'),
         document.getElementById('image-merger-wrapper'),
-        document.getElementById('qr-generator-wrapper') // BARIS INI DITAMBAHKAN
+        document.getElementById('qr-generator-wrapper'),
+        document.getElementById('image-compressor-wrapper') // BARIS INI DITAMBAHKAN
     ];
     const loginPrompt = document.getElementById('login-prompt');
     const toolSelectionSection = document.querySelector('.tool-selection'); 
@@ -177,12 +178,14 @@ function setupToolsPage(token) {
         document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper', token));
         document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper', token));
         document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper', token));
-        document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper', token)); // BARIS INI DITAMBAHKAN
+        document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper', token));
+        document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper', token)); // BARIS INI DITAMBAHKAN
 
         attachShortenerListener(token);
         attachConverterListener(token);
         attachImageMergerListener(token);
-        attachQrCodeGeneratorListener(token); // BARIS INI DITAMBAHKAN
+        attachQrCodeGeneratorListener(token);
+        attachImageCompressorListener(token); // BARIS INI DITAMBAHKAN
 
     } else {
         if (loginPrompt) loginPrompt.classList.remove('hidden');
@@ -220,7 +223,8 @@ function showToolSection(sectionIdToShow, token) {
         document.getElementById('shortener-wrapper'),
         document.getElementById('converter-wrapper'),
         document.getElementById('image-merger-wrapper'),
-        document.getElementById('qr-generator-wrapper') // BARIS INI DITAMBAHKAN
+        document.getElementById('qr-generator-wrapper'),
+        document.getElementById('image-compressor-wrapper') // BARIS INI DITAMBAHKAN
     ];
     const historySection = document.getElementById('history-section'); 
 
@@ -391,7 +395,7 @@ function attachImageMergerListener(token) {
     });
 }
 
-// === FUNGSI BARU: QR CODE GENERATOR CLIENT-SIDE LOGIC ===
+// === FUNGSI QR CODE GENERATOR CLIENT-SIDE LOGIC ===
 function attachQrCodeGeneratorListener(token) {
     const form = document.getElementById('qr-generator-form');
     if (!form) return;
@@ -453,6 +457,99 @@ function attachQrCodeGeneratorListener(token) {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    });
+}
+
+// === FUNGSI BARU: IMAGE COMPRESSOR CLIENT-SIDE LOGIC ===
+function attachImageCompressorListener(token) {
+    const form = document.getElementById('image-compressor-form');
+    if (!form) return;
+
+    const imageInput = document.getElementById('image-compress-input');
+    const qualityInput = document.getElementById('compress-quality');
+    const qualityValueSpan = document.getElementById('compress-quality-value');
+    const formatSelect = document.getElementById('compress-format');
+    const messageDiv = document.getElementById('image-compressor-message');
+    const compressedImagePreview = document.getElementById('compressed-image-preview');
+    const originalSizeSpan = document.getElementById('original-image-size');
+    const compressedSizeSpan = document.getElementById('compressed-image-size');
+    const downloadButton = document.getElementById('download-compressed-button');
+
+    // Update quality value display
+    qualityInput.addEventListener('input', () => {
+        qualityValueSpan.textContent = `${qualityInput.value}%`;
+    });
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        messageDiv.textContent = 'Compressing image, please wait...';
+        messageDiv.className = '';
+        compressedImagePreview.style.display = 'none';
+        downloadButton.style.display = 'none';
+        originalSizeSpan.textContent = 'N/A';
+        compressedSizeSpan.textContent = 'N/A';
+        
+        const file = imageInput.files[0];
+        if (!file) {
+            messageDiv.textContent = 'Please select an image file.';
+            messageDiv.className = 'error';
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('quality', qualityInput.value);
+        formData.append('format', formatSelect.value);
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/compress-image`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: response.statusText }));
+                throw new Error(errorData.error || 'Failed to compress image.');
+            }
+
+            const compressedBlob = await response.blob();
+            const originalSize = response.headers.get('X-Original-Size');
+            const compressedSize = response.headers.get('X-Compressed-Size');
+            const outputFileName = `compressed-image.${formatSelect.value}`;
+
+            // Display original and compressed sizes
+            originalSizeSpan.textContent = `${(originalSize / 1024).toFixed(2)} KB`;
+            compressedSizeSpan.textContent = `${(compressedSize / 1024).toFixed(2)} KB`;
+
+            // Display compressed image preview
+            const imageUrl = URL.createObjectURL(compressedBlob);
+            compressedImagePreview.src = imageUrl;
+            compressedImagePreview.style.display = 'block';
+
+            // Enable download button
+            downloadButton.onclick = () => {
+                const link = document.createElement('a');
+                link.href = imageUrl;
+                link.download = outputFileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(imageUrl); // Clean up the object URL
+            };
+            downloadButton.style.display = 'block';
+
+            messageDiv.textContent = 'Image compressed successfully!';
+            messageDiv.className = 'success';
+
+        } catch (error) {
+            messageDiv.textContent = `Error: ${error.message}`;
+            messageDiv.className = 'error';
+            compressedImagePreview.style.display = 'none';
+            downloadButton.style.display = 'none';
+        }
     });
 }
 
@@ -690,7 +787,7 @@ if (resetForm) {
         try {
             const response = await fetch(`${API_BASE_URL}/api/reset-password`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, password }) });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Terjadi kesalahan');
+            if (!response.ok) throw new Error(data.error);
             messageDiv.textContent = `${data.message} Anda akan diarahkan ke halaman login...`;
             messageDiv.className = 'success';
             setTimeout(() => { window.location.href = 'auth.html'; }, 3000);
