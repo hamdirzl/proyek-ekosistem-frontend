@@ -525,3 +525,62 @@ input:focus, textarea:focus {
 #copy-button:hover svg {
     color: var(--accent-color);
 }
+
+/* =================================================================== */
+/* ==   PENYEMPURNAAN TAMPILAN MOBILE PROFESIONAL                 == */
+/* =================================================================== */
+
+/* Perbaikan untuk kotak hasil utama */
+.result-box {
+    align-items: center;
+}
+
+#short-url-text {
+    flex-grow: 1; /* Biarkan teks mengambil ruang yang tersedia */
+    flex-shrink: 1; /* Izinkan teks untuk menyusut */
+    min-width: 0; /* Wajib agar flex-shrink berfungsi dengan baik */
+    word-break: break-all; /* Patahkan URL jika terlalu panjang */
+}
+
+#copy-button {
+    flex-shrink: 0; /* Jangan biarkan tombol salin menyusut */
+    margin-left: var(--space-sm);
+}
+
+/* Perbaikan untuk item di riwayat tautan */
+.mood-item-header {
+    align-items: center;
+    gap: var(--space-sm); /* Beri jarak antara URL dan tombol */
+}
+
+.mood-item-header strong {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word; /* Gunakan break-word agar lebih rapi */
+}
+
+.mood-item-header .button-pintu {
+    flex-shrink: 0;
+}
+
+/* Penyesuaian Profesional untuk Mobile */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: clamp(1.75rem, 1.5rem + 2.5vw, 2.25rem); /* Perkecil sedikit judul seksi */
+        margin-bottom: var(--space-md);
+    }
+
+    .tool-section, .history-section {
+        padding: var(--space-md); /* Kurangi padding agar tidak terlalu renggang */
+    }
+
+    .mood-item {
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    /* Pastikan tombol login di pesan prompt tidak terlalu besar */
+    #login-prompt a {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+}
