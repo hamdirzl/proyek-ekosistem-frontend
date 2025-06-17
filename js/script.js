@@ -151,94 +151,67 @@ async function handleDeleteLink(event) {
 // ===================================
 // === LOGIKA HALAMAN TOOLS        ===
 // ===================================
+// script.js
+
 function setupToolsPage(token) {
-    // Referensi ke semua elemen yang kita butuhkan
+    const wrappers = [
+        document.getElementById('shortener-wrapper'),
+        document.getElementById('history-section'),
+        document.getElementById('converter-wrapper'),
+        document.getElementById('image-merger-wrapper')
+    ];
     const loginPrompt = document.getElementById('login-prompt');
-    const toolSelectionWrapper = document.getElementById('tool-selection-wrapper');
-    const allToolsContainer = document.getElementById('all-tools-container');
 
-    // Referensi ke tombol pilihan
-    const showShortenerBtn = document.getElementById('show-shortener-btn');
-    const showConverterBtn = document.getElementById('show-converter-btn');
-    const showRemoverBtn = document.getElementById('show-remover-btn'); // Tombol baru
-
-    // Referensi ke wrapper setiap perkakas
-    const shortenerWrapper = document.getElementById('shortener-wrapper');
-    const converterContainer = document.getElementById('converter-container');
-    const removerWrapper = document.getElementById('remover-wrapper'); // Wrapper baru
-    
     if (token) {
-        // Jika login, tampilkan menu pilihan perkakas
-        loginPrompt.classList.add('hidden');
-        toolSelectionWrapper.classList.remove('hidden');
+        // Jika login, tampilkan semua perkakas dan sembunyikan pesan login
+        wrappers.forEach(el => el && el.classList.remove('hidden'));
+        if (loginPrompt) loginPrompt.classList.add('hidden');
 
-        // Sembunyikan semua perkakas pada awalnya
-        allToolsContainer.classList.add('hidden');
-        shortenerWrapper.style.display = 'none';
-        converterContainer.style.display = 'none';
-        removerWrapper.style.display = 'none'; // Sembunyikan wrapper baru
-
-        // --- Tambahkan event listener untuk tombol-tombol pilihan ---
-
-        showShortenerBtn.addEventListener('click', () => {
-            allToolsContainer.classList.remove('hidden'); // Tampilkan kontainer utama
-            shortenerWrapper.style.display = 'block';     // Tampilkan peramping tautan
-            converterContainer.style.display = 'none';    // Sembunyikan konverter
-            removerWrapper.style.display = 'none';        // Sembunyikan remover
-            fetchUserLinkHistory(token); // Muat riwayat tautan saat perkakas dipilih
-        });
-
-        showConverterBtn.addEventListener('click', () => {
-            allToolsContainer.classList.remove('hidden'); // Tampilkan kontainer utama
-            shortenerWrapper.style.display = 'none';      // Sembunyikan peramping tautan
-            converterContainer.style.display = 'block';   // Tampilkan konverter
-            removerWrapper.style.display = 'none';        // Sembunyikan remover
-        });
-
-        showRemoverBtn.addEventListener('click', () => { // Event listener baru
-            allToolsContainer.classList.remove('hidden'); // Tampilkan kontainer utama
-            shortenerWrapper.style.display = 'none';      // Sembunyikan peramping tautan
-            converterContainer.style.display = 'none';    // Sembunyikan konverter
-            removerWrapper.style.display = 'block';       // Tampilkan remover
-        });
-
-
-        // Pasang listener ke form-form seperti sebelumnya
+        // Pasang semua event listener untuk form yang ada
         attachShortenerListener(token);
         attachConverterListener(token);
         attachImageMergerListener(token);
-        attachBackgroundRemoverListener(token); // Panggil fungsi listener baru
 
+        // Ambil riwayat tautan
+        fetchUserLinkHistory(token);
     } else {
-        // Jika tidak login, tampilkan pesan login dan sembunyikan menu pilihan
-        loginPrompt.classList.remove('hidden');
-        toolSelectionWrapper.classList.add('hidden');
-        allToolsContainer.classList.add('hidden');
+        // Jika tidak login, sembunyikan semua perkakas dan tampilkan pesan login
+        wrappers.forEach(el => el && el.classList.add('hidden'));
+        if (loginPrompt) loginPrompt.classList.remove('hidden');
     }
 
-    // Logika untuk menonaktifkan opsi konversi yang tidak andal tetap ada
+    // =================================================================
+    // ==   KODE BARU DITAMBAHKAN DI SINI   ==
+    // =================================================================
+    // Logika untuk menonaktifkan opsi konversi yang tidak andal
     const fileInput = document.getElementById('file-input');
     const outputFormatSelect = document.getElementById('output-format');
 
     if (fileInput && outputFormatSelect) {
         fileInput.addEventListener('change', () => {
             if (!fileInput.files || fileInput.files.length === 0) return;
+
             const fileName = fileInput.files[0].name.toLowerCase();
             const docxOption = outputFormatSelect.querySelector('option[value="docx"]');
+
             if (fileName.endsWith('.pdf')) {
+                // Jika file adalah PDF, nonaktifkan opsi DOCX
                 if (docxOption) {
                     docxOption.disabled = true;
+                    // Jika opsi DOCX sedang terpilih, ganti ke pilihan default (PDF)
                     if (outputFormatSelect.value === 'docx') {
-                        outputFormatSelect.value = 'pdf';
+                        outputFormatSelect.value = 'pdf'; 
                     }
                 }
             } else {
-                if (docxOption) docxOption.disabled = false;
+                // Jika file bukan PDF, aktifkan kembali opsi DOCX
+                if (docxOption) {
+                    docxOption.disabled = false;
+                }
             }
         });
     }
 }
-
 function attachShortenerListener(token) {
     const form = document.getElementById('shortener-form');
     if (!form) return;
@@ -379,66 +352,6 @@ function attachImageMergerListener(token) {
             messageDiv.className = 'error';
         } finally {
             submitButton.disabled = false;
-        }
-    });
-}
-
-function attachBackgroundRemoverListener(token) {
-    const form = document.getElementById('remover-form');
-    if (!form) return;
-
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const fileInput = document.getElementById('image-remover-input');
-        const messageDiv = document.getElementById('remover-message');
-        const submitButton = form.querySelector('button');
-
-        if (!fileInput.files || fileInput.files.length === 0) {
-            messageDiv.textContent = 'Silakan pilih file gambar terlebih dahulu.';
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('imageFile', fileInput.files[0]);
-
-        messageDiv.textContent = 'Memproses gambar, harap tunggu... Ini mungkin perlu waktu.';
-        messageDiv.className = '';
-        submitButton.disabled = true;
-        submitButton.textContent = 'Memproses...';
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/tools/remove-background`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: formData
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: 'Gagal memproses respons error dari server.' }));
-                throw new Error(errorData.error || response.statusText);
-            }
-
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = 'no-bg.png';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            a.remove();
-            
-            messageDiv.textContent = 'Berhasil! Gambar tanpa background sedang diunduh.';
-            messageDiv.className = 'success';
-            form.reset();
-
-        } catch (error) {
-            messageDiv.textContent = `Error: ${error.message}`;
-            messageDiv.className = 'error';
-        } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = 'Hapus Background!';
         }
     });
 }

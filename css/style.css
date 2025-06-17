@@ -584,23 +584,3 @@ input:focus, textarea:focus {
         font-size: 0.9rem;
     }
 }
-
-/* KODE BARU DITAMBAHKAN */
-/* GAYA UNTUK MENU PEMILIHAN PERKAKAS BARU */
-.tool-selection-menu {
-    display: flex;
-    justify-content: center;
-    gap: var(--space-md);
-    flex-wrap: wrap;
-    margin-bottom: var(--space-xl);
-}
-
-.tool-selection-menu .button-pintu {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 250px; /* Lebar minimum tombol */
-    font-size: 1.1rem;
-    padding-top: var(--space-sm);
-    padding-bottom: var(--space-sm);
-}
