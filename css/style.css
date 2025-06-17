@@ -1,5 +1,5 @@
 /* =================================================================== */
-/* ==   STYLE.CSS (VERSI FINAL LENGKAP)                           == */
+/* ==   STYLE.CSS (VERSI FINAL LENGKAP - PERBAIKAN ANIMASI MENU)    == */
 /* =================================================================== */
 
 /* === PENGATURAN GLOBAL: DESIGN SYSTEM === */
@@ -45,6 +45,7 @@ body {
     transition: background-color 0.4s ease;
 }
 
+/* --- PERBAIKAN: Menghilangkan Efek Blur untuk Performa --- */
 body.menu-open::before {
     content: '';
     position: fixed;
@@ -52,9 +53,9 @@ body.menu-open::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6); /* Sedikit lebih gelap untuk kompensasi tanpa blur */
     z-index: 1500;
-    backdrop-filter: blur(2px);
+    /* DIHAPUS: backdrop-filter: blur(2px); (Penyebab blur dan animasi patah-patah) */
 }
 body.menu-open {
     overflow: hidden;
@@ -209,7 +210,6 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 .mood-date { font-size: 0.85rem; color: var(--text-muted-color); }
 .mood-notes { color: var(--text-color); font-style: italic; word-break: break-all; }
 
-/* REVISI: Style baru yang lebih ringkas untuk riwayat tautan */
 .mood-history-list { list-style: none; padding: 0; }
 .history-item {
     display: flex;
@@ -300,8 +300,9 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
         gap: var(--space-md);
         z-index: 2000;
         transform: translateX(100%);
-        transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         visibility: hidden;
+        /* --- PERBAIKAN: Animasi dipercepat dan timing function diubah --- */
+        transition: transform 0.3s ease;
     }
     .nav-links.active {
         transform: translateX(0);
@@ -348,4 +349,4 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
     .tool-selector-button { width: 100%; }
 }
 
-.nav-close-btn { display: none; } /* Sembunyikan tombol close di desktop */
+.nav-close-btn { display: none; }
