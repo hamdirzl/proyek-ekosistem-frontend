@@ -417,63 +417,39 @@ async function fetchUserLinkHistory(token) {
     }
 }
 
+// Tambahkan definisi ikon SVG
+const copyIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+
 // Fungsi baru untuk merender item tautan pengguna dengan tombol hapus
 function renderUserLinkItem(link, container, token) {
     const shortUrl = `https://link.hamdirzl.my.id/${link.slug}`;
     const listItem = document.createElement('li');
     listItem.className = 'mood-item';
     listItem.id = `user-link-${link.slug}`; // Memberi ID unik untuk kemudahan penghapusan DOM
+
     listItem.innerHTML = `
-        <div class="mood-item-header" style="align-items: center;">
-            <strong style="font-size: 1.1em; color: var(--accent-color); word-break: break-all;">${shortUrl}</strong>
-            <div style="display: flex; gap: 5px;">
-                <button class="button-pintu copy-history-btn" data-url="${shortUrl}" style="padding: 5px 10px; font-size: 0.9em;">Salin</button>
-                <button class="button-pintu delete-user-link-btn" data-slug="${link.slug}" style="background-color: #ff4d4d; border-color: #ff4d4d; padding: 5px 10px; font-size: 0.9em;">Hapus</button>
+        <div class="mood-item-header">
+            <strong>${shortUrl}</strong>
+            <div class="mood-item-actions">
+                <button class="mood-icon-button copy-history-btn" data-url="${shortUrl}" aria-label="Salin tautan">${copyIconSvg}</button>
+                <button class="mood-icon-button delete-user-link-btn delete-button" data-slug="${link.slug}" aria-label="Hapus tautan">${trashIconSvg}</button>
             </div>
         </div>
-        <p class="mood-notes" style="word-break: break-all;">URL Asli: <a href="${link.original_url}" target="_blank">${link.original_url}</a></p>
-        <small class="mood-date">Dibuat pada: ${new Date(link.created_at).toLocaleString('id-ID')}</small>`;
+        <p class="mood-notes">URL Asli: <a href="${link.original_url}" target="_blank">${link.original_url}</a></p>
+        <small class="mood-date">Dibuat pada: ${new Date(link.created_at).toLocaleString('id-ID')}</small>
+    `;
     container.appendChild(listItem);
 
     listItem.querySelector('.copy-history-btn').addEventListener('click', (e) => {
-        navigator.clipboard.writeText(e.target.dataset.url).then(() => {
-            const originalText = e.target.textContent;
-            e.target.textContent = 'Tersalin!';
-            setTimeout(() => { e.target.textContent = originalText; }, 2000);
+        navigator.clipboard.writeText(e.currentTarget.dataset.url).then(() => {
+            const originalSvg = e.currentTarget.innerHTML;
+            e.currentTarget.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00f5a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>`; // Icon centang hijau
+            setTimeout(() => { e.currentTarget.innerHTML = originalSvg; }, 2000);
         });
     });
 
     listItem.querySelector('.delete-user-link-btn').addEventListener('click', (e) => handleDeleteUserLink(e, token));
-}
-
-async function handleDeleteUserLink(event, token) {
-    const slugToDelete = event.target.dataset.slug;
-
-    if (!confirm(`Anda yakin ingin menghapus tautan dengan slug "${slugToDelete}" dari riwayat Anda?`)) return;
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/links/${slugToDelete}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error || 'Gagal menghapus tautan.');
-        }
-
-        alert(data.message);
-        // Hapus item dari DOM
-        const listItemToRemove = document.getElementById(`user-link-${slugToDelete}`);
-        if (listItemToRemove) listItemToRemove.remove();
-
-        // Opsional: Muat ulang riwayat jika daftar kosong atau perlu refresh
-        fetchUserLinkHistory(token);
-
-    } catch (error) {
-        alert(`Error: ${error.message}`);
-        console.error('Error saat menghapus tautan pengguna:', error);
-    }
 }
 
 

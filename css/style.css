@@ -338,11 +338,106 @@ input:focus, textarea:focus, select:focus {
 #auth-message.success { background-color: rgba(0, 245, 160, 0.1); color: var(--accent-color); border: 1px solid var(--accent-color); }
 #auth-message.error { background-color: rgba(248, 87, 87, 0.1); color: #f89696; border: 1px solid #f85757;}
 
-.mood-history-list { list-style: none; padding: 0; }
-.mood-item { background-color: #2a2a2a; padding: var(--space-sm) var(--space-md); border-radius: 8px; margin-bottom: var(--space-sm); border-left: 4px solid var(--accent-color); }
-.mood-item-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-xs); font-weight: bold; }
-.mood-date { font-size: 0.85rem; color: var(--text-muted-color); }
-.mood-notes { color: var(--text-color); font-style: italic; word-break: break-all; }
+/* === RIWAYAT TAUTAN (NEW STYLES) === */
+.mood-history-list {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-md); /* Beri jarak dari judul */
+}
+
+.mood-item {
+    background-color: var(--card-bg-color); /* Ubah dari #2a2a2a ke var */
+    padding: var(--space-sm) var(--space-md); /* Kurangi padding */
+    border-radius: 8px;
+    margin-bottom: var(--space-sm);
+    border: 1px solid var(--border-color); /* Tambahkan border konsisten */
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    display: flex; /* Gunakan flexbox untuk tata letak internal */
+    flex-direction: column; /* Tumpuk item secara vertikal */
+    gap: var(--space-xs); /* Jarak antar elemen di dalam item */
+}
+
+.mood-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-color: var(--accent-color); /* Aksen pada hover */
+}
+
+.mood-item-header {
+    display: flex;
+    flex-wrap: wrap; /* Izinkan wrap pada layar kecil */
+    justify-content: space-between;
+    align-items: center; /* Pusatkan secara vertikal */
+    gap: var(--space-xs); /* Kurangi gap */
+    font-weight: 500; /* Sedikit lebih ringan */
+}
+
+.mood-item-header strong {
+    font-size: 0.95rem; /* Ukuran font untuk URL pendek */
+    color: var(--accent-color);
+    word-break: break-all; /* Pastikan URL panjang pecah baris */
+    flex-grow: 1; /* Biarkan mengisi ruang */
+    margin-right: var(--space-sm); /* Beri sedikit jarak ke tombol */
+}
+
+.mood-item .mood-notes {
+    font-size: 0.85rem; /* Ukuran font untuk URL asli */
+    color: var(--text-muted-color);
+    margin-bottom: 0; /* Hapus margin bottom */
+}
+
+.mood-item .mood-date {
+    font-size: 0.75rem; /* Ukuran font untuk tanggal */
+    color: var(--text-muted-color);
+    text-align: right; /* Rata kanan tanggal */
+    width: 100%; /* Ambil lebar penuh */
+    margin-top: var(--space-xs); /* Jarak dari URL asli */
+}
+
+.mood-item-actions {
+    display: flex;
+    gap: 5px; /* Jarak antar tombol ikon */
+    flex-shrink: 0; /* Jangan biarkan menyusut */
+}
+
+.mood-icon-button {
+    background: var(--background-color); /* Latar belakang gelap */
+    border: 1px solid var(--border-color);
+    border-radius: 6px; /* Sudut sedikit melengkung */
+    padding: 6px; /* Padding untuk ukuran tombol */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1; /* Penting untuk centering SVG */
+}
+
+.mood-icon-button:hover {
+    background-color: var(--border-hover-color);
+    border-color: var(--accent-color);
+    transform: translateY(-1px);
+}
+
+.mood-icon-button svg {
+    width: 16px; /* Ukuran ikon */
+    height: 16px; /* Ukuran ikon */
+    color: var(--text-muted-color); /* Warna ikon default */
+    transition: color 0.2s ease;
+}
+
+.mood-icon-button:hover svg {
+    color: var(--accent-color); /* Warna ikon saat hover */
+}
+
+/* Gaya khusus untuk tombol hapus (opsional, jika ingin warna merah) */
+.mood-icon-button.delete-button:hover {
+    border-color: #ff4d4d; /* Warna border merah saat hover */
+}
+.mood-icon-button.delete-button:hover svg {
+    color: #ff4d4d; /* Warna ikon merah saat hover */
+}
+
 
 /* === HAMBURGER & RESPONSIVE === */
 .hamburger { display: none; background: transparent; border: none; cursor: pointer; padding: 0; z-index: 1001; }
@@ -357,9 +452,11 @@ input:focus, textarea:focus, select:focus {
     .nav-links { 
         position: fixed; 
         top: 0; 
-        left: 0;
-        right: 0;
-        bottom: 0;
+        left: auto; /* Reset left */
+        right: 0; /* Mulai dari kanan */
+        width: 70%; /* Lebar menu saat terbuka */
+        max-width: 300px; /* Batasi lebar maksimum */
+        bottom: 0; /* Pastikan tinggi penuh viewport */
         height: 100vh;
         background-color: rgba(18, 18, 18, 0.98); 
         backdrop-filter: blur(10px);
@@ -367,19 +464,38 @@ input:focus, textarea:focus, select:focus {
         padding-top: var(--space-xxl); 
         opacity: 0; 
         visibility: hidden; 
-        transform: translateY(-100%); 
+        transform: translateX(100%); /* Sembunyikan ke kanan */
         transition: all 0.4s ease; 
         flex-direction: column; 
-        align-items: center; 
-        justify-content: center;
-        gap: var(--space-md);
+        align-items: flex-start; /* Rata kiri item menu */
+        justify-content: flex-start; /* Tata item dari atas ke bawah */
+        gap: var(--space-sm);
+        box-shadow: -5px 0 15px rgba(0,0,0,0.3); /* Tambahkan bayangan */
     }
-    .nav-links.active { opacity: 1; visibility: visible; transform: translateY(0); }
-    .nav-links li { margin: 0; width: 100%; text-align: center; }
-    .nav-links a, .nav-links .nav-button { display: block; padding: var(--space-md) 5%; width: 100%; border-radius: 0; font-size: 1.5rem; }
+    .nav-links.active { opacity: 1; visibility: visible; transform: translateX(0); }
+    .nav-links li { 
+        margin: 0; 
+        width: 100%; 
+        text-align: left; /* Rata kiri teks item menu */
+        padding-left: var(--space-lg); /* Beri indentasi */
+        padding-right: var(--space-lg); /* Beri indentasi */
+    }
+    .nav-links a, .nav-links .nav-button { 
+        display: block; 
+        padding: var(--space-sm) 0; /* Kurangi padding horizontal, pakai padding li */
+        width: 100%; 
+        border-radius: 0; 
+        font-size: 1.1rem; /* Kurangi ukuran font */
+    }
     .nav-links a:hover, .nav-links .nav-button:hover { background-color: transparent; color: var(--accent-color); }
     .nav-links a::after { display: none; }
-    .nav-links a.login-button { margin: var(--space-md) auto; width: 80%; text-align: center; font-size: 1.2rem; }
+    .nav-links a.login-button { 
+        margin: var(--space-md) var(--space-lg); /* Sesuaikan margin */
+        width: auto; /* Biarkan lebar auto */
+        text-align: center; 
+        font-size: 1.0rem; /* Sesuaikan ukuran font */
+        align-self: flex-start; /* Posisikan di kiri */
+    }
     
     .page-container { 
         padding-top: var(--space-xl);
@@ -392,6 +508,13 @@ input:focus, textarea:focus, select:focus {
     #shortener-form {
         grid-template-columns: 1fr; /* REFINEMENT: Form menjadi 1 kolom di mobile */
     }
+}
+
+@media (max-width: 480px) {
+    .tool-selector-button { width: 100%; }
+    .mood-item-header { flex-direction: column; align-items: flex-start; }
+    .mood-item-actions { width: 100%; justify-content: flex-end; } /* Posisikan tombol kanan bawah jika header wrap */
+    .mood-item-header strong { margin-right: 0; } /* Hapus margin kanan jika wrap */
 }
 
 /* === GAYA IKON SOSIAL DI FOOTER === */
@@ -470,9 +593,4 @@ input:focus, textarea:focus, select:focus {
 .tool-selector-button {
     min-width: 180px; padding: 1rem 1.5rem; font-size: 1.1rem;
     font-weight: 700; cursor: pointer;
-}
-
-@media (max-width: 480px) {
-    .tool-selector-button { width: 100%; }
-    .mood-item-header { flex-direction: column; align-items: flex-start; }
 }
