@@ -452,12 +452,11 @@ input:focus, textarea:focus, select:focus {
     .nav-links { 
         position: fixed; 
         top: 0; 
-        left: auto; /* Reset left */
-        right: 0; /* Mulai dari kanan */
+        right: 0; /* Pastikan selalu dari kanan */
+        bottom: 0; /* Membentang penuh tinggi viewport */
         width: 85%; /* Menambah lebar agar menutupi lebih banyak layar */
-        max-width: 300px; /* Batasi lebar maksimum */
-        bottom: 0; /* Pastikan tinggi penuh viewport */
-        height: 100vh;
+        max-width: 350px; /* Mungkin naikkan sedikit max-width, atau tetap di 300px jika dirasa pas */
+        height: 100vh; /* Pastikan tinggi penuh viewport */
         background-color: rgba(18, 18, 18, 0.98); 
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
@@ -467,48 +466,53 @@ input:focus, textarea:focus, select:focus {
         transform: translateX(100%); /* Sembunyikan ke kanan */
         transition: all 0.4s ease; 
         flex-direction: column; 
-        align-items: flex-start; /* Rata kiri item menu */
-        justify-content: flex-start; /* Tata item dari atas ke bawah */
+        align-items: flex-start; 
+        justify-content: flex-start;
         gap: var(--space-sm);
-        box-shadow: -5px 0 15px rgba(0,0,0,0.3); /* Tambahkan bayangan */
+        box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+        z-index: 1000; /* Pastikan z-index tinggi, ini sudah ada */
     }
-    .nav-links.active { opacity: 1; visibility: visible; transform: translateX(0); }
+    .nav-links.active { 
+        opacity: 1; 
+        visibility: visible; 
+        transform: translateX(0); 
+        z-index: 1000; /* Pastikan z-index tetap tinggi saat aktif */
+    }
+    
+    /* Penting: Atur body dan html untuk mencegah scrolling */
+    body.menu-open {
+        overflow: hidden; /* Mencegah scrolling pada body */
+        height: 100vh; /* Membatasi tinggi body agar tidak bisa digulir */
+    }
+    html.menu-open {
+        overflow: hidden; /* Mencegah scrolling pada html */
+        height: 100vh; /* Membatasi tinggi html agar tidak bisa digulir */
+    }
+
     .nav-links li { 
         margin: 0; 
         width: 100%; 
-        text-align: left; /* Rata kiri teks item menu */
-        padding-left: var(--space-lg); /* Beri indentasi */
-        padding-right: var(--space-lg); /* Beri indentasi */
+        text-align: left; 
+        padding-left: var(--space-lg); 
+        padding-right: var(--space-lg); 
     }
     .nav-links a, .nav-links .nav-button { 
         display: block; 
-        padding: var(--space-sm) 0; /* Kurangi padding horizontal, pakai padding li */
+        padding: var(--space-sm) 0; 
         width: 100%; 
         border-radius: 0; 
-        font-size: 1.1rem; /* Kurangi ukuran font */
+        font-size: 1.1rem; 
     }
     .nav-links a:hover, .nav-links .nav-button:hover { background-color: transparent; color: var(--accent-color); }
     .nav-links a::after { display: none; }
     .nav-links a.login-button { 
-        margin: var(--space-md) var(--space-lg); /* Sesuaikan margin */
-        width: auto; /* Biarkan lebar auto */
+        margin: var(--space-md) var(--space-lg); 
+        width: auto; 
         text-align: center; 
-        font-size: 1.0rem; /* Sesuaikan ukuran font */
-        align-self: flex-start; /* Posisikan di kiri */
+        font-size: 1.0rem; 
+        align-self: flex-start; 
     }
     
-    .page-container { 
-        padding-top: var(--space-xl);
-        padding-bottom: var(--space-xl);
-    }
-    .tool-section, .dashboard-header, .history-section, .pintu { padding: var(--space-md); }
-    .hero { min-height: 70vh; }
-    .modal-content { width: 95%; }
-
-    #shortener-form {
-        grid-template-columns: 1fr; /* REFINEMENT: Form menjadi 1 kolom di mobile */
-    }
-
     /* Penyesuaian khusus untuk history item di mobile */
     .mood-item-header { flex-direction: column; align-items: flex-start; }
     .mood-item-actions { width: 100%; justify-content: flex-end; } /* Posisikan tombol kanan bawah jika header wrap */
