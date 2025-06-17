@@ -82,10 +82,10 @@ async function checkUserRoleAndSetupAdminPanel(token) {
 async function fetchAndDisplayLinks(token) {
     const linkList = document.getElementById('link-list');
     const loadingMessage = document.getElementById('loading-links');
-    if (!linkList || !loadingMessage) return; // Tambahkan cek null
+    if (!linkList || !loadingMessage) return;
 
-    loadingMessage.textContent = 'Memuat semua tautan...'; // Pastikan pesan ini muncul
-    loadingMessage.style.display = 'block'; // Pastikan ditampilkan
+    loadingMessage.textContent = 'Memuat semua tautan...';
+    loadingMessage.style.display = 'block';
 
     try {
         const response = await fetch(`${API_BASE_URL}/api/links`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -162,7 +162,8 @@ function setupToolsPage(token) {
         document.getElementById('shortener-wrapper'),
         document.getElementById('history-section'),
         document.getElementById('converter-wrapper'),
-        document.getElementById('image-merger-wrapper')
+        document.getElementById('image-merger-wrapper'),
+        document.getElementById('qr-generator-wrapper') // BARIS INI DITAMBAHKAN
     ];
     const loginPrompt = document.getElementById('login-prompt');
     const toolSelectionSection = document.querySelector('.tool-selection'); 
@@ -176,10 +177,12 @@ function setupToolsPage(token) {
         document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper', token));
         document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper', token));
         document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper', token));
+        document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper', token)); // BARIS INI DITAMBAHKAN
 
         attachShortenerListener(token);
         attachConverterListener(token);
         attachImageMergerListener(token);
+        attachQrCodeGeneratorListener(token); // BARIS INI DITAMBAHKAN
 
     } else {
         if (loginPrompt) loginPrompt.classList.remove('hidden');
@@ -216,7 +219,8 @@ function showToolSection(sectionIdToShow, token) {
     const allToolSections = [
         document.getElementById('shortener-wrapper'),
         document.getElementById('converter-wrapper'),
-        document.getElementById('image-merger-wrapper')
+        document.getElementById('image-merger-wrapper'),
+        document.getElementById('qr-generator-wrapper') // BARIS INI DITAMBAHKAN
     ];
     const historySection = document.getElementById('history-section'); 
 
@@ -387,13 +391,79 @@ function attachImageMergerListener(token) {
     });
 }
 
+// === FUNGSI BARU: QR CODE GENERATOR CLIENT-SIDE LOGIC ===
+function attachQrCodeGeneratorListener(token) {
+    const form = document.getElementById('qr-generator-form');
+    if (!form) return;
+
+    const qrText = document.getElementById('qr-text');
+    const qrErrorLevel = document.getElementById('qr-error-level');
+    const qrColorDark = document.getElementById('qr-color-dark');
+    const qrColorLight = document.getElementById('qr-color-light');
+    const qrCodeMessage = document.getElementById('qr-code-message');
+    const qrCodeImage = document.getElementById('qr-code-image');
+    const downloadQrButton = document.getElementById('download-qr-button');
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        qrCodeMessage.textContent = 'Generating QR Code...';
+        qrCodeMessage.className = '';
+        qrCodeImage.style.display = 'none';
+        downloadQrButton.style.display = 'none';
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/generate-qr`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    text: qrText.value,
+                    level: qrErrorLevel.value,
+                    colorDark: qrColorDark.value,
+                    colorLight: qrColorLight.value
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to generate QR Code.');
+            }
+
+            qrCodeMessage.textContent = data.message;
+            qrCodeMessage.className = 'success';
+            qrCodeImage.src = data.qrCodeImage;
+            qrCodeImage.style.display = 'block';
+            downloadQrButton.style.display = 'block';
+
+        } catch (error) {
+            qrCodeMessage.textContent = `Error: ${error.message}`;
+            qrCodeMessage.className = 'error';
+            qrCodeImage.style.display = 'none';
+            downloadQrButton.style.display = 'none';
+        }
+    });
+
+    downloadQrButton.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.href = qrCodeImage.src;
+        link.download = `qrcode_${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+}
+
+
 async function fetchUserLinkHistory(token) {
     const historyList = document.getElementById('link-history-list');
     const loadingMessage = document.getElementById('loading-history');
     if (!historyList || !loadingMessage) return;
 
     loadingMessage.textContent = 'Memuat riwayat...';
-    loadingMessage.style.display = 'block'; // Pastikan ini ditampilkan saat memuat
+    loadingMessage.style.display = 'block';
 
     try {
         const response = await fetch(`${API_BASE_URL}/api/user/links`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -401,15 +471,15 @@ async function fetchUserLinkHistory(token) {
         const links = await response.json();
         historyList.innerHTML = ''; 
         if (links.length === 0) {
-            loadingMessage.textContent = 'Anda belum memiliki riwayat tautan.'; // Ubah teks jika kosong
-            loadingMessage.style.display = 'block'; // Pastikan ditampilkan jika kosong
+            loadingMessage.textContent = 'Anda belum memiliki riwayat tautan.';
+            loadingMessage.style.display = 'block';
         } else {
-            loadingMessage.style.display = 'none'; // Sembunyikan jika ada data
+            loadingMessage.style.display = 'none';
             links.forEach(link => renderUserLinkItem(link, historyList, token)); 
         }
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
-        loadingMessage.style.display = 'block'; // Pastikan error ditampilkan
+        loadingMessage.style.display = 'block';
     }
 }
 
@@ -452,7 +522,7 @@ function renderUserLinkItem(link, container, token) {
 // === FUNGSI BARU: HAPUS TAUTAN PENGGUNA                 ===
 // ==========================================================
 async function handleDeleteUserLink(event, token) {
-    const slugToDelete = event.currentTarget.dataset.slug; // Menggunakan currentTarget karena event listener ada di button
+    const slugToDelete = event.currentTarget.dataset.slug;
     
     if (!confirm(`Anda yakin ingin menghapus tautan ${slugToDelete} dari riwayat Anda?`)) {
         return;
@@ -648,7 +718,7 @@ function setupMobileMenu() {
         navCloseButton.setAttribute('aria-label', 'Tutup menu');
         // Menggunakan ikon SVG 'x' dari feather icons
         navCloseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-        navLinks.prepend(navCloseButton); // Tambahkan sebagai child pertama dari navLinks
+        navLinks.prepend(navCloseButton);
     }
 
     const toggleMenu = () => {
@@ -663,17 +733,13 @@ function setupMobileMenu() {
     }
 
     if (navCloseButton) {
-        navCloseButton.addEventListener('click', toggleMenu); // Close menu with the 'X' button
+        navCloseButton.addEventListener('click', toggleMenu);
     }
 
     // Close menu when clicking outside (on the overlay itself)
-    // This assumes navLinks covers most of the right side.
-    // A more robust solution might involve a separate overlay div.
-    // For now, let's make sure clicking navLinks itself (if active) closes it,
-    // but only if the click is directly on the .nav-links area and not its children.
     if (navLinks) {
         navLinks.addEventListener('click', (event) => {
-            if (event.target === navLinks) { // Only close if the click is on the navLinks div itself
+            if (event.target === navLinks) {
                 toggleMenu();
             }
         });

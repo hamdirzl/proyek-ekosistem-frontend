@@ -48,7 +48,7 @@
                 <button id="show-shortener" class="button-pintu tool-selector-button">URL Shortener</button>
                 <button id="show-converter" class="button-pintu tool-selector-button">Media Converter</button>
                 <button id="show-image-merger" class="button-pintu tool-selector-button">Image to PDF</button>
-            </div>
+                <button id="show-qr-generator" class="button-pintu tool-selector-button">QR Code Generator</button> </div>
         </section>
 
         <div id="shortener-wrapper" class="hidden">
@@ -93,7 +93,42 @@
             </form>
             <div id="image-merger-message" style="margin-top: 1rem;"></div>
         </section>
-    </main>
+
+        <div id="qr-generator-wrapper" class="hidden">
+            <section class="tool-section" data-aos="fade-up">
+                <h2 class="section-title">Tool: QR Code Generator</h2>
+                <form id="qr-generator-form">
+                    <div class="form-group">
+                        <label for="qr-text">Text or URL</label>
+                        <input type="text" id="qr-text" placeholder="Enter text or URL for QR code..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="qr-error-level">Error Correction Level (more robust, larger QR)</label>
+                        <select id="qr-error-level">
+                            <option value="L">Low (L)</option>
+                            <option value="M" selected>Medium (M)</option>
+                            <option value="Q">Quartile (Q)</option>
+                            <option value="H">High (H)</option>
+                        </select>
+                    </div>
+                     <div class="form-group">
+                        <label for="qr-color-dark">QR Code Color</label>
+                        <input type="color" id="qr-color-dark" value="#000000">
+                    </div>
+                    <div class="form-group">
+                        <label for="qr-color-light">Background Color</label>
+                        <input type="color" id="qr-color-light" value="#ffffff">
+                    </div>
+                    <button type="submit" class="button-pintu">Generate QR Code</button>
+                </form>
+                <div id="qr-code-message" style="margin-top: 1rem;"></div>
+                <div id="qr-code-display" style="text-align: center; margin-top: 2rem;">
+                    <img id="qr-code-image" src="" alt="Generated QR Code" style="max-width: 250px; height: auto; display: none;">
+                    <button id="download-qr-button" class="button-pintu" style="margin-top: 1rem; display: none;">Download QR Code</button>
+                </div>
+            </section>
+        </div>
+        </main>
 
     <footer>
         <div class="social-icons">
