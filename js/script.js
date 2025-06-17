@@ -21,15 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pemicu logika berdasarkan halaman yang aktif
     if (document.body.contains(document.getElementById('dashboard-main'))) {
         setupDashboardPage(token);
-    } else if (document.title.includes("Tools")) { // Cek judul halaman "Tools"
+    } else if (document.title.includes("Tools")) { 
         setupToolsPage(token);
-    } else if (document.getElementById('login-form')) { // Cek Halaman Auth
+    } else if (document.getElementById('login-form')) { 
         setupAuthPage();
     }
     
     // Setup elemen UI umum yang ada di semua halaman
     setupAboutModal();
-    setupMobileMenu();
+    setupMobileMenu(); // Perubahan ada di sini
     setupAllPasswordToggles();
 });
 
@@ -153,40 +153,34 @@ async function handleDeleteLink(event) {
 // ===================================
 
 function setupToolsPage(token) {
-    const wrappers = [ // Semua wrapper perkakas dan riwayat
+    const wrappers = [ 
         document.getElementById('shortener-wrapper'),
         document.getElementById('history-section'),
         document.getElementById('converter-wrapper'),
         document.getElementById('image-merger-wrapper')
     ];
     const loginPrompt = document.getElementById('login-prompt');
-    const toolSelectionSection = document.querySelector('.tool-selection'); // Bagian baru untuk tombol pilihan
+    const toolSelectionSection = document.querySelector('.tool-selection'); 
 
-    // Sembunyikan semua perkakas dan riwayat secara default saat halaman dimuat
     wrappers.forEach(el => el && el.classList.add('hidden'));
 
     if (token) {
-        // Jika login, tampilkan bagian pilihan perkakas dan sembunyikan pesan login
         if (loginPrompt) loginPrompt.classList.add('hidden');
         if (toolSelectionSection) toolSelectionSection.classList.remove('hidden');
 
-        // Pasang event listener untuk tombol-tombol pilihan perkakas
         document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper', token));
         document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper', token));
         document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper', token));
 
-        // Inisialisasi listener form (mereka hanya akan aktif jika wrapper-nya terlihat)
         attachShortenerListener(token);
         attachConverterListener(token);
         attachImageMergerListener(token);
 
     } else {
-        // Jika tidak login, sembunyikan semua perkakas, sembunyikan pilihan perkakas, dan tampilkan pesan login
         if (loginPrompt) loginPrompt.classList.remove('hidden');
         if (toolSelectionSection) toolSelectionSection.classList.add('hidden');
     }
 
-    // Logika untuk menonaktifkan opsi konversi yang tidak andal
     const fileInput = document.getElementById('file-input');
     const outputFormatSelect = document.getElementById('output-format');
 
@@ -198,16 +192,13 @@ function setupToolsPage(token) {
             const docxOption = outputFormatSelect.querySelector('option[value="docx"]');
 
             if (fileName.endsWith('.pdf')) {
-                // Jika file adalah PDF, nonaktifkan opsi DOCX
                 if (docxOption) {
                     docxOption.disabled = true;
-                    // Jika opsi DOCX sedang terpilih, ganti ke pilihan default (PDF)
                     if (outputFormatSelect.value === 'docx') {
                         outputFormatSelect.value = 'pdf'; 
                     }
                 }
             } else {
-                // Jika file bukan PDF, aktifkan kembali opsi DOCX
                 if (docxOption) {
                     docxOption.disabled = false;
                 }
@@ -216,14 +207,13 @@ function setupToolsPage(token) {
     }
 }
 
-// Fungsi baru untuk menampilkan bagian perkakas tertentu dan menyembunyikan yang lain
 function showToolSection(sectionIdToShow, token) {
     const allToolSections = [
         document.getElementById('shortener-wrapper'),
         document.getElementById('converter-wrapper'),
         document.getElementById('image-merger-wrapper')
     ];
-    const historySection = document.getElementById('history-section'); // Ambil riwayat secara terpisah
+    const historySection = document.getElementById('history-section'); 
 
     allToolSections.forEach(section => {
         if (section && section.id === sectionIdToShow) {
@@ -233,17 +223,15 @@ function showToolSection(sectionIdToShow, token) {
         }
     });
 
-    // Logika khusus untuk history section: hanya tampilkan jika shortener-wrapper yang aktif
     if (historySection) {
         if (sectionIdToShow === 'shortener-wrapper') {
             historySection.classList.remove('hidden');
-            fetchUserLinkHistory(token); // Muat ulang riwayat saat shortener ditampilkan
+            fetchUserLinkHistory(token); 
         } else {
             historySection.classList.add('hidden');
         }
     }
 
-    // Gulir ke bagian yang ditampilkan (opsional, untuk UX yang lebih baik)
     const targetSection = document.getElementById(sectionIdToShow);
     if (targetSection) {
         targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -598,16 +586,37 @@ if (resetForm) {
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
+    const navCloseButton = document.getElementById('nav-close-button'); // Get the new close button
+
+    const toggleMenu = () => {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
+        document.body.classList.toggle('menu-open'); 
+        document.documentElement.classList.toggle('menu-open'); 
+    };
+
     if (hamburger && navLinks) {
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navLinks.classList.toggle('active');
-            // Menambahkan/menghapus kelas menu-open pada elemen body dan html
-            document.body.classList.toggle('menu-open'); 
-            document.documentElement.classList.toggle('menu-open'); 
+        hamburger.addEventListener('click', toggleMenu);
+    }
+
+    if (navCloseButton) {
+        navCloseButton.addEventListener('click', toggleMenu); // Close menu with the 'X' button
+    }
+
+    // Close menu when clicking outside (on the overlay itself)
+    // This assumes navLinks covers most of the right side.
+    // A more robust solution might involve a separate overlay div.
+    // For now, let's make sure clicking navLinks itself (if active) closes it,
+    // but only if the click is directly on the .nav-links area and not its children.
+    if (navLinks) {
+        navLinks.addEventListener('click', (event) => {
+            if (event.target === navLinks) { // Only close if the click is on the navLinks div itself
+                toggleMenu();
+            }
         });
     }
 }
+
 
 function setupAboutModal() {
     const aboutButtons = document.querySelectorAll('#about-button');
