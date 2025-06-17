@@ -315,7 +315,7 @@ footer {
 #shortener-form input[type="url"] { grid-column: 1 / -1; }
 #shortener-form #custom-slug { flex-grow: 1; }
 
-input[type="url"], input[type="email"], input[type="password"], input[type="text"], textarea, select { 
+input[type="url"], input[type="email"], input[type="password"], input[type="text"], textarea, select, input[type="number"] { 
     width: 100%;
     padding: var(--space-sm); 
     border: 1px solid var(--border-color); 
@@ -714,7 +714,8 @@ input:focus, textarea:focus, select:focus {
 
 #qr-generator-form input[type="text"],
 #qr-generator-form select,
-#qr-generator-form input[type="color"] {
+#qr-generator-form input[type="color"],
+#qr-generator-form input[type="number"] {
     width: 100%;
     padding: var(--space-sm);
     border: 1px solid var(--border-color);
@@ -808,9 +809,250 @@ input:focus, textarea:focus, select:focus {
     box-shadow: 0 6px 20px rgba(0, 245, 160, 0.25);
 }
 
-/* Responsif untuk form QR Generator */
+/* === IMAGE COMPRESSOR LAYOUT & SYMMETRY === */
+#image-compressor-wrapper .tool-section {
+    max-width: 600px;
+    margin: var(--space-lg) auto;
+    padding: var(--space-lg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg-color);
+    box-shadow: var(--card-shadow);
+}
+
+#image-compressor-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+}
+
+#image-compressor-form .form-group {
+    margin-bottom: 0;
+}
+
+#image-compressor-form label {
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-xs);
+    color: var(--text-muted-color);
+    font-weight: 500;
+}
+
+#image-compressor-form input[type="file"],
+#image-compressor-form input[type="range"],
+#image-compressor-form select {
+    width: 100%;
+    padding: var(--space-sm);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #2a2a2a;
+    color: var(--text-color);
+    font-size: var(--font-size-base);
+    font-family: var(--font-body);
+}
+
+#image-compressor-form input[type="range"] {
+    padding: 0; /* Range input doesn't need vertical padding */
+    margin-top: var(--space-xs); /* Adjust margin for aesthetic */
+}
+
+#image-compressor-form #compress-quality-value {
+    display: block;
+    text-align: right;
+    font-size: 0.9em;
+    color: var(--text-muted-color);
+    margin-top: 5px; /* Space above value */
+    margin-bottom: 0;
+}
+
+#image-compressor-form button {
+    grid-column: 1 / -1;
+    margin-top: var(--space-md);
+    width: 100%;
+    padding: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 245, 160, 0.2);
+}
+
+#image-compressor-message {
+    text-align: center;
+    margin-top: var(--space-md);
+    padding: var(--space-sm);
+    border-radius: 8px;
+}
+
+#compressed-image-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+}
+
+#compressed-image-preview {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+}
+
+#download-compressed-button {
+    padding: 0.7rem 1.6rem;
+    border: 2px solid var(--accent-color);
+    border-radius: 8px;
+    background: none;
+    color: var(--accent-color);
+    font-weight: 700;
+    font-family: var(--font-heading);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 245, 160, 0.1);
+}
+
+#download-compressed-button:hover {
+    background: var(--accent-color);
+    color: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 245, 160, 0.25);
+}
+
+/* === AUDIO CUTTER LAYOUT & SYMMETRY === */
+#audio-cutter-wrapper .tool-section {
+    max-width: 600px;
+    margin: var(--space-lg) auto;
+    padding: var(--space-lg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg-color);
+    box-shadow: var(--card-shadow);
+}
+
+#audio-cutter-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+}
+
+#audio-cutter-form .form-group {
+    margin-bottom: 0;
+}
+
+#audio-cutter-form label {
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-xs);
+    color: var(--text-muted-color);
+    font-weight: 500;
+}
+
+#audio-cutter-form input[type="file"],
+#audio-cutter-form input[type="number"] {
+    width: 100%;
+    padding: var(--space-sm);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #2a2a2a;
+    color: var(--text-color);
+    font-size: var(--font-size-base);
+    font-family: var(--font-body);
+}
+
+#audio-file-info {
+    font-size: 0.9em;
+    color: var(--text-muted-color);
+    margin-top: var(--space-xs);
+    margin-bottom: 0; /* Ensure no extra margin */
+    text-align: left; /* Align text to left */
+}
+
+#audio-cutter-form button.button-pintu {
+    grid-column: 1 / -1;
+    margin-top: 0; /* Managed by gap */
+    width: 100%;
+    padding: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 245, 160, 0.2);
+}
+
+#preview-audio-button {
+    background-color: var(--text-muted-color); /* Warna yang lebih netral */
+    border-color: var(--text-muted-color);
+    color: #000000; /* Teks hitam */
+}
+
+#preview-audio-button:hover {
+    background-color: #888888; /* Sedikit lebih terang saat hover */
+    border-color: #888888;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(160, 160, 160, 0.25); /* Shadow abu-abu */
+}
+
+#preview-audio-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+
+#audio-cutter-message {
+    text-align: center;
+    margin-top: var(--space-md);
+    padding: var(--space-sm);
+    border-radius: 8px;
+}
+
+#audio-cutter-message.success {
+    background-color: rgba(0, 245, 160, 0.1);
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+}
+
+#audio-cutter-message.error {
+    background-color: rgba(248, 87, 87, 0.1);
+    color: #f89696;
+    border: 1px solid #f85757;
+}
+
+#audio-player-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+}
+
+#cut-audio-preview {
+    width: 100%;
+    max-width: 400px; /* Batasi lebar player */
+    background-color: #2a2a2a; /* Background player agar terlihat di tema gelap */
+    border-radius: 8px;
+    padding: 5px;
+    box-shadow: var(--card-shadow);
+}
+
+#download-cut-audio-button {
+    padding: 0.7rem 1.6rem;
+    border: 2px solid var(--accent-color);
+    border-radius: 8px;
+    background: none;
+    color: var(--accent-color);
+    font-weight: 700;
+    font-family: var(--font-heading);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 245, 160, 0.1);
+}
+
+#download-cut-audio-button:hover {
+    background: var(--accent-color);
+    color: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 245, 160, 0.25);
+}
+
+/* Responsif untuk form Audio Cutter */
 @media (max-width: 480px) {
-    #qr-generator-form {
-        grid-template-columns: 1fr; /* Pastikan satu kolom di layar sangat kecil */
+    #audio-cutter-form {
+        grid-template-columns: 1fr;
     }
 }

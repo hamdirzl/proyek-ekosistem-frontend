@@ -165,7 +165,7 @@ function setupToolsPage(token) {
         document.getElementById('image-merger-wrapper'),
         document.getElementById('qr-generator-wrapper'),
         document.getElementById('image-compressor-wrapper'),
-        document.getElementById('audio-cutter-wrapper') // BARIS INI DITAMBAHKAN
+        document.getElementById('audio-cutter-wrapper')
     ];
     const loginPrompt = document.getElementById('login-prompt');
     const toolSelectionSection = document.querySelector('.tool-selection'); 
@@ -181,14 +181,14 @@ function setupToolsPage(token) {
         document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper', token));
         document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper', token));
         document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper', token));
-        document.getElementById('show-audio-cutter')?.addEventListener('click', () => showToolSection('audio-cutter-wrapper', token)); // BARIS INI DITAMBAHKAN
+        document.getElementById('show-audio-cutter')?.addEventListener('click', () => showToolSection('audio-cutter-wrapper', token));
 
         attachShortenerListener(token);
         attachConverterListener(token);
         attachImageMergerListener(token);
         attachQrCodeGeneratorListener(token);
         attachImageCompressorListener(token);
-        attachAudioCutterListener(token); // BARIS INI DITAMBAHKAN
+        attachAudioCutterListener(token);
 
     } else {
         if (loginPrompt) loginPrompt.classList.remove('hidden');
@@ -228,7 +228,7 @@ function showToolSection(sectionIdToShow, token) {
         document.getElementById('image-merger-wrapper'),
         document.getElementById('qr-generator-wrapper'),
         document.getElementById('image-compressor-wrapper'),
-        document.getElementById('audio-cutter-wrapper') // BARIS INI DITAMBAHKAN
+        document.getElementById('audio-cutter-wrapper')
     ];
     const historySection = document.getElementById('history-section'); 
 
@@ -541,7 +541,7 @@ function attachImageCompressorListener(token) {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                URL.revokeObjectURL(imageUrl); // Clean up the object URL
+                URL.revokeObjectURL(imageUrl);
             };
             downloadButton.style.display = 'block';
 
@@ -557,7 +557,7 @@ function attachImageCompressorListener(token) {
     });
 }
 
-// === FUNGSI BARU: AUDIO CUTTER CLIENT-SIDE LOGIC ===
+// === FUNGSI AUDIO CUTTER CLIENT-SIDE LOGIC ===
 function attachAudioCutterListener(token) {
     const form = document.getElementById('audio-cutter-form');
     if (!form) return;
@@ -565,9 +565,100 @@ function attachAudioCutterListener(token) {
     const audioInput = document.getElementById('audio-input');
     const startTimeInput = document.getElementById('start-time');
     const endTimeInput = document.getElementById('end-time');
+    const audioFileInfo = document.getElementById('audio-file-info'); // BARIS INI DITAMBAHKAN
+    const previewAudioButton = document.getElementById('preview-audio-button'); // BARIS INI DITAMBAHKAN
     const messageDiv = document.getElementById('audio-cutter-message');
     const cutAudioPreview = document.getElementById('cut-audio-preview');
     const downloadButton = document.getElementById('download-cut-audio-button');
+
+    let audioContext; // Menyimpan AudioContext
+    let currentAudioBuffer; // Menyimpan buffer audio yang dimuat
+    let previewSource; // Menyimpan AudioBufferSourceNode untuk preview
+
+    // Helper to format seconds into MM:SS
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    };
+
+    // Fungsi untuk memuat file audio dan mendapatkan durasi
+    audioInput.addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        if (!file) {
+            audioFileInfo.textContent = '';
+            // Reset player and buttons if file is cleared
+            cutAudioPreview.pause();
+            cutAudioPreview.src = '';
+            cutAudioPreview.style.display = 'none';
+            previewAudioButton.disabled = true;
+            downloadButton.style.display = 'none';
+            return;
+        }
+
+        audioFileInfo.textContent = `Loading "${file.name}"...`;
+        previewAudioButton.disabled = true; // Disable preview while loading
+
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            currentAudioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+            const duration = currentAudioBuffer.duration;
+            audioFileInfo.textContent = `File: "${file.name}" | Duration: ${formatTime(duration)}`;
+            endTimeInput.value = duration; // Set end time to full duration by default
+            
+            previewAudioButton.disabled = false; // Enable preview once loaded
+
+        } catch (error) {
+            audioFileInfo.textContent = `Error loading audio: ${error.message}`;
+            messageDiv.textContent = `Error loading audio: ${error.message}`;
+            messageDiv.className = 'error';
+            console.error("Audio loading error:", error);
+            previewAudioButton.disabled = true;
+        }
+    });
+
+    // Fungsi untuk preview segmen audio
+    previewAudioButton.addEventListener('click', () => {
+        if (!currentAudioBuffer || !audioContext) {
+            messageDiv.textContent = 'Please load an audio file first.';
+            messageDiv.className = 'error';
+            return;
+        }
+
+        const startTime = parseFloat(startTimeInput.value);
+        const endTime = parseFloat(endTimeInput.value);
+
+        if (isNaN(startTime) || isNaN(endTime) || startTime < 0 || endTime <= startTime || endTime > currentAudioBuffer.duration) {
+            messageDiv.textContent = 'Invalid start/end time for preview.';
+            messageDiv.className = 'error';
+            return;
+        }
+        
+        // Stop any currently playing preview
+        if (previewSource) {
+            previewSource.stop();
+            previewSource.disconnect();
+        }
+
+        previewSource = audioContext.createBufferSource();
+        previewSource.buffer = currentAudioBuffer;
+        previewSource.connect(audioContext.destination);
+        previewSource.start(0, startTime, endTime - startTime); // (when, offset, duration)
+
+        messageDiv.textContent = `Playing preview from ${formatTime(startTime)} to ${formatTime(endTime)}...`;
+        messageDiv.className = '';
+
+        // Stop preview after it finishes
+        previewSource.onended = () => {
+            messageDiv.textContent = 'Preview finished.';
+            messageDiv.className = 'success';
+        };
+    });
+
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -575,6 +666,13 @@ function attachAudioCutterListener(token) {
         messageDiv.className = '';
         cutAudioPreview.style.display = 'none';
         downloadButton.style.display = 'none';
+        
+        // Stop any playing preview before cutting
+        if (previewSource) {
+            previewSource.stop();
+            previewSource.disconnect();
+            previewSource = null;
+        }
 
         const file = audioInput.files[0];
         if (!file) {
@@ -583,10 +681,19 @@ function attachAudioCutterListener(token) {
             return;
         }
 
+        const startTime = parseFloat(startTimeInput.value);
+        const endTime = parseFloat(endTimeInput.value);
+
+        if (isNaN(startTime) || isNaN(endTime) || startTime < 0 || endTime <= startTime || endTime > currentAudioBuffer.duration) {
+            messageDiv.textContent = 'Invalid start/end time. Please ensure End Time is greater than Start Time and within total duration.';
+            messageDiv.className = 'error';
+            return;
+        }
+
         const formData = new FormData();
         formData.append('audio', file);
-        formData.append('startTime', startTimeInput.value);
-        formData.append('endTime', endTimeInput.value);
+        formData.append('startTime', startTime);
+        formData.append('endTime', endTime);
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/cut-audio`, {
@@ -616,11 +723,11 @@ function attachAudioCutterListener(token) {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                URL.revokeObjectURL(audioUrl); // Clean up the object URL
+                URL.revokeObjectURL(audioUrl);
             };
             downloadButton.style.display = 'block';
 
-            messageDiv.textContent = 'Audio cut successfully!';
+            messageDiv.textContent = 'Audio cut successfully! Preview available.';
             messageDiv.className = 'success';
 
         } catch (error) {

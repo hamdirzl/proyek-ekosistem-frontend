@@ -50,7 +50,8 @@
                 <button id="show-image-merger" class="button-pintu tool-selector-button">Image to PDF</button>
                 <button id="show-qr-generator" class="button-pintu tool-selector-button">QR Code Generator</button>
                 <button id="show-image-compressor" class="button-pintu tool-selector-button">Image Compressor</button>
-                <button id="show-audio-cutter" class="button-pintu tool-selector-button">Audio Cutter</button> </div>
+                <button id="show-audio-cutter" class="button-pintu tool-selector-button">Audio Cutter</button>
+            </div>
         </section>
 
         <div id="shortener-wrapper" class="hidden">
@@ -168,14 +169,16 @@
                     <div class="form-group">
                         <label for="audio-input">Select Audio File (MP3, WAV, etc.)</label>
                         <input type="file" id="audio-input" name="audio" required accept="audio/*">
-                    </div>
+                        <p id="audio-file-info" style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 0.5rem;"></p> </div>
                     <div class="form-group">
-                        <label for="start-time">Start Time (seconds, e.g., 5.5)</label>
+                        <label for="start-time">Start Time (seconds)</label>
                         <input type="number" id="start-time" step="0.1" min="0" value="0" required>
                     </div>
                     <div class="form-group">
-                        <label for="end-time">End Time (seconds, e.g., 15.0)</label>
+                        <label for="end-time">End Time (seconds)</label>
                         <input type="number" id="end-time" step="0.1" min="0" value="10" required>
+                    </div>
+                    <div class="form-group"> <button type="button" id="preview-audio-button" class="button-pintu" style="width: 100%; background-color: var(--text-muted-color); border-color: var(--text-muted-color);">Preview Segment</button>
                     </div>
                     <button type="submit" class="button-pintu">Cut Audio</button>
                 </form>
