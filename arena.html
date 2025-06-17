@@ -69,7 +69,34 @@
                     </ul>
             </div>
         </section>
-
+        
+        <section class="tool-section" data-aos="fade-up">
+            <h2 class="section-title">Perkakas: Media Converter</h2>
+            <div id="converter-wrapper" class="hidden">
+                <form id="converter-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="file-input" style="display: block; margin-bottom: 0.5rem;">Pilih File</label>
+                        <input type="file" id="file-input" name="file" required style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; background-color: #2a2a2a; color: var(--text-color);">
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label for="output-format" style="display: block; margin-bottom: 0.5rem;">Konversi Ke:</label>
+                        <select id="output-format" name="outputFormat" required style="width: 100%; padding: var(--space-sm); border: 1px solid var(--border-color); border-radius: 8px; font-size: var(--font-size-base); font-family: var(--font-body); background-color: #2a2a2a; color: var(--text-color);">
+                            <option value="pdf">PDF</option>
+                            <option value="docx">DOCX (Word Document)</option>
+                            <option value="pptx">PPTX (PowerPoint)</option>
+                            <option value="odt">ODT (OpenDocument Text)</option>
+                            <option value="jpg">JPG</option>
+                            <option value="png">PNG</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="button-pintu" style="margin-top: 1.5rem; width: 100%;">Konversi!</button>
+                </form>
+                <div id="converter-message" style="margin-top: 1rem;"></div>
+            </div>
+            <div id="converter-login-prompt" class="hidden" style="text-align: center;">
+                <p>Fitur ini hanya untuk pengguna yang sudah <a href="auth.html" style="color: var(--accent-color);">login</a>.</p>
+            </div>
+        </section>
         <section class="game-section" data-aos="fade-up">
             <h2 class="section-title">Game Buatan Saya</h2>
             <div class="portfolio-grid">

@@ -38,6 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.body.contains(document.getElementById('shortener-wrapper'))) {
         setupArenaPage();
     }
+
+    // Setup untuk Converter
+    if (document.body.contains(document.getElementById('converter-form'))) {
+        setupConverterPage();
+    }
     
     // Setup elemen UI umum
     setupAboutModal();
@@ -207,6 +212,84 @@ if (shortenerForm) {
         });
     }
 }
+
+// ===================================
+// === LOGIKA UNTUK MEDIA CONVERTER ===
+// ===================================
+function setupConverterPage() {
+    const token = localStorage.getItem('jwt_token');
+    const converterWrapper = document.getElementById('converter-wrapper');
+    const loginPrompt = document.getElementById('converter-login-prompt');
+    const converterForm = document.getElementById('converter-form');
+    const messageDiv = document.getElementById('converter-message');
+
+    if (token) {
+        converterWrapper.classList.remove('hidden');
+        loginPrompt.classList.add('hidden');
+    } else {
+        converterWrapper.classList.add('hidden');
+        loginPrompt.classList.remove('hidden');
+        return; 
+    }
+
+    converterForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        
+        const formData = new FormData(converterForm);
+        const submitButton = converterForm.querySelector('button');
+
+        messageDiv.textContent = 'Mengunggah dan mengonversi file, harap tunggu...';
+        messageDiv.className = '';
+        submitButton.disabled = true;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/convert`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Terjadi kesalahan di server.');
+            }
+
+            const blob = await response.blob();
+            
+            const contentDisposition = response.headers.get('content-disposition');
+            let fileName = 'converted-file';
+            if (contentDisposition) {
+                const match = contentDisposition.match(/filename="(.+)"/);
+                if (match) {
+                    fileName = match[1];
+                }
+            }
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+            
+            messageDiv.textContent = 'Konversi berhasil! File sedang diunduh.';
+            messageDiv.className = 'success';
+            converterForm.reset();
+
+        } catch (error) {
+            messageDiv.textContent = `Error: ${error.message}`;
+            messageDiv.className = 'error';
+        } finally {
+            submitButton.disabled = false;
+        }
+    });
+}
+
 
 // ==========================================================
 // ===         LOGIKA UNTUK HALAMAN AUTENTIKASI           ===
@@ -466,7 +549,7 @@ function setupAboutModal() {
     const aboutButtons = document.querySelectorAll('#about-button');
     const modalOverlay = document.getElementById('about-modal');
     
-    if (!modalOverlay) return; // Keluar jika modal tidak ada di halaman ini
+    if (!modalOverlay) return; 
     
     const modalCloseButton = modalOverlay.querySelector('.modal-close');
 
