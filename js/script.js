@@ -82,6 +82,11 @@ async function checkUserRoleAndSetupAdminPanel(token) {
 async function fetchAndDisplayLinks(token) {
     const linkList = document.getElementById('link-list');
     const loadingMessage = document.getElementById('loading-links');
+    if (!linkList || !loadingMessage) return; // Tambahkan cek null
+
+    loadingMessage.textContent = 'Memuat semua tautan...'; // Pastikan pesan ini muncul
+    loadingMessage.style.display = 'block'; // Pastikan ditampilkan
+
     try {
         const response = await fetch(`${API_BASE_URL}/api/links`, { headers: { 'Authorization': `Bearer ${token}` } });
         if (!response.ok) throw new Error('Gagal mengambil data link. Pastikan Anda adalah admin.');
@@ -388,20 +393,23 @@ async function fetchUserLinkHistory(token) {
     if (!historyList || !loadingMessage) return;
 
     loadingMessage.textContent = 'Memuat riwayat...';
+    loadingMessage.style.display = 'block'; // Pastikan ini ditampilkan saat memuat
+
     try {
         const response = await fetch(`${API_BASE_URL}/api/user/links`, { headers: { 'Authorization': `Bearer ${token}` } });
         if (!response.ok) throw new Error('Gagal mengambil riwayat.');
         const links = await response.json();
         historyList.innerHTML = ''; 
         if (links.length === 0) {
-            loadingMessage.style.display = 'block';
-            loadingMessage.textContent = 'Anda belum memiliki riwayat tautan.';
+            loadingMessage.textContent = 'Anda belum memiliki riwayat tautan.'; // Ubah teks jika kosong
+            loadingMessage.style.display = 'block'; // Pastikan ditampilkan jika kosong
         } else {
-            loadingMessage.style.display = 'none';
+            loadingMessage.style.display = 'none'; // Sembunyikan jika ada data
             links.forEach(link => renderUserLinkItem(link, historyList, token)); 
         }
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
+        loadingMessage.style.display = 'block'; // Pastikan error ditampilkan
     }
 }
 
@@ -438,6 +446,51 @@ function renderUserLinkItem(link, container, token) {
     });
 
     listItem.querySelector('.delete-user-link-btn').addEventListener('click', (e) => handleDeleteUserLink(e, token));
+}
+
+// ==========================================================
+// === FUNGSI BARU: HAPUS TAUTAN PENGGUNA                 ===
+// ==========================================================
+async function handleDeleteUserLink(event, token) {
+    const slugToDelete = event.currentTarget.dataset.slug; // Menggunakan currentTarget karena event listener ada di button
+    
+    if (!confirm(`Anda yakin ingin menghapus tautan ${slugToDelete} dari riwayat Anda?`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/user/links/${slugToDelete}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Gagal menghapus tautan dari riwayat.');
+        }
+
+        alert(data.message);
+        // Hapus item dari DOM setelah berhasil dihapus dari server
+        const listItemToRemove = document.getElementById(`user-link-${slugToDelete}`);
+        if (listItemToRemove) {
+            listItemToRemove.remove();
+        }
+        
+        // Periksa apakah daftar kosong setelah penghapusan terakhir
+        const historyList = document.getElementById('link-history-list');
+        const loadingMessage = document.getElementById('loading-history');
+        if (historyList && historyList.children.length === 0) {
+            loadingMessage.textContent = 'Anda belum memiliki riwayat tautan.';
+            loadingMessage.style.display = 'block';
+        }
+
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+        console.error('Error deleting user link:', error);
+    }
 }
 
 
