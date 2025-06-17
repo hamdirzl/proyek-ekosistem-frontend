@@ -453,19 +453,27 @@ input:focus, textarea:focus, select:focus {
     position: absolute;
     top: var(--space-md);
     left: var(--space-md); /* Position from the left inside the slide-in menu */
-    background: none;
-    border: none;
+    background: rgba(255, 255, 255, 0.1); /* Latar belakang semi-transparan */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Border tipis */
+    border-radius: 50%; /* Bentuk lingkaran */
+    width: 48px; /* Ukuran tombol */
+    height: 48px; /* Ukuran tombol */
     font-size: 2.5rem; /* Large size for easy tapping */
-    font-weight: 300;
-    color: var(--text-color);
+    font-weight: 500; /* Ditingkatkan dari 300 */
+    color: white; /* Warna teks yang kontras */
     cursor: pointer;
     line-height: 1;
-    transition: color 0.3s ease, transform 0.3s ease;
+    transition: color 0.3s ease, transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
     z-index: 1001; /* Ensure it's above menu items */
+    display: flex; /* Untuk memposisikan 'X' di tengah */
+    justify-content: center;
+    align-items: center;
 }
 
 .nav-close-button:hover {
     color: var(--accent-color);
+    background-color: rgba(255, 255, 255, 0.2); /* Sedikit lebih gelap saat hover */
+    border-color: var(--accent-color); /* Border berubah warna saat hover */
     transform: rotate(90deg);
 }
 
@@ -536,7 +544,7 @@ input:focus, textarea:focus, select:focus {
 
     /* Show close button on mobile */
     .nav-close-button {
-        display: block; 
+        display: flex; /* Ubah dari block menjadi flex untuk centering */
     }
     
     /* Penyesuaian khusus untuk history item di mobile */

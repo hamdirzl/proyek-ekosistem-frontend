@@ -586,7 +586,17 @@ if (resetForm) {
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
-    const navCloseButton = document.getElementById('nav-close-button'); // Get the new close button
+    // Membuat tombol close SVG secara dinamis jika belum ada di HTML
+    let navCloseButton = document.getElementById('nav-close-button');
+    if (!navCloseButton) {
+        navCloseButton = document.createElement('button');
+        navCloseButton.id = 'nav-close-button';
+        navCloseButton.classList.add('nav-close-button');
+        navCloseButton.setAttribute('aria-label', 'Tutup menu');
+        // Menggunakan ikon SVG 'x' dari feather icons
+        navCloseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+        navLinks.prepend(navCloseButton); // Tambahkan sebagai child pertama dari navLinks
+    }
 
     const toggleMenu = () => {
         hamburger.classList.toggle('active');
