@@ -502,3 +502,46 @@ input:focus, textarea:focus {
     line-height: 1.8;
     margin-bottom: var(--space-sm);
 }
+/* === GAYA UNTUK FITUR SALIN LINK === */
+.result-box {
+    display: none; /* Sembunyi secara default, tampil via JS */
+    justify-content: space-between;
+    align-items: center;
+    border: 1px dashed var(--accent-color);
+    background-color: #2a2a2a;
+    padding: var(--space-sm) var(--space-md);
+    margin-top: var(--space-md);
+    border-radius: 8px;
+}
+
+#short-url-text {
+    color: var(--accent-color);
+    font-weight: 600;
+    word-break: break-all;
+    padding-right: var(--space-sm);
+}
+
+#copy-button {
+    background: transparent;
+    border: 2px solid var(--text-muted-color);
+    border-radius: 8px;
+    padding: var(--space-xs);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+#copy-button svg {
+    color: var(--text-muted-color);
+    transition: color 0.2s ease;
+}
+
+#copy-button:hover {
+    border-color: var(--accent-color);
+}
+
+#copy-button:hover svg {
+    color: var(--accent-color);
+}

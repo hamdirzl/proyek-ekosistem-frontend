@@ -30,20 +30,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ===================================
-// === FUNGSI UNTUK URL SHORTENER ===
-// ===================================
+// === FUNGSI UNTUK URL SHORTENER (DENGAN FITUR SALIN) ===
 const shortenerForm = document.getElementById('shortener-form');
 if (shortenerForm) {
     const longUrlInput = document.getElementById('long-url');
     const customSlugInput = document.getElementById('custom-slug');
     const resultBox = document.getElementById('result');
+    const resultText = document.getElementById('short-url-text');
+    const copyButton = document.getElementById('copy-button');
+    const copyIcon = document.getElementById('copy-icon');
+    const checkIcon = document.getElementById('check-icon');
 
     shortenerForm.addEventListener('submit', async (event) => {
         event.preventDefault();
+
+        // Tampilkan pesan proses di dalam result-box
+        resultBox.style.display = 'block';
+        resultText.textContent = 'Memproses...';
+        copyButton.style.display = 'none';
+
         const originalUrl = longUrlInput.value;
         const customSlug = customSlugInput.value;
-        resultBox.textContent = 'Memproses...';
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/shorten`, {
@@ -56,13 +63,36 @@ if (shortenerForm) {
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Gagal mengambil data');
-            resultBox.textContent = `Link pendek Anda: ${data.short_url}`;
+            
+            // Tampilkan hasil dan tombol salin
+            resultBox.style.display = 'flex';
+            copyButton.style.display = 'flex';
+            resultText.textContent = data.short_url;
             longUrlInput.value = '';
             customSlugInput.value = '';
+
         } catch (error) {
             console.error('Terjadi Error:', error);
-            resultBox.textContent = 'Gagal: ' + error.message;
+            resultText.textContent = 'Gagal: ' + error.message;
+            copyButton.style.display = 'none'; // Sembunyikan tombol jika error
         }
+    });
+
+    copyButton.addEventListener('click', () => {
+        navigator.clipboard.writeText(resultText.textContent).then(() => {
+            // Beri feedback visual setelah berhasil menyalin
+            copyIcon.style.display = 'none';
+            checkIcon.style.display = 'block';
+
+            // Kembalikan ke ikon semula setelah 2 detik
+            setTimeout(() => {
+                copyIcon.style.display = 'block';
+                checkIcon.style.display = 'none';
+            }, 2000);
+        }).catch(err => {
+            console.error('Gagal menyalin ke clipboard:', err);
+            alert('Gagal menyalin link.');
+        });
     });
 }
 
