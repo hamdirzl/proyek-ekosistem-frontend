@@ -151,38 +151,41 @@ async function handleDeleteLink(event) {
 // ===================================
 // === LOGIKA HALAMAN TOOLS        ===
 // ===================================
-// script.js
 
 function setupToolsPage(token) {
-    const wrappers = [
+    const wrappers = [ // Semua wrapper perkakas dan riwayat
         document.getElementById('shortener-wrapper'),
         document.getElementById('history-section'),
         document.getElementById('converter-wrapper'),
         document.getElementById('image-merger-wrapper')
     ];
     const loginPrompt = document.getElementById('login-prompt');
+    const toolSelectionSection = document.querySelector('.tool-selection'); // Bagian baru untuk tombol pilihan
+
+    // Sembunyikan semua perkakas dan riwayat secara default saat halaman dimuat
+    wrappers.forEach(el => el && el.classList.add('hidden'));
 
     if (token) {
-        // Jika login, tampilkan semua perkakas dan sembunyikan pesan login
-        wrappers.forEach(el => el && el.classList.remove('hidden'));
+        // Jika login, tampilkan bagian pilihan perkakas dan sembunyikan pesan login
         if (loginPrompt) loginPrompt.classList.add('hidden');
+        if (toolSelectionSection) toolSelectionSection.classList.remove('hidden');
 
-        // Pasang semua event listener untuk form yang ada
+        // Pasang event listener untuk tombol-tombol pilihan perkakas
+        document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper', token));
+        document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper', token));
+        document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper', token));
+
+        // Inisialisasi listener form (mereka hanya akan aktif jika wrapper-nya terlihat)
         attachShortenerListener(token);
         attachConverterListener(token);
         attachImageMergerListener(token);
 
-        // Ambil riwayat tautan
-        fetchUserLinkHistory(token);
     } else {
-        // Jika tidak login, sembunyikan semua perkakas dan tampilkan pesan login
-        wrappers.forEach(el => el && el.classList.add('hidden'));
+        // Jika tidak login, sembunyikan semua perkakas, sembunyikan pilihan perkakas, dan tampilkan pesan login
         if (loginPrompt) loginPrompt.classList.remove('hidden');
+        if (toolSelectionSection) toolSelectionSection.classList.add('hidden');
     }
 
-    // =================================================================
-    // ==   KODE BARU DITAMBAHKAN DI SINI   ==
-    // =================================================================
     // Logika untuk menonaktifkan opsi konversi yang tidak andal
     const fileInput = document.getElementById('file-input');
     const outputFormatSelect = document.getElementById('output-format');
@@ -212,6 +215,38 @@ function setupToolsPage(token) {
         });
     }
 }
+
+// Fungsi baru untuk menampilkan bagian perkakas tertentu dan menyembunyikan yang lain
+function showToolSection(sectionIdToShow, token) {
+    const allToolSections = [
+        document.getElementById('shortener-wrapper'),
+        document.getElementById('converter-wrapper'),
+        document.getElementById('image-merger-wrapper'),
+        document.getElementById('history-section') // Riwayat tautan akan selalu muncul bersama shortener, tetapi juga disembunyikan/ditampilkan oleh fungsi ini
+    ];
+
+    allToolSections.forEach(section => {
+        if (section && section.id === sectionIdToShow) {
+            section.classList.remove('hidden');
+            // Jika shortener ditampilkan, tampilkan juga riwayat
+            if (sectionIdToShow === 'shortener-wrapper') {
+                document.getElementById('history-section')?.classList.remove('hidden');
+                fetchUserLinkHistory(token); // Muat ulang riwayat saat shortener ditampilkan
+            } else {
+                document.getElementById('history-section')?.classList.add('hidden');
+            }
+        } else {
+            section?.classList.add('hidden');
+        }
+    });
+
+    // Gulir ke bagian yang ditampilkan (opsional, untuk UX yang lebih baik)
+    const targetSection = document.getElementById(sectionIdToShow);
+    if (targetSection) {
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
 function attachShortenerListener(token) {
     const form = document.getElementById('shortener-form');
     if (!form) return;
