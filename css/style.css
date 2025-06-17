@@ -297,23 +297,8 @@ input:focus, textarea:focus {
 #auth-message.error, #mood-message.error { background-color: rgba(248, 215, 218, 0.1); color: #f8d7da; }
 
 .mood-history-list { list-style: none; padding: 0; }
-.mood-item { 
-    background-color: #2a2a2a; 
-    padding: var(--space-sm) var(--space-md); 
-    border-radius: 8px; 
-    margin-bottom: var(--space-sm); 
-    border-left: 4px solid var(--accent-color); 
-}
-.mood-item-header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: var(--space-xs); 
-    font-weight: bold; 
-    /* NEW: Allow content to wrap */
-    flex-wrap: wrap; 
-    gap: var(--space-sm); /* Gap between elements in header */
-}
+.mood-item { background-color: #2a2a2a; padding: var(--space-sm) var(--space-md); border-radius: 8px; margin-bottom: var(--space-sm); border-left: 4px solid var(--accent-color); }
+.mood-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xs); font-weight: bold; }
 .mood-date { font-size: 0.85rem; color: var(--text-muted-color); }
 .mood-notes { color: var(--text-color); font-style: italic; }
 
@@ -555,7 +540,6 @@ input:focus, textarea:focus {
     flex-shrink: 1; /* Izinkan teks untuk menyusut */
     min-width: 0; /* Wajib agar flex-shrink berfungsi dengan baik */
     word-break: break-all; /* Patahkan URL jika terlalu panjang */
-    overflow-wrap: break-word; /* NEW: Menangani kata yang sangat panjang */
 }
 
 #copy-button {
@@ -565,33 +549,19 @@ input:focus, textarea:focus {
 
 /* Perbaikan untuk item di riwayat tautan */
 .mood-item-header {
-    /* NEW: Ensure sufficient space for button row */
-    align-items: flex-start; /* Align items to the start for better button alignment */
+    align-items: center;
     gap: var(--space-sm); /* Beri jarak antara URL dan tombol */
-    /* NEW: Allows content to wrap to next line if needed, important for URL */
-    flex-wrap: wrap; 
 }
 
 .mood-item-header strong {
     flex: 1;
-    min-width: 0; /* Important for flex items with text that needs to wrap */
+    min-width: 0;
     word-break: break-word; /* Gunakan break-word agar lebih rapi */
-    overflow-wrap: break-word; /* NEW: Menangani kata yang sangat panjang */
 }
 
 .mood-item-header .button-pintu {
     flex-shrink: 0;
-    /* NEW: Smaller padding for buttons in history */
-    padding: 0.4rem 0.8rem;
-    font-size: 0.85em; 
 }
-
-/* NEW: Container for history buttons to ensure they stay together */
-.mood-item-header .button-container {
-    display: flex;
-    gap: 5px; /* Gap between Salin and Hapus buttons */
-}
-
 
 /* Penyesuaian Profesional untuk Mobile */
 @media (max-width: 768px) {
@@ -613,33 +583,32 @@ input:focus, textarea:focus {
         padding: 0.4rem 0.8rem;
         font-size: 0.9rem;
     }
+}
 
-    /* Adjust main padding for smaller screens */
-    .page-container {
-        padding: 0 var(--space-sm); /* Reduce horizontal padding */
-        margin-top: var(--space-xl); /* Adjust top margin for less empty space */
-    }
+/* Gaya untuk pilihan perkakas */
+.tool-selection {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+}
 
-    .page-title {
-        font-size: clamp(2rem, 1.8rem + 2vw, 3rem); /* Smaller title on mobile */
-    }
+.tool-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+}
 
-    .page-subtitle {
-        font-size: 0.95rem; /* Smaller subtitle on mobile */
-        margin-bottom: var(--space-lg); /* Reduce bottom margin */
-    }
+.tool-selector-button {
+    min-width: 180px;
+    padding: 1rem 1.5rem;
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+}
 
-    .tool-selection {
-        margin-bottom: var(--space-lg); /* Reduce margin below tool selection */
-    }
-    
+@media (max-width: 768px) {
     .tool-selector-button {
-        width: calc(100% - (var(--space-md) * 2)); /* Full width minus gap on small screens */
-        margin: 0 auto; /* Center button */
-    }
-
-    /* NEW: Adjust spacing for general tool sections on mobile */
-    .tool-section, .history-section {
-        margin-bottom: var(--space-md); /* Less space between sections */
+        width: 100%;
     }
 }
