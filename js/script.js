@@ -1,5 +1,5 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (Lengkap dengan semua fitur)         ==
+// ==   FILE FINAL SCRIPT.JS (Update: Fitur Gabung Gambar ke PDF) ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
@@ -39,9 +39,14 @@ document.addEventListener('DOMContentLoaded', () => {
         setupArenaPage();
     }
 
-    // Setup untuk Converter
+    // Setup untuk Converter Umum
     if (document.body.contains(document.getElementById('converter-form'))) {
         setupConverterPage();
+    }
+    
+    // Setup untuk Image Merger BARU
+    if (document.body.contains(document.getElementById('image-merger-form'))) {
+        setupImageMergerPage();
     }
     
     // Setup elemen UI umum
@@ -101,7 +106,6 @@ async function fetchUserLinkHistory(token) {
 }
 
 function renderLinkItem(link, container, prepend = false) {
-    // Anda bisa mengganti ini dengan domain Anda jika berbeda
     const baseUrl = 'https://link.hamdirzl.my.id';
     const shortUrl = `${baseUrl}/${link.slug}`;
 
@@ -136,14 +140,6 @@ function renderLinkItem(link, container, prepend = false) {
 
 const shortenerForm = document.getElementById('shortener-form');
 if (shortenerForm) {
-    const longUrlInput = document.getElementById('long-url');
-    const customSlugInput = document.getElementById('custom-slug');
-    const resultBox = document.getElementById('result');
-    const resultText = document.getElementById('short-url-text');
-    const copyButton = document.getElementById('copy-button');
-    const copyIcon = document.getElementById('copy-icon');
-    const checkIcon = document.getElementById('check-icon');
-
     shortenerForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const token = localStorage.getItem('jwt_token');
@@ -152,35 +148,28 @@ if (shortenerForm) {
             window.location.href = 'auth.html';
             return;
         }
-
+        // ... (sisa logika shortener tidak berubah)
+        const resultBox = document.getElementById('result');
+        const resultText = document.getElementById('short-url-text');
+        const longUrlInput = document.getElementById('long-url');
+        const customSlugInput = document.getElementById('custom-slug');
+        const copyButton = document.getElementById('copy-button');
         resultBox.style.display = 'block';
         resultText.textContent = 'Memproses...';
         copyButton.style.display = 'none';
-
-        const originalUrl = longUrlInput.value;
-        const customSlug = customSlugInput.value;
-
         try {
             const response = await fetch(`${API_BASE_URL}/api/shorten`, {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    original_url: originalUrl,
-                    custom_slug: customSlug
-                }),
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ original_url: longUrlInput.value, custom_slug: customSlugInput.value }),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Gagal mengambil data');
-            
             resultBox.style.display = 'flex';
             copyButton.style.display = 'flex';
             resultText.textContent = data.short_url;
             longUrlInput.value = '';
             customSlugInput.value = '';
-
             const historyList = document.getElementById('link-history-list');
             const loadingMessage = document.getElementById('loading-history');
             if(loadingMessage.textContent.includes('belum memiliki')) {
@@ -188,26 +177,22 @@ if (shortenerForm) {
                 historyList.innerHTML = '';
             }
             renderLinkItem(data.link_data, historyList, true);
-
         } catch (error) {
-            console.error('Terjadi Error:', error);
             resultText.textContent = 'Gagal: ' + error.message;
             copyButton.style.display = 'none';
         }
     });
 
+    const copyButton = document.getElementById('copy-button');
     if (copyButton) {
         copyButton.addEventListener('click', () => {
-            navigator.clipboard.writeText(resultText.textContent).then(() => {
-                copyIcon.style.display = 'none';
-                checkIcon.style.display = 'block';
+            navigator.clipboard.writeText(document.getElementById('short-url-text').textContent).then(() => {
+                document.getElementById('copy-icon').style.display = 'none';
+                document.getElementById('check-icon').style.display = 'block';
                 setTimeout(() => {
-                    copyIcon.style.display = 'block';
-                    checkIcon.style.display = 'none';
+                    document.getElementById('copy-icon').style.display = 'block';
+                    document.getElementById('check-icon').style.display = 'none';
                 }, 2000);
-            }).catch(err => {
-                console.error('Gagal menyalin ke clipboard:', err);
-                alert('Gagal menyalin link.');
             });
         });
     }
@@ -216,12 +201,13 @@ if (shortenerForm) {
 // ===================================
 // === LOGIKA UNTUK MEDIA CONVERTER ===
 // ===================================
+
+// Logika untuk Converter Umum (Satu File)
 function setupConverterPage() {
     const token = localStorage.getItem('jwt_token');
     const converterWrapper = document.getElementById('converter-wrapper');
     const loginPrompt = document.getElementById('converter-login-prompt');
-    const converterForm = document.getElementById('converter-form');
-    const messageDiv = document.getElementById('converter-message');
+    if (!converterWrapper) return;
 
     if (token) {
         converterWrapper.classList.remove('hidden');
@@ -229,15 +215,15 @@ function setupConverterPage() {
     } else {
         converterWrapper.classList.add('hidden');
         loginPrompt.classList.remove('hidden');
-        return; 
+        return;
     }
 
+    const converterForm = document.getElementById('converter-form');
     converterForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-        
         const formData = new FormData(converterForm);
         const submitButton = converterForm.querySelector('button');
-
+        const messageDiv = document.getElementById('converter-message');
         messageDiv.textContent = 'Mengunggah dan mengonversi file, harap tunggu...';
         messageDiv.className = '';
         submitButton.disabled = true;
@@ -245,36 +231,28 @@ function setupConverterPage() {
         try {
             const response = await fetch(`${API_BASE_URL}/api/convert`, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
             });
 
-
             if (!response.ok) {
-                // Coba baca error sebagai JSON, jika gagal, baca sebagai teks biasa.
                 let errorMessage;
                 try {
                     const errorData = await response.json();
                     errorMessage = errorData.error || 'Terjadi kesalahan di server.';
                 } catch (jsonError) {
-                    errorMessage = await response.text(); // Fallback ke teks jika bukan JSON
+                    errorMessage = await response.text();
                 }
                 throw new Error(errorMessage);
             }
 
             const blob = await response.blob();
-            
             const contentDisposition = response.headers.get('content-disposition');
             let fileName = 'converted-file';
             if (contentDisposition) {
                 const match = contentDisposition.match(/filename="(.+)"/);
-                if (match) {
-                    fileName = match[1];
-                }
+                if (match) fileName = match[1];
             }
-
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';
@@ -284,10 +262,75 @@ function setupConverterPage() {
             a.click();
             window.URL.revokeObjectURL(url);
             a.remove();
-            
             messageDiv.textContent = 'Konversi berhasil! File sedang diunduh.';
             messageDiv.className = 'success';
             converterForm.reset();
+        } catch (error) {
+            messageDiv.textContent = `Error: ${error.message}`;
+            messageDiv.className = 'error';
+        } finally {
+            submitButton.disabled = false;
+        }
+    });
+}
+
+// Logika BARU untuk Image Merger
+function setupImageMergerPage() {
+    const token = localStorage.getItem('jwt_token');
+    const wrapper = document.getElementById('image-merger-wrapper');
+    const loginPrompt = document.getElementById('image-merger-login-prompt');
+    const form = document.getElementById('image-merger-form');
+    const messageDiv = document.getElementById('image-merger-message');
+    const fileInput = document.getElementById('image-files-input');
+
+    if (token) {
+        wrapper.classList.remove('hidden');
+        loginPrompt.classList.add('hidden');
+    } else {
+        wrapper.classList.add('hidden');
+        loginPrompt.classList.remove('hidden');
+        return;
+    }
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (fileInput.files.length === 0) {
+            messageDiv.textContent = 'Error: Silakan pilih setidaknya satu gambar.';
+            messageDiv.className = 'error';
+            return;
+        }
+        const formData = new FormData(form);
+        const submitButton = form.querySelector('button');
+        messageDiv.textContent = 'Mengunggah dan menggabungkan gambar... Ini mungkin memakan waktu beberapa saat.';
+        messageDiv.className = '';
+        submitButton.disabled = true;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/convert/images-to-pdf`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Terjadi kesalahan di server.');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'hasil-gabungan.pdf';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+            
+            messageDiv.textContent = 'Berhasil! PDF Anda sedang diunduh.';
+            messageDiv.className = 'success';
+            form.reset();
 
         } catch (error) {
             messageDiv.textContent = `Error: ${error.message}`;
@@ -300,8 +343,10 @@ function setupConverterPage() {
 
 
 // ==========================================================
-// ===         LOGIKA UNTUK HALAMAN AUTENTIKASI           ===
+// ===         SISA LOGIKA (TIDAK BERUBAH)                ===
 // ==========================================================
+
+// ... (semua logika untuk autentikasi, dashboard, UI umum, dll. tetap sama) ...
 if (document.getElementById('login-form')) {
     const loginSection = document.getElementById('login-section');
     const registerSection = document.getElementById('register-section');
@@ -376,9 +421,6 @@ if (document.getElementById('login-form')) {
     }
 }
 
-// ==========================================================
-// ===         LOGIKA UNTUK LUPA & RESET PASSWORD         ===
-// ==========================================================
 const forgotForm = document.getElementById('forgot-form');
 if (forgotForm) {
     forgotForm.addEventListener('submit', async (e) => {
@@ -440,9 +482,6 @@ if (resetForm) {
     });
 }
 
-// ==========================================================
-// ===   LOGIKA UNTUK DASHBOARD (INFO USER & PANEL ADMIN) ===
-// ==========================================================
 function populateUserInfo() {
     const token = localStorage.getItem('jwt_token');
     if (!token) return;
@@ -538,10 +577,6 @@ async function handleDeleteLink(event) {
     }
 }
 
-
-// ==========================================================
-// ===         LOGIKA UNTUK ELEMEN UI UMUM                ===
-// ==========================================================
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');

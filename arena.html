@@ -58,7 +58,7 @@
         </div>
 
         <div id="login-prompt" class="hidden" style="text-align: center; padding: 2rem; background-color: var(--card-bg-color); border-radius: 12px; margin-bottom: var(--space-lg);">
-            <p>Anda harus <a href="auth.html" style="color: var(--accent-color);">login</a> untuk menggunakan peramping tautan dan melihat riwayat Anda.</p>
+            <p>Anda harus <a href="auth.html" style="color: var(--accent-color);">login</a> untuk menggunakan perkakas dan melihat riwayat Anda.</p>
         </div>
 
         <section id="history-section" class="history-section hidden" data-aos="fade-up">
@@ -97,6 +97,24 @@
                 <p>Fitur ini hanya untuk pengguna yang sudah <a href="auth.html" style="color: var(--accent-color);">login</a>.</p>
             </div>
         </section>
+        
+        <section class="tool-section" data-aos="fade-up">
+            <h2 class="section-title">Perkakas: Gabung Gambar ke PDF</h2>
+            <div id="image-merger-wrapper" class="hidden">
+                <form id="image-merger-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="image-files-input" style="display: block; margin-bottom: 0.5rem;">Pilih Gambar (JPG/PNG, bisa lebih dari satu)</label>
+                        <input type="file" id="image-files-input" name="files" required multiple accept="image/png, image/jpeg" style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; background-color: #2a2a2a; color: var(--text-color);">
+                    </div>
+                    <button type="submit" class="button-pintu" style="margin-top: 1.5rem; width: 100%;">Gabungkan ke PDF!</button>
+                </form>
+                <div id="image-merger-message" style="margin-top: 1rem;"></div>
+            </div>
+            <div id="image-merger-login-prompt" class="hidden" style="text-align: center;">
+                <p>Fitur ini hanya untuk pengguna yang sudah <a href="auth.html" style="color: var(--accent-color);">login</a>.</p>
+            </div>
+        </section>
+
         <section class="game-section" data-aos="fade-up">
             <h2 class="section-title">Game Buatan Saya</h2>
             <div class="portfolio-grid">
