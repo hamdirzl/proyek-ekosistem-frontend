@@ -362,20 +362,25 @@ input:focus, textarea:focus {
     .nav-links a.login-button { margin: var(--space-xs) 5%; width: 90%; text-align: center; }
     
     .page-container { 
-        padding: 75px var(--space-md) 0;
+        padding-top: 75px;
     }
 
     .tool-section, .dashboard-header, .history-section, .pintu {
         padding: var(--space-md);
     }
     
+    /* PERBAIKAN TAMPILAN MOBILE HERO SECTION */
     .hero { 
-        text-align: center; 
-        padding: 12rem var(--space-md) var(--space-xl) var(--space-md);
-        min-height: auto;
+        padding: 8rem var(--space-md) 6rem var(--space-md);
+        min-height: 70vh;
+        text-align: center;
+    }
+    
+    .hero h1 {
+        font-size: clamp(2.2rem, 1.8rem + 6vw, 3.2rem);
+        line-height: 1.25;
     }
 
-    /* [PERBAIKAN] Penyesuaian Modal untuk Mobile */
     .modal-content {
         padding: var(--space-md);
         padding-top: var(--space-xl); /* Beri ruang untuk tombol close */
@@ -451,7 +456,7 @@ input:focus, textarea:focus {
 
 .modal-content {
     background: var(--card-bg-color);
-    padding: var(--space-lg); /* [PERBAIKAN] Padding dikecilkan */
+    padding: var(--space-lg);
     border-radius: 12px;
     max-width: 600px;
     width: 90%;
@@ -481,12 +486,12 @@ input:focus, textarea:focus {
 }
 
 .modal-content .section-title {
-    font-size: var(--font-size-h3); /* [PERBAIKAN] Judul modal dikecilkan */
+    font-size: var(--font-size-h3);
     margin-bottom: var(--space-md);
 }
 
 .about-greeting {
-    font-size: calc(var(--font-size-base) * 1.2); /* [PERBAIKAN] Sapaan dikecilkan */
+    font-size: calc(var(--font-size-base) * 1.2);
     font-family: var(--font-heading);
     color: var(--accent-color);
     margin-bottom: var(--space-md);
@@ -495,5 +500,5 @@ input:focus, textarea:focus {
 .modal-content p {
     color: var(--text-muted-color);
     line-height: 1.8;
-    margin-bottom: var(--space-sm); /* [PERBAIKAN] Jarak antar paragraf dirapatkan */
+    margin-bottom: var(--space-sm);
 }
