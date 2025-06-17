@@ -151,67 +151,80 @@ async function handleDeleteLink(event) {
 // ===================================
 // === LOGIKA HALAMAN TOOLS        ===
 // ===================================
-// script.js
-
 function setupToolsPage(token) {
-    const wrappers = [
-        document.getElementById('shortener-wrapper'),
-        document.getElementById('history-section'),
-        document.getElementById('converter-wrapper'),
-        document.getElementById('image-merger-wrapper')
-    ];
+    // Referensi ke semua elemen yang kita butuhkan
     const loginPrompt = document.getElementById('login-prompt');
+    const toolSelectionWrapper = document.getElementById('tool-selection-wrapper');
+    const allToolsContainer = document.getElementById('all-tools-container');
 
+    // Referensi ke tombol pilihan
+    const showShortenerBtn = document.getElementById('show-shortener-btn');
+    const showConverterBtn = document.getElementById('show-converter-btn');
+
+    // Referensi ke wrapper setiap perkakas
+    const shortenerWrapper = document.getElementById('shortener-wrapper');
+    const converterContainer = document.getElementById('converter-container');
+    
     if (token) {
-        // Jika login, tampilkan semua perkakas dan sembunyikan pesan login
-        wrappers.forEach(el => el && el.classList.remove('hidden'));
-        if (loginPrompt) loginPrompt.classList.add('hidden');
+        // Jika login, tampilkan menu pilihan perkakas
+        loginPrompt.classList.add('hidden');
+        toolSelectionWrapper.classList.remove('hidden');
 
-        // Pasang semua event listener untuk form yang ada
+        // Sembunyikan semua perkakas pada awalnya
+        allToolsContainer.classList.add('hidden');
+        shortenerWrapper.style.display = 'none';
+        converterContainer.style.display = 'none';
+
+        // --- Tambahkan event listener untuk tombol-tombol pilihan ---
+
+        showShortenerBtn.addEventListener('click', () => {
+            allToolsContainer.classList.remove('hidden'); // Tampilkan kontainer utama
+            shortenerWrapper.style.display = 'block';     // Tampilkan peramping tautan
+            converterContainer.style.display = 'none';    // Sembunyikan konverter
+            fetchUserLinkHistory(token); // Muat riwayat tautan saat perkakas dipilih
+        });
+
+        showConverterBtn.addEventListener('click', () => {
+            allToolsContainer.classList.remove('hidden'); // Tampilkan kontainer utama
+            shortenerWrapper.style.display = 'none';      // Sembunyikan peramping tautan
+            converterContainer.style.display = 'block';   // Tampilkan konverter
+        });
+
+        // Pasang listener ke form-form seperti sebelumnya
         attachShortenerListener(token);
         attachConverterListener(token);
         attachImageMergerListener(token);
 
-        // Ambil riwayat tautan
-        fetchUserLinkHistory(token);
     } else {
-        // Jika tidak login, sembunyikan semua perkakas dan tampilkan pesan login
-        wrappers.forEach(el => el && el.classList.add('hidden'));
-        if (loginPrompt) loginPrompt.classList.remove('hidden');
+        // Jika tidak login, tampilkan pesan login dan sembunyikan menu pilihan
+        loginPrompt.classList.remove('hidden');
+        toolSelectionWrapper.classList.add('hidden');
+        allToolsContainer.classList.add('hidden');
     }
 
-    // =================================================================
-    // ==   KODE BARU DITAMBAHKAN DI SINI   ==
-    // =================================================================
-    // Logika untuk menonaktifkan opsi konversi yang tidak andal
+    // Logika untuk menonaktifkan opsi konversi yang tidak andal tetap ada
     const fileInput = document.getElementById('file-input');
     const outputFormatSelect = document.getElementById('output-format');
 
     if (fileInput && outputFormatSelect) {
         fileInput.addEventListener('change', () => {
             if (!fileInput.files || fileInput.files.length === 0) return;
-
             const fileName = fileInput.files[0].name.toLowerCase();
             const docxOption = outputFormatSelect.querySelector('option[value="docx"]');
-
             if (fileName.endsWith('.pdf')) {
-                // Jika file adalah PDF, nonaktifkan opsi DOCX
                 if (docxOption) {
                     docxOption.disabled = true;
-                    // Jika opsi DOCX sedang terpilih, ganti ke pilihan default (PDF)
                     if (outputFormatSelect.value === 'docx') {
-                        outputFormatSelect.value = 'pdf'; 
+                        outputFormatSelect.value = 'pdf';
                     }
                 }
             } else {
-                // Jika file bukan PDF, aktifkan kembali opsi DOCX
-                if (docxOption) {
-                    docxOption.disabled = false;
-                }
+                if (docxOption) docxOption.disabled = false;
             }
         });
     }
 }
+
 function attachShortenerListener(token) {
     const form = document.getElementById('shortener-form');
     if (!form) return;
