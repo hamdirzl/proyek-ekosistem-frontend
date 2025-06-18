@@ -56,16 +56,15 @@
         <div id="shortener-wrapper" class="hidden">
             <section class="tool-section" data-aos="fade-up">
                 <h2 class="section-title">Tool: URL Shortener</h2>
-                <form id="shortener-form">
-                    <input type="url" id="long-url" placeholder="Masukkan URL panjang Anda di sini..." required>
-                    <input type="text" id="custom-slug" placeholder="Nama kustom (opsional)..." pattern="[a-zA-Z0-9-]+" title="Hanya huruf, angka, dan tanda hubung yang diizinkan">
+                <form id="shortener-form" action="javascript:void(0);">
+                    <input type="url" id="long-url" name="original_url" placeholder="Masukkan URL panjang Anda di sini..." required>
+                    <input type="text" id="custom-slug" name="custom_slug" placeholder="Nama kustom (opsional)..." pattern="[a-zA-Z0-9-]+" title="Hanya huruf, angka, dan tanda hubung yang diizinkan">
                     <button type="submit" class="button-pintu">Persingkat!</button>
                 </form>
                 <div class="result-box" id="result">
                     <span id="short-url-text"></span> 
                     <button id="copy-button" class="icon-button" aria-label="Salin Tautan">
-                        <svg id="copy-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        <svg id="check-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     </button>
                 </div>
             </section>
@@ -77,39 +76,43 @@
             <ul id="link-history-list" class="item-list"></ul>
         </section>
 
-        <section id="converter-wrapper" class="tool-section hidden" data-aos="fade-up">
-            <h2 class="section-title">Tool: Media Converter</h2>
-            <form id="converter-form" enctype="multipart/form-data" action="javascript:void(0);">
-                <div class="form-group">
-                    <label for="file-input">Pilih File</label>
-                    <input type="file" id="file-input" name="file" required>
-                </div>
-                <div class="form-group">
-                    <label for="output-format">Konversi Ke:</label>
-                    <select id="output-format" name="outputFormat" required>
-                        <option value="pdf">PDF</option>
-                        <option value="docx">DOCX (Word Document)</option>
-                        <option value="pptx">PPTX (PowerPoint)</option>
-                        <option value="odt">ODT (OpenDocument Text)</option>
-                        <option value="jpg">JPG</option><option value="png">PNG</option>
-                    </select>
-                </div>
-                <button type="submit" class="button-pintu">Konversi!</button>
-            </form>
-            <div id="converter-message" class="message-box hidden"></div>
-        </section>
+        <div id="converter-wrapper" class="hidden">
+            <section class="tool-section" data-aos="fade-up">
+                <h2 class="section-title">Tool: Media Converter</h2>
+                <form id="converter-form" enctype="multipart/form-data" action="javascript:void(0);">
+                    <div class="form-group">
+                        <label for="file-input">Pilih File</label>
+                        <input type="file" id="file-input" name="file" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="output-format">Konversi Ke:</label>
+                        <select id="output-format" name="outputFormat" required>
+                            <option value="pdf">PDF</option>
+                            <option value="docx">DOCX (Word Document)</option>
+                            <option value="pptx">PPTX (PowerPoint)</option>
+                            <option value="odt">ODT (OpenDocument Text)</option>
+                            <option value="jpg">JPG</option><option value="png">PNG</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="button-pintu">Konversi!</button>
+                </form>
+                <div id="converter-message" class="message-box hidden"></div>
+            </section>
+        </div>
         
-        <section id="image-merger-wrapper" class="tool-section hidden" data-aos="fade-up">
-            <h2 class="section-title">Tool: Gabung Gambar ke PDF</h2>
-            <form id="image-merger-form" enctype="multipart/form-data" action="javascript:void(0);">
-                <div class="form-group">
-                    <label for="image-files-input">Pilih Gambar (JPG/PNG, bisa lebih dari satu)</label>
-                    <input type="file" id="image-files-input" name="files" required multiple accept="image/png, image/jpeg">
-                </div>
-                <button type="submit" class="button-pintu">Gabung ke PDF!</button>
-            </form>
-            <div id="image-merger-message" class="message-box hidden"></div>
-        </section>
+        <div id="image-merger-wrapper" class="hidden">
+            <section class="tool-section" data-aos="fade-up">
+                <h2 class="section-title">Tool: Gabung Gambar ke PDF</h2>
+                <form id="image-merger-form" enctype="multipart/form-data" action="javascript:void(0);">
+                    <div class="form-group">
+                        <label for="image-files-input">Pilih Gambar (JPG/PNG, bisa lebih dari satu)</label>
+                        <input type="file" id="image-files-input" name="files" required multiple accept="image/png, image/jpeg">
+                    </div>
+                    <button type="submit" class="button-pintu">Gabung ke PDF!</button>
+                </form>
+                <div id="image-merger-message" class="message-box hidden"></div>
+            </section>
+        </div>
 
         <div id="qr-generator-wrapper" class="hidden">
             <section class="tool-section" data-aos="fade-up">
@@ -117,11 +120,11 @@
                 <form id="qr-generator-form" action="javascript:void(0);">
                     <div class="form-group">
                         <label for="qr-text">Teks atau URL</label>
-                        <input type="text" id="qr-text" placeholder="Masukkan teks atau URL..." required>
+                        <input type="text" id="qr-text" name="text" placeholder="Masukkan teks atau URL..." required>
                     </div>
                     <div class="form-group">
                         <label for="qr-error-level">Tingkat Koreksi Error</label>
-                        <select id="qr-error-level">
+                        <select id="qr-error-level" name="level">
                             <option value="L">Rendah (L)</option>
                             <option value="M" selected>Sedang (M)</option>
                             <option value="Q">Tinggi (Q)</option>
@@ -130,11 +133,11 @@
                     </div>
                      <div class="form-group">
                         <label for="qr-color-dark">Warna QR Code</label>
-                        <input type="color" id="qr-color-dark" value="#000000">
+                        <input type="color" id="qr-color-dark" name="colorDark" value="#000000">
                     </div>
                     <div class="form-group">
                         <label for="qr-color-light">Warna Latar Belakang</label>
-                        <input type="color" id="qr-color-light" value="#ffffff">
+                        <input type="color" id="qr-color-light" name="colorLight" value="#ffffff">
                     </div>
                     <button type="submit" class="button-pintu">Buat QR Code</button>
                 </form>
@@ -156,7 +159,7 @@
                     </div>
                     <div class="form-group">
                         <label for="compress-quality">Kualitas (0-100%)</label>
-                        <input type="range" id="compress-quality" min="0" max="100" value="80">
+                        <input type="range" id="compress-quality" name="quality" min="0" max="100" value="80">
                         <span id="compress-quality-value" style="display: block; text-align: right; font-size: 0.9em; color: var(--text-muted-color);">80%</span>
                     </div>
                     <div class="form-group">
