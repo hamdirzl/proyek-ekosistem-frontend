@@ -16,20 +16,20 @@
     <header class="navbar">
         <div class="logo"><a href="index.html">HAMDI RIZAL</a></div>
        <nav>
-    <ul class="nav-links">
-        <li><a href="portfolio.html">Portofolio</a></li>
-        <li><a href="tools.html">Tools Hamdi</a></li>
-        <li><a href="arena.html">Arena Game</a></li>
-        <li><a href="jurnal.html">Jurnal</a></li>
-        <li><button id="about-button" class="nav-button">Tentang Saya</button></li>
-        <li><a href="auth.html" class="login-button">Login</a></li>
-    </ul>
-    <button class="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
-</nav>
+            <ul class="nav-links">
+                <li><a href="portfolio.html">Portofolio</a></li>
+                <li><a href="tools.html">Tools Hamdi</a></li>
+                <li><a href="arena.html">Arena Game</a></li>
+                <li><a href="jurnal.html">Jurnal</a></li>
+                <li><button id="about-button" class="nav-button">Tentang Saya</button></li>
+                <li><a href="auth.html" class="login-button">Login</a></li>
+            </ul>
+            <button class="hamburger" aria-label="Buka menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
     </header>
 
     <main class="page-container">
@@ -38,19 +38,19 @@
             <p class="page-subtitle">Kumpulan tulisan tentang perjalanan, ide, dan hal-hal yang saya pelajari.</p>
         </div>
 
-        <div class="jurnal-grid">
-             <article class="jurnal-card" data-aos="fade-up">
+        <div class="content-grid jurnal-grid">
+             <article class="content-card jurnal-card" data-aos="fade-up">
                 <img src="https://images.unsplash.com/photo-1489549132488-d00b7d8818e5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Pemandangan cakrawala kota saat senja">
-                <div class="jurnal-content">
+                <div class="jurnal-content card-body">
                     <h3>Judul Artikel Pertama yang Menarik</h3>
                     <p class="post-meta">Dipublikasikan pada 17 Juni 2025</p>
                     <p>Ini adalah cuplikan atau paragraf pembuka dari artikel. Tujuannya untuk menarik pembaca agar mau mengklik dan membaca lebih lanjut...</p>
                     <a href="#" class="button-pintu">Baca Selengkapnya</a>
                 </div>
             </article>
-             <article class="jurnal-card" data-aos="fade-up" data-aos-delay="100">
+             <article class="content-card jurnal-card" data-aos="fade-up" data-aos-delay="100">
                 <img src="https://images.unsplash.com/photo-1483058712412-4245e9b90334?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Seseorang mengetik di laptop dengan secangkir kopi">
-                <div class="jurnal-content">
+                <div class="jurnal-content card-body">
                     <h3>Judul Artikel Lainnya</h3>
                     <p class="post-meta">Dipublikasikan pada 10 Juni 2025</p>
                     <p>Ini adalah cuplikan atau paragraf pembuka dari artikel. Tujuannya untuk menarik pembaca agar mau mengklik dan membaca lebih lanjut...</p>
@@ -63,13 +63,13 @@
     <footer>
         <div class="social-icons">
             <a href="https://www.instagram.com/hamdirzl/" target="_blank" aria-label="Instagram">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-instagram"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
             </a>
-            <a href="https://open.spotify.com/user/pw7cyaxhvilcfmrpdddu33bvu?si=9d2ef3b1e0794b83" target="_blank" aria-label="Spotify">
+            <a href="https://link.hamdirzl.my.id/spotify" target="_blank" aria-label="Spotify">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-music"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
             </a>
         </div>
-        <p>© 2025 HAMDI RIZAL. Dibangun dengan semangat dan secangkir kopi.</p>
+        <p>&copy; <span id="copyright-year">2025</span> HAMDI RIZAL. Dibangun dengan semangat dan secangkir kopi.</p>
     </footer>
 
     <script src="js/script.js"></script>
