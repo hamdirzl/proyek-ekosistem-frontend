@@ -938,7 +938,7 @@ function setupChatBubble() {
         chatInputText.value = '';
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        appendMessage('Mengetik...', 'ai-message typing-indicator'); // Show typing indicator
+        appendMessage('Mengetik...', 'ai-message', 'typing-indicator'); // Show typing indicator
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/chat-with-ai`, {
@@ -965,12 +965,12 @@ function setupChatBubble() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function appendMessage(text, type) {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', type);
-        messageElement.textContent = text;
-        chatMessages.appendChild(messageElement);
-    }
+    function appendMessage(text, ...types) { // Menggunakan rest parameter untuk menerima banyak kelas
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', ...types); // Menambahkan semua kelas yang diberikan
+    messageElement.textContent = text;
+    chatMessages.appendChild(messageElement);
+}
 
     function removeTypingIndicator() {
         const typingIndicator = chatMessages.querySelector('.typing-indicator');
