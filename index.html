@@ -16,20 +16,20 @@
     <header class="navbar">
         <div class="logo"><a href="index.html">HAMDI RIZAL</a></div>
         <nav>
-            <ul class="nav-links">
-                <li><a href="portfolio.html">Portofolio</a></li>
-                <li><a href="tools.html">Tools Hamdi</a></li>
-                <li><a href="arena.html">Arena Game</a></li>
-                <li><a href="jurnal.html">Jurnal</a></li>
-                <li><button id="about-button" class="nav-button">Tentang Saya</button></li>
-                <li><a href="auth.html" class="login-button">Login</a></li>
-            </ul>
-            <button class="hamburger" aria-label="Buka menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </nav>
+    <ul class="nav-links">
+        <li><a href="portfolio.html">Portofolio</a></li>
+        <li><a href="tools.html">Tools Hamdi</a></li>
+        <li><a href="arena.html">Arena Game</a></li>
+        <li><a href="jurnal.html">Jurnal</a></li>
+        <li><button id="about-button" class="nav-button">Tentang Saya</button></li>
+        <li><a href="auth.html" class="login-button">Login</a></li>
+    </ul>
+    <button class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+</nav>
     </header>
 
     <main>
@@ -47,7 +47,10 @@
                 
                 <div class="pintu" data-aos="fade-up" data-aos-delay="100">
                     <div class="pintu-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
                     </div>
                     <h3>Portofolio Profesional</h3>
                     <p>Lihat proyek dan keahlian yang telah saya kembangkan selama ini.</p>
@@ -56,7 +59,10 @@
 
                 <div class="pintu" data-aos="fade-up" data-aos-delay="200">
                     <div class="pintu-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-play-circle"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-play-circle">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                        </svg>
                     </div>
                     <h3>Arena Interaktif</h3>
                     <p>Mainkan game buatan saya dan gunakan perkakas digital gratis.</p>
@@ -65,7 +71,10 @@
                 
                 <div class="pintu" data-aos="fade-up" data-aos-delay="300">
                     <div class="pintu-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
                     </div>
                     <h3>Jurnal Pemikiran</h3>
                     <p>Baca tulisan dan refleksi saya tentang teknologi, kreativitas, dan kehidupan.</p>
@@ -78,21 +87,19 @@
     <div id="chat-bubble" class="chat-bubble hidden">
         <div class="chat-header">
             <h3>Chat dengan AI</h3>
-            <button id="close-chat" class="chat-close-button" aria-label="Tutup Chat">×</button>
+            <button id="close-chat" class="chat-close-button">&times;</button>
         </div>
         <div class="chat-messages" id="chat-messages">
             <div class="message ai-message">Halo! Ada yang bisa saya bantu?</div>
         </div>
-        <form id="chat-form" class="chat-input" action="javascript:void(0);">
-            <input type="text" id="chat-input-text" placeholder="Ketik pesan..." autocomplete="off" name="message">
-            <button id="send-chat-button" type="submit" aria-label="Kirim">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-            </button>
-        </form>
+        <div class="chat-input">
+            <input type="text" id="chat-input-text" placeholder="Ketik pesan Anda...">
+            <button id="send-chat-button">Kirim</button>
+        </div>
     </div>
 
-    <button id="open-chat-button" class="open-chat-button" aria-label="Buka Chat">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    <button id="open-chat-button" class="open-chat-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
     </button>
 
     <div id="about-modal" class="modal-overlay hidden">
@@ -105,17 +112,16 @@
             <p>Kalau kamu nemu sesuatu yang menarik, itu bonus. Terima kasih udah mampir.</p>
         </div>
     </div>
-
     <footer>
         <div class="social-icons">
             <a href="https://www.instagram.com/hamdirzl/" target="_blank" aria-label="Instagram">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-instagram"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
             </a>
-            <a href="https://link.hamdirzl.my.id/spotify" target="_blank" aria-label="Spotify">
+            <a href="https://open.spotify.com/user/pw7cyaxhvilcfmrpdddu33bvu?si=9d2ef3b1e0794b83" target="_blank" aria-label="Spotify">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-music"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
             </a>
         </div>
-        <p>&copy; <span id="copyright-year">2025</span> HAMDI RIZAL. Dibangun dengan semangat dan secangkir kopi.</p>
+        <p>© 2025 HAMDI RIZAL. Dibangun dengan semangat dan secangkir kopi.</p>
     </footer>
 
     <script src="js/script.js"></script>
