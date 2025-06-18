@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAboutModal();
     setupMobileMenu();
     setupAllPasswordToggles();
+    setupChatBubble(); // BARIS INI DITAMBAHKAN
 });
 
 function decodeJwt(token) {
@@ -164,7 +165,7 @@ function setupToolsPage(token) {
         document.getElementById('converter-wrapper'),
         document.getElementById('image-merger-wrapper'),
         document.getElementById('qr-generator-wrapper'),
-        document.getElementById('image-compressor-wrapper') // BARIS INI DITAMBAHKAN
+        document.getElementById('image-compressor-wrapper') 
     ];
     const loginPrompt = document.getElementById('login-prompt');
     const toolSelectionSection = document.querySelector('.tool-selection'); 
@@ -179,13 +180,13 @@ function setupToolsPage(token) {
         document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper', token));
         document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper', token));
         document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper', token));
-        document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper', token)); // BARIS INI DITAMBAHKAN
+        document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper', token)); 
 
         attachShortenerListener(token);
         attachConverterListener(token);
         attachImageMergerListener(token);
         attachQrCodeGeneratorListener(token);
-        attachImageCompressorListener(token); // BARIS INI DITAMBAHKAN
+        attachImageCompressorListener(token); 
 
     } else {
         if (loginPrompt) loginPrompt.classList.remove('hidden');
@@ -224,7 +225,7 @@ function showToolSection(sectionIdToShow, token) {
         document.getElementById('converter-wrapper'),
         document.getElementById('image-merger-wrapper'),
         document.getElementById('qr-generator-wrapper'),
-        document.getElementById('image-compressor-wrapper') // BARIS INI DITAMBAHKAN
+        document.getElementById('image-compressor-wrapper') 
     ];
     const historySection = document.getElementById('history-section'); 
 
@@ -895,4 +896,86 @@ function setupAllPasswordToggles() {
     setupPasswordToggle('toggle-register-password', 'register-password');
     setupPasswordToggle('toggle-reset-password', 'reset-password');
     setupPasswordToggle('toggle-confirm-password', 'confirm-password');
+}
+
+// === FUNGSI BARU UNTUK CHAT BUBBLE ===
+function setupChatBubble() {
+    const chatBubble = document.getElementById('chat-bubble');
+    const openChatButton = document.getElementById('open-chat-button');
+    const closeChatButton = document.getElementById('close-chat');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInputText = document.getElementById('chat-input-text');
+    const sendChatButton = document.getElementById('send-chat-button');
+
+    if (!chatBubble || !openChatButton || !closeChatButton || !chatMessages || !chatInputText || !sendChatButton) {
+        console.warn("One or more chat elements not found. Chat bubble will not be initialized.");
+        return;
+    }
+
+    openChatButton.addEventListener('click', () => {
+        chatBubble.classList.remove('hidden');
+        openChatButton.classList.add('hidden');
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom on open
+    });
+
+    closeChatButton.addEventListener('click', () => {
+        chatBubble.classList.add('hidden');
+        openChatButton.classList.remove('hidden');
+    });
+
+    sendChatButton.addEventListener('click', sendMessage);
+    chatInputText.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    async function sendMessage() {
+        const userMessage = chatInputText.value.trim();
+        if (userMessage === '') return;
+
+        appendMessage(userMessage, 'user-message');
+        chatInputText.value = '';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        appendMessage('Mengetik...', 'ai-message typing-indicator'); // Show typing indicator
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/chat-with-ai`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` 
+                },
+                body: JSON.stringify({ message: userMessage })
+            });
+
+            if (!response.ok) {
+                throw new Error('Gagal terhubung ke AI.');
+            }
+
+            const data = await response.json();
+            removeTypingIndicator();
+            appendMessage(data.reply || "Maaf, saya tidak mengerti. Bisakah Anda mengatakannya dengan cara lain?", 'ai-message');
+        } catch (error) {
+            console.error('Error sending message to AI:', error);
+            removeTypingIndicator();
+            appendMessage("Maaf, terjadi kesalahan saat mencoba menghubungi AI. Silakan coba lagi nanti.", 'ai-message');
+        }
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function appendMessage(text, type) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', type);
+        messageElement.textContent = text;
+        chatMessages.appendChild(messageElement);
+    }
+
+    function removeTypingIndicator() {
+        const typingIndicator = chatMessages.querySelector('.typing-indicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
 }
