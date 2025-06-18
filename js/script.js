@@ -1,6 +1,6 @@
-// ===================================================================
-// ==   FILE FINAL SCRIPT.JS (PERBAIKAN TAMPILAN & URUTAN MENU)   ==
-// ===================================================================
+// =======================================================================
+// ==   FILE FINAL SCRIPT.JS (PERBAIKAN TOMBOL CLOSE & URUTAN MENU)   ==
+// =======================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
@@ -54,21 +54,18 @@ async function fetchWithAuth(url, options = {}) {
 }
 
 // Fungsi untuk membangun ulang UI Navigasi berdasarkan status login dan urutan
-// Di dalam file script.js
-// GANTI FUNGSI setupAuthUI YANG LAMA DENGAN YANG INI
-
 function setupAuthUI() {
     const refreshToken = localStorage.getItem('jwt_refresh_token');
     const navLinks = document.querySelector('.nav-links');
     if (!navLinks) return;
-
-    const mobileCloseButton = navLinks.querySelector('.nav-close-button');
-    navLinks.innerHTML = ''; // Kosongkan menu
-
-    if (mobileCloseButton) {
-        navLinks.appendChild(mobileCloseButton);
-    }
     
+    // [PERBAIKAN] Hapus hanya item menu (<li>), bukan semua isi navLinks
+    Array.from(navLinks.children).forEach(child => {
+        if (child.tagName === 'LI') {
+            child.remove();
+        }
+    });
+
     // Definisikan ikon untuk setiap menu
     const icons = {
         dasbor:     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
@@ -81,7 +78,6 @@ function setupAuthUI() {
         login:      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>`
     };
 
-    // Definisikan struktur item menu
     const menuItems = [
         { key: 'dasbor', text: 'Dasbor', href: 'dashboard.html', requiresAuth: true },
         { key: 'portfolio', text: 'Portofolio', href: 'portfolio.html' },
@@ -93,16 +89,12 @@ function setupAuthUI() {
         { key: 'login', text: 'Login', href: 'auth.html', requiresAuth: false, buttonClass: 'login-button' }
     ];
 
+    const fragment = document.createDocumentFragment();
     menuItems.forEach(item => {
         const isUserLoggedIn = !!refreshToken;
-        // Tampilkan item jika:
-        // 1. Tidak memerlukan auth (selalu tampil)
-        // 2. Memerlukan auth dan user sudah login
-        // 3. Ditujukan untuk user yg belum login (requiresAuth: false) dan user memang belum login
         if (item.requiresAuth === undefined || item.requiresAuth === isUserLoggedIn) {
             const li = document.createElement('li');
             let element;
-
             if (item.isButton) {
                 element = document.createElement('button');
                 element.id = item.id;
@@ -112,14 +104,13 @@ function setupAuthUI() {
                 element.href = item.href;
                 if(item.buttonClass) element.className = item.buttonClass;
             }
-
             element.innerHTML = `${icons[item.key]} <span>${item.text}</span>`;
             li.appendChild(element);
-            navLinks.appendChild(li);
+            fragment.appendChild(li);
         }
     });
+    navLinks.appendChild(fragment);
 
-    // Pasang kembali event listener untuk tombol logout
     const logoutButton = document.getElementById('logout-button');
     if (logoutButton) {
         logoutButton.addEventListener('click', async () => {
@@ -134,15 +125,17 @@ function setupAuthUI() {
     }
 }
 
+
 /* === FUNGSI GLOBAL === */
 document.addEventListener('DOMContentLoaded', async () => {
-    // Panggil fungsi baru untuk mengatur UI navigasi
+    // [PERBAIKAN] Panggil setupMobileMenu DULU agar tombol close dibuat
+    setupMobileMenu();
+    // Baru panggil setupAuthUI untuk mengisi item menu
     setupAuthUI();
 
     const refreshToken = localStorage.getItem('jwt_refresh_token');
 
     if (refreshToken && !sessionStorage.getItem('jwt_access_token')) {
-        console.log("Sesi baru, mencoba mendapatkan access token...");
         try {
             const refreshResponse = await fetch(`${API_BASE_URL}/api/refresh-token`, {
                 method: 'POST',
@@ -173,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     setupAboutModal();
-    setupMobileMenu();
+    // setupMobileMenu(); // Pindah ke atas
     setupAllPasswordToggles();
     setupChatBubble();
 });
@@ -182,9 +175,7 @@ function decodeJwt(token) {
     try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
 }
 
-// ... SISA KODE DARI SINI KE BAWAH TETAP SAMA SEPERTI FILE ASLI ANDA ...
-// (Tidak ada perubahan yang diperlukan untuk fungsi-fungsi di bawah ini)
-
+// ... Sisa kode lainnya dari sini ke bawah tetap sama ...
 // ===================================
 // === LOGIKA HALAMAN DASHBOARD    ===
 // ===================================
@@ -981,32 +972,31 @@ if (resetForm) {
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
+    if (!hamburger || !navLinks) return;
     
-    // Tombol close sekarang dibuat dinamis, jadi kita cari di sini
-    const navCloseButton = navLinks.querySelector('.nav-close-button');
-
+    // [PERBAIKAN] Pastikan tombol close dibuat jika belum ada
+    let navCloseButton = navLinks.querySelector('.nav-close-button');
+    if (!navCloseButton) {
+        navCloseButton = document.createElement('button');
+        navCloseButton.className = 'nav-close-button';
+        navCloseButton.setAttribute('aria-label', 'Tutup menu');
+        navCloseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+        navLinks.prepend(navCloseButton);
+    }
+    
     const toggleMenu = () => {
-        if(hamburger) hamburger.classList.toggle('active');
-        if(navLinks) navLinks.classList.toggle('active');
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
         document.body.classList.toggle('menu-open');
         document.documentElement.classList.toggle('menu-open');
     };
 
-    if (hamburger && navLinks) hamburger.addEventListener('click', toggleMenu);
-    if (navCloseButton) navCloseButton.addEventListener('click', toggleMenu);
-    
-    // Menutup menu jika user meng-klik di luar area nav-links (area overlay)
-    // Cek ini harus dilakukan dengan hati-hati
-    document.addEventListener('click', (event) => {
-        if (navLinks.classList.contains('active') && !navLinks.contains(event.target) && !hamburger.contains(event.target)) {
-           toggleMenu();
-        }
-    });
+    hamburger.addEventListener('click', toggleMenu);
+    navCloseButton.addEventListener('click', toggleMenu);
 }
 
 
 function setupAboutModal() {
-    // Event listener dipasang ke body karena tombol #about-button dibuat dinamis
     document.body.addEventListener('click', (event) => {
         if (event.target.id === 'about-button' || event.target.closest('#about-button')) {
              event.preventDefault();
