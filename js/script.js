@@ -26,7 +26,6 @@ async function fetchWithAuth(url, options = {}) {
         options.headers['Authorization'] = `Bearer ${accessToken}`;
     }
 
-    // Hapus header Content-Type jika body adalah FormData, biarkan browser yang atur
     if (options.body instanceof FormData) {
         delete options.headers['Content-Type'];
     } else if (!options.headers['Content-Type'] && !(options.body instanceof FormData)) {
@@ -73,7 +72,6 @@ async function fetchWithAuth(url, options = {}) {
 
 /* === FUNGSI GLOBAL === */
 document.addEventListener('DOMContentLoaded', async () => {
-    // DIUBAH: Sumber utama status login adalah refreshToken
     const refreshToken = localStorage.getItem('jwt_refresh_token');
 
     const loginLink = document.querySelector('a.login-button');
@@ -87,7 +85,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // BARU: Logika untuk mendapatkan accessToken baru saat halaman dimuat
     if (refreshToken && !sessionStorage.getItem('jwt_access_token')) {
         console.log("Sesi baru, mencoba mendapatkan access token...");
         try {
@@ -101,7 +98,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const data = await refreshResponse.json();
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
                 console.log("Access token berhasil didapatkan untuk sesi ini.");
-                // Muat ulang data yang bergantung pada token setelah berhasil refresh
                 if (document.body.contains(document.getElementById('dashboard-main'))) {
                     setupDashboardPage();
                 }
@@ -114,7 +110,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Pemicu logika berdasarkan halaman yang aktif
     if (document.body.contains(document.getElementById('dashboard-main'))) {
         setupDashboardPage();
     } else if (document.title.includes("Tools")) {
@@ -136,6 +131,7 @@ function decodeJwt(token) {
 // ===================================
 // === LOGIKA HALAMAN DASHBOARD    ===
 // ===================================
+
 function setupDashboardPage() {
     if (!localStorage.getItem('jwt_refresh_token')) {
         window.location.href = 'auth.html';
