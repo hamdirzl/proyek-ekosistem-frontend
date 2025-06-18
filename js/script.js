@@ -1,5 +1,5 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (PERBAIKAN LOGOUT & UI NAVIGASI)     ==
+// ==   FILE FINAL SCRIPT.JS (PERBAIKAN TAMPILAN & URUTAN MENU)   ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
@@ -9,7 +9,6 @@ console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_
 function forceLogout() {
     localStorage.removeItem('jwt_refresh_token');
     sessionStorage.removeItem('jwt_access_token');
-    // Arahkan ke halaman index untuk alur yang lebih baik
     window.location.href = 'index.html';
 }
 
@@ -27,7 +26,6 @@ async function fetchWithAuth(url, options = {}) {
     }
     let response = await fetch(url, options);
     if (response.status === 401 || response.status === 403) {
-        console.log("Access Token kedaluwarsa, mencoba refresh...");
         const refreshToken = localStorage.getItem('jwt_refresh_token');
         if (!refreshToken) {
             forceLogout();
@@ -42,7 +40,6 @@ async function fetchWithAuth(url, options = {}) {
             if (refreshResponse.ok) {
                 const data = await refreshResponse.json();
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
-                console.log("Refresh berhasil, mengulangi permintaan...");
                 options.headers['Authorization'] = `Bearer ${data.accessToken}`;
                 response = await fetch(url, options);
             } else {
@@ -56,57 +53,78 @@ async function fetchWithAuth(url, options = {}) {
     return response;
 }
 
-// Fungsi untuk mengatur UI Navigasi berdasarkan status login
+// Fungsi untuk membangun ulang UI Navigasi berdasarkan status login dan urutan
 function setupAuthUI() {
     const refreshToken = localStorage.getItem('jwt_refresh_token');
     const navLinks = document.querySelector('.nav-links');
     if (!navLinks) return;
 
-    const loginListItem = navLinks.querySelector('a.login-button')?.parentElement;
-    const logoutListItem = navLinks.querySelector('button#logout-button')?.parentElement;
-    const dashboardLinkItem = navLinks.querySelector('a[href="dashboard.html"]')?.parentElement;
-
-    // Bersihkan semua tombol terkait otentikasi yang mungkin ada
-    loginListItem?.remove();
-    logoutListItem?.remove();
-    dashboardLinkItem?.remove();
+    // Simpan tombol close menu mobile jika ada
+    const mobileCloseButton = navLinks.querySelector('.nav-close-button');
     
-    if (refreshToken) {
-        // --- PENGGUNA SUDAH LOGIN ---
-        // Buat & tambahkan link 'Dasbor'
-        const dasborLi = document.createElement('li');
-        // Gunakan style sederhana agar tidak terlalu menonjol seperti tombol login
-        dasborLi.innerHTML = `<a href="dashboard.html" class="nav-button">Dasbor</a>`;
-        navLinks.appendChild(dasborLi);
+    // Kosongkan menu untuk dibangun ulang
+    navLinks.innerHTML = '';
 
-        // Buat & tambahkan tombol 'Logout'
-        const logoutLi = document.createElement('li');
-        const logoutButton = document.createElement('button');
-        logoutButton.id = 'logout-button';
-        logoutButton.className = 'login-button'; // Pakai kelas 'login-button' agar stylenya sama
-        logoutButton.textContent = 'Logout';
-        
+    // Tambahkan kembali tombol close menu mobile
+    if (mobileCloseButton) {
+        navLinks.appendChild(mobileCloseButton);
+    }
+    
+    // Definisikan semua item menu yang mungkin ada
+    const menuConfig = {
+        dasbor: '<li><a href="dashboard.html">Dasbor</a></li>',
+        portfolio: '<li><a href="portfolio.html">Portofolio</a></li>',
+        jurnal: '<li><a href="jurnal.html">Jurnal</a></li>',
+        arena: '<li><a href="arena.html">Arena Game</a></li>',
+        tools: '<li><a href="tools.html">Tools Hamdi</a></li>', // Saya tetap masukkan ini agar tidak hilang
+        tentang: '<li><button id="about-button" class="nav-button">Tentang Saya</button></li>',
+        logout: '<li><button id="logout-button" class="login-button">Logout</button></li>',
+        login: '<li><a href="auth.html" class="login-button">Login</a></li>'
+    };
+
+    // Tentukan urutan menu
+    let orderedMenu;
+    if (refreshToken) {
+        // Urutan saat login
+        orderedMenu = [
+            menuConfig.dasbor,
+            menuConfig.portfolio,
+            menuConfig.jurnal,
+            menuConfig.arena,
+            menuConfig.tools,
+            menuConfig.tentang,
+            menuConfig.logout
+        ];
+    } else {
+        // Urutan saat tidak login
+        orderedMenu = [
+            menuConfig.portfolio,
+            menuConfig.jurnal,
+            menuConfig.arena,
+            menuConfig.tools,
+            menuConfig.tentang,
+            menuConfig.login
+        ];
+    }
+
+    // Tambahkan item ke dalam menu
+    navLinks.innerHTML += orderedMenu.join('');
+
+    // Pasang kembali event listener untuk tombol logout jika ada
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
         logoutButton.addEventListener('click', async () => {
             try {
                 await fetchWithAuth(`${API_BASE_URL}/api/logout`, { method: 'POST' });
             } catch (e) {
-                console.error("Gagal logout di server, tapi tetap lanjut logout di client.", e);
+                console.error("Gagal logout di server, tapi lanjut logout di client.", e);
             } finally {
                 forceLogout();
             }
         });
-        
-        logoutLi.appendChild(logoutButton);
-        navLinks.appendChild(logoutLi);
-
-    } else {
-        // --- PENGGUNA BELUM LOGIN ---
-        // Tambahkan kembali tombol Login jika tidak ada
-        const loginLi = document.createElement('li');
-        loginLi.innerHTML = `<a href="auth.html" class="login-button">Login</a>`;
-        navLinks.appendChild(loginLi);
     }
 }
+
 
 /* === FUNGSI GLOBAL === */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -115,7 +133,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const refreshToken = localStorage.getItem('jwt_refresh_token');
 
-    // Cek jika butuh access token baru saat load halaman
     if (refreshToken && !sessionStorage.getItem('jwt_access_token')) {
         console.log("Sesi baru, mencoba mendapatkan access token...");
         try {
@@ -124,13 +141,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token: refreshToken })
             });
-
             if (refreshResponse.ok) {
                 const data = await refreshResponse.json();
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
-                console.log("Access token berhasil didapatkan untuk sesi ini.");
                 if (document.body.contains(document.getElementById('dashboard-main'))) {
-                    setupDashboardPage(); // Panggil ulang setup jika di halaman dashboard
+                    setupDashboardPage();
                 }
             } else {
                 forceLogout();
@@ -141,7 +156,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Setup spesifik per halaman
     if (document.body.contains(document.getElementById('dashboard-main'))) {
         setupDashboardPage();
     } else if (document.title.includes("Tools")) {
@@ -150,7 +164,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupAuthPage();
     }
 
-    // Setup global
     setupAboutModal();
     setupMobileMenu();
     setupAllPasswordToggles();
@@ -161,41 +174,23 @@ function decodeJwt(token) {
     try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
 }
 
+// ... SISA KODE DARI SINI KE BAWAH TETAP SAMA SEPERTI FILE ASLI ANDA ...
+// (Tidak ada perubahan yang diperlukan untuk fungsi-fungsi di bawah ini)
+
 // ===================================
 // === LOGIKA HALAMAN DASHBOARD    ===
 // ===================================
-
 function setupDashboardPage() {
     if (!localStorage.getItem('jwt_refresh_token')) {
         window.location.href = 'auth.html';
         return;
     }
-    // Tombol logout sekarang di-handle oleh setupAuthUI,
-    // jadi event listener di sini tidak diperlukan lagi untuk tombol di navbar.
-    // Namun kita biarkan jika ada tombol logout lain di body dashboard
-    const logoutButton = document.getElementById('logout-button');
-    if (logoutButton && !logoutButton.getAttribute('listener-attached')) {
-        logoutButton.addEventListener('click', async () => {
-             try {
-                await fetchWithAuth(`${API_BASE_URL}/api/logout`, { method: 'POST' });
-            } catch (e) {
-                console.error("Gagal logout di server, tapi tetap lanjut logout di client.", e);
-            } finally {
-                forceLogout();
-            }
-        });
-        logoutButton.setAttribute('listener-attached', 'true');
-    }
-
     const accessToken = sessionStorage.getItem('jwt_access_token');
     if (accessToken) {
         populateUserInfo(accessToken);
         checkUserRoleAndSetupAdminPanel(accessToken);
     }
 }
-
-// ... SISA KODE DARI SINI KE BAWAH TETAP SAMA SEPERTI FILE ASLI ANDA ...
-// (Tidak ada perubahan yang diperlukan untuk fungsi-fungsi di bawah ini)
 
 function populateUserInfo(token) {
     const decodedToken = decodeJwt(token);
@@ -978,15 +973,9 @@ if (resetForm) {
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
-    let navCloseButton = document.getElementById('nav-close-button');
-    if (!navCloseButton) {
-        navCloseButton = document.createElement('button');
-        navCloseButton.id = 'nav-close-button';
-        navCloseButton.classList.add('nav-close-button');
-        navCloseButton.setAttribute('aria-label', 'Tutup menu');
-        navCloseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-        if(navLinks) navLinks.prepend(navCloseButton);
-    }
+    
+    // Tombol close sekarang dibuat dinamis, jadi kita cari di sini
+    const navCloseButton = navLinks.querySelector('.nav-close-button');
 
     const toggleMenu = () => {
         if(hamburger) hamburger.classList.toggle('active');
@@ -997,21 +986,32 @@ function setupMobileMenu() {
 
     if (hamburger && navLinks) hamburger.addEventListener('click', toggleMenu);
     if (navCloseButton) navCloseButton.addEventListener('click', toggleMenu);
-    if (navLinks) {
-        navLinks.addEventListener('click', (event) => {
-            if (event.target === navLinks) toggleMenu();
-        });
-    }
+    
+    // Menutup menu jika user meng-klik di luar area nav-links (area overlay)
+    // Cek ini harus dilakukan dengan hati-hati
+    document.addEventListener('click', (event) => {
+        if (navLinks.classList.contains('active') && !navLinks.contains(event.target) && !hamburger.contains(event.target)) {
+           toggleMenu();
+        }
+    });
 }
 
+
 function setupAboutModal() {
-    const aboutButtons = document.querySelectorAll('#about-button');
+    // Event listener dipasang ke body karena tombol #about-button dibuat dinamis
+    document.body.addEventListener('click', (event) => {
+        if (event.target.id === 'about-button' || event.target.closest('#about-button')) {
+             event.preventDefault();
+             const modalOverlay = document.getElementById('about-modal');
+             if(modalOverlay) modalOverlay.classList.remove('hidden');
+        }
+    });
+
     const modalOverlay = document.getElementById('about-modal');
     if (!modalOverlay) return;
     const modalCloseButton = modalOverlay.querySelector('.modal-close');
-    const openModal = () => modalOverlay.classList.remove('hidden');
     const closeModal = () => modalOverlay.classList.add('hidden');
-    aboutButtons.forEach(button => button.addEventListener('click', e => { e.preventDefault(); openModal(); }));
+    
     if (modalCloseButton) modalCloseButton.addEventListener('click', closeModal);
     modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) closeModal(); });
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); });

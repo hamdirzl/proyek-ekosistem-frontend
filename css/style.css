@@ -525,6 +525,8 @@ input:focus, textarea:focus, select:focus {
     transform: rotate(90deg);
 }
 
+/* Di dalam file style.css */
+
 @media (max-width: 768px) {
     .hamburger { display: block; }
     .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
@@ -536,21 +538,24 @@ input:focus, textarea:focus, select:focus {
         top: 0; 
         right: 0; 
         bottom: 0; 
-        width: 85%; /* Optimal width for mobile overlay */
-        max-width: 350px; /* Limits width on larger tablets */
+        width: 85%;
+        max-width: 350px;
         height: 100vh; 
         background-color: rgba(18, 18, 18, 0.98); 
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        padding-top: var(--space-xxl); /* Push content down from top */
+        
+        /* [MODIFIKASI] Kurangi padding atas dan gap agar tidak terlalu renggang */
+        padding-top: var(--space-xl); 
+        gap: 0; /* Atur gap ke 0, kita akan kontrol spasi dengan padding di <li> */
+
         opacity: 0; 
         visibility: hidden; 
         transform: translateX(100%); 
         transition: transform 0.4s ease, opacity 0.4s ease, visibility 0.4s ease; 
         flex-direction: column; 
-        align-items: flex-start; /* Align text to left */
+        align-items: flex-start;
         justify-content: flex-start;
-        gap: var(--space-sm);
         box-shadow: -5px 0 15px rgba(0,0,0,0.3);
         z-index: 1000; 
     }
@@ -560,39 +565,68 @@ input:focus, textarea:focus, select:focus {
         transform: translateX(0); 
     }
     
-    /* Overlay for content behind the menu */
-    body.menu-open, html.menu-open {
-        overflow: hidden; 
-    }
-
+    /* [MODIFIKASI] Atur padding di <li> dan tambahkan garis pemisah */
     .nav-links li { 
         margin: 0; 
         width: 100%; 
-        text-align: left; /* Ensure text alignment */
-        padding-left: var(--space-lg); /* Consistent padding for list items */
-        padding-right: var(--space-lg); /* Consistent padding for list items */
+        text-align: left;
+        padding: 0; /* Reset padding di sini */
+        border-bottom: 1px solid var(--border-color); /* Garis pemisah */
     }
+
+    /* [TAMBAHAN] Hilangkan garis di item terakhir agar rapi */
+    .nav-links li:last-child {
+        border-bottom: none;
+        margin-top: var(--space-md); /* Beri sedikit jarak untuk tombol logout */
+    }
+
+    /* [TAMBAHAN] Item paling atas juga diberi garis pemisah */
+    .nav-links li:first-child:not(:last-child) {
+        border-top: 1px solid var(--border-color);
+    }
+    
     .nav-links a, .nav-links .nav-button { 
         display: block; 
-        padding: var(--space-sm) 0; /* Adjust padding within list items */
+        
+        /* [MODIFIKASI] Kurangi padding vertikal dan tambahkan padding horizontal */
+        padding: var(--space-sm) var(--space-lg); 
+        
         width: 100%; 
         border-radius: 0; 
         font-size: 1.1rem; 
+        transition: background-color 0.2s ease, color 0.2s ease; /* Transisi hover */
     }
-    .nav-links a:hover, .nav-links .nav-button:hover { background-color: transparent; color: var(--accent-color); }
-    .nav-links a::after { display: none; } /* Hide underline on mobile menu items */
     
-    .nav-links a.login-button { 
-        margin: var(--space-md) var(--space-lg); /* Adjusted margin for consistency */
-        width: calc(100% - (var(--space-lg) * 2)); /* Make button span full width minus padding */
-        text-align: center; 
-        font-size: 1.0rem; 
-        align-self: flex-start; /* Keep aligned with other text */
+    /* [MODIFIKASI] Ubah cara hover agar lebih interaktif */
+    .nav-links a:hover, .nav-links .nav-button:hover { 
+        background-color: var(--card-bg-color); /* Latar belakang saat hover */
+        color: var(--accent-color); 
+    }
+    
+    .nav-links a::after { display: none; }
+    
+    /* [MODIFIKASI] Pastikan tombol Login/Logout terlihat konsisten */
+    .nav-links a.login-button, .nav-links button.login-button { 
+        margin: 0;
+        width: 100%;
+        text-align: left; /* Ratakan teks ke kiri */
+        font-size: 1.1rem; 
+        align-self: flex-start;
+        border-radius: 0;
+        background: transparent; /* Samakan background */
+        color: var(--text-color); /* Samakan warna teks */
+        border: none;
+        padding: var(--space-sm) var(--space-lg); /* Samakan padding */
     }
 
-    /* Show close button on mobile */
+    /* [TAMBAHAN] Beri warna khusus saat hover di tombol Login/Logout */
+    .nav-links a.login-button:hover, .nav-links button.login-button:hover {
+        background-color: var(--card-bg-color) !important;
+        color: var(--accent-color) !important;
+    }
+
     .nav-close-button {
-        display: block; /* Cukup block karena sudah tidak flex untuk centering */
+        display: block;
     }
     
     /* Penyesuaian khusus untuk history item di mobile */
