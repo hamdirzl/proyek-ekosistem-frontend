@@ -1,27 +1,23 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (100% LENGKAP DENGAN REFRESH TOKEN)  ==
+// ==   FILE FINAL SCRIPT.JS (DENGAN PERBAIKAN MENU)              ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
 
-// BARU: Fungsi untuk memaksa logout, membersihkan semua token dan mengarahkan ke halaman login.
 function forceLogout() {
     localStorage.removeItem('jwt_refresh_token');
     sessionStorage.removeItem('jwt_access_token');
-    // Hanya redirect jika belum di halaman auth untuk menghindari loop
     if (!window.location.pathname.endsWith('auth.html')) {
         alert('Sesi Anda telah berakhir. Silakan login kembali.');
         window.location.href = 'auth.html';
     }
 }
 
-// BARU: Pembungkus Fetch API yang secara otomatis menangani refresh token.
-// Semua panggilan ke API yang butuh otentikasi harus menggunakan fungsi ini.
 async function fetchWithAuth(url, options = {}) {
     let accessToken = sessionStorage.getItem('jwt_access_token');
 
-    options.headers = { ...options.headers }; // Salin header yang ada
+    options.headers = { ...options.headers }; 
     if (accessToken) {
         options.headers['Authorization'] = `Bearer ${accessToken}`;
     }
@@ -119,7 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     setupAboutModal();
-    setupMobileMenu();
+    setupMobileMenu(); // Fungsi ini yang kita modifikasi
     setupAllPasswordToggles();
     setupChatBubble();
 });
@@ -127,6 +123,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 function decodeJwt(token) {
     try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
 }
+
+// ... Sisa fungsi lain (setupDashboardPage, setupToolsPage, dll. tetap sama) ...
+// (Kode di bawah ini tidak berubah dari file asli Anda)
 
 // ===================================
 // === LOGIKA HALAMAN DASHBOARD    ===
@@ -700,7 +699,6 @@ function attachImageCompressorListener() {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                // URL.revokeObjectURL(imageUrl); // Don't revoke immediately if preview is still needed
             };
             downloadButton.style.display = 'block';
             messageDiv.textContent = 'Image compressed successfully!';
@@ -854,12 +852,10 @@ function setupAuthPage() {
             const password = document.getElementById('login-password').value;
             authMessage.textContent = 'Memproses...';
             try {
-                // Fetch biasa karena belum ada token
                 const response = await fetch(`${API_BASE_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error);
 
-                // DIUBAH: Simpan kedua token
                 localStorage.setItem('jwt_refresh_token', data.refreshToken);
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
 
@@ -940,34 +936,38 @@ if (resetForm) {
 // ==========================================================
 // ===         LOGIKA UNTUK ELEMEN UI UMUM                ===
 // ==========================================================
+
+// KODE LAMA setupMobileMenu DIHAPUS DAN DIGANTI DENGAN YANG BARU INI
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
-    let navCloseButton = document.getElementById('nav-close-button');
-    if (!navCloseButton) {
+    const menuOverlay = document.getElementById('menu-overlay'); // Ambil elemen overlay baru
+
+    // Buat tombol close jika belum ada (logika ini tetap sama)
+    let navCloseButton = navLinks ? navLinks.querySelector('.nav-close-button') : null;
+    if (!navCloseButton && navLinks) {
         navCloseButton = document.createElement('button');
-        navCloseButton.id = 'nav-close-button';
         navCloseButton.classList.add('nav-close-button');
         navCloseButton.setAttribute('aria-label', 'Tutup menu');
         navCloseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-        if(navLinks) navLinks.prepend(navCloseButton);
+        navLinks.prepend(navCloseButton);
     }
 
+    // Fungsi untuk membuka/menutup menu
     const toggleMenu = () => {
         if(hamburger) hamburger.classList.toggle('active');
         if(navLinks) navLinks.classList.toggle('active');
+        if(menuOverlay) menuOverlay.classList.toggle('active'); // Aktifkan/nonaktifkan overlay
         document.body.classList.toggle('menu-open');
         document.documentElement.classList.toggle('menu-open');
     };
 
-    if (hamburger && navLinks) hamburger.addEventListener('click', toggleMenu);
+    // Tambahkan event listener ke elemen yang relevan
+    if (hamburger) hamburger.addEventListener('click', toggleMenu);
     if (navCloseButton) navCloseButton.addEventListener('click', toggleMenu);
-    if (navLinks) {
-        navLinks.addEventListener('click', (event) => {
-            if (event.target === navLinks) toggleMenu();
-        });
-    }
+    if (menuOverlay) menuOverlay.addEventListener('click', toggleMenu); // Tutup menu saat overlay diklik
 }
+
 
 function setupAboutModal() {
     const aboutButtons = document.querySelectorAll('#about-button');
@@ -1046,7 +1046,6 @@ function setupChatBubble() {
 
             if (!response.ok) {
                  const error = await response.json().catch(() => ({error: "Gagal terhubung ke AI."}));
-                 // Cek jika error karena butuh login
                  if (response.status === 401 || response.status === 403) {
                      throw new Error("Anda harus login untuk menggunakan fitur chat.");
                  }
