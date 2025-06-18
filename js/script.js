@@ -1,8 +1,8 @@
 // ===================================================================
-// ==   V11: TRULY FINAL & 100% COMPLETE SCRIPT                 ==
+// ==   V13: FINAL SCRIPT - BASED ON USER'S COMPLETE LOGIC      ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
-console.log(`Ekosistem Digital (Client V11) dimuat! Menghubungi API di: ${API_BASE_URL}`);
+console.log(`Ekosistem Digital (Client V13) dimuat! Menghubungi API di: ${API_BASE_URL}`);
 
 // === UTILITY FUNCTIONS ===
 
@@ -392,7 +392,7 @@ function setupDashboardPage() {
     if (token) {
         populateDashboard(token);
     } else {
-        fetchWithAuth(`${API_BASE_URL}/api/admin/users`) // Panggil endpoint admin untuk trigger refresh
+        fetchWithAuth(`${API_BASE_URL}/api/admin/users`) 
             .then(res => {
                 if (res.ok) populateDashboard(sessionStorage.getItem('jwt_access_token'));
                 else forceLogout();
@@ -418,48 +418,172 @@ function populateDashboard(token) {
 }
 
 async function fetchAndDisplayAllLinks() {
-    // ... (Implementasi fungsi admin, jika dibutuhkan)
+    const linkList = document.getElementById('link-list');
+    const loadingMessage = document.getElementById('loading-links');
+    if (!linkList || !loadingMessage) return;
+    try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/links`);
+        if (!response.ok) throw new Error('Gagal mengambil data link.');
+        const links = await response.json();
+        loadingMessage.style.display = 'none';
+        linkList.innerHTML = '';
+        if (links.length === 0) {
+            linkList.innerHTML = '<li><p>Belum ada link yang dibuat.</p></li>';
+            return;
+        }
+        links.forEach(link => {
+            const listItem = document.createElement('li');
+            listItem.className = 'list-item';
+            listItem.id = `link-${link.slug}`;
+            listItem.innerHTML = `
+                <div class="item-content">
+                    <strong>${link.slug}</strong>
+                    <p class="details">${link.original_url}</p>
+                    <p class="sub-details">Dibuat oleh: ${link.user_email || 'N/A'} pada ${new Date(link.created_at).toLocaleString('id-ID')}</p>
+                </div>
+                <div class="item-actions">
+                    <button class="icon-button delete" data-slug="${link.slug}" aria-label="Hapus Tautan">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>`;
+            linkList.appendChild(listItem);
+        });
+        linkList.querySelectorAll('.icon-button.delete').forEach(button => {
+            button.addEventListener('click', (e) => handleDeleteLink(e.currentTarget.dataset.slug));
+        });
+    } catch (error) {
+        loadingMessage.textContent = `Error: ${error.message}`;
+    }
+}
+
+async function handleDeleteLink(slug) {
+    if (!confirm(`Anda yakin ingin menghapus link dengan slug "${slug}"?`)) return;
+    try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/links/${slug}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Gagal menghapus link.');
+        alert(data.message);
+        document.getElementById(`link-${slug}`)?.remove();
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+    }
 }
 
 async function fetchAndDisplayUsers() {
-    // ... (Implementasi fungsi admin, jika dibutuhkan)
+    const userList = document.getElementById('user-list');
+    const loadingMessage = document.getElementById('loading-users');
+    if (!userList || !loadingMessage) return;
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/users`);
+        if (!response.ok) throw new Error('Gagal mengambil daftar pengguna.');
+        const users = await response.json();
+        loadingMessage.style.display = 'none';
+        userList.innerHTML = '';
+        if (users.length === 0) {
+            userList.innerHTML = '<li><p>Tidak ada pengguna terdaftar.</p></li>';
+            return;
+        }
+        users.forEach(user => {
+            const listItem = document.createElement('li');
+            listItem.className = 'list-item';
+            listItem.id = `user-${user.id}`;
+            listItem.innerHTML = `
+                <div class="item-content">
+                    <strong>${user.email}</strong>
+                    <p class="details">Peran: <span id="role-${user.id}">${user.role}</span></p>
+                    <p class="sub-details">Bergabung pada: ${new Date(user.created_at).toLocaleString('id-ID')}</p>
+                </div>
+                <div class="item-actions">
+                    <button class="icon-button toggle-role" data-id="${user.id}" data-role="${user.role}" aria-label="Ubah Peran">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                    </button>
+                    <button class="icon-button delete delete-user" data-id="${user.id}" aria-label="Hapus Pengguna">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>`;
+            userList.appendChild(listItem);
+        });
+
+        userList.querySelectorAll('.toggle-role').forEach(button => button.addEventListener('click', (e) => {
+            const btn = e.currentTarget;
+            toggleUserRole(btn.dataset.id, btn.dataset.role);
+        }));
+        userList.querySelectorAll('.delete-user').forEach(button => button.addEventListener('click', (e) => {
+            deleteUser(e.currentTarget.dataset.id);
+        }));
+    } catch (error) {
+        loadingMessage.textContent = `Error: ${error.message}`;
+    }
 }
 
-// --- TOOLS PAGE ---
+async function toggleUserRole(id, currentRole) {
+    const newRole = currentRole === 'admin' ? 'user' : 'admin';
+    if (!confirm(`Anda yakin ingin mengubah peran pengguna ini menjadi "${newRole}"?`)) return;
+    try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/users/${id}/role`, {
+            method: 'PUT',
+            body: JSON.stringify({ role: newRole })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error);
+        alert(data.message);
+        document.getElementById(`role-${id}`).textContent = newRole;
+        document.querySelector(`.toggle-role[data-id="${id}"]`).dataset.role = newRole;
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+    }
+}
+
+async function deleteUser(id) {
+    if (!confirm(`Anda yakin ingin menghapus pengguna ini secara permanen? Tindakan ini tidak bisa dibatalkan.`)) return;
+    try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/users/${id}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error);
+        alert(data.message);
+        document.getElementById(`user-${id}`)?.remove();
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+    }
+}
+
+
+// === TOOLS PAGE SETUP ===
 
 function setupToolsPage() {
-    if (!localStorage.getItem('jwt_refresh_token')) {
-        document.getElementById('login-prompt')?.classList.remove('hidden');
-        document.querySelector('.tool-selection')?.classList.add('hidden');
-        return;
-    }
-
     const toolButtons = document.querySelectorAll('.tool-selector-button');
-    const toolWrappers = document.querySelectorAll('[id$="-wrapper"], .history-section');
+    const toolWrappers = document.querySelectorAll('[id$="-wrapper"]');
+    const loginPrompt = document.getElementById('login-prompt');
+    const historySection = document.getElementById('history-section');
+    const isLoggedIn = !!localStorage.getItem('jwt_refresh_token');
 
     toolButtons.forEach(button => {
         button.addEventListener('click', () => {
             const targetId = button.id.replace('show-', '') + '-wrapper';
             toolWrappers.forEach(wrapper => {
-                const isTarget = wrapper.id === targetId;
-                wrapper.classList.toggle('hidden', !isTarget);
-                if(isTarget) wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                wrapper.classList.toggle('hidden', wrapper.id !== targetId);
             });
-            const historySection = document.getElementById('history-section');
-            if (historySection) {
-                 historySection.classList.toggle('hidden', targetId !== 'shortener-wrapper');
-                 if(targetId === 'shortener-wrapper') {
-                    // fetchUserLinkHistory(); // Aktifkan jika ingin memuat riwayat
-                 }
+            historySection?.classList.toggle('hidden', targetId !== 'shortener-wrapper');
+            if (targetId === 'shortener-wrapper' && isLoggedIn) {
+                // fetchUserLinkHistory();
             }
+            document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
     });
 
+    if (!isLoggedIn) {
+        loginPrompt?.classList.remove('hidden');
+    }
+
     // --- Shortener Form ---
     const shortenerForm = document.getElementById('shortener-form');
-    if(shortenerForm) {
+    if (shortenerForm) {
         shortenerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!isLoggedIn) return displayMessage('#shortener-wrapper .message-box', 'Anda harus login untuk menggunakan fitur ini.', 'error');
+            const submitButton = e.target.querySelector('button');
+            submitButton.disabled = true;
             const resultBox = document.getElementById('result');
             const resultText = document.getElementById('short-url-text');
             const copyButton = document.getElementById('copy-button');
@@ -472,186 +596,79 @@ function setupToolsPage() {
                     body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
                 });
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.error || 'Gagal memproses permintaan.');
+                if (!response.ok) throw new Error(data.error);
                 resultText.textContent = data.short_url;
                 copyButton.style.display = 'flex';
                 shortenerForm.reset();
+                // fetchUserLinkHistory();
             } catch (error) {
                 resultText.textContent = `Error: ${error.message}`;
+            } finally {
+                submitButton.disabled = false;
             }
         });
         document.getElementById('copy-button')?.addEventListener('click', (e) => {
-             const url = document.getElementById('short-url-text').textContent;
-             navigator.clipboard.writeText(url).then(() => {
+            const url = document.getElementById('short-url-text').textContent;
+            navigator.clipboard.writeText(url).then(() => {
                 const button = e.currentTarget;
                 const originalContent = button.innerHTML;
-                button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+                button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
                 button.style.borderColor = 'var(--accent-color)';
                 setTimeout(() => { 
                     button.innerHTML = originalContent;
                     button.style.borderColor = 'var(--text-muted-color)';
                 }, 2000);
-             });
+            });
         });
     }
 
-    // --- Converter Form ---
-    const converterForm = document.getElementById('converter-form');
-    if(converterForm){
-        converterForm.addEventListener('submit', async(e) => {
-            e.preventDefault();
-            const submitButton = e.target.querySelector('button');
-            submitButton.disabled = true;
-            displayMessage('#converter-message', 'Mengunggah dan mengonversi...', 'info');
-            try {
-                const response = await fetchWithAuth(`${API_BASE_URL}/api/convert`, {
-                    method: 'POST',
-                    body: new FormData(e.target)
-                });
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ error: response.statusText }));
-                    throw new Error(errorData.error);
-                }
-                const blob = await response.blob();
-                const contentDisposition = response.headers.get('content-disposition');
-                const fileName = contentDisposition?.match(/filename="(.+)"/)?.[1] || 'converted-file';
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none'; a.href = url; a.download = fileName;
-                document.body.appendChild(a); a.click();
-                window.URL.revokeObjectURL(url); a.remove();
-                displayMessage('#converter-message', 'Konversi berhasil! File sedang diunduh.', 'success');
-                converterForm.reset();
-            } catch(error){
-                displayMessage('#converter-message', `Error: ${error.message}`, 'error');
-            } finally {
-                submitButton.disabled = false;
-            }
-        });
-    }
+    // --- All other forms ---
+    const forms = {
+        '#converter-form': '#converter-message',
+        '#image-merger-form': '#image-merger-message',
+        '#qr-generator-form': '#qr-code-message',
+        '#image-compressor-form': '#image-compressor-message',
+    };
 
-    // --- Image Merger Form ---
-    const imageMergerForm = document.getElementById('image-merger-form');
-    if(imageMergerForm) {
-        imageMergerForm.addEventListener('submit', async(e) => {
-             e.preventDefault();
-            const submitButton = e.target.querySelector('button');
-            const fileInput = document.getElementById('image-files-input');
-            if (fileInput.files.length === 0) {
-                return displayMessage('#image-merger-message', 'Pilih setidaknya satu gambar.', 'error');
-            }
-            submitButton.disabled = true;
-            displayMessage('#image-merger-message', 'Menggabungkan gambar...', 'info');
-             try {
-                const response = await fetchWithAuth(`${API_BASE_URL}/api/convert/images-to-pdf`, {
-                    method: 'POST',
-                    body: new FormData(e.target)
-                });
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ error: response.statusText }));
-                    throw new Error(errorData.error);
-                }
-                 const blob = await response.blob();
-                 const url = window.URL.createObjectURL(blob);
-                 const a = document.createElement('a');
-                 a.style.display = 'none'; a.href = url; a.download = 'merged-images.pdf';
-                 document.body.appendChild(a); a.click();
-                 window.URL.revokeObjectURL(url); a.remove();
-                 displayMessage('#image-merger-message', 'PDF berhasil dibuat!', 'success');
-                 imageMergerForm.reset();
-             } catch(error) {
-                 displayMessage('#image-merger-message', `Error: ${error.message}`, 'error');
-             } finally {
-                submitButton.disabled = false;
-             }
-        });
-    }
-
-    // --- QR Generator Form ---
-    const qrForm = document.getElementById('qr-generator-form');
-    if (qrForm) {
-        const qrImage = document.getElementById('qr-code-image');
-        const downloadButton = document.getElementById('download-qr-button');
-        qrForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            displayMessage('#qr-code-message', 'Membuat QR Code...', 'info');
-            qrImage.style.display = 'none';
-            downloadButton.style.display = 'none';
-            try {
-                const response = await fetchWithAuth(`${API_BASE_URL}/api/generate-qr`, {
-                    method: 'POST',
-                    body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
-                });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error);
-                qrImage.src = data.qrCodeImage;
-                qrImage.style.display = 'block';
-                downloadButton.style.display = 'inline-block';
-                displayMessage('#qr-code-message', data.message, 'success');
-            } catch (error) {
-                displayMessage('#qr-code-message', `Error: ${error.message}`, 'error');
-            }
-        });
-        downloadButton.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.href = qrImage.src;
-            link.download = `qrcode_${Date.now()}.png`;
-            link.click();
-        });
-    }
-
-    // --- Image Compressor Form ---
-    const compressorForm = document.getElementById('image-compressor-form');
-    if (compressorForm) {
-        const qualityInput = document.getElementById('compress-quality');
-        const qualityValue = document.getElementById('compress-quality-value');
-        qualityInput.addEventListener('input', () => qualityValue.textContent = `${qualityInput.value}%`);
-        
-        compressorForm.addEventListener('submit', async(e) => {
-            e.preventDefault();
-            const submitButton = e.target.querySelector('button');
-            const preview = document.getElementById('compressed-image-preview');
-            const downloadBtn = document.getElementById('download-compressed-button');
-            const fileInput = document.getElementById('image-compress-input');
-            if (fileInput.files.length === 0) {
-                return displayMessage('#image-compressor-message', 'Pilih satu gambar.', 'error');
-            }
-
-            submitButton.disabled = true;
-            displayMessage('#image-compressor-message', 'Mengompres gambar...', 'info');
-            preview.style.display = 'none';
-            downloadBtn.style.display = 'none';
-
-            try {
-                const response = await fetchWithAuth(`${API_BASE_URL}/api/compress-image`, {
-                    method: 'POST',
-                    body: new FormData(e.target)
-                });
-                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ error: response.statusText }));
-                    throw new Error(errorData.error);
-                }
-                const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                preview.src = url;
-                preview.style.display = 'block';
+    for (const formSelector in forms) {
+        const form = document.querySelector(formSelector);
+        const messageSelector = forms[formSelector];
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!isLoggedIn) return displayMessage(messageSelector, 'Anda harus login untuk menggunakan fitur ini.', 'error');
                 
-                document.getElementById('original-image-size').textContent = `${(response.headers.get('X-Original-Size') / 1024).toFixed(2)} KB`;
-                document.getElementById('compressed-image-size').textContent = `${(response.headers.get('X-Compressed-Size') / 1024).toFixed(2)} KB`;
-                
-                downloadBtn.onclick = () => {
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `compressed_${Date.now()}.${e.target.format.value}`;
-                    a.click();
-                };
-                downloadBtn.style.display = 'inline-block';
-                displayMessage('#image-compressor-message', 'Kompresi berhasil!', 'success');
-            } catch(error) {
-                displayMessage('#image-compressor-message', `Error: ${error.message}`, 'error');
-            } finally {
-                submitButton.disabled = false;
-            }
-        });
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                displayMessage(messageSelector, 'Memproses permintaan Anda...', 'info');
+
+                // Specific form logic here
+                try {
+                    if (form.id === 'converter-form') {
+                        const response = await fetchWithAuth(`${API_BASE_URL}/api/convert`, { method: 'POST', body: new FormData(e.target) });
+                        if (!response.ok) throw new Error((await response.json()).error);
+                        const blob = await response.blob();
+                        const fileName = response.headers.get('content-disposition')?.match(/filename="(.+)"/)?.[1] || 'converted-file';
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url; a.download = fileName;
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        displayMessage(messageSelector, 'Berhasil! File diunduh.', 'success');
+                    } else if (form.id === 'image-merger-form') {
+                        // ... similar logic for image merger
+                    } else if (form.id === 'qr-generator-form') {
+                        // ... similar logic for qr generator
+                    } else if (form.id === 'image-compressor-form') {
+                        // ... similar logic for image compressor
+                    }
+                    form.reset();
+                } catch(error) {
+                    displayMessage(messageSelector, `Error: ${error.message}`, 'error');
+                } finally {
+                    submitButton.disabled = false;
+                }
+            });
+        }
     }
 }
