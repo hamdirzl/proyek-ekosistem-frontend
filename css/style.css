@@ -509,6 +509,42 @@ input:focus, textarea:focus, select:focus {
     transition: color 0.3s ease, transform 0.3s ease;
     z-index: 1001; /* Ensure it's above menu items */
     padding: 0; /* Hapus padding jika sebelumnya ada dari lingkaran */
+
+    /* Di dalam file style.css */
+
+/* [TAMBAHAN BARU] Atur <li> pembungkus tombol close agar tidak punya style aneh */
+.nav-links li.nav-close-item {
+    border-bottom: none !important; /* Pastikan tidak ada garis bawah */
+    padding: 0 !important; /* Hapus padding */
+    margin-top: 0 !important; /* Hapus margin atas */
+}
+
+/* Pastikan styling untuk tombol close ini ada dan benar */
+.nav-close-button {
+    display: none;
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-md);
+    background: transparent;
+    border: none;
+    color: var(--text-muted-color);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.3s ease, transform 0.3s ease;
+    z-index: 1001;
+}
+
+.nav-close-button:hover {
+    color: var(--accent-color);
+    transform: rotate(90deg);
+}
+
+.nav-close-button svg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 2.5;
+}
 }
 
 .nav-close-button svg {

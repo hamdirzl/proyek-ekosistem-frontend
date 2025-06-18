@@ -973,20 +973,27 @@ if (resetForm) {
 /* Di dalam file script.js */
 /* GANTI FUNGSI setupMobileMenu YANG LAMA DENGAN VERSI BARU INI */
 
+/* GANTI FUNGSI LAMA DENGAN INI */
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
     if (!hamburger || !navLinks) return;
 
-    // Pastikan tombol close dibuat jika belum ada.
-    // Ini penting agar tombol selalu ada saat menu mobile aktif.
-    let navCloseButton = navLinks.querySelector('.nav-close-button');
-    if (!navCloseButton) {
-        navCloseButton = document.createElement('button');
+    // Cek apakah <li> pembungkus tombol close sudah ada
+    let navCloseItem = navLinks.querySelector('.nav-close-item');
+    if (!navCloseItem) {
+        // [PERBAIKAN] Buat <li> sebagai pembungkus
+        navCloseItem = document.createElement('li');
+        navCloseItem.className = 'nav-close-item'; // Beri kelas agar mudah di-style
+
+        const navCloseButton = document.createElement('button');
         navCloseButton.className = 'nav-close-button';
         navCloseButton.setAttribute('aria-label', 'Tutup menu');
         navCloseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-        navLinks.prepend(navCloseButton);
+        
+        // Masukkan tombol ke dalam <li>, lalu <li> ke dalam <ul>
+        navCloseItem.appendChild(navCloseButton);
+        navLinks.prepend(navCloseItem);
     }
     
     const toggleMenu = () => {
@@ -996,13 +1003,10 @@ function setupMobileMenu() {
         document.documentElement.classList.toggle('menu-open');
     };
 
-    // Pasang listener pada tombol hamburger
     hamburger.addEventListener('click', toggleMenu);
 
-    // [PERBAIKAN] Pasang listener pada container menu (navLinks)
-    // Ini akan menangkap klik bahkan pada tombol close yang dibuat dinamis.
+    // Pasang listener pada container menu untuk menangani klik tombol close
     navLinks.addEventListener('click', (event) => {
-        // Cek apakah yang diklik adalah tombol close atau ikon di dalamnya
         if (event.target.closest('.nav-close-button')) {
             toggleMenu();
         }
