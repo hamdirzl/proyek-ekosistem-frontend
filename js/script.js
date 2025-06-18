@@ -969,12 +969,17 @@ if (resetForm) {
 // ==========================================================
 // ===         LOGIKA UNTUK ELEMEN UI UMUM                ===
 // ==========================================================
+
+/* Di dalam file script.js */
+/* GANTI FUNGSI setupMobileMenu YANG LAMA DENGAN VERSI BARU INI */
+
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
     if (!hamburger || !navLinks) return;
-    
-    // [PERBAIKAN] Pastikan tombol close dibuat jika belum ada
+
+    // Pastikan tombol close dibuat jika belum ada.
+    // Ini penting agar tombol selalu ada saat menu mobile aktif.
     let navCloseButton = navLinks.querySelector('.nav-close-button');
     if (!navCloseButton) {
         navCloseButton = document.createElement('button');
@@ -991,10 +996,18 @@ function setupMobileMenu() {
         document.documentElement.classList.toggle('menu-open');
     };
 
+    // Pasang listener pada tombol hamburger
     hamburger.addEventListener('click', toggleMenu);
-    navCloseButton.addEventListener('click', toggleMenu);
-}
 
+    // [PERBAIKAN] Pasang listener pada container menu (navLinks)
+    // Ini akan menangkap klik bahkan pada tombol close yang dibuat dinamis.
+    navLinks.addEventListener('click', (event) => {
+        // Cek apakah yang diklik adalah tombol close atau ikon di dalamnya
+        if (event.target.closest('.nav-close-button')) {
+            toggleMenu();
+        }
+    });
+}
 
 function setupAboutModal() {
     document.body.addEventListener('click', (event) => {
