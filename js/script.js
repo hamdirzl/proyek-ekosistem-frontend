@@ -1,60 +1,48 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (100% LENGKAP DENGAN REFRESH TOKEN)  ==
+// ==   FILE FINAL SCRIPT.JS (PERBAIKAN LOGOUT & UI NAVIGASI)     ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
 
-// BARU: Fungsi untuk memaksa logout, membersihkan semua token dan mengarahkan ke halaman login.
+// Fungsi untuk memaksa logout, membersihkan semua token dan mengarahkan ke halaman utama.
 function forceLogout() {
     localStorage.removeItem('jwt_refresh_token');
     sessionStorage.removeItem('jwt_access_token');
-    // Hanya redirect jika belum di halaman auth untuk menghindari loop
-    if (!window.location.pathname.endsWith('auth.html')) {
-        alert('Sesi Anda telah berakhir. Silakan login kembali.');
-        window.location.href = 'auth.html';
-    }
+    // Arahkan ke halaman index untuk alur yang lebih baik
+    window.location.href = 'index.html';
 }
 
-// BARU: Pembungkus Fetch API yang secara otomatis menangani refresh token.
-// Semua panggilan ke API yang butuh otentikasi harus menggunakan fungsi ini.
+// Pembungkus Fetch API yang secara otomatis menangani refresh token.
 async function fetchWithAuth(url, options = {}) {
     let accessToken = sessionStorage.getItem('jwt_access_token');
-
-    options.headers = { ...options.headers }; // Salin header yang ada
+    options.headers = { ...options.headers };
     if (accessToken) {
         options.headers['Authorization'] = `Bearer ${accessToken}`;
     }
-
     if (options.body instanceof FormData) {
         delete options.headers['Content-Type'];
     } else if (!options.headers['Content-Type'] && !(options.body instanceof FormData)) {
         options.headers['Content-Type'] = 'application/json';
     }
-
     let response = await fetch(url, options);
-
     if (response.status === 401 || response.status === 403) {
-        console.log("Access Token kedaluwarsa atau tidak valid, mencoba refresh...");
+        console.log("Access Token kedaluwarsa, mencoba refresh...");
         const refreshToken = localStorage.getItem('jwt_refresh_token');
-
         if (!refreshToken) {
             forceLogout();
             return response;
         }
-
         try {
             const refreshResponse = await fetch(`${API_BASE_URL}/api/refresh-token`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token: refreshToken })
             });
-
             if (refreshResponse.ok) {
                 const data = await refreshResponse.json();
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
                 console.log("Refresh berhasil, mengulangi permintaan...");
-
                 options.headers['Authorization'] = `Bearer ${data.accessToken}`;
                 response = await fetch(url, options);
             } else {
@@ -65,26 +53,69 @@ async function fetchWithAuth(url, options = {}) {
             forceLogout();
         }
     }
-
     return response;
 }
 
+// Fungsi untuk mengatur UI Navigasi berdasarkan status login
+function setupAuthUI() {
+    const refreshToken = localStorage.getItem('jwt_refresh_token');
+    const navLinks = document.querySelector('.nav-links');
+    if (!navLinks) return;
+
+    const loginListItem = navLinks.querySelector('a.login-button')?.parentElement;
+    const logoutListItem = navLinks.querySelector('button#logout-button')?.parentElement;
+    const dashboardLinkItem = navLinks.querySelector('a[href="dashboard.html"]')?.parentElement;
+
+    // Bersihkan semua tombol terkait otentikasi yang mungkin ada
+    loginListItem?.remove();
+    logoutListItem?.remove();
+    dashboardLinkItem?.remove();
+    
+    if (refreshToken) {
+        // --- PENGGUNA SUDAH LOGIN ---
+        // Buat & tambahkan link 'Dasbor'
+        const dasborLi = document.createElement('li');
+        // Gunakan style sederhana agar tidak terlalu menonjol seperti tombol login
+        dasborLi.innerHTML = `<a href="dashboard.html" class="nav-button">Dasbor</a>`;
+        navLinks.appendChild(dasborLi);
+
+        // Buat & tambahkan tombol 'Logout'
+        const logoutLi = document.createElement('li');
+        const logoutButton = document.createElement('button');
+        logoutButton.id = 'logout-button';
+        logoutButton.className = 'login-button'; // Pakai kelas 'login-button' agar stylenya sama
+        logoutButton.textContent = 'Logout';
+        
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await fetchWithAuth(`${API_BASE_URL}/api/logout`, { method: 'POST' });
+            } catch (e) {
+                console.error("Gagal logout di server, tapi tetap lanjut logout di client.", e);
+            } finally {
+                forceLogout();
+            }
+        });
+        
+        logoutLi.appendChild(logoutButton);
+        navLinks.appendChild(logoutLi);
+
+    } else {
+        // --- PENGGUNA BELUM LOGIN ---
+        // Tambahkan kembali tombol Login jika tidak ada
+        const loginLi = document.createElement('li');
+        loginLi.innerHTML = `<a href="auth.html" class="login-button">Login</a>`;
+        navLinks.appendChild(loginLi);
+    }
+}
 
 /* === FUNGSI GLOBAL === */
 document.addEventListener('DOMContentLoaded', async () => {
+    // Panggil fungsi baru untuk mengatur UI navigasi
+    setupAuthUI();
+
     const refreshToken = localStorage.getItem('jwt_refresh_token');
 
-    const loginLink = document.querySelector('a.login-button');
-    if (loginLink) {
-        if (refreshToken) {
-            loginLink.textContent = 'Dasbor';
-            loginLink.href = 'dashboard.html';
-        } else {
-            loginLink.textContent = 'Login';
-            loginLink.href = 'auth.html';
-        }
-    }
-
+    // Cek jika butuh access token baru saat load halaman
     if (refreshToken && !sessionStorage.getItem('jwt_access_token')) {
         console.log("Sesi baru, mencoba mendapatkan access token...");
         try {
@@ -99,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
                 console.log("Access token berhasil didapatkan untuk sesi ini.");
                 if (document.body.contains(document.getElementById('dashboard-main'))) {
-                    setupDashboardPage();
+                    setupDashboardPage(); // Panggil ulang setup jika di halaman dashboard
                 }
             } else {
                 forceLogout();
@@ -110,6 +141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Setup spesifik per halaman
     if (document.body.contains(document.getElementById('dashboard-main'))) {
         setupDashboardPage();
     } else if (document.title.includes("Tools")) {
@@ -118,6 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupAuthPage();
     }
 
+    // Setup global
     setupAboutModal();
     setupMobileMenu();
     setupAllPasswordToggles();
@@ -137,19 +170,21 @@ function setupDashboardPage() {
         window.location.href = 'auth.html';
         return;
     }
-
+    // Tombol logout sekarang di-handle oleh setupAuthUI,
+    // jadi event listener di sini tidak diperlukan lagi untuk tombol di navbar.
+    // Namun kita biarkan jika ada tombol logout lain di body dashboard
     const logoutButton = document.getElementById('logout-button');
-    if (logoutButton) {
+    if (logoutButton && !logoutButton.getAttribute('listener-attached')) {
         logoutButton.addEventListener('click', async () => {
-            try {
+             try {
                 await fetchWithAuth(`${API_BASE_URL}/api/logout`, { method: 'POST' });
             } catch (e) {
                 console.error("Gagal logout di server, tapi tetap lanjut logout di client.", e);
             } finally {
                 forceLogout();
-                window.location.href = 'index.html';
             }
         });
+        logoutButton.setAttribute('listener-attached', 'true');
     }
 
     const accessToken = sessionStorage.getItem('jwt_access_token');
@@ -158,6 +193,9 @@ function setupDashboardPage() {
         checkUserRoleAndSetupAdminPanel(accessToken);
     }
 }
+
+// ... SISA KODE DARI SINI KE BAWAH TETAP SAMA SEPERTI FILE ASLI ANDA ...
+// (Tidak ada perubahan yang diperlukan untuk fungsi-fungsi di bawah ini)
 
 function populateUserInfo(token) {
     const decodedToken = decodeJwt(token);
@@ -700,7 +738,6 @@ function attachImageCompressorListener() {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                // URL.revokeObjectURL(imageUrl); // Don't revoke immediately if preview is still needed
             };
             downloadButton.style.display = 'block';
             messageDiv.textContent = 'Image compressed successfully!';
@@ -854,12 +891,10 @@ function setupAuthPage() {
             const password = document.getElementById('login-password').value;
             authMessage.textContent = 'Memproses...';
             try {
-                // Fetch biasa karena belum ada token
                 const response = await fetch(`${API_BASE_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error);
 
-                // DIUBAH: Simpan kedua token
                 localStorage.setItem('jwt_refresh_token', data.refreshToken);
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
 
@@ -1046,7 +1081,6 @@ function setupChatBubble() {
 
             if (!response.ok) {
                  const error = await response.json().catch(() => ({error: "Gagal terhubung ke AI."}));
-                 // Cek jika error karena butuh login
                  if (response.status === 401 || response.status === 403) {
                      throw new Error("Anda harus login untuk menggunakan fitur chat.");
                  }
