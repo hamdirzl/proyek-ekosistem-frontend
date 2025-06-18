@@ -164,8 +164,7 @@ function setupToolsPage(token) {
         document.getElementById('converter-wrapper'),
         document.getElementById('image-merger-wrapper'),
         document.getElementById('qr-generator-wrapper'),
-        document.getElementById('image-compressor-wrapper'),
-        document.getElementById('audio-cutter-wrapper')
+        document.getElementById('image-compressor-wrapper') // BARIS INI DITAMBAHKAN
     ];
     const loginPrompt = document.getElementById('login-prompt');
     const toolSelectionSection = document.querySelector('.tool-selection'); 
@@ -180,15 +179,13 @@ function setupToolsPage(token) {
         document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper', token));
         document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper', token));
         document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper', token));
-        document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper', token));
-        document.getElementById('show-audio-cutter')?.addEventListener('click', () => showToolSection('audio-cutter-wrapper', token));
+        document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper', token)); // BARIS INI DITAMBAHKAN
 
         attachShortenerListener(token);
         attachConverterListener(token);
         attachImageMergerListener(token);
         attachQrCodeGeneratorListener(token);
-        attachImageCompressorListener(token);
-        attachAudioCutterListener(token);
+        attachImageCompressorListener(token); // BARIS INI DITAMBAHKAN
 
     } else {
         if (loginPrompt) loginPrompt.classList.remove('hidden');
@@ -227,8 +224,7 @@ function showToolSection(sectionIdToShow, token) {
         document.getElementById('converter-wrapper'),
         document.getElementById('image-merger-wrapper'),
         document.getElementById('qr-generator-wrapper'),
-        document.getElementById('image-compressor-wrapper'),
-        document.getElementById('audio-cutter-wrapper')
+        document.getElementById('image-compressor-wrapper') // BARIS INI DITAMBAHKAN
     ];
     const historySection = document.getElementById('history-section'); 
 
@@ -464,7 +460,7 @@ function attachQrCodeGeneratorListener(token) {
     });
 }
 
-// === FUNGSI IMAGE COMPRESSOR CLIENT-SIDE LOGIC ===
+// === FUNGSI BARU: IMAGE COMPRESSOR CLIENT-SIDE LOGIC ===
 function attachImageCompressorListener(token) {
     const form = document.getElementById('image-compressor-form');
     if (!form) return;
@@ -541,7 +537,7 @@ function attachImageCompressorListener(token) {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                URL.revokeObjectURL(imageUrl);
+                URL.revokeObjectURL(imageUrl); // Clean up the object URL
             };
             downloadButton.style.display = 'block';
 
@@ -553,312 +549,6 @@ function attachImageCompressorListener(token) {
             messageDiv.className = 'error';
             compressedImagePreview.style.display = 'none';
             downloadButton.style.display = 'none';
-        }
-    });
-}
-
-// === FUNGSI AUDIO CUTTER CLIENT-SIDE LOGIC (dengan WaveSurfer.js) ===
-function attachAudioCutterListener(token) {
-    const form = document.getElementById('audio-cutter-form');
-    if (!form) return;
-
-    const audioInput = document.getElementById('audio-input');
-    const startTimeInput = document.getElementById('start-time');
-    const endTimeInput = document.getElementById('end-time');
-    const audioFileInfo = document.getElementById('audio-file-info');
-    const waveformContainer = document.getElementById('waveform');
-    const playPauseButton = document.getElementById('waveform-play-pause-button');
-    const stopButton = document.getElementById('waveform-stop-button');
-    const cutAudioSubmitButton = form.querySelector('button[type="submit"]');
-    const messageDiv = document.getElementById('audio-cutter-message');
-    const cutAudioPreview = document.getElementById('cut-audio-preview');
-    const downloadButton = document.getElementById('download-cut-audio-button');
-
-    let wavesurfer = null;
-    let currentRegion = null;
-
-    // Helper to format seconds into MM:SS
-    const formatTime = (seconds) => {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = Math.floor(seconds % 60);
-        return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-    };
-
-    // Fungsi untuk menginisialisasi WaveSurfer.js
-    const initializeWaveSurfer = () => {
-        console.log("Initializing WaveSurfer...");
-        if (wavesurfer) {
-            wavesurfer.destroy();
-            console.log("Destroyed old WaveSurfer instance.");
-            currentRegion = null; // Pastikan region juga direset
-        }
-        wavesurfer = WaveSurfer.create({
-            container: waveformContainer,
-            waveColor: 'rgba(0, 245, 160, 0.5)',
-            progressColor: 'var(--accent-color)',
-            cursorColor: 'var(--text-muted-color)',
-            barWidth: 2,
-            barRadius: 2,
-            barGap: 1,
-            height: 120,
-            backend: 'WebAudio',
-            responsive: true,
-            pixelRatio: 1,
-            minPxPerSec: 20,
-            plugins: [
-                WaveSurfer.Regions.create({
-                    regionsMinLength: 0.1,
-                    dragSelection: {
-                        slop: 5,
-                        opacity: 0.2,
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    }
-                })
-            ]
-        });
-        console.log("WaveSurfer instance created.");
-
-        // Event listener untuk WaveSurfer
-        wavesurfer.on('ready', () => {
-            console.log("WaveSurfer is ready!");
-            const duration = wavesurfer.getDuration();
-            audioFileInfo.textContent = `File: "${audioInput.files[0].name}" | Duration: ${formatTime(duration)}`;
-            endTimeInput.value = duration.toFixed(1);
-            startTimeInput.value = 0;
-
-            if (!currentRegion && Object.keys(wavesurfer.regions.list).length === 0) {
-                currentRegion = wavesurfer.regions.add({
-                    start: 0,
-                    end: duration,
-                    loop: false,
-                    color: 'rgba(0, 255, 0, 0.1)',
-                    drag: true,
-                    resize: true,
-                    id: 'default-region'
-                });
-                console.log("Default region added.");
-            } else if (currentRegion) {
-                currentRegion.update({ start: 0, end: duration });
-                console.log("Existing region updated.");
-            }
-            cutAudioSubmitButton.disabled = false;
-            playPauseButton.disabled = false;
-            stopButton.disabled = false;
-            messageDiv.textContent = 'Audio loaded and waveform ready! Drag to select a segment.';
-            messageDiv.className = 'success';
-        });
-
-        wavesurfer.on('error', (err) => {
-            console.error('WaveSurfer error:', err);
-            messageDiv.textContent = `WaveSurfer Error: ${err.message}. Please try a different audio file or format.`;
-            messageDiv.className = 'error';
-            cutAudioSubmitButton.disabled = true;
-            playPauseButton.disabled = true;
-            stopButton.disabled = true;
-            audioFileInfo.textContent = `Error loading file.`;
-        });
-
-        wavesurfer.on('region-updated', (region) => {
-            currentRegion = region;
-            startTimeInput.value = region.start.toFixed(1);
-            endTimeInput.value = region.end.toFixed(1);
-            console.log(`Region updated: Start ${region.start.toFixed(1)}, End ${region.end.toFixed(1)}`);
-        });
-
-        wavesurfer.on('region-created', (region) => {
-            Object.values(wavesurfer.regions.list).forEach(r => {
-                if (r.id !== region.id) {
-                    wavesurfer.regions.remove(r.id);
-                }
-            });
-            currentRegion = region;
-            startTimeInput.value = region.start.toFixed(1);
-            endTimeInput.value = region.end.toFixed(1);
-            console.log(`Region created: Start ${region.start.toFixed(1)}, End ${region.end.toFixed(1)}`);
-        });
-
-        wavesurfer.on('region-click', (region, mouseEvent) => {
-            mouseEvent.stopPropagation();
-            region.play();
-            messageDiv.textContent = `Playing selected region...`;
-            messageDiv.className = '';
-            console.log(`Playing region from ${region.start.toFixed(1)} to ${region.end.toFixed(1)}`);
-        });
-
-        wavesurfer.on('region-out', (region) => {
-            if (region.isPlaying()) {
-                wavesurfer.stop();
-            }
-        });
-
-        wavesurfer.on('loading', (percents, xhr) => {
-            audioFileInfo.textContent = `Loading "${audioInput.files[0].name}"... ${percents}%`;
-            messageDiv.textContent = `Loading audio: ${percents}%...`;
-            messageDiv.className = '';
-            cutAudioSubmitButton.disabled = true;
-            playPauseButton.disabled = true;
-            stopButton.disabled = true;
-            console.log(`Audio loading progress: ${percents}%`);
-        });
-
-        const updateRegionFromInputs = () => {
-            if (currentRegion && wavesurfer.isReady()) { // Periksa juga isReady()
-                const newStart = parseFloat(startTimeInput.value);
-                const newEnd = parseFloat(endTimeInput.value);
-
-                if (!isNaN(newStart) && !isNaN(newEnd) && newStart < newEnd && newEnd <= wavesurfer.getDuration()) {
-                    currentRegion.update({ start: newStart, end: newEnd });
-                    console.log(`Region updated from inputs: Start ${newStart.toFixed(1)}, End ${newEnd.toFixed(1)}`);
-                } else {
-                    messageDiv.textContent = 'Invalid time input. Please check values.';
-                    messageDiv.className = 'error';
-                }
-            } else {
-                console.warn("WaveSurfer not ready or no currentRegion to update from inputs.");
-            }
-        };
-
-        startTimeInput.addEventListener('change', updateRegionFromInputs);
-        endTimeInput.addEventListener('change', updateRegionFromInputs);
-    };
-
-    audioInput.addEventListener('change', async (event) => {
-        const file = event.target.files[0];
-        if (!file) {
-            audioFileInfo.textContent = '';
-            if (wavesurfer) {
-                wavesurfer.destroy();
-                wavesurfer = null;
-                currentRegion = null;
-            }
-            cutAudioSubmitButton.disabled = true;
-            playPauseButton.disabled = true;
-            stopButton.disabled = true;
-            cutAudioPreview.pause();
-            cutAudioPreview.src = '';
-            cutAudioPreview.style.display = 'none';
-            downloadButton.style.display = 'none';
-            messageDiv.textContent = '';
-            messageDiv.className = '';
-            console.log("No file selected, WaveSurfer destroyed.");
-            return;
-        }
-
-        audioFileInfo.textContent = `Processing "${file.name}"...`;
-        messageDiv.textContent = 'Decoding audio...';
-        messageDiv.className = '';
-        cutAudioSubmitButton.disabled = true;
-        playPauseButton.disabled = true;
-        stopButton.disabled = true;
-
-        if (waveformContainer) {
-            waveformContainer.innerHTML = '';
-        }
-
-        initializeWaveSurfer();
-        wavesurfer.loadBlob(file);
-        console.log("Loading file into WaveSurfer:", file.name);
-    });
-
-    playPauseButton.addEventListener('click', () => {
-        if (wavesurfer && wavesurfer.isReady()) {
-            wavesurfer.playPause();
-            console.log("Play/Pause clicked. Current time:", wavesurfer.getCurrentTime());
-        } else {
-            messageDiv.textContent = 'Audio not ready yet. Please wait for waveform to load.';
-            messageDiv.className = 'error';
-            console.warn("Play/Pause clicked before WaveSurfer was ready.");
-        }
-    });
-
-    stopButton.addEventListener('click', () => {
-        if (wavesurfer && wavesurfer.isReady()) {
-            wavesurfer.stop();
-            console.log("Stop clicked.");
-        } else {
-            messageDiv.textContent = 'Audio not ready yet. Please wait for waveform to load.';
-            messageDiv.className = 'error';
-            console.warn("Stop clicked before WaveSurfer was ready.");
-        }
-    });
-
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        messageDiv.textContent = 'Cutting audio, please wait...';
-        messageDiv.className = '';
-        cutAudioPreview.style.display = 'none';
-        downloadButton.style.display = 'none';
-        
-        if (wavesurfer && wavesurfer.isReady()) {
-            wavesurfer.stop();
-        } else {
-            messageDiv.textContent = 'Audio not loaded or waveform not ready. Please select a file and wait for it to load.';
-            messageDiv.className = 'error';
-            return;
-        }
-
-        const file = audioInput.files[0];
-        if (!file) {
-            messageDiv.textContent = 'Please select an audio file.';
-            messageDiv.className = 'error';
-            return;
-        }
-
-        const startTime = parseFloat(startTimeInput.value);
-        const endTime = parseFloat(endTimeInput.value);
-
-        if (isNaN(startTime) || isNaN(endTime) || startTime < 0 || endTime <= startTime || endTime > wavesurfer.getDuration()) {
-            messageDiv.textContent = 'Invalid start/end time. Please ensure End Time is greater than Start Time and within total duration.';
-            messageDiv.className = 'error';
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('audio', file);
-        formData.append('startTime', startTime);
-        formData.append('endTime', endTime);
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/cut-audio`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: response.statusText }));
-                throw new Error(errorData.error || 'Failed to cut audio.');
-            }
-
-            const audioBlob = await response.blob();
-            const fileName = response.headers.get('Content-Disposition')?.match(/filename="(.+)"/)?.[1] || `cut_audio.${file.name.split('.').pop() || 'mp3'}`;
-
-            const audioUrl = URL.createObjectURL(audioBlob);
-            cutAudioPreview.src = audioUrl;
-            cutAudioPreview.style.display = 'block';
-            
-            downloadButton.onclick = () => {
-                const link = document.createElement('a');
-                link.href = audioUrl;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(audioUrl);
-            };
-            downloadButton.style.display = 'block';
-
-            messageDiv.textContent = 'Audio cut successfully! Preview available.';
-            messageDiv.className = 'success';
-
-        } catch (error) {
-            messageDiv.textContent = `Error: ${error.message}`;
-            messageDiv.className = 'error';
-            cutAudioPreview.style.display = 'none';
-            downloadButton.style.display = 'none';
-            console.error("Audio Cutter Frontend Error:", error);
         }
     });
 }
@@ -1116,12 +806,14 @@ if (resetForm) {
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
+    // Membuat tombol close SVG secara dinamis jika belum ada di HTML
     let navCloseButton = document.getElementById('nav-close-button');
     if (!navCloseButton) {
         navCloseButton = document.createElement('button');
         navCloseButton.id = 'nav-close-button';
         navCloseButton.classList.add('nav-close-button');
         navCloseButton.setAttribute('aria-label', 'Tutup menu');
+        // Menggunakan ikon SVG 'x' dari feather icons
         navCloseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
         navLinks.prepend(navCloseButton);
     }
@@ -1141,6 +833,7 @@ function setupMobileMenu() {
         navCloseButton.addEventListener('click', toggleMenu);
     }
 
+    // Close menu when clicking outside (on the overlay itself)
     if (navLinks) {
         navLinks.addEventListener('click', (event) => {
             if (event.target === navLinks) {
@@ -1173,7 +866,7 @@ function setupAboutModal() {
         modalCloseButton.addEventListener('click', closeModal);
     }
     
-modalOverlay.addEventListener('click', (event) => { 
+    modalOverlay.addEventListener('click', (event) => { 
         if (event.target === modalOverlay) closeModal(); 
     });
     

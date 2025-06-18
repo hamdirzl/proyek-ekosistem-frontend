@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-    <link rel="stylesheet" href="https://unpkg.com/wavesurfer.js@6.6.0/dist/plugins/wavesurfer.regions.min.css" /> 
 </head>
 <body>
 
@@ -50,9 +49,7 @@
                 <button id="show-converter" class="button-pintu tool-selector-button">Media Converter</button>
                 <button id="show-image-merger" class="button-pintu tool-selector-button">Image to PDF</button>
                 <button id="show-qr-generator" class="button-pintu tool-selector-button">QR Code Generator</button>
-                <button id="show-image-compressor" class="button-pintu tool-selector-button">Image Compressor</button>
-                <button id="show-audio-cutter" class="button-pintu tool-selector-button">Audio Cutter</button>
-            </div>
+                <button id="show-image-compressor" class="button-pintu tool-selector-button">Image Compressor</button> </div>
         </section>
 
         <div id="shortener-wrapper" class="hidden">
@@ -163,41 +160,6 @@
                 </div>
             </section>
         </div>
-        <div id="audio-cutter-wrapper" class="hidden">
-            <section class="tool-section" data-aos="fade-up">
-                <h2 class="section-title">Tool: Audio Cutter</h2>
-                <form id="audio-cutter-form" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="audio-input">Select Audio File (MP3, WAV, etc.)</label>
-                        <input type="file" id="audio-input" name="audio" required accept="audio/*">
-                        <p id="audio-file-info" style="font-size: 0.9em; color: var(--text-muted-color); margin-top: 0.5rem;"></p>
-                    </div>
-
-                    <div id="waveform" style="width: 100%; height: 120px; background-color: #333; margin: var(--space-md) 0; border-radius: 8px; overflow: hidden;"></div>
-                    
-                    <div style="display: flex; justify-content: center; gap: var(--space-sm); margin-bottom: var(--space-md);">
-                        <button type="button" id="waveform-play-pause-button" class="button-pintu" style="background-color: var(--text-muted-color); border-color: var(--text-muted-color);">Play / Pause</button>
-                        <button type="button" id="waveform-stop-button" class="button-pintu" style="background-color: #cc3333; border-color: #cc3333;">Stop</button>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="start-time">Start Time (seconds)</label>
-                        <input type="number" id="start-time" step="0.1" min="0" value="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="end-time">End Time (seconds)</label>
-                        <input type="number" id="end-time" step="0.1" min="0" value="0" required>
-                    </div>
-                    
-                    <button type="submit" class="button-pintu">Cut Audio</button>
-                </form>
-                <div id="audio-cutter-message" style="margin-top: 1rem;"></div>
-                <div id="audio-player-display" style="text-align: center; margin-top: 2rem;">
-                    <audio id="cut-audio-preview" controls style="width: 100%; max-width: 400px; display: none;"></audio>
-                    <button id="download-cut-audio-button" class="button-pintu" style="margin-top: 1rem; display: none;">Download Cut Audio</button>
-                </div>
-            </section>
-        </div>
         </main>
 
     <footer>
@@ -210,8 +172,6 @@
     
     <script src="js/script.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-    <script src="https://unpkg.com/wavesurfer.js@6.6.0/dist/wavesurfer.min.js"></script>
-    <script src="https://unpkg.com/wavesurfer.js@6.6.0/dist/plugins/wavesurfer.regions.min.js"></script>
     <script>AOS.init({duration: 800, once: true});</script>
 </body>
 </html>
