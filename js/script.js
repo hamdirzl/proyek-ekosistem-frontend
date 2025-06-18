@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAboutModal();
     setupMobileMenu();
     setupAllPasswordToggles();
-    setupChatBubble(); // BARIS INI DITAMBAHKAN
+    setupChatBubble();
 });
 
 function decodeJwt(token) {
@@ -70,13 +70,20 @@ function populateUserInfo(token) {
 async function checkUserRoleAndSetupAdminPanel(token) {
     const decodedToken = decodeJwt(token);
     if (decodedToken && decodedToken.role === 'admin') {
-        const adminSection = document.getElementById('admin-section');
+        const adminSection = document.getElementById('admin-section'); // Manajemen Link
+        const adminUsersSection = document.getElementById('admin-users-section'); // Manajemen User
         const userEmailElement = document.getElementById('user-email');
+
         if (adminSection) {
             adminSection.classList.remove('hidden');
-            if(userEmailElement) userEmailElement.innerHTML += ' (Admin)';
-            fetchAndDisplayLinks(token);
+            fetchAndDisplayLinks(token); // Memuat tautan
         }
+        if (adminUsersSection) {
+            adminUsersSection.classList.remove('hidden');
+            fetchAndDisplayUsers(token); // Memuat pengguna
+        }
+
+        if(userEmailElement) userEmailElement.innerHTML += ' (Admin)';
     }
 }
 
@@ -153,6 +160,142 @@ async function handleDeleteLink(event) {
     }
 }
 
+// === FUNGSI BARU UNTUK MANAJEMEN PENGGUNA ADMIN ===
+async function fetchAndDisplayUsers(token) {
+    const userList = document.getElementById('user-list');
+    const loadingMessage = document.getElementById('loading-users');
+    if (!userList || !loadingMessage) return;
+
+    loadingMessage.textContent = 'Memuat daftar pengguna...';
+    loadingMessage.style.display = 'block';
+    userList.innerHTML = ''; // Bersihkan daftar sebelumnya
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch users.');
+        }
+
+        const users = await response.json();
+        loadingMessage.style.display = 'none';
+
+        if (users.length === 0) {
+            userList.innerHTML = '<li><p>No users found.</p></li>';
+            return;
+        }
+
+        // Ikon untuk tombol ubah peran
+        const repeatIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-repeat"><polyline points="17 1 21 5 17 9"></polyline><path d="M21 15v4a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12"></path></svg>`;
+        const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+
+
+        users.forEach(user => {
+            const listItem = document.createElement('li');
+            listItem.className = 'mood-item';
+            listItem.id = `user-${user.id}`;
+            listItem.innerHTML = `
+                <div class="mood-item-header">
+                    <span><strong>Email:</strong> ${user.email}</span>
+                    <span><strong>Role:</strong> <span id="role-${user.id}">${user.role}</span></span>
+                    <div class="mood-item-actions">
+                        <button class="mood-icon-button toggle-user-role-btn" data-user-id="${user.id}" data-current-role="${user.role}" aria-label="Ubah Peran">
+                            ${repeatIconSvg}
+                        </button>
+                        <button class="mood-icon-button delete-user-btn delete-button" data-user-id="${user.id}" aria-label="Hapus Pengguna">
+                            ${trashIconSvg}
+                        </button>
+                    </div>
+                </div>
+                <small class="mood-date">Bergabung pada: ${new Date(user.created_at).toLocaleString('id-ID')}</small>
+            `;
+            userList.appendChild(listItem);
+        });
+
+        document.querySelectorAll('.toggle-user-role-btn').forEach(button => {
+            button.addEventListener('click', (e) => toggleUserRole(e, token));
+        });
+        document.querySelectorAll('.delete-user-btn').forEach(button => {
+            button.addEventListener('click', (e) => deleteUser(e, token));
+        });
+
+    } catch (error) {
+        loadingMessage.textContent = `Error: ${error.message}`;
+        console.error(error);
+    }
+}
+
+// Fungsi untuk mengubah peran pengguna
+async function toggleUserRole(event, token) {
+    const button = event.currentTarget;
+    const userId = button.dataset.userId;
+    const currentRole = button.dataset.currentRole;
+    const newRole = currentRole === 'admin' ? 'user' : 'admin';
+
+    if (!confirm(`Anda yakin ingin mengubah peran pengguna ini menjadi ${newRole}?`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/role`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ role: newRole })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Gagal memperbarui peran.');
+
+        alert(data.message);
+        // Update UI
+        const roleSpan = document.getElementById(`role-${userId}`);
+        if (roleSpan) {
+            roleSpan.textContent = newRole;
+            button.dataset.currentRole = newRole; // Update data attribute
+        }
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+        console.error(error);
+    }
+}
+
+// Fungsi untuk menghapus pengguna
+async function deleteUser(event, token) {
+    const button = event.currentTarget;
+    const userId = button.dataset.userId;
+
+    if (!confirm(`Anda yakin ingin menghapus pengguna ini secara permanen? Tindakan ini tidak bisa dibatalkan.`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Gagal menghapus pengguna.');
+
+        alert(data.message);
+        // Remove from UI
+        const listItemToRemove = document.getElementById(`user-${userId}`);
+        if (listItemToRemove) {
+            listItemToRemove.remove();
+        }
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+        console.error(error);
+    }
+}
 
 // ===================================
 // === LOGIKA HALAMAN TOOLS        ===
@@ -898,7 +1041,7 @@ function setupAllPasswordToggles() {
     setupPasswordToggle('toggle-confirm-password', 'confirm-password');
 }
 
-// === FUNGSI BARU UNTUK CHAT BUBBLE ===
+// === FUNGSI UNTUK CHAT BUBBLE ===
 function setupChatBubble() {
     const chatBubble = document.getElementById('chat-bubble');
     const openChatButton = document.getElementById('open-chat-button');
@@ -966,11 +1109,11 @@ function setupChatBubble() {
     }
 
     function appendMessage(text, ...types) { // Menggunakan rest parameter untuk menerima banyak kelas
-    const messageElement = document.createElement('div');
-    messageElement.classList.add('message', ...types); // Menambahkan semua kelas yang diberikan
-    messageElement.textContent = text;
-    chatMessages.appendChild(messageElement);
-}
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', ...types); // Menambahkan semua kelas yang diberikan
+        messageElement.textContent = text;
+        chatMessages.appendChild(messageElement);
+    }
 
     function removeTypingIndicator() {
         const typingIndicator = chatMessages.querySelector('.typing-indicator');
