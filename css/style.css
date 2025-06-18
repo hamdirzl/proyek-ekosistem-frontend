@@ -527,6 +527,9 @@ input:focus, textarea:focus, select:focus {
 
 /* Di dalam file style.css */
 
+/* Di dalam file style.css */
+/* GANTI SELURUH BLOK @media DI BAWAH INI */
+
 @media (max-width: 768px) {
     .hamburger { display: block; }
     .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
@@ -539,24 +542,21 @@ input:focus, textarea:focus, select:focus {
         right: 0; 
         bottom: 0; 
         width: 85%;
-        max-width: 350px;
+        max-width: 320px; /* Lebar yang lebih ideal untuk menu mobile */
         height: 100vh; 
-        background-color: rgba(18, 18, 18, 0.98); 
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        
-        /* [MODIFIKASI] Kurangi padding atas dan gap agar tidak terlalu renggang */
+        background-color: #161616; /* Sedikit lebih terang dari background utama */
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         padding-top: var(--space-xl); 
-        gap: 0; /* Atur gap ke 0, kita akan kontrol spasi dengan padding di <li> */
-
+        gap: 0;
         opacity: 0; 
         visibility: hidden; 
         transform: translateX(100%); 
-        transition: transform 0.4s ease, opacity 0.4s ease, visibility 0.4s ease; 
+        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease, visibility 0.4s ease; 
         flex-direction: column; 
-        align-items: flex-start;
+        align-items: stretch; /* Item membentang selebar menu */
         justify-content: flex-start;
-        box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+        box-shadow: -5px 0 25px rgba(0,0,0,0.4);
         z-index: 1000; 
     }
     .nav-links.active { 
@@ -565,75 +565,86 @@ input:focus, textarea:focus, select:focus {
         transform: translateX(0); 
     }
     
-    /* [MODIFIKASI] Atur padding di <li> dan tambahkan garis pemisah */
     .nav-links li { 
         margin: 0; 
         width: 100%; 
-        text-align: left;
-        padding: 0; /* Reset padding di sini */
-        border-bottom: 1px solid var(--border-color); /* Garis pemisah */
+        padding: 0 var(--space-md); /* Beri padding kiri-kanan pada <li> */
+        border: none; /* Hapus border, kita akan fokus pada itemnya */
     }
 
-    /* [TAMBAHAN] Hilangkan garis di item terakhir agar rapi */
-    .nav-links li:last-child {
-        border-bottom: none;
-        margin-top: var(--space-md); /* Beri sedikit jarak untuk tombol logout */
-    }
-
-    /* [TAMBAHAN] Item paling atas juga diberi garis pemisah */
-    .nav-links li:first-child:not(:last-child) {
-        border-top: 1px solid var(--border-color);
-    }
+    /* Hilangkan modifikasi untuk li:last-child dan li:first-child */
     
-    .nav-links a, .nav-links .nav-button { 
-        display: block; 
-        
-        /* [MODIFIKASI] Kurangi padding vertikal dan tambahkan padding horizontal */
-        padding: var(--space-sm) var(--space-lg); 
-        
+    /* [REVISI TOTAL] Atur link dan button agar simetris dengan ikon */
+    .nav-links a, .nav-links button { 
+        display: flex; /* Gunakan Flexbox */
+        align-items: center; /* Sejajarkan vertikal */
+        gap: var(--space-md); /* Jarak antara ikon dan teks */
+        padding: 1rem; /* Padding yang konsisten di dalam item */
         width: 100%; 
-        border-radius: 0; 
-        font-size: 1.1rem; 
-        transition: background-color 0.2s ease, color 0.2s ease; /* Transisi hover */
+        border-radius: 8px; /* Sudut membulat untuk setiap item */
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-muted-color);
+        text-decoration: none;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        text-align: left;
+        background: transparent;
+        border: none;
+        font-family: var(--font-body);
+        cursor: pointer;
     }
     
-    /* [MODIFIKASI] Ubah cara hover agar lebih interaktif */
-    .nav-links a:hover, .nav-links .nav-button:hover { 
-        background-color: var(--card-bg-color); /* Latar belakang saat hover */
-        color: var(--accent-color); 
+    .nav-links a:hover, .nav-links button:hover { 
+        background-color: var(--card-bg-color);
+        color: var(--text-color); 
+    }
+    
+    /* [BARU] Styling untuk ikon di dalam menu */
+    .nav-links svg {
+        width: 20px;
+        height: 20px;
+        stroke-width: 2;
+        flex-shrink: 0; /* Mencegah ikon menyusut */
+        color: var(--text-muted-color);
+        transition: color 0.2s ease;
+    }
+    
+    .nav-links a:hover svg, .nav-links button:hover svg {
+        color: var(--accent-color);
     }
     
     .nav-links a::after { display: none; }
     
-    /* [MODIFIKASI] Pastikan tombol Login/Logout terlihat konsisten */
-    .nav-links a.login-button, .nav-links button.login-button { 
-        margin: 0;
-        width: 100%;
-        text-align: left; /* Ratakan teks ke kiri */
-        font-size: 1.1rem; 
-        align-self: flex-start;
-        border-radius: 0;
-        background: transparent; /* Samakan background */
-        color: var(--text-color); /* Samakan warna teks */
-        border: none;
-        padding: var(--space-sm) var(--space-lg); /* Samakan padding */
+    /* [REVISI] Pastikan tombol Logout/Login terlihat sama */
+    .nav-links .login-button {
+        color: #000; /* Warna teks tombol logout */
+        background: var(--accent-color);
+        font-weight: 600;
+        margin-top: var(--space-md); /* Jarak pemisah */
+    }
+    
+    .nav-links .login-button:hover {
+        background: var(--accent-hover) !important;
+        color: #000 !important;
+    }
+    
+    .nav-links .login-button:hover svg {
+        color: #000 !important;
     }
 
-    /* [TAMBAHAN] Beri warna khusus saat hover di tombol Login/Logout */
-    .nav-links a.login-button:hover, .nav-links button.login-button:hover {
-        background-color: var(--card-bg-color) !important;
-        color: var(--accent-color) !important;
+    .nav-links .login-button svg {
+        color: #000;
     }
 
     .nav-close-button {
         display: block;
     }
-    
+}
     /* Penyesuaian khusus untuk history item di mobile */
     .mood-item-header { flex-direction: column; align-items: flex-start; }
     .mood-item-actions { width: 100%; justify-content: flex-end; } 
     .mood-item-header strong { margin-right: 0; } 
-}
+
 
 @media (max-width: 480px) {
     .tool-selector-button { width: 100%; }

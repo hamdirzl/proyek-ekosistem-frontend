@@ -54,77 +54,85 @@ async function fetchWithAuth(url, options = {}) {
 }
 
 // Fungsi untuk membangun ulang UI Navigasi berdasarkan status login dan urutan
+// Di dalam file script.js
+// GANTI FUNGSI setupAuthUI YANG LAMA DENGAN YANG INI
+
 function setupAuthUI() {
     const refreshToken = localStorage.getItem('jwt_refresh_token');
     const navLinks = document.querySelector('.nav-links');
     if (!navLinks) return;
 
-    // Simpan tombol close menu mobile jika ada
     const mobileCloseButton = navLinks.querySelector('.nav-close-button');
-    
-    // Kosongkan menu untuk dibangun ulang
-    navLinks.innerHTML = '';
+    navLinks.innerHTML = ''; // Kosongkan menu
 
-    // Tambahkan kembali tombol close menu mobile
     if (mobileCloseButton) {
         navLinks.appendChild(mobileCloseButton);
     }
     
-    // Definisikan semua item menu yang mungkin ada
-    const menuConfig = {
-        dasbor: '<li><a href="dashboard.html">Dasbor</a></li>',
-        portfolio: '<li><a href="portfolio.html">Portofolio</a></li>',
-        jurnal: '<li><a href="jurnal.html">Jurnal</a></li>',
-        arena: '<li><a href="arena.html">Arena Game</a></li>',
-        tools: '<li><a href="tools.html">Tools Hamdi</a></li>', // Saya tetap masukkan ini agar tidak hilang
-        tentang: '<li><button id="about-button" class="nav-button">Tentang Saya</button></li>',
-        logout: '<li><button id="logout-button" class="login-button">Logout</button></li>',
-        login: '<li><a href="auth.html" class="login-button">Login</a></li>'
+    // Definisikan ikon untuk setiap menu
+    const icons = {
+        dasbor:     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
+        portfolio:  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>`,
+        jurnal:     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`,
+        arena:      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>`,
+        tools:      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>`,
+        tentang:    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+        logout:     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`,
+        login:      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>`
     };
 
-    // Tentukan urutan menu
-    let orderedMenu;
-    if (refreshToken) {
-        // Urutan saat login
-        orderedMenu = [
-            menuConfig.dasbor,
-            menuConfig.portfolio,
-            menuConfig.jurnal,
-            menuConfig.arena,
-            menuConfig.tools,
-            menuConfig.tentang,
-            menuConfig.logout
-        ];
-    } else {
-        // Urutan saat tidak login
-        orderedMenu = [
-            menuConfig.portfolio,
-            menuConfig.jurnal,
-            menuConfig.arena,
-            menuConfig.tools,
-            menuConfig.tentang,
-            menuConfig.login
-        ];
-    }
+    // Definisikan struktur item menu
+    const menuItems = [
+        { key: 'dasbor', text: 'Dasbor', href: 'dashboard.html', requiresAuth: true },
+        { key: 'portfolio', text: 'Portofolio', href: 'portfolio.html' },
+        { key: 'jurnal', text: 'Jurnal', href: 'jurnal.html' },
+        { key: 'arena', text: 'Arena Game', href: 'arena.html' },
+        { key: 'tools', text: 'Tools Hamdi', href: 'tools.html' },
+        { key: 'tentang', text: 'Tentang Saya', id: 'about-button', isButton: true },
+        { key: 'logout', text: 'Logout', id: 'logout-button', isButton: true, requiresAuth: true, buttonClass: 'login-button' },
+        { key: 'login', text: 'Login', href: 'auth.html', requiresAuth: false, buttonClass: 'login-button' }
+    ];
 
-    // Tambahkan item ke dalam menu
-    navLinks.innerHTML += orderedMenu.join('');
+    menuItems.forEach(item => {
+        const isUserLoggedIn = !!refreshToken;
+        // Tampilkan item jika:
+        // 1. Tidak memerlukan auth (selalu tampil)
+        // 2. Memerlukan auth dan user sudah login
+        // 3. Ditujukan untuk user yg belum login (requiresAuth: false) dan user memang belum login
+        if (item.requiresAuth === undefined || item.requiresAuth === isUserLoggedIn) {
+            const li = document.createElement('li');
+            let element;
 
-    // Pasang kembali event listener untuk tombol logout jika ada
+            if (item.isButton) {
+                element = document.createElement('button');
+                element.id = item.id;
+                if(item.buttonClass) element.className = item.buttonClass;
+            } else {
+                element = document.createElement('a');
+                element.href = item.href;
+                if(item.buttonClass) element.className = item.buttonClass;
+            }
+
+            element.innerHTML = `${icons[item.key]} <span>${item.text}</span>`;
+            li.appendChild(element);
+            navLinks.appendChild(li);
+        }
+    });
+
+    // Pasang kembali event listener untuk tombol logout
     const logoutButton = document.getElementById('logout-button');
     if (logoutButton) {
         logoutButton.addEventListener('click', async () => {
             try {
                 await fetchWithAuth(`${API_BASE_URL}/api/logout`, { method: 'POST' });
             } catch (e) {
-                console.error("Gagal logout di server, tapi lanjut logout di client.", e);
+                console.error("Gagal logout di server, tapi tetap lanjut logout di client.", e);
             } finally {
                 forceLogout();
             }
         });
     }
 }
-
 
 /* === FUNGSI GLOBAL === */
 document.addEventListener('DOMContentLoaded', async () => {
