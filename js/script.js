@@ -1,45 +1,60 @@
-// =======================================================================
-// ==   FILE FINAL SCRIPT.JS (PERBAIKAN TOMBOL CLOSE & URUTAN MENU)   ==
-// =======================================================================
+// ===================================================================
+// ==   FILE FINAL SCRIPT.JS (100% LENGKAP DENGAN REFRESH TOKEN)  ==
+// ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
 
-// Fungsi untuk memaksa logout, membersihkan semua token dan mengarahkan ke halaman utama.
+// BARU: Fungsi untuk memaksa logout, membersihkan semua token dan mengarahkan ke halaman login.
 function forceLogout() {
     localStorage.removeItem('jwt_refresh_token');
     sessionStorage.removeItem('jwt_access_token');
-    window.location.href = 'index.html';
+    // Hanya redirect jika belum di halaman auth untuk menghindari loop
+    if (!window.location.pathname.endsWith('auth.html')) {
+        alert('Sesi Anda telah berakhir. Silakan login kembali.');
+        window.location.href = 'auth.html';
+    }
 }
 
-// Pembungkus Fetch API yang secara otomatis menangani refresh token.
+// BARU: Pembungkus Fetch API yang secara otomatis menangani refresh token.
+// Semua panggilan ke API yang butuh otentikasi harus menggunakan fungsi ini.
 async function fetchWithAuth(url, options = {}) {
     let accessToken = sessionStorage.getItem('jwt_access_token');
-    options.headers = { ...options.headers };
+
+    options.headers = { ...options.headers }; // Salin header yang ada
     if (accessToken) {
         options.headers['Authorization'] = `Bearer ${accessToken}`;
     }
+
     if (options.body instanceof FormData) {
         delete options.headers['Content-Type'];
     } else if (!options.headers['Content-Type'] && !(options.body instanceof FormData)) {
         options.headers['Content-Type'] = 'application/json';
     }
+
     let response = await fetch(url, options);
+
     if (response.status === 401 || response.status === 403) {
+        console.log("Access Token kedaluwarsa atau tidak valid, mencoba refresh...");
         const refreshToken = localStorage.getItem('jwt_refresh_token');
+
         if (!refreshToken) {
             forceLogout();
             return response;
         }
+
         try {
             const refreshResponse = await fetch(`${API_BASE_URL}/api/refresh-token`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token: refreshToken })
             });
+
             if (refreshResponse.ok) {
                 const data = await refreshResponse.json();
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
+                console.log("Refresh berhasil, mengulangi permintaan...");
+
                 options.headers['Authorization'] = `Bearer ${data.accessToken}`;
                 response = await fetch(url, options);
             } else {
@@ -50,101 +65,39 @@ async function fetchWithAuth(url, options = {}) {
             forceLogout();
         }
     }
+
     return response;
-}
-
-// Fungsi untuk membangun ulang UI Navigasi berdasarkan status login dan urutan
-function setupAuthUI() {
-    const refreshToken = localStorage.getItem('jwt_refresh_token');
-    const navLinks = document.querySelector('.nav-links');
-    if (!navLinks) return;
-    
-    // [PERBAIKAN] Hapus hanya item menu (<li>), bukan semua isi navLinks
-    Array.from(navLinks.children).forEach(child => {
-        if (child.tagName === 'LI') {
-            child.remove();
-        }
-    });
-
-    // Definisikan ikon untuk setiap menu
-    const icons = {
-        dasbor:     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
-        portfolio:  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>`,
-        jurnal:     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`,
-        arena:      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>`,
-        tools:      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>`,
-        tentang:    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
-        logout:     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`,
-        login:      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>`
-    };
-
-    const menuItems = [
-        { key: 'dasbor', text: 'Dasbor', href: 'dashboard.html', requiresAuth: true },
-        { key: 'portfolio', text: 'Portofolio', href: 'portfolio.html' },
-        { key: 'jurnal', text: 'Jurnal', href: 'jurnal.html' },
-        { key: 'arena', text: 'Arena Game', href: 'arena.html' },
-        { key: 'tools', text: 'Tools Hamdi', href: 'tools.html' },
-        { key: 'tentang', text: 'Tentang Saya', id: 'about-button', isButton: true },
-        { key: 'logout', text: 'Logout', id: 'logout-button', isButton: true, requiresAuth: true, buttonClass: 'login-button' },
-        { key: 'login', text: 'Login', href: 'auth.html', requiresAuth: false, buttonClass: 'login-button' }
-    ];
-
-    const fragment = document.createDocumentFragment();
-    menuItems.forEach(item => {
-        const isUserLoggedIn = !!refreshToken;
-        if (item.requiresAuth === undefined || item.requiresAuth === isUserLoggedIn) {
-            const li = document.createElement('li');
-            let element;
-            if (item.isButton) {
-                element = document.createElement('button');
-                element.id = item.id;
-                if(item.buttonClass) element.className = item.buttonClass;
-            } else {
-                element = document.createElement('a');
-                element.href = item.href;
-                if(item.buttonClass) element.className = item.buttonClass;
-            }
-            element.innerHTML = `${icons[item.key]} <span>${item.text}</span>`;
-            li.appendChild(element);
-            fragment.appendChild(li);
-        }
-    });
-    navLinks.appendChild(fragment);
-
-    const logoutButton = document.getElementById('logout-button');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', async () => {
-            try {
-                await fetchWithAuth(`${API_BASE_URL}/api/logout`, { method: 'POST' });
-            } catch (e) {
-                console.error("Gagal logout di server, tapi tetap lanjut logout di client.", e);
-            } finally {
-                forceLogout();
-            }
-        });
-    }
 }
 
 
 /* === FUNGSI GLOBAL === */
 document.addEventListener('DOMContentLoaded', async () => {
-    // [PERBAIKAN] Panggil setupMobileMenu DULU agar tombol close dibuat
-    setupMobileMenu();
-    // Baru panggil setupAuthUI untuk mengisi item menu
-    setupAuthUI();
-
     const refreshToken = localStorage.getItem('jwt_refresh_token');
 
+    const loginLink = document.querySelector('a.login-button');
+    if (loginLink) {
+        if (refreshToken) {
+            loginLink.textContent = 'Dasbor';
+            loginLink.href = 'dashboard.html';
+        } else {
+            loginLink.textContent = 'Login';
+            loginLink.href = 'auth.html';
+        }
+    }
+
     if (refreshToken && !sessionStorage.getItem('jwt_access_token')) {
+        console.log("Sesi baru, mencoba mendapatkan access token...");
         try {
             const refreshResponse = await fetch(`${API_BASE_URL}/api/refresh-token`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token: refreshToken })
             });
+
             if (refreshResponse.ok) {
                 const data = await refreshResponse.json();
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
+                console.log("Access token berhasil didapatkan untuk sesi ini.");
                 if (document.body.contains(document.getElementById('dashboard-main'))) {
                     setupDashboardPage();
                 }
@@ -166,7 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     setupAboutModal();
-    // setupMobileMenu(); // Pindah ke atas
+    setupMobileMenu();
     setupAllPasswordToggles();
     setupChatBubble();
 });
@@ -175,15 +128,30 @@ function decodeJwt(token) {
     try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
 }
 
-// ... Sisa kode lainnya dari sini ke bawah tetap sama ...
 // ===================================
 // === LOGIKA HALAMAN DASHBOARD    ===
 // ===================================
+
 function setupDashboardPage() {
     if (!localStorage.getItem('jwt_refresh_token')) {
         window.location.href = 'auth.html';
         return;
     }
+
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await fetchWithAuth(`${API_BASE_URL}/api/logout`, { method: 'POST' });
+            } catch (e) {
+                console.error("Gagal logout di server, tapi tetap lanjut logout di client.", e);
+            } finally {
+                forceLogout();
+                window.location.href = 'index.html';
+            }
+        });
+    }
+
     const accessToken = sessionStorage.getItem('jwt_access_token');
     if (accessToken) {
         populateUserInfo(accessToken);
@@ -732,6 +700,7 @@ function attachImageCompressorListener() {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                // URL.revokeObjectURL(imageUrl); // Don't revoke immediately if preview is still needed
             };
             downloadButton.style.display = 'block';
             messageDiv.textContent = 'Image compressed successfully!';
@@ -885,10 +854,12 @@ function setupAuthPage() {
             const password = document.getElementById('login-password').value;
             authMessage.textContent = 'Memproses...';
             try {
+                // Fetch biasa karena belum ada token
                 const response = await fetch(`${API_BASE_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error);
 
+                // DIUBAH: Simpan kedua token
                 localStorage.setItem('jwt_refresh_token', data.refreshToken);
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
 
@@ -969,64 +940,43 @@ if (resetForm) {
 // ==========================================================
 // ===         LOGIKA UNTUK ELEMEN UI UMUM                ===
 // ==========================================================
-
-/* Di dalam file script.js */
-/* GANTI FUNGSI setupMobileMenu YANG LAMA DENGAN VERSI BARU INI */
-
-/* GANTI FUNGSI LAMA DENGAN INI */
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
-    if (!hamburger || !navLinks) return;
-
-    // Cek apakah <li> pembungkus tombol close sudah ada
-    let navCloseItem = navLinks.querySelector('.nav-close-item');
-    if (!navCloseItem) {
-        // [PERBAIKAN] Buat <li> sebagai pembungkus
-        navCloseItem = document.createElement('li');
-        navCloseItem.className = 'nav-close-item'; // Beri kelas agar mudah di-style
-
-        const navCloseButton = document.createElement('button');
-        navCloseButton.className = 'nav-close-button';
+    let navCloseButton = document.getElementById('nav-close-button');
+    if (!navCloseButton) {
+        navCloseButton = document.createElement('button');
+        navCloseButton.id = 'nav-close-button';
+        navCloseButton.classList.add('nav-close-button');
         navCloseButton.setAttribute('aria-label', 'Tutup menu');
         navCloseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-        
-        // Masukkan tombol ke dalam <li>, lalu <li> ke dalam <ul>
-        navCloseItem.appendChild(navCloseButton);
-        navLinks.prepend(navCloseItem);
+        if(navLinks) navLinks.prepend(navCloseButton);
     }
-    
+
     const toggleMenu = () => {
-        hamburger.classList.toggle('active');
-        navLinks.classList.toggle('active');
+        if(hamburger) hamburger.classList.toggle('active');
+        if(navLinks) navLinks.classList.toggle('active');
         document.body.classList.toggle('menu-open');
         document.documentElement.classList.toggle('menu-open');
     };
 
-    hamburger.addEventListener('click', toggleMenu);
-
-    // Pasang listener pada container menu untuk menangani klik tombol close
-    navLinks.addEventListener('click', (event) => {
-        if (event.target.closest('.nav-close-button')) {
-            toggleMenu();
-        }
-    });
+    if (hamburger && navLinks) hamburger.addEventListener('click', toggleMenu);
+    if (navCloseButton) navCloseButton.addEventListener('click', toggleMenu);
+    if (navLinks) {
+        navLinks.addEventListener('click', (event) => {
+            if (event.target === navLinks) toggleMenu();
+        });
+    }
 }
 
 function setupAboutModal() {
-    document.body.addEventListener('click', (event) => {
-        if (event.target.id === 'about-button' || event.target.closest('#about-button')) {
-             event.preventDefault();
-             const modalOverlay = document.getElementById('about-modal');
-             if(modalOverlay) modalOverlay.classList.remove('hidden');
-        }
-    });
-
+    const aboutButtons = document.querySelectorAll('#about-button');
     const modalOverlay = document.getElementById('about-modal');
     if (!modalOverlay) return;
     const modalCloseButton = modalOverlay.querySelector('.modal-close');
+    const openModal = () => modalOverlay.classList.remove('hidden');
     const closeModal = () => modalOverlay.classList.add('hidden');
-    
+    aboutButtons.forEach(button => button.addEventListener('click', e => { e.preventDefault(); openModal(); }));
     if (modalCloseButton) modalCloseButton.addEventListener('click', closeModal);
     modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) closeModal(); });
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); });
@@ -1096,6 +1046,7 @@ function setupChatBubble() {
 
             if (!response.ok) {
                  const error = await response.json().catch(() => ({error: "Gagal terhubung ke AI."}));
+                 // Cek jika error karena butuh login
                  if (response.status === 401 || response.status === 403) {
                      throw new Error("Anda harus login untuk menggunakan fitur chat.");
                  }

@@ -509,42 +509,6 @@ input:focus, textarea:focus, select:focus {
     transition: color 0.3s ease, transform 0.3s ease;
     z-index: 1001; /* Ensure it's above menu items */
     padding: 0; /* Hapus padding jika sebelumnya ada dari lingkaran */
-
-    /* Di dalam file style.css */
-
-/* [TAMBAHAN BARU] Atur <li> pembungkus tombol close agar tidak punya style aneh */
-.nav-links li.nav-close-item {
-    border-bottom: none !important; /* Pastikan tidak ada garis bawah */
-    padding: 0 !important; /* Hapus padding */
-    margin-top: 0 !important; /* Hapus margin atas */
-}
-
-/* Pastikan styling untuk tombol close ini ada dan benar */
-.nav-close-button {
-    display: none;
-    position: absolute;
-    top: var(--space-sm);
-    right: var(--space-md);
-    background: transparent;
-    border: none;
-    color: var(--text-muted-color);
-    cursor: pointer;
-    line-height: 1;
-    padding: 0;
-    transition: color 0.3s ease, transform 0.3s ease;
-    z-index: 1001;
-}
-
-.nav-close-button:hover {
-    color: var(--accent-color);
-    transform: rotate(90deg);
-}
-
-.nav-close-button svg {
-    width: 28px;
-    height: 28px;
-    stroke-width: 2.5;
-}
 }
 
 .nav-close-button svg {
@@ -561,43 +525,33 @@ input:focus, textarea:focus, select:focus {
     transform: rotate(90deg);
 }
 
-/* Di dalam file style.css */
-
-/* Di dalam file style.css */
-/* GANTI SELURUH BLOK @media DI BAWAH INI */
-
-/* Di dalam file style.css */
-/* HAPUS BLOK @media (max-width: 768px) LAMA ANDA, LALU GANTI DENGAN BLOK LENGKAP INI */
-
 @media (max-width: 768px) {
-    /* --- Hamburger Button --- */
     .hamburger { display: block; }
     .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .hamburger.active span:nth-child(2) { opacity: 0; }
     .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
     
-    /* --- Mobile Menu Container --- */
     .nav-links { 
         position: fixed; 
         top: 0; 
         right: 0; 
         bottom: 0; 
-        width: 85%;
-        max-width: 320px;
+        width: 85%; /* Optimal width for mobile overlay */
+        max-width: 350px; /* Limits width on larger tablets */
         height: 100vh; 
-        background-color: #161616;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        padding-top: var(--space-xl); 
-        gap: 0;
+        background-color: rgba(18, 18, 18, 0.98); 
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding-top: var(--space-xxl); /* Push content down from top */
         opacity: 0; 
         visibility: hidden; 
         transform: translateX(100%); 
-        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease, visibility 0.4s ease; 
+        transition: transform 0.4s ease, opacity 0.4s ease, visibility 0.4s ease; 
         flex-direction: column; 
-        align-items: stretch;
+        align-items: flex-start; /* Align text to left */
         justify-content: flex-start;
-        box-shadow: -5px 0 25px rgba(0,0,0,0.4);
+        gap: var(--space-sm);
+        box-shadow: -5px 0 15px rgba(0,0,0,0.3);
         z-index: 1000; 
     }
     .nav-links.active { 
@@ -606,177 +560,46 @@ input:focus, textarea:focus, select:focus {
         transform: translateX(0); 
     }
     
-    /* --- Menu Items (<li>) --- */
+    /* Overlay for content behind the menu */
+    body.menu-open, html.menu-open {
+        overflow: hidden; 
+    }
+
     .nav-links li { 
         margin: 0; 
         width: 100%; 
-        padding: 0 var(--space-md);
-        border: none;
+        text-align: left; /* Ensure text alignment */
+        padding-left: var(--space-lg); /* Consistent padding for list items */
+        padding-right: var(--space-lg); /* Consistent padding for list items */
     }
-    
-    /* --- Close Button Container (<li>) --- */
-    .nav-links li.nav-close-item {
-        border-bottom: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        position: absolute; /* Posisikan container li-nya */
-        top: 0;
-        right: 0;
-        width: auto;
-    }
-
-    /* --- THE FIX: Close Button Styling --- */
-    .nav-close-button {
-        display: block !important; /* INI KUNCINYA: Paksa tombol untuk tampil */
-        position: static; /* Buat statis karena parent-nya (li) sudah absolute */
-        padding: var(--space-md); /* Area klik yang lebih besar */
-        color: var(--text-muted-color);
-        cursor: pointer;
-        line-height: 1;
-        background: transparent;
-        border: none;
-        transition: color 0.3s ease, transform 0.3s ease;
-    }
-    .nav-close-button:hover {
-        color: var(--accent-color);
-        transform: rotate(90deg);
-    }
-    .nav-close-button svg {
-        width: 28px;
-        height: 28px;
-        stroke-width: 2.5;
-    }
-    
-    /* --- Menu Links & Buttons --- */
-    .nav-links a, .nav-links button:not(.nav-close-button) { 
-        display: flex;
-        align-items: center;
-        gap: var(--space-md);
-        padding: 1rem;
-        width: 100%;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 500;
-        color: var(--text-muted-color);
-        text-decoration: none;
-        transition: background-color 0.2s ease, color 0.2s ease;
-        text-align: left;
-        background: transparent;
-        border: none;
-        font-family: var(--font-body);
-        cursor: pointer;
-    }
-    .nav-links a:hover, .nav-links button:not(.nav-close-button):hover { 
-        background-color: var(--card-bg-color);
-        color: var(--text-color); 
-    }
-    
-    /* --- Icons inside menu --- */
-    .nav-links svg {
-        width: 20px;
-        height: 20px;
-        stroke-width: 2;
-        flex-shrink: 0;
-        color: var(--text-muted-color);
-        transition: color 0.2s ease;
-    }
-    .nav-links a:hover svg, .nav-links button:not(.nav-close-button):hover svg {
-        color: var(--accent-color);
-    }
-    
-    .nav-links a::after { display: none; }
-    
-    /* --- Logout/Login Button Specifics --- */
-    .nav-links .login-button {
-        color: #000;
-        background: var(--accent-color);
-        font-weight: 600;
-        margin-top: var(--space-md);
-    }
-    .nav-links .login-button:hover {
-        background: var(--accent-hover) !important;
-        color: #000 !important;
-    }
-    .nav-links .login-button:hover svg {
-        color: #000 !important;
-    }
-    .nav-links .login-button svg {
-        color: #000;
-    }
-}
-
-    /* Hilangkan modifikasi untuk li:last-child dan li:first-child */
-    
-    /* [REVISI TOTAL] Atur link dan button agar simetris dengan ikon */
-    .nav-links a, .nav-links button { 
-        display: flex; /* Gunakan Flexbox */
-        align-items: center; /* Sejajarkan vertikal */
-        gap: var(--space-md); /* Jarak antara ikon dan teks */
-        padding: 1rem; /* Padding yang konsisten di dalam item */
+    .nav-links a, .nav-links .nav-button { 
+        display: block; 
+        padding: var(--space-sm) 0; /* Adjust padding within list items */
         width: 100%; 
-        border-radius: 8px; /* Sudut membulat untuk setiap item */
-        font-size: 1rem;
-        font-weight: 500;
-        color: var(--text-muted-color);
-        text-decoration: none;
-        transition: background-color 0.2s ease, color 0.2s ease;
-        text-align: left;
-        background: transparent;
-        border: none;
-        font-family: var(--font-body);
-        cursor: pointer;
+        border-radius: 0; 
+        font-size: 1.1rem; 
     }
+    .nav-links a:hover, .nav-links .nav-button:hover { background-color: transparent; color: var(--accent-color); }
+    .nav-links a::after { display: none; } /* Hide underline on mobile menu items */
     
-    .nav-links a:hover, .nav-links button:hover { 
-        background-color: var(--card-bg-color);
-        color: var(--text-color); 
-    }
-    
-    /* [BARU] Styling untuk ikon di dalam menu */
-    .nav-links svg {
-        width: 20px;
-        height: 20px;
-        stroke-width: 2;
-        flex-shrink: 0; /* Mencegah ikon menyusut */
-        color: var(--text-muted-color);
-        transition: color 0.2s ease;
-    }
-    
-    .nav-links a:hover svg, .nav-links button:hover svg {
-        color: var(--accent-color);
-    }
-    
-    .nav-links a::after { display: none; }
-    
-    /* [REVISI] Pastikan tombol Logout/Login terlihat sama */
-    .nav-links .login-button {
-        color: #000; /* Warna teks tombol logout */
-        background: var(--accent-color);
-        font-weight: 600;
-        margin-top: var(--space-md); /* Jarak pemisah */
-    }
-    
-    .nav-links .login-button:hover {
-        background: var(--accent-hover) !important;
-        color: #000 !important;
-    }
-    
-    .nav-links .login-button:hover svg {
-        color: #000 !important;
+    .nav-links a.login-button { 
+        margin: var(--space-md) var(--space-lg); /* Adjusted margin for consistency */
+        width: calc(100% - (var(--space-lg) * 2)); /* Make button span full width minus padding */
+        text-align: center; 
+        font-size: 1.0rem; 
+        align-self: flex-start; /* Keep aligned with other text */
     }
 
-    .nav-links .login-button svg {
-        color: #000;
-    }
-
+    /* Show close button on mobile */
     .nav-close-button {
-        display: block;
+        display: block; /* Cukup block karena sudah tidak flex untuk centering */
     }
+    
     /* Penyesuaian khusus untuk history item di mobile */
     .mood-item-header { flex-direction: column; align-items: flex-start; }
     .mood-item-actions { width: 100%; justify-content: flex-end; } 
     .mood-item-header strong { margin-right: 0; } 
-
+}
 
 @media (max-width: 480px) {
     .tool-selector-button { width: 100%; }
