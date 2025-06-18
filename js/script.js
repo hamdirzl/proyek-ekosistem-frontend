@@ -1,33 +1,128 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (100% LENGKAP DAN UTUH)              ==
+// ==   FILE FINAL SCRIPT.JS (100% LENGKAP DENGAN REFRESH TOKEN)  ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
 
-/* === FUNGSI GLOBAL === */
-document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('jwt_token');
+// BARU: Fungsi untuk memaksa logout, membersihkan semua token dan mengarahkan ke halaman login.
+function forceLogout() {
+    localStorage.removeItem('jwt_refresh_token');
+    sessionStorage.removeItem('jwt_access_token');
+    // Hanya redirect jika belum di halaman auth untuk menghindari loop
+    if (!window.location.pathname.endsWith('auth.html')) {
+        alert('Sesi Anda telah berakhir. Silakan login kembali.');
+        window.location.href = 'auth.html';
+    }
+}
 
-    // Cek status login umum untuk navigasi
-    const loginLink = document.querySelector('a.login-button'); 
-    if (token) {
-        if(loginLink) {
+// BARU: Pembungkus Fetch API yang secara otomatis menangani refresh token.
+// Semua panggilan ke API yang butuh otentikasi harus menggunakan fungsi ini.
+async function fetchWithAuth(url, options = {}) {
+    let accessToken = sessionStorage.getItem('jwt_access_token');
+
+    options.headers = { ...options.headers }; // Salin header yang ada
+    if (accessToken) {
+        options.headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    // Hapus header Content-Type jika body adalah FormData, biarkan browser yang atur
+    if (options.body instanceof FormData) {
+        delete options.headers['Content-Type'];
+    } else if (!options.headers['Content-Type'] && !(options.body instanceof FormData)) {
+        options.headers['Content-Type'] = 'application/json';
+    }
+
+    let response = await fetch(url, options);
+
+    if (response.status === 401 || response.status === 403) {
+        console.log("Access Token kedaluwarsa atau tidak valid, mencoba refresh...");
+        const refreshToken = localStorage.getItem('jwt_refresh_token');
+
+        if (!refreshToken) {
+            forceLogout();
+            return response;
+        }
+
+        try {
+            const refreshResponse = await fetch(`${API_BASE_URL}/api/refresh-token`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: refreshToken })
+            });
+
+            if (refreshResponse.ok) {
+                const data = await refreshResponse.json();
+                sessionStorage.setItem('jwt_access_token', data.accessToken);
+                console.log("Refresh berhasil, mengulangi permintaan...");
+
+                options.headers['Authorization'] = `Bearer ${data.accessToken}`;
+                response = await fetch(url, options);
+            } else {
+                forceLogout();
+            }
+        } catch (error) {
+            console.error("Error saat proses refresh token:", error);
+            forceLogout();
+        }
+    }
+
+    return response;
+}
+
+
+/* === FUNGSI GLOBAL === */
+document.addEventListener('DOMContentLoaded', async () => {
+    // DIUBAH: Sumber utama status login adalah refreshToken
+    const refreshToken = localStorage.getItem('jwt_refresh_token');
+
+    const loginLink = document.querySelector('a.login-button');
+    if (loginLink) {
+        if (refreshToken) {
             loginLink.textContent = 'Dasbor';
             loginLink.href = 'dashboard.html';
+        } else {
+            loginLink.textContent = 'Login';
+            loginLink.href = 'auth.html';
+        }
+    }
+
+    // BARU: Logika untuk mendapatkan accessToken baru saat halaman dimuat
+    if (refreshToken && !sessionStorage.getItem('jwt_access_token')) {
+        console.log("Sesi baru, mencoba mendapatkan access token...");
+        try {
+            const refreshResponse = await fetch(`${API_BASE_URL}/api/refresh-token`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: refreshToken })
+            });
+
+            if (refreshResponse.ok) {
+                const data = await refreshResponse.json();
+                sessionStorage.setItem('jwt_access_token', data.accessToken);
+                console.log("Access token berhasil didapatkan untuk sesi ini.");
+                // Muat ulang data yang bergantung pada token setelah berhasil refresh
+                if (document.body.contains(document.getElementById('dashboard-main'))) {
+                    setupDashboardPage();
+                }
+            } else {
+                forceLogout();
+            }
+        } catch (error) {
+            console.error("Gagal mendapatkan access token saat load:", error);
+            forceLogout();
         }
     }
 
     // Pemicu logika berdasarkan halaman yang aktif
     if (document.body.contains(document.getElementById('dashboard-main'))) {
-        setupDashboardPage(token);
-    } else if (document.title.includes("Tools")) { 
-        setupToolsPage(token);
-    } else if (document.getElementById('login-form')) { 
+        setupDashboardPage();
+    } else if (document.title.includes("Tools")) {
+        setupToolsPage();
+    } else if (document.getElementById('login-form')) {
         setupAuthPage();
     }
-    
-    // Setup elemen UI umum yang ada di semua halaman
+
     setupAboutModal();
     setupMobileMenu();
     setupAllPasswordToggles();
@@ -41,53 +136,61 @@ function decodeJwt(token) {
 // ===================================
 // === LOGIKA HALAMAN DASHBOARD    ===
 // ===================================
-function setupDashboardPage(token) {
-    if (!token) {
+function setupDashboardPage() {
+    if (!localStorage.getItem('jwt_refresh_token')) {
         window.location.href = 'auth.html';
         return;
     }
+
     const logoutButton = document.getElementById('logout-button');
     if (logoutButton) {
-        logoutButton.addEventListener('click', () => {
-            localStorage.removeItem('jwt_token');
-            window.location.href = 'index.html';
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await fetchWithAuth(`${API_BASE_URL}/api/logout`, { method: 'POST' });
+            } catch (e) {
+                console.error("Gagal logout di server, tapi tetap lanjut logout di client.", e);
+            } finally {
+                forceLogout();
+                window.location.href = 'index.html';
+            }
         });
     }
-    populateUserInfo(token);
-    checkUserRoleAndSetupAdminPanel(token);
+
+    const accessToken = sessionStorage.getItem('jwt_access_token');
+    if (accessToken) {
+        populateUserInfo(accessToken);
+        checkUserRoleAndSetupAdminPanel(accessToken);
+    }
 }
 
 function populateUserInfo(token) {
     const decodedToken = decodeJwt(token);
     if (decodedToken && decodedToken.email) {
         const userEmailElement = document.getElementById('user-email');
-        if (userEmailElement) {
-            userEmailElement.textContent = decodedToken.email;
-        }
+        if (userEmailElement) userEmailElement.textContent = decodedToken.email;
     }
 }
 
-async function checkUserRoleAndSetupAdminPanel(token) {
+function checkUserRoleAndSetupAdminPanel(token) {
     const decodedToken = decodeJwt(token);
     if (decodedToken && decodedToken.role === 'admin') {
-        const adminSection = document.getElementById('admin-section'); // Manajemen Link
-        const adminUsersSection = document.getElementById('admin-users-section'); // Manajemen User
+        const adminSection = document.getElementById('admin-section');
+        const adminUsersSection = document.getElementById('admin-users-section');
         const userEmailElement = document.getElementById('user-email');
 
         if (adminSection) {
             adminSection.classList.remove('hidden');
-            fetchAndDisplayLinks(token); // Memuat tautan
+            fetchAndDisplayLinks();
         }
         if (adminUsersSection) {
             adminUsersSection.classList.remove('hidden');
-            fetchAndDisplayUsers(token); // Memuat pengguna
+            fetchAndDisplayUsers();
         }
-
-        if(userEmailElement) userEmailElement.innerHTML += ' (Admin)';
+        if (userEmailElement) userEmailElement.innerHTML += ' (Admin)';
     }
 }
 
-async function fetchAndDisplayLinks(token) {
+async function fetchAndDisplayLinks() {
     const linkList = document.getElementById('link-list');
     const loadingMessage = document.getElementById('loading-links');
     if (!linkList || !loadingMessage) return;
@@ -96,9 +199,9 @@ async function fetchAndDisplayLinks(token) {
     loadingMessage.style.display = 'block';
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/links`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/links`);
         if (!response.ok) throw new Error('Gagal mengambil data link. Pastikan Anda adalah admin.');
-        
+
         const links = await response.json();
         loadingMessage.style.display = 'none';
         linkList.innerHTML = '';
@@ -137,16 +240,10 @@ async function fetchAndDisplayLinks(token) {
 
 async function handleDeleteLink(event) {
     const slugToDelete = event.target.dataset.slug;
-    const token = localStorage.getItem('jwt_token');
-
     if (!confirm(`Anda yakin ingin menghapus link dengan slug "${slugToDelete}"?`)) return;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/links/${slugToDelete}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/links/${slugToDelete}`, { method: 'DELETE' });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Gagal menghapus link.');
 
@@ -160,21 +257,17 @@ async function handleDeleteLink(event) {
     }
 }
 
-// === FUNGSI BARU UNTUK MANAJEMEN PENGGUNA ADMIN ===
-async function fetchAndDisplayUsers(token) {
+async function fetchAndDisplayUsers() {
     const userList = document.getElementById('user-list');
     const loadingMessage = document.getElementById('loading-users');
     if (!userList || !loadingMessage) return;
 
     loadingMessage.textContent = 'Memuat daftar pengguna...';
     loadingMessage.style.display = 'block';
-    userList.innerHTML = ''; // Bersihkan daftar sebelumnya
+    userList.innerHTML = '';
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/users`);
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || 'Failed to fetch users.');
@@ -188,10 +281,8 @@ async function fetchAndDisplayUsers(token) {
             return;
         }
 
-        // Ikon untuk tombol ubah peran
         const repeatIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-repeat"><polyline points="17 1 21 5 17 9"></polyline><path d="M21 15v4a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12"></path></svg>`;
         const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
-
 
         users.forEach(user => {
             const listItem = document.createElement('li');
@@ -202,12 +293,8 @@ async function fetchAndDisplayUsers(token) {
                     <span><strong>Email:</strong> ${user.email}</span>
                     <span><strong>Role:</strong> <span id="role-${user.id}">${user.role}</span></span>
                     <div class="mood-item-actions">
-                        <button class="mood-icon-button toggle-user-role-btn" data-user-id="${user.id}" data-current-role="${user.role}" aria-label="Ubah Peran">
-                            ${repeatIconSvg}
-                        </button>
-                        <button class="mood-icon-button delete-user-btn delete-button" data-user-id="${user.id}" aria-label="Hapus Pengguna">
-                            ${trashIconSvg}
-                        </button>
+                        <button class="mood-icon-button toggle-user-role-btn" data-user-id="${user.id}" data-current-role="${user.role}" aria-label="Ubah Peran">${repeatIconSvg}</button>
+                        <button class="mood-icon-button delete-user-btn delete-button" data-user-id="${user.id}" aria-label="Hapus Pengguna">${trashIconSvg}</button>
                     </div>
                 </div>
                 <small class="mood-date">Bergabung pada: ${new Date(user.created_at).toLocaleString('id-ID')}</small>
@@ -215,12 +302,8 @@ async function fetchAndDisplayUsers(token) {
             userList.appendChild(listItem);
         });
 
-        document.querySelectorAll('.toggle-user-role-btn').forEach(button => {
-            button.addEventListener('click', (e) => toggleUserRole(e, token));
-        });
-        document.querySelectorAll('.delete-user-btn').forEach(button => {
-            button.addEventListener('click', (e) => deleteUser(e, token));
-        });
+        document.querySelectorAll('.toggle-user-role-btn').forEach(button => button.addEventListener('click', toggleUserRole));
+        document.querySelectorAll('.delete-user-btn').forEach(button => button.addEventListener('click', deleteUser));
 
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
@@ -228,36 +311,26 @@ async function fetchAndDisplayUsers(token) {
     }
 }
 
-// Fungsi untuk mengubah peran pengguna
-async function toggleUserRole(event, token) {
+async function toggleUserRole(event) {
     const button = event.currentTarget;
     const userId = button.dataset.userId;
     const currentRole = button.dataset.currentRole;
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
-
-    if (!confirm(`Anda yakin ingin mengubah peran pengguna ini menjadi ${newRole}?`)) {
-        return;
-    }
+    if (!confirm(`Anda yakin ingin mengubah peran pengguna ini menjadi ${newRole}?`)) return;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/role`, {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/users/${userId}/role`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify({ role: newRole })
         });
-
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Gagal memperbarui peran.');
 
         alert(data.message);
-        // Update UI
         const roleSpan = document.getElementById(`role-${userId}`);
         if (roleSpan) {
             roleSpan.textContent = newRole;
-            button.dataset.currentRole = newRole; // Update data attribute
+            button.dataset.currentRole = newRole;
         }
     } catch (error) {
         alert(`Error: ${error.message}`);
@@ -265,32 +338,19 @@ async function toggleUserRole(event, token) {
     }
 }
 
-// Fungsi untuk menghapus pengguna
-async function deleteUser(event, token) {
-    const button = event.currentTarget;
-    const userId = button.dataset.userId;
-
-    if (!confirm(`Anda yakin ingin menghapus pengguna ini secara permanen? Tindakan ini tidak bisa dibatalkan.`)) {
-        return;
-    }
+async function deleteUser(event) {
+    const userId = event.currentTarget.dataset.userId;
+    if (!confirm(`Anda yakin ingin menghapus pengguna ini secara permanen? Tindakan ini tidak bisa dibatalkan.`)) return;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/users/${userId}`, { method: 'DELETE' });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Gagal menghapus pengguna.');
 
         alert(data.message);
-        // Remove from UI
         const listItemToRemove = document.getElementById(`user-${userId}`);
-        if (listItemToRemove) {
-            listItemToRemove.remove();
-        }
+        if (listItemToRemove) listItemToRemove.remove();
+
     } catch (error) {
         alert(`Error: ${error.message}`);
         console.error(error);
@@ -300,36 +360,32 @@ async function deleteUser(event, token) {
 // ===================================
 // === LOGIKA HALAMAN TOOLS        ===
 // ===================================
-
-function setupToolsPage(token) {
-    const wrappers = [ 
-        document.getElementById('shortener-wrapper'),
-        document.getElementById('history-section'),
-        document.getElementById('converter-wrapper'),
-        document.getElementById('image-merger-wrapper'),
-        document.getElementById('qr-generator-wrapper'),
-        document.getElementById('image-compressor-wrapper') 
+function setupToolsPage() {
+    const wrappers = [
+        document.getElementById('shortener-wrapper'), document.getElementById('history-section'),
+        document.getElementById('converter-wrapper'), document.getElementById('image-merger-wrapper'),
+        document.getElementById('qr-generator-wrapper'), document.getElementById('image-compressor-wrapper')
     ];
     const loginPrompt = document.getElementById('login-prompt');
-    const toolSelectionSection = document.querySelector('.tool-selection'); 
+    const toolSelectionSection = document.querySelector('.tool-selection');
 
     wrappers.forEach(el => el && el.classList.add('hidden'));
 
-    if (token) {
+    if (localStorage.getItem('jwt_refresh_token')) {
         if (loginPrompt) loginPrompt.classList.add('hidden');
         if (toolSelectionSection) toolSelectionSection.classList.remove('hidden');
 
-        document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper', token));
-        document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper', token));
-        document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper', token));
-        document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper', token));
-        document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper', token)); 
+        document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper'));
+        document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper'));
+        document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper'));
+        document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper'));
+        document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper'));
 
-        attachShortenerListener(token);
-        attachConverterListener(token);
-        attachImageMergerListener(token);
-        attachQrCodeGeneratorListener(token);
-        attachImageCompressorListener(token); 
+        attachShortenerListener();
+        attachConverterListener();
+        attachImageMergerListener();
+        attachQrCodeGeneratorListener();
+        attachImageCompressorListener();
 
     } else {
         if (loginPrompt) loginPrompt.classList.remove('hidden');
@@ -342,60 +398,47 @@ function setupToolsPage(token) {
     if (fileInput && outputFormatSelect) {
         fileInput.addEventListener('change', () => {
             if (!fileInput.files || fileInput.files.length === 0) return;
-
             const fileName = fileInput.files[0].name.toLowerCase();
             const docxOption = outputFormatSelect.querySelector('option[value="docx"]');
-
             if (fileName.endsWith('.pdf')) {
                 if (docxOption) {
                     docxOption.disabled = true;
-                    if (outputFormatSelect.value === 'docx') {
-                        outputFormatSelect.value = 'pdf'; 
-                    }
+                    if (outputFormatSelect.value === 'docx') outputFormatSelect.value = 'pdf';
                 }
             } else {
-                if (docxOption) {
-                    docxOption.disabled = false;
-                }
+                if (docxOption) docxOption.disabled = false;
             }
         });
     }
 }
 
-function showToolSection(sectionIdToShow, token) {
+function showToolSection(sectionIdToShow) {
     const allToolSections = [
-        document.getElementById('shortener-wrapper'),
-        document.getElementById('converter-wrapper'),
-        document.getElementById('image-merger-wrapper'),
-        document.getElementById('qr-generator-wrapper'),
-        document.getElementById('image-compressor-wrapper') 
+        document.getElementById('shortener-wrapper'), document.getElementById('converter-wrapper'),
+        document.getElementById('image-merger-wrapper'), document.getElementById('qr-generator-wrapper'),
+        document.getElementById('image-compressor-wrapper')
     ];
-    const historySection = document.getElementById('history-section'); 
+    const historySection = document.getElementById('history-section');
 
     allToolSections.forEach(section => {
-        if (section && section.id === sectionIdToShow) {
-            section.classList.remove('hidden');
-        } else {
-            section?.classList.add('hidden');
-        }
+        if (section && section.id === sectionIdToShow) section.classList.remove('hidden');
+        else section?.classList.add('hidden');
     });
 
     if (historySection) {
         if (sectionIdToShow === 'shortener-wrapper') {
             historySection.classList.remove('hidden');
-            fetchUserLinkHistory(token); 
+            fetchUserLinkHistory();
         } else {
             historySection.classList.add('hidden');
         }
     }
 
     const targetSection = document.getElementById(sectionIdToShow);
-    if (targetSection) {
-        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (targetSection) targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function attachShortenerListener(token) {
+function attachShortenerListener() {
     const form = document.getElementById('shortener-form');
     if (!form) return;
 
@@ -414,21 +457,19 @@ function attachShortenerListener(token) {
         copyButton.style.display = 'none';
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/shorten`, {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/shorten`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ original_url: longUrlInput.value, custom_slug: customSlugInput.value }),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Gagal mengambil data');
-            
+
             resultBox.style.display = 'flex';
             copyButton.style.display = 'flex';
             resultText.textContent = data.short_url;
             longUrlInput.value = '';
             customSlugInput.value = '';
-
-            fetchUserLinkHistory(token); 
+            fetchUserLinkHistory();
 
         } catch (error) {
             resultText.textContent = 'Gagal: ' + error.message;
@@ -446,7 +487,7 @@ function attachShortenerListener(token) {
     }
 }
 
-function attachConverterListener(token) {
+function attachConverterListener() {
     const form = document.getElementById('converter-form');
     if (!form) return;
 
@@ -460,8 +501,8 @@ function attachConverterListener(token) {
         submitButton.disabled = true;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/convert`, {
-                method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/convert`, {
+                method: 'POST', body: formData
             });
 
             if (!response.ok) {
@@ -472,13 +513,13 @@ function attachConverterListener(token) {
             const blob = await response.blob();
             const contentDisposition = response.headers.get('content-disposition');
             let fileName = contentDisposition?.match(/filename="(.+)"/)?.[1] || 'converted-file';
-            
+
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none'; a.href = url; a.download = fileName;
             document.body.appendChild(a); a.click();
             window.URL.revokeObjectURL(url); a.remove();
-            
+
             messageDiv.textContent = 'Konversi berhasil! File sedang diunduh.';
             messageDiv.className = 'success';
             form.reset();
@@ -491,7 +532,7 @@ function attachConverterListener(token) {
     });
 }
 
-function attachImageMergerListener(token) {
+function attachImageMergerListener() {
     const form = document.getElementById('image-merger-form');
     if (!form) return;
 
@@ -505,7 +546,7 @@ function attachImageMergerListener(token) {
             messageDiv.className = 'error';
             return;
         }
-        
+
         const formData = new FormData(form);
         const submitButton = form.querySelector('button');
         messageDiv.textContent = 'Mengunggah dan menggabungkan gambar...';
@@ -513,8 +554,8 @@ function attachImageMergerListener(token) {
         submitButton.disabled = true;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/convert/images-to-pdf`, {
-                method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/convert/images-to-pdf`, {
+                method: 'POST', body: formData
             });
             if (!response.ok) {
                 const errorData = await response.json();
@@ -526,7 +567,7 @@ function attachImageMergerListener(token) {
             a.style.display = 'none'; a.href = url; a.download = 'hasil-gabungan.pdf';
             document.body.appendChild(a); a.click();
             window.URL.revokeObjectURL(url); a.remove();
-            
+
             messageDiv.textContent = 'Berhasil! PDF Anda sedang diunduh.';
             messageDiv.className = 'success';
             form.reset();
@@ -539,8 +580,7 @@ function attachImageMergerListener(token) {
     });
 }
 
-// === FUNGSI QR CODE GENERATOR CLIENT-SIDE LOGIC ===
-function attachQrCodeGeneratorListener(token) {
+function attachQrCodeGeneratorListener() {
     const form = document.getElementById('qr-generator-form');
     if (!form) return;
 
@@ -560,12 +600,8 @@ function attachQrCodeGeneratorListener(token) {
         downloadQrButton.style.display = 'none';
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/generate-qr`, {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/generate-qr`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
                 body: JSON.stringify({
                     text: qrText.value,
                     level: qrErrorLevel.value,
@@ -575,10 +611,7 @@ function attachQrCodeGeneratorListener(token) {
             });
 
             const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Failed to generate QR Code.');
-            }
+            if (!response.ok) throw new Error(data.error || 'Failed to generate QR Code.');
 
             qrCodeMessage.textContent = data.message;
             qrCodeMessage.className = 'success';
@@ -589,8 +622,6 @@ function attachQrCodeGeneratorListener(token) {
         } catch (error) {
             qrCodeMessage.textContent = `Error: ${error.message}`;
             qrCodeMessage.className = 'error';
-            qrCodeImage.style.display = 'none';
-            downloadQrButton.style.display = 'none';
         }
     });
 
@@ -604,8 +635,7 @@ function attachQrCodeGeneratorListener(token) {
     });
 }
 
-// === FUNGSI BARU: IMAGE COMPRESSOR CLIENT-SIDE LOGIC ===
-function attachImageCompressorListener(token) {
+function attachImageCompressorListener() {
     const form = document.getElementById('image-compressor-form');
     if (!form) return;
 
@@ -619,7 +649,6 @@ function attachImageCompressorListener(token) {
     const compressedSizeSpan = document.getElementById('compressed-image-size');
     const downloadButton = document.getElementById('download-compressed-button');
 
-    // Update quality value display
     qualityInput.addEventListener('input', () => {
         qualityValueSpan.textContent = `${qualityInput.value}%`;
     });
@@ -632,7 +661,7 @@ function attachImageCompressorListener(token) {
         downloadButton.style.display = 'none';
         originalSizeSpan.textContent = 'N/A';
         compressedSizeSpan.textContent = 'N/A';
-        
+
         const file = imageInput.files[0];
         if (!file) {
             messageDiv.textContent = 'Please select an image file.';
@@ -646,11 +675,8 @@ function attachImageCompressorListener(token) {
         formData.append('format', formatSelect.value);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/compress-image`, {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/compress-image`, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
                 body: formData
             });
 
@@ -664,16 +690,13 @@ function attachImageCompressorListener(token) {
             const compressedSize = response.headers.get('X-Compressed-Size');
             const outputFileName = `compressed-image.${formatSelect.value}`;
 
-            // Display original and compressed sizes
             originalSizeSpan.textContent = `${(originalSize / 1024).toFixed(2)} KB`;
             compressedSizeSpan.textContent = `${(compressedSize / 1024).toFixed(2)} KB`;
 
-            // Display compressed image preview
             const imageUrl = URL.createObjectURL(compressedBlob);
             compressedImagePreview.src = imageUrl;
             compressedImagePreview.style.display = 'block';
 
-            // Enable download button
             downloadButton.onclick = () => {
                 const link = document.createElement('a');
                 link.href = imageUrl;
@@ -681,24 +704,20 @@ function attachImageCompressorListener(token) {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                URL.revokeObjectURL(imageUrl); // Clean up the object URL
+                // URL.revokeObjectURL(imageUrl); // Don't revoke immediately if preview is still needed
             };
             downloadButton.style.display = 'block';
-
             messageDiv.textContent = 'Image compressed successfully!';
             messageDiv.className = 'success';
 
         } catch (error) {
             messageDiv.textContent = `Error: ${error.message}`;
             messageDiv.className = 'error';
-            compressedImagePreview.style.display = 'none';
-            downloadButton.style.display = 'none';
         }
     });
 }
 
-
-async function fetchUserLinkHistory(token) {
+async function fetchUserLinkHistory() {
     const historyList = document.getElementById('link-history-list');
     const loadingMessage = document.getElementById('loading-history');
     if (!historyList || !loadingMessage) return;
@@ -707,16 +726,16 @@ async function fetchUserLinkHistory(token) {
     loadingMessage.style.display = 'block';
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/user/links`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/user/links`);
         if (!response.ok) throw new Error('Gagal mengambil riwayat.');
         const links = await response.json();
-        historyList.innerHTML = ''; 
+        historyList.innerHTML = '';
         if (links.length === 0) {
             loadingMessage.textContent = 'Anda belum memiliki riwayat tautan.';
             loadingMessage.style.display = 'block';
         } else {
             loadingMessage.style.display = 'none';
-            links.forEach(link => renderUserLinkItem(link, historyList, token)); 
+            links.forEach(link => renderUserLinkItem(link, historyList));
         }
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
@@ -724,16 +743,14 @@ async function fetchUserLinkHistory(token) {
     }
 }
 
-// Tambahkan definisi ikon SVG
 const copyIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
 const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
 
-// Fungsi baru untuk merender item tautan pengguna dengan tombol hapus
-function renderUserLinkItem(link, container, token) {
+function renderUserLinkItem(link, container) {
     const shortUrl = `https://link.hamdirzl.my.id/${link.slug}`;
     const listItem = document.createElement('li');
     listItem.className = 'mood-item';
-    listItem.id = `user-link-${link.slug}`; 
+    listItem.id = `user-link-${link.slug}`;
 
     listItem.innerHTML = `
         <div class="mood-item-header">
@@ -751,59 +768,38 @@ function renderUserLinkItem(link, container, token) {
     listItem.querySelector('.copy-history-btn').addEventListener('click', (e) => {
         navigator.clipboard.writeText(e.currentTarget.dataset.url).then(() => {
             const originalSvg = e.currentTarget.innerHTML;
-            e.currentTarget.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00f5a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>`; 
+            e.currentTarget.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00f5a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
             setTimeout(() => { e.currentTarget.innerHTML = originalSvg; }, 2000);
         });
     });
 
-    listItem.querySelector('.delete-user-link-btn').addEventListener('click', (e) => handleDeleteUserLink(e, token));
+    listItem.querySelector('.delete-user-link-btn').addEventListener('click', (e) => handleDeleteUserLink(e));
 }
 
-// ==========================================================
-// === FUNGSI BARU: HAPUS TAUTAN PENGGUNA                 ===
-// ==========================================================
-async function handleDeleteUserLink(event, token) {
+async function handleDeleteUserLink(event) {
     const slugToDelete = event.currentTarget.dataset.slug;
-    
-    if (!confirm(`Anda yakin ingin menghapus tautan ${slugToDelete} dari riwayat Anda?`)) {
-        return;
-    }
+    if (!confirm(`Anda yakin ingin menghapus tautan ${slugToDelete} dari riwayat Anda?`)) return;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/user/links/${slugToDelete}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/user/links/${slugToDelete}`, { method: 'DELETE' });
         const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.error || 'Gagal menghapus tautan dari riwayat.');
-        }
+        if (!response.ok) throw new Error(data.error || 'Gagal menghapus tautan dari riwayat.');
 
         alert(data.message);
-        // Hapus item dari DOM setelah berhasil dihapus dari server
         const listItemToRemove = document.getElementById(`user-link-${slugToDelete}`);
-        if (listItemToRemove) {
-            listItemToRemove.remove();
-        }
-        
-        // Periksa apakah daftar kosong setelah penghapusan terakhir
+        if (listItemToRemove) listItemToRemove.remove();
+
         const historyList = document.getElementById('link-history-list');
         const loadingMessage = document.getElementById('loading-history');
         if (historyList && historyList.children.length === 0) {
             loadingMessage.textContent = 'Anda belum memiliki riwayat tautan.';
             loadingMessage.style.display = 'block';
         }
-
     } catch (error) {
         alert(`Error: ${error.message}`);
         console.error('Error deleting user link:', error);
     }
 }
-
 
 // ==========================================================
 // ===         LOGIKA UNTUK HALAMAN AUTENTIKASI           ===
@@ -823,21 +819,19 @@ function setupAuthPage() {
             e.preventDefault();
             loginSection.classList.add('hidden');
             registerSection.classList.remove('hidden');
-            if(authTitle) authTitle.textContent = 'Registrasi';
+            if (authTitle) authTitle.textContent = 'Registrasi';
             authMessage.textContent = ''; authMessage.className = '';
         });
     }
-
     if (showLoginLink) {
         showLoginLink.addEventListener('click', (e) => {
             e.preventDefault();
             registerSection.classList.add('hidden');
             loginSection.classList.remove('hidden');
-            if(authTitle) authTitle.textContent = 'Login';
+            if (authTitle) authTitle.textContent = 'Login';
             authMessage.textContent = ''; authMessage.className = '';
         });
     }
-
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -857,7 +851,6 @@ function setupAuthPage() {
             }
         });
     }
-
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -865,10 +858,15 @@ function setupAuthPage() {
             const password = document.getElementById('login-password').value;
             authMessage.textContent = 'Memproses...';
             try {
+                // Fetch biasa karena belum ada token
                 const response = await fetch(`${API_BASE_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error);
-                localStorage.setItem('jwt_token', data.token);
+
+                // DIUBAH: Simpan kedua token
+                localStorage.setItem('jwt_refresh_token', data.refreshToken);
+                sessionStorage.setItem('jwt_access_token', data.accessToken);
+
                 authMessage.textContent = 'Login berhasil! Mengalihkan ke dashboard...';
                 authMessage.className = 'success';
                 setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
@@ -943,80 +941,49 @@ if (resetForm) {
     });
 }
 
-
 // ==========================================================
 // ===         LOGIKA UNTUK ELEMEN UI UMUM                ===
 // ==========================================================
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
-    // Membuat tombol close SVG secara dinamis jika belum ada di HTML
     let navCloseButton = document.getElementById('nav-close-button');
     if (!navCloseButton) {
         navCloseButton = document.createElement('button');
         navCloseButton.id = 'nav-close-button';
         navCloseButton.classList.add('nav-close-button');
         navCloseButton.setAttribute('aria-label', 'Tutup menu');
-        // Menggunakan ikon SVG 'x' dari feather icons
         navCloseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-        navLinks.prepend(navCloseButton);
+        if(navLinks) navLinks.prepend(navCloseButton);
     }
 
     const toggleMenu = () => {
-        hamburger.classList.toggle('active');
-        navLinks.classList.toggle('active');
-        document.body.classList.toggle('menu-open'); 
-        document.documentElement.classList.toggle('menu-open'); 
+        if(hamburger) hamburger.classList.toggle('active');
+        if(navLinks) navLinks.classList.toggle('active');
+        document.body.classList.toggle('menu-open');
+        document.documentElement.classList.toggle('menu-open');
     };
 
-    if (hamburger && navLinks) {
-        hamburger.addEventListener('click', toggleMenu);
-    }
-
-    if (navCloseButton) {
-        navCloseButton.addEventListener('click', toggleMenu);
-    }
-
-    // Close menu when clicking outside (on the overlay itself)
+    if (hamburger && navLinks) hamburger.addEventListener('click', toggleMenu);
+    if (navCloseButton) navCloseButton.addEventListener('click', toggleMenu);
     if (navLinks) {
         navLinks.addEventListener('click', (event) => {
-            if (event.target === navLinks) {
-                toggleMenu();
-            }
+            if (event.target === navLinks) toggleMenu();
         });
     }
 }
 
-
 function setupAboutModal() {
     const aboutButtons = document.querySelectorAll('#about-button');
     const modalOverlay = document.getElementById('about-modal');
-    
-    if (!modalOverlay) return; 
-    
+    if (!modalOverlay) return;
     const modalCloseButton = modalOverlay.querySelector('.modal-close');
-
     const openModal = () => modalOverlay.classList.remove('hidden');
     const closeModal = () => modalOverlay.classList.add('hidden');
-
-    aboutButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            openModal();
-        });
-    });
-    
-    if (modalCloseButton) {
-        modalCloseButton.addEventListener('click', closeModal);
-    }
-    
-    modalOverlay.addEventListener('click', (event) => { 
-        if (event.target === modalOverlay) closeModal(); 
-    });
-    
-    document.addEventListener('keydown', (event) => { 
-        if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); 
-    });
+    aboutButtons.forEach(button => button.addEventListener('click', e => { e.preventDefault(); openModal(); }));
+    if (modalCloseButton) modalCloseButton.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) closeModal(); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); });
 }
 
 function setupAllPasswordToggles() {
@@ -1034,14 +1001,12 @@ function setupAllPasswordToggles() {
             });
         }
     };
-
     setupPasswordToggle('toggle-login-password', 'login-password');
     setupPasswordToggle('toggle-register-password', 'register-password');
     setupPasswordToggle('toggle-reset-password', 'reset-password');
     setupPasswordToggle('toggle-confirm-password', 'confirm-password');
 }
 
-// === FUNGSI UNTUK CHAT BUBBLE ===
 function setupChatBubble() {
     const chatBubble = document.getElementById('chat-bubble');
     const openChatButton = document.getElementById('open-chat-button');
@@ -1050,28 +1015,23 @@ function setupChatBubble() {
     const chatInputText = document.getElementById('chat-input-text');
     const sendChatButton = document.getElementById('send-chat-button');
 
-    if (!chatBubble || !openChatButton || !closeChatButton || !chatMessages || !chatInputText || !sendChatButton) {
-        console.warn("One or more chat elements not found. Chat bubble will not be initialized.");
-        return;
-    }
+    if (!chatBubble || !openChatButton) return;
 
     openChatButton.addEventListener('click', () => {
         chatBubble.classList.remove('hidden');
         openChatButton.classList.add('hidden');
-        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom on open
+        if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
     });
 
-    closeChatButton.addEventListener('click', () => {
-        chatBubble.classList.add('hidden');
-        openChatButton.classList.remove('hidden');
-    });
-
-    sendChatButton.addEventListener('click', sendMessage);
-    chatInputText.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
+    if (closeChatButton) {
+        closeChatButton.addEventListener('click', () => {
+            chatBubble.classList.add('hidden');
+            openChatButton.classList.remove('hidden');
+        });
+    }
+    
+    if (sendChatButton) sendChatButton.addEventListener('click', sendMessage);
+    if (chatInputText) chatInputText.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 
     async function sendMessage() {
         const userMessage = chatInputText.value.trim();
@@ -1080,45 +1040,43 @@ function setupChatBubble() {
         appendMessage(userMessage, 'user-message');
         chatInputText.value = '';
         chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        appendMessage('Mengetik...', 'ai-message', 'typing-indicator'); // Show typing indicator
+        appendMessage('Mengetik...', 'ai-message', 'typing-indicator');
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/chat-with-ai`, {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/chat-with-ai`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('jwt_token')}` 
-                },
                 body: JSON.stringify({ message: userMessage })
             });
 
             if (!response.ok) {
-                throw new Error('Gagal terhubung ke AI.');
+                 const error = await response.json().catch(() => ({error: "Gagal terhubung ke AI."}));
+                 // Cek jika error karena butuh login
+                 if (response.status === 401 || response.status === 403) {
+                     throw new Error("Anda harus login untuk menggunakan fitur chat.");
+                 }
+                throw new Error(error.error);
             }
 
             const data = await response.json();
             removeTypingIndicator();
-            appendMessage(data.reply || "Maaf, saya tidak mengerti. Bisakah Anda mengatakannya dengan cara lain?", 'ai-message');
+            appendMessage(data.reply || "Maaf, saya tidak mengerti.", 'ai-message');
         } catch (error) {
             console.error('Error sending message to AI:', error);
             removeTypingIndicator();
-            appendMessage("Maaf, terjadi kesalahan saat mencoba menghubungi AI. Silakan coba lagi nanti.", 'ai-message');
+            appendMessage(`Error: ${error.message}`, 'ai-message');
         }
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function appendMessage(text, ...types) { // Menggunakan rest parameter untuk menerima banyak kelas
+    function appendMessage(text, ...types) {
         const messageElement = document.createElement('div');
-        messageElement.classList.add('message', ...types); // Menambahkan semua kelas yang diberikan
+        messageElement.classList.add('message', ...types);
         messageElement.textContent = text;
         chatMessages.appendChild(messageElement);
     }
 
     function removeTypingIndicator() {
         const typingIndicator = chatMessages.querySelector('.typing-indicator');
-        if (typingIndicator) {
-            typingIndicator.remove();
-        }
+        if (typingIndicator) typingIndicator.remove();
     }
 }
