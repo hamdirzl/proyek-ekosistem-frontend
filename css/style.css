@@ -535,6 +535,35 @@ input:focus, textarea:focus, select:focus {
     .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
     .hamburger.active span:nth-child(2) { opacity: 0; }
     .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+    /* Di dalam file style.css */
+/* TAMBAHKAN BLOK INI untuk memperbaiki posisi tombol close */
+
+.nav-close-button {
+    display: none; /* Tetap tersembunyi di desktop */
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-md);
+    background: transparent;
+    border: none;
+    color: var(--text-muted-color);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.3s ease, transform 0.3s ease;
+    z-index: 1001; /* Pastikan di atas item menu lainnya */
+}
+
+.nav-close-button:hover {
+    color: var(--accent-color);
+    transform: rotate(90deg);
+}
+
+.nav-close-button svg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 2.5;
+}
     
     .nav-links { 
         position: fixed; 
