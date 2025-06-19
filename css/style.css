@@ -1162,3 +1162,11 @@ input:focus, textarea:focus, select:focus {
         font-size: 1.3rem;
     }
 }
+
+/* === Gaya BARU untuk kerapian Panel Admin === */
+.admin-management-section {
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: var(--space-lg);
+}
