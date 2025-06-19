@@ -1,5 +1,5 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (DENGAN PERBAIKAN MENU)              ==
+// ==   FILE FINAL SCRIPT.JS (KOMPATIBEL DENGAN MENU KIRI/KANAN)  ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     setupAboutModal();
-    setupMobileMenu(); // Fungsi ini yang kita modifikasi
+    setupMobileMenu();
     setupAllPasswordToggles();
     setupChatBubble();
 });
@@ -123,9 +123,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 function decodeJwt(token) {
     try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
 }
-
-// ... Sisa fungsi lain (setupDashboardPage, setupToolsPage, dll. tetap sama) ...
-// (Kode di bawah ini tidak berubah dari file asli Anda)
 
 // ===================================
 // === LOGIKA HALAMAN DASHBOARD    ===
@@ -936,14 +933,11 @@ if (resetForm) {
 // ==========================================================
 // ===         LOGIKA UNTUK ELEMEN UI UMUM                ===
 // ==========================================================
-
-// KODE LAMA setupMobileMenu DIHAPUS DAN DIGANTI DENGAN YANG BARU INI
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
-    const menuOverlay = document.getElementById('menu-overlay'); // Ambil elemen overlay baru
+    const menuOverlay = document.getElementById('menu-overlay');
 
-    // Buat tombol close jika belum ada (logika ini tetap sama)
     let navCloseButton = navLinks ? navLinks.querySelector('.nav-close-button') : null;
     if (!navCloseButton && navLinks) {
         navCloseButton = document.createElement('button');
@@ -953,19 +947,17 @@ function setupMobileMenu() {
         navLinks.prepend(navCloseButton);
     }
 
-    // Fungsi untuk membuka/menutup menu
     const toggleMenu = () => {
         if(hamburger) hamburger.classList.toggle('active');
         if(navLinks) navLinks.classList.toggle('active');
-        if(menuOverlay) menuOverlay.classList.toggle('active'); // Aktifkan/nonaktifkan overlay
+        if(menuOverlay) menuOverlay.classList.toggle('active');
         document.body.classList.toggle('menu-open');
         document.documentElement.classList.toggle('menu-open');
     };
 
-    // Tambahkan event listener ke elemen yang relevan
     if (hamburger) hamburger.addEventListener('click', toggleMenu);
     if (navCloseButton) navCloseButton.addEventListener('click', toggleMenu);
-    if (menuOverlay) menuOverlay.addEventListener('click', toggleMenu); // Tutup menu saat overlay diklik
+    if (menuOverlay) menuOverlay.addEventListener('click', toggleMenu);
 }
 
 
