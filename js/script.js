@@ -67,7 +67,6 @@ async function fetchWithAuth(url, options = {}) {
 
 
 /* === FUNGSI GLOBAL === */
-/* Ganti listener DOMContentLoaded yang ada dengan yang ini */
 document.addEventListener('DOMContentLoaded', async () => {
     // Definisi elemen navigasi
     const navDasbor = document.getElementById('nav-dasbor');
@@ -145,6 +144,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupAllPasswordToggles();
     setupChatBubble();
 });
+
+
+function decodeJwt(token) {
+    try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
+}
 
 // ===================================
 // === LOGIKA HALAMAN DASHBOARD    ===

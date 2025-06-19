@@ -437,10 +437,19 @@ input:focus, textarea:focus, select:focus {
 }
 
 
-/* GANTI CSS INI di dalam @media (max-width: 768px) */
 @media (max-width: 768px) {
-    /* ... (CSS Anda yang lain untuk mobile) ... */
-
+    .navbar {
+        flex-direction: row-reverse;
+    }
+    nav {
+        display: flex;
+    }
+    .hamburger { 
+        display: block; 
+        order: -1; 
+        margin-right: var(--space-sm);
+    }
+    
     .nav-links { 
         position: fixed; 
         top: 0; 
@@ -463,8 +472,12 @@ input:focus, textarea:focus, select:focus {
         box-shadow: 5px 0 25px rgba(0,0,0,0.4); 
         z-index: 1000; 
     }
-
-    /* ... */
+    
+    .nav-links.active { 
+        transform: translateX(0); 
+    }
+    
+    body.menu-open, html.menu-open { overflow: hidden; }
 
     .nav-links li { 
         margin: 0; 
@@ -474,7 +487,18 @@ input:focus, textarea:focus, select:focus {
         transform: translateX(-20px); 
         transition: opacity 0.4s ease, transform 0.4s ease;
     }
-    
+    .nav-links.active li {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    .nav-links.active li:nth-child(1) { transition-delay: 0.1s; }
+    .nav-links.active li:nth-child(2) { transition-delay: 0.15s; }
+    .nav-links.active li:nth-child(3) { transition-delay: 0.2s; }
+    .nav-links.active li:nth-child(4) { transition-delay: 0.25s; }
+    .nav-links.active li:nth-child(5) { transition-delay: 0.3s; }
+    .nav-links.active li:nth-child(6) { transition-delay: 0.35s; }
+    .nav-links.active li:nth-child(7) { transition-delay: 0.4s; }
+
     /* Ganti gaya untuk link dan tombol di menu */
     .nav-links a, .nav-links .nav-button { 
         display: flex; /* Gunakan flex untuk ikon dan teks */
@@ -531,6 +555,10 @@ input:focus, textarea:focus, select:focus {
         gap: var(--space-sm);
         padding: 0.8rem 1.6rem;
     }
+
+    .mood-item-header { flex-direction: column; align-items: flex-start; }
+    .mood-item-actions { width: 100%; justify-content: flex-end; } 
+    .mood-item-header strong { margin-right: 0; } 
 }
 
 /* Penyesuaian form URL shortener di mobile */
