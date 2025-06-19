@@ -1354,3 +1354,29 @@ input:focus, textarea:focus, select:focus {
         display: none !important;
     }
 }
+
+/* Penyesuaian Footer untuk Mobile */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: var(--space-lg);
+    }
+
+    .footer-logo,
+    .footer-links,
+    .footer-social {
+        width: 100%;
+        max-width: 320px;
+        text-align: center;
+    }
+
+    .footer-links ul {
+        padding: 0;
+    }
+
+    .footer-social .social-icons {
+        justify-content: center;
+    }
+}
