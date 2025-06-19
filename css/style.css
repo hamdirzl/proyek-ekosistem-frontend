@@ -437,20 +437,10 @@ input:focus, textarea:focus, select:focus {
 }
 
 
+/* GANTI CSS INI di dalam @media (max-width: 768px) */
 @media (max-width: 768px) {
-    /* === PERUBAHAN UNTUK MENU KIRI === */
-    .navbar {
-        flex-direction: row-reverse;
-    }
-    nav {
-        display: flex;
-    }
-    .hamburger { 
-        display: block; 
-        order: -1; 
-        margin-right: var(--space-sm);
-    }
-    
+    /* ... (CSS Anda yang lain untuk mobile) ... */
+
     .nav-links { 
         position: fixed; 
         top: 0; 
@@ -458,69 +448,89 @@ input:focus, textarea:focus, select:focus {
         bottom: 0; 
         width: 85%;
         max-width: 320px; 
-        height: 100vh; 
+        height: 100vh; /* Pastikan tinggi penuh */
         background-color: rgba(24, 24, 24, 0.98); 
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        padding-top: var(--space-xxl);
+        padding: var(--space-xl) 0; /* Ubah padding vertikal */
         transform: translateX(-100%); 
         transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-        flex-direction: column; 
+        display: flex; /* Aktifkan flexbox */
+        flex-direction: column; /* Atur item secara vertikal */
         align-items: flex-start;
         justify-content: flex-start;
-        gap: var(--space-sm);
+        gap: 0; /* Hapus gap utama, atur di item */
         box-shadow: 5px 0 25px rgba(0,0,0,0.4); 
         z-index: 1000; 
     }
-    .nav-links.active { 
-        transform: translateX(0); 
-    }
-    
-    body.menu-open, html.menu-open { overflow: hidden; }
+
+    /* ... */
 
     .nav-links li { 
         margin: 0; 
         width: 100%; 
         text-align: left;
-        padding-left: var(--space-lg);
-        padding-right: var(--space-lg);
         opacity: 0;
         transform: translateX(-20px); 
         transition: opacity 0.4s ease, transform 0.4s ease;
     }
-    .nav-links.active li {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    .nav-links.active li:nth-child(1) { transition-delay: 0.1s; }
-    .nav-links.active li:nth-child(2) { transition-delay: 0.15s; }
-    .nav-links.active li:nth-child(3) { transition-delay: 0.2s; }
-    .nav-links.active li:nth-child(4) { transition-delay: 0.25s; }
-    .nav-links.active li:nth-child(5) { transition-delay: 0.3s; }
-    .nav-links.active li:nth-child(6) { transition-delay: 0.35s; }
-    .nav-links.active li:nth-child(7) { transition-delay: 0.4s; }
-
+    
+    /* Ganti gaya untuk link dan tombol di menu */
     .nav-links a, .nav-links .nav-button { 
-        display: block; 
-        padding: var(--space-sm) 0;
+        display: flex; /* Gunakan flex untuk ikon dan teks */
+        align-items: center;
+        gap: var(--space-md); /* Jarak antara ikon dan teks */
+        padding: var(--space-sm) var(--space-lg);
         width: 100%; 
         border-radius: 0; 
-        font-size: 1.1rem; 
+        font-size: 1.0rem;
+        font-weight: 500;
+        color: var(--text-muted-color);
+        transition: color 0.3s ease, background-color 0.3s ease;
     }
-    .nav-links a:hover, .nav-links .nav-button:hover { background-color: transparent; color: var(--accent-color); }
+    
+    .nav-links a:hover, .nav-links .nav-button:hover { 
+      background-color: rgba(255, 255, 255, 0.05);
+      color: var(--text-color); 
+    }
+
     .nav-links a::after { display: none; }
     
+    /* Atur ikon di dalam link */
+    .nav-links a svg, .nav-links .nav-button svg {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0; /* Mencegah ikon menyusut */
+        color: var(--text-muted-color);
+        transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover svg, .nav-links .nav-button:hover svg {
+        color: var(--text-color);
+    }
+
+    /* Tombol login asli */
     .nav-links a.login-button { 
         margin: var(--space-md) var(--space-lg);
         width: calc(100% - (var(--space-lg) * 2));
-        text-align: center; 
-        font-size: 1.0rem; 
-        align-self: flex-start;
+        text-align: center;
+        display: block; /* Kembalikan ke block karena tidak ada ikon */
     }
     
-    .mood-item-header { flex-direction: column; align-items: flex-start; }
-    .mood-item-actions { width: 100%; justify-content: flex-end; } 
-    .mood-item-header strong { margin-right: 0; } 
+    /* CSS BARU UNTUK TOMBOL LOGOUT */
+    .nav-logout-item {
+        margin-top: auto; /* INI KUNCINYA: Mendorong item ini ke bawah */
+        padding: var(--space-md) var(--space-lg);
+    }
+    
+    .nav-logout-item button {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: var(--space-sm);
+        padding: 0.8rem 1.6rem;
+    }
 }
 
 /* Penyesuaian form URL shortener di mobile */

@@ -67,20 +67,45 @@ async function fetchWithAuth(url, options = {}) {
 
 
 /* === FUNGSI GLOBAL === */
+/* Ganti listener DOMContentLoaded yang ada dengan yang ini */
 document.addEventListener('DOMContentLoaded', async () => {
+    // Definisi elemen navigasi
+    const navDasbor = document.getElementById('nav-dasbor');
+    const navLogin = document.getElementById('nav-login');
+    const navLogout = document.getElementById('nav-logout');
+    const logoutButtonNav = document.getElementById('logout-button-nav');
+
     const refreshToken = localStorage.getItem('jwt_refresh_token');
 
-    const loginLink = document.querySelector('a.login-button');
-    if (loginLink) {
-        if (refreshToken) {
-            loginLink.textContent = 'Dasbor';
-            loginLink.href = 'dashboard.html';
-        } else {
-            loginLink.textContent = 'Login';
-            loginLink.href = 'auth.html';
-        }
-    }
+    // Logika untuk menampilkan/menyembunyikan elemen navigasi
+    if (refreshToken) {
+        // Jika Pengguna LOGIN
+        if (navDasbor) navDasbor.style.display = 'list-item';
+        if (navLogin) navLogin.style.display = 'none';
+        if (navLogout) navLogout.style.display = 'list-item';
 
+        // Event listener untuk tombol logout di NAVIGASI
+        if (logoutButtonNav) {
+            logoutButtonNav.addEventListener('click', async () => {
+                try {
+                    await fetchWithAuth(`${API_BASE_URL}/api/logout`, { method: 'POST' });
+                } catch (e) {
+                    console.error("Gagal logout di server, tapi tetap lanjut logout di client.", e);
+                } finally {
+                    forceLogout();
+                    window.location.href = 'index.html';
+                }
+            });
+        }
+
+    } else {
+        // Jika Pengguna LOGOUT
+        if (navDasbor) navDasbor.style.display = 'none';
+        if (navLogin) navLogin.style.display = 'list-item';
+        if (navLogout) navLogout.style.display = 'none';
+    }
+    
+    // Logika untuk mendapatkan access token jika sesi baru
     if (refreshToken && !sessionStorage.getItem('jwt_access_token')) {
         console.log("Sesi baru, mencoba mendapatkan access token...");
         try {
@@ -106,6 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Inisialisasi fungsi lain
     if (document.body.contains(document.getElementById('dashboard-main'))) {
         setupDashboardPage();
     } else if (document.title.includes("Tools")) {
@@ -119,10 +145,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupAllPasswordToggles();
     setupChatBubble();
 });
-
-function decodeJwt(token) {
-    try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
-}
 
 // ===================================
 // === LOGIKA HALAMAN DASHBOARD    ===
