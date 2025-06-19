@@ -938,15 +938,6 @@ function setupMobileMenu() {
     const navLinks = document.querySelector('.nav-links');
     const menuOverlay = document.getElementById('menu-overlay');
 
-    let navCloseButton = navLinks ? navLinks.querySelector('.nav-close-button') : null;
-    if (!navCloseButton && navLinks) {
-        navCloseButton = document.createElement('button');
-        navCloseButton.classList.add('nav-close-button');
-        navCloseButton.setAttribute('aria-label', 'Tutup menu');
-        navCloseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-        navLinks.prepend(navCloseButton);
-    }
-
     const toggleMenu = () => {
         if(hamburger) hamburger.classList.toggle('active');
         if(navLinks) navLinks.classList.toggle('active');
@@ -956,7 +947,6 @@ function setupMobileMenu() {
     };
 
     if (hamburger) hamburger.addEventListener('click', toggleMenu);
-    if (navCloseButton) navCloseButton.addEventListener('click', toggleMenu);
     if (menuOverlay) menuOverlay.addEventListener('click', toggleMenu);
 }
 
