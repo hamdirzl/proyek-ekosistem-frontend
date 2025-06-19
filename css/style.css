@@ -438,9 +438,28 @@ input:focus, textarea:focus, select:focus {
 
 
 @media (max-width: 768px) {
-    .navbar {
-        flex-direction: row-reverse;
-    }
+   .navbar .logo {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.navbar nav {
+    order: -1;
+    width: 50px; /* Beri lebar tetap untuk simetri */
+    display: flex;
+    justify-content: center;
+}
+
+.navbar::after {
+    content: '';
+    display: block;
+    width: 50px; /* Lebarnya HARUS SAMA dengan elemen <nav> di atas */
+}
+
+.hamburger {
+    margin-right: 0;
+}
+
     nav {
         display: flex;
     }
