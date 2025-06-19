@@ -1,5 +1,5 @@
 /* =================================================================== */
-/* ==   V10: FINAL STYLE - FIXED OVERLAPPING CLOSE ICON           == */
+/* ==   V11: FINAL STYLE - FIX OVERLAPPING CLOSE ICON (DEFINITIVE) == */
 /* =================================================================== */
 
 /* === PENGATURAN GLOBAL: DESIGN SYSTEM === */
@@ -450,19 +450,16 @@ input:focus, textarea:focus, select:focus {
 @media (max-width: 768px) {
     /* === PERUBAHAN UNTUK MENU KIRI === */
     .navbar {
-        flex-direction: row-reverse; /* Balik urutan: nav (dengan hamburger) jadi di kiri */
+        flex-direction: row-reverse;
     }
     nav {
-        display: flex; /* Pastikan nav adalah flex container */
+        display: flex;
     }
     .hamburger { 
         display: block; 
-        order: -1; /* Pindahkan hamburger ke paling kiri di dalam <nav> */
+        order: -1; 
         margin-right: var(--space-sm);
     }
-    /* === AKHIR PERUBAHAN UNTUK MENU KIRI === */
-    
-    /* KODE ANIMASI HAMBURGER MENJADI X DIHAPUS DARI SINI */
 
     .nav-links { 
         position: fixed; 
