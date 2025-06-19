@@ -1182,3 +1182,11 @@ input:focus, textarea:focus, select:focus {
     color: var(--accent-hover);
     text-decoration: underline;
 }
+
+/* === Perbaikan untuk Teks Panjang (Overflow) di Panel Admin === */
+.mood-item-header > span {
+    min-width: 0; /* Memungkinkan item flex untuk menyusut */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
