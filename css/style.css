@@ -135,13 +135,75 @@ html, body {
     box-shadow: 0 6px 20px rgba(0, 245, 160, 0.25);
 }
 
-footer { 
-    text-align: center; 
-    padding: var(--space-lg); 
-    margin-top: var(--space-xl); 
+footer {
+    padding: var(--space-xl) clamp(var(--space-md), 5vw, var(--space-xl));
+    margin-top: var(--space-xxl);
     background-color: var(--card-bg-color);
-    color: var(--text-muted-color); 
-    border-top: 1px solid var(--border-color); 
+    color: var(--text-muted-color);
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.footer-logo, .footer-links, .footer-social {
+    flex: 1;
+    min-width: 220px;
+}
+
+.footer-logo a {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: #ffffff;
+    line-height: 1.2;
+    transition: color 0.3s ease;
+}
+.footer-logo a:hover {
+    color: var(--accent-color);
+}
+
+.footer-links h4, .footer-social h4 {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    color: var(--text-color);
+    margin-bottom: var(--space-md);
+    font-weight: 600;
+}
+
+.footer-links ul {
+    list-style: none;
+}
+
+.footer-links ul li {
+    margin-bottom: var(--space-xs);
+}
+
+.footer-links ul a {
+    color: var(--text-muted-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links ul a:hover {
+    color: var(--accent-color);
+}
+
+.footer-social .social-icons {
+    justify-content: flex-start;
+}
+
+.footer-bottom {
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    padding-top: var(--space-md);
+    font-size: 0.9rem;
 }
 
 /* === HALAMAN UTAMA === */
