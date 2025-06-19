@@ -143,9 +143,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupMobileMenu();
     setupAllPasswordToggles();
     setupChatBubble();
-
-    // PANGGILAN FUNGSI BARU UNTUK TEMA
-    setupThemeToggle();
 });
 
 
@@ -824,6 +821,9 @@ async function handleDeleteUserLink(event) {
 // ==========================================================
 // ===         LOGIKA UNTUK HALAMAN AUTENTIKASI           ===
 // ==========================================================
+// ==========================================================
+// ===         LOGIKA UNTUK HALAMAN AUTENTIKASI           ===
+// ==========================================================
 function setupAuthPage() {
     const loginSection = document.getElementById('login-section');
     const registerSection = document.getElementById('register-section');
@@ -1084,42 +1084,4 @@ function setupChatBubble() {
         const typingIndicator = chatMessages.querySelector('.typing-indicator');
         if (typingIndicator) typingIndicator.remove();
     }
-}
-
-// FUNGSI BARU UNTUK THEME TOGGLE
-function setupThemeToggle() {
-    const toggleButton = document.getElementById('theme-toggle');
-    if (!toggleButton) return;
-
-    const sunIcon = toggleButton.querySelector('.sun-icon');
-    const moonIcon = toggleButton.querySelector('.moon-icon');
-    const currentTheme = localStorage.getItem('theme');
-
-    // Fungsi untuk menerapkan tema
-    const applyTheme = (theme) => {
-        if (theme === 'light') {
-            document.body.classList.add('light-mode');
-            if (sunIcon) sunIcon.style.display = 'block';
-            if (moonIcon) moonIcon.style.display = 'none';
-        } else {
-            document.body.classList.remove('light-mode');
-            if (sunIcon) sunIcon.style.display = 'none';
-            if (moonIcon) moonIcon.style.display = 'block';
-        }
-    };
-
-    // Terapkan tema saat halaman dimuat
-    applyTheme(currentTheme || 'dark'); // Default ke dark mode jika tidak ada pilihan
-
-    // Tambahkan event listener untuk tombol
-    toggleButton.addEventListener('click', () => {
-        let newTheme;
-        if (document.body.classList.contains('light-mode')) {
-            newTheme = 'dark';
-        } else {
-            newTheme = 'light';
-        }
-        localStorage.setItem('theme', newTheme);
-        applyTheme(newTheme);
-    });
 }
