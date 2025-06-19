@@ -1262,3 +1262,16 @@ input:focus, textarea:focus, select:focus {
         gap: var(--space-md);
     }
 }
+
+/* [FIX V4] Perbaikan Tampilan Logo di Header Mobile */
+@media (max-width: 768px) {
+    /* Mengembalikan logo ke ukuran font normal di mobile */
+    .logo a {
+        font-size: 1.5rem; 
+    }
+
+    /* Menyembunyikan <br> agar logo menjadi satu baris horizontal */
+    .logo br {
+        display: none;
+    }
+}
