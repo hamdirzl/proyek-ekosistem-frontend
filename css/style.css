@@ -1165,8 +1165,8 @@ input:focus, textarea:focus, select:focus {
 
 /* === PENGATURAN LIGHT MODE & TRANSISI === */
 
-/* Tambahkan transisi agar pergantian warna mulus */
-body, .navbar, .pintu, .portfolio-card, .jurnal-card, .tool-section, .auth-container, .modal-content, .chat-bubble, .chat-input, input, select, textarea, .mood-item {
+/* Tambahkan transisi agar pergantian warna mulus (termasuk .hamburger span) */
+body, .navbar, .pintu, .portfolio-card, .jurnal-card, .tool-section, .auth-container, .modal-content, .chat-bubble, .chat-input, input, select, textarea, .mood-item, .hamburger span {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -1186,6 +1186,11 @@ body.light-mode {
 body.light-mode .navbar {
     background-color: rgba(255, 255, 255, 0.7);
     border-bottom-color: var(--border-color);
+}
+
+/* ATURAN BARU UNTUK MEMASTIKAN HAMBURGER BERUBAH WARNA */
+body.light-mode .hamburger span {
+    background-color: var(--text-color);
 }
 
 body.light-mode .logo a,
@@ -1225,6 +1230,52 @@ body.light-mode .chat-messages {
 body.light-mode .ai-message {
     background-color: #e4e6eb;
     color: var(--text-color);
+}
+
+/* Sembunyikan teks di samping ikon pada layar besar */
+@media (min-width: 769px) {
+    #theme-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px; 
+        height: 40px;
+        padding: 0;
+        border-radius: 50%; 
+        border: 1px solid var(--border-color);
+        background-color: var(--card-bg-color);
+    }
+    .theme-toggle-text {
+        display: none;
+    }
+    #theme-toggle svg {
+        margin: 0;
+    }
+}
+
+/* Tampilkan teks di menu hamburger pada layar kecil */
+@media (max-width: 768px) {
+    #theme-toggle .theme-toggle-text {
+        display: inline;
+    }
+    #theme-toggle {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        padding: var(--space-sm) var(--space-lg);
+        width: 100%;
+        font-size: 1.0rem;
+        font-weight: 500;
+        color: var(--text-muted-color);
+    }
+    #theme-toggle:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        color: var(--text-color); 
+    }
+    body.light-mode #theme-toggle:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        color: var(--text-color);
+    }
 }
 
 /* Sembunyikan teks di samping ikon pada layar besar */
