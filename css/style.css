@@ -1190,3 +1190,67 @@ input:focus, textarea:focus, select:focus {
     word-wrap: break-word;
     word-break: break-word;
 }
+
+/* === Perbaikan Tata Letak Header Desktop === */
+
+/* Mengatur logo menjadi dua baris dan lebih rapi */
+.logo a {
+    line-height: 1.2;
+    display: inline-block;
+    text-align: center;
+}
+
+/* Menghapus efek garis bawah pada link navigasi desktop */
+.nav-links a::after {
+    display: none;
+}
+
+/* Mengatur tata letak setiap item nav menjadi vertikal (ikon di atas, teks di bawah) */
+.nav-links li > a,
+.nav-links li > .nav-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px; /* Jarak antara ikon dan teks */
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Efek hover untuk item navigasi */
+.nav-links li > a:hover,
+.nav-links li > .nav-button:hover {
+    background-color: var(--border-color);
+    color: var(--text-color);
+}
+
+/* Menyesuaikan ukuran ikon dan teks di dalam navigasi */
+.nav-links li svg {
+    width: 22px;
+    height: 22px;
+}
+
+.nav-links li span {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Penyesuaian khusus untuk tombol logout agar sesuai referensi */
+#nav-logout .button-pintu {
+    display: flex;
+    flex-direction: row; /* Logout dibuat horizontal */
+    align-items: center;
+    gap: 8px;
+    border-radius: 50px; /* Membuatnya berbentuk pil */
+    padding: 10px 20px;
+    background-color: var(--accent-color) !important;
+}
+
+#nav-logout .button-pintu:hover {
+    background-color: var(--accent-hover) !important;
+}
+
+#nav-logout .button-pintu svg {
+    width: 20px;
+    height: 20px;
+}
