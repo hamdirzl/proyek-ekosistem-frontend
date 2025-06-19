@@ -1,5 +1,5 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (DENGAN PERBAIKAN TOMBOL DUPLIKAT)   ==
+// ==   FILE FINAL SCRIPT.JS (KOMPATIBEL DENGAN MENU KIRI/KANAN)  ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     setupAboutModal();
-    setupMobileMenu(); // Fungsi ini yang kita perbaiki
+    setupMobileMenu();
     setupAllPasswordToggles();
     setupChatBubble();
 });
@@ -124,7 +124,6 @@ function decodeJwt(token) {
     try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
 }
 
-// ... Sisa kode lainnya tetap sama ...
 // ===================================
 // === LOGIKA HALAMAN DASHBOARD    ===
 // ===================================
@@ -939,33 +938,26 @@ function setupMobileMenu() {
     const navLinks = document.querySelector('.nav-links');
     const menuOverlay = document.getElementById('menu-overlay');
 
-    if (!hamburger || !navLinks || !menuOverlay) {
-        console.warn('Elemen menu (hamburger, navLinks, atau menuOverlay) tidak ditemukan.');
-        return;
-    }
-
-    // Cari atau buat tombol tutup untuk memastikan hanya ada satu.
-    let navCloseButton = navLinks.querySelector('.nav-close-button');
-    if (!navCloseButton) {
+    let navCloseButton = navLinks ? navLinks.querySelector('.nav-close-button') : null;
+    if (!navCloseButton && navLinks) {
         navCloseButton = document.createElement('button');
-        navCloseButton.className = 'nav-close-button';
+        navCloseButton.classList.add('nav-close-button');
         navCloseButton.setAttribute('aria-label', 'Tutup menu');
-        navCloseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+        navCloseButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
         navLinks.prepend(navCloseButton);
     }
 
     const toggleMenu = () => {
-        hamburger.classList.toggle('active');
-        navLinks.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
+        if(hamburger) hamburger.classList.toggle('active');
+        if(navLinks) navLinks.classList.toggle('active');
+        if(menuOverlay) menuOverlay.classList.toggle('active');
         document.body.classList.toggle('menu-open');
         document.documentElement.classList.toggle('menu-open');
     };
 
-    // Pastikan event listener tidak terpasang berulang kali
-    hamburger.onclick = toggleMenu;
-    navCloseButton.onclick = toggleMenu;
-    menuOverlay.onclick = toggleMenu;
+    if (hamburger) hamburger.addEventListener('click', toggleMenu);
+    if (navCloseButton) navCloseButton.addEventListener('click', toggleMenu);
+    if (menuOverlay) menuOverlay.addEventListener('click', toggleMenu);
 }
 
 
