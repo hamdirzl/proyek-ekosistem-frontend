@@ -1170,3 +1170,15 @@ input:focus, textarea:focus, select:focus {
     margin-right: auto;
     margin-bottom: var(--space-lg);
 }
+
+/* === Perbaikan Warna Link di Panel Admin === */
+.mood-notes a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+.mood-notes a:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
