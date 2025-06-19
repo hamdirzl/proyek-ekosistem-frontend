@@ -821,6 +821,9 @@ async function handleDeleteUserLink(event) {
 // ==========================================================
 // ===         LOGIKA UNTUK HALAMAN AUTENTIKASI           ===
 // ==========================================================
+// ==========================================================
+// ===         LOGIKA UNTUK HALAMAN AUTENTIKASI           ===
+// ==========================================================
 function setupAuthPage() {
     const loginSection = document.getElementById('login-section');
     const registerSection = document.getElementById('register-section');
@@ -882,9 +885,9 @@ function setupAuthPage() {
                 localStorage.setItem('jwt_refresh_token', data.refreshToken);
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
 
-                authMessage.textContent = 'Login berhasil! Mengalihkan ke dashboard...';
+                authMessage.textContent = 'Login berhasil! Mengalihkan ke halaman utama...';
                 authMessage.className = 'success';
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+                setTimeout(() => { window.location.href = 'index.html'; }, 1000);
             } catch (error) {
                 authMessage.textContent = `Error: ${error.message}`;
                 authMessage.className = 'error';
@@ -892,7 +895,6 @@ function setupAuthPage() {
         });
     }
 }
-
 // ==========================================================
 // ===         LOGIKA UNTUK LUPA & RESET PASSWORD         ===
 // ==========================================================
