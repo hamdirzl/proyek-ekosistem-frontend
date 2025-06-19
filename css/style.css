@@ -1263,15 +1263,32 @@ input:focus, textarea:focus, select:focus {
     }
 }
 
-/* [FIX V4] Perbaikan Tampilan Logo di Header Mobile */
+/* ================================================= */
+/* == BLOK FINAL V6 UNTUK LOGO (DESKTOP & MOBILE) == */
+/* ================================================= */
+
+/* Aturan untuk menyembunyikan logo mobile di layar besar (DESKTOP) */
+.logo-mobile {
+    display: none !important;
+}
+
+/* Aturan untuk menampilkan logo desktop di layar besar (DESKTOP) */
+.logo-desktop {
+    display: inline-block !important;
+    line-height: 1.2;
+    text-align: center;
+}
+
+/* Aturan untuk layar kecil (MOBILE) */
 @media (max-width: 768px) {
-    /* Mengembalikan logo ke ukuran font normal di mobile */
-    .logo a {
-        font-size: 1.5rem; 
+    /* Tampilkan logo mobile dan atur gayanya */
+    .logo-mobile {
+        display: inline-block !important;
+        font-size: 1.5rem;
     }
 
-    /* Menyembunyikan <br> agar logo menjadi satu baris horizontal */
-    .logo br {
-        display: none;
+    /* SEMBUNYIKAN logo desktop */
+    .logo-desktop {
+        display: none !important;
     }
 }
