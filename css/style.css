@@ -1487,3 +1487,22 @@ input:focus, textarea:focus, select:focus {
         border-bottom-color: var(--accent-color); /* Garis bawah aktif */
     }
 }
+
+/* ============================================= */
+/* ==      GAYA BARU UNTUK STATS GRID         == */
+/* ============================================= */
+
+.stats-grid {
+    display: grid;
+    gap: var(--space-lg);
+    /* Secara default (mobile), hanya ada 1 kolom, jadi kartu akan tersusun ke bawah */
+    grid-template-columns: 1fr; 
+}
+
+/* Terapkan 2 kolom hanya jika lebar layar 768px atau lebih */
+@media (min-width: 768px) {
+    .stats-grid {
+        /* Di layar besar, ubah menjadi 2 kolom */
+        grid-template-columns: 1fr 1fr;
+    }
+}
