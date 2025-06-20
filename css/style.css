@@ -1560,3 +1560,15 @@ input:focus, textarea:focus, select:focus {
 .search-container:focus-within .search-icon {
     color: var(--accent-color);
 }
+
+/* === STYLE UNTUK MEMBUAT KARTU MENJADI LINK === */
+.portfolio-link-card {
+    display: block; /* Membuat tag <a> berperilaku seperti div */
+    text-decoration: none; /* Menghapus garis bawah dari link */
+    color: inherit; /* Membuat warna teks mengikuti style aslinya */
+}
+
+/* Memastikan efek hover tetap berjalan */
+.portfolio-link-card:hover {
+    color: inherit; 
+}
