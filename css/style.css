@@ -338,7 +338,9 @@ footer {
     padding: var(--space-md);
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    flex-grow: 1; /* Penting: Pastikan ini ada */
+    justify-content: space-between; /* BARU: Ini adalah kunci untuk mendorong tombol ke bawah */
+    height: 100%; /* BARU: Memastikan konten mengisi tinggi yang tersedia dari parent-nya */
 }
 
 .portfolio-card h3, .jurnal-card h3, .game-section .portfolio-card h3 { 
@@ -347,16 +349,27 @@ footer {
     margin-bottom: var(--space-xs);
 }
 .portfolio-card p, .jurnal-card p, .game-section .portfolio-card p {
-    /* Properti yang sudah ada di sini, seperti color, flex-grow, margin-bottom */
+    color: var(--text-muted-color);
+    flex-grow: 1; /* Pastikan ini ada dan bernilai 1 */
+    margin-bottom: var(--space-md); /* Jaga jarak dengan tombol */
+
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* Ini membatasi 3 baris. Anda bisa mengubah angka ini. */
+    -webkit-line-clamp: 3; /* Batasi maksimal 3 baris */
     -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis; /* Menambahkan "..." jika teks terpotong */
+    text-overflow: ellipsis; /* Tambahkan elipsis jika teks terpotong */
+    min-height: 60px; /* Jaring pengaman: Pastikan tinggi minimum yang cukup untuk 3 baris teks. Sesuaikan nilai ini jika 60px tidak cukup untuk 3 baris di font Anda. */
+
+    /* BARU: Tambahkan properti standar untuk kompatibilitas */
+    display: -webkit-box; /* Tetap pertahankan ini untuk kompatibilitas lama */
+    -webkit-box-orient: vertical; /* Tetap pertahankan ini */
+    -webkit-line-clamp: 3; /* Tetap pertahankan ini */
+    line-clamp: 3; /* STANDAR: Tambahkan properti ini! */
+    box-orient: vertical; /* STANDAR: Tambahkan properti ini! */
 }
-.portfolio-card .button-pintu, .jurnal-card .button-pintu, .game-section .portfolio-card .button-pintu { 
-    margin-top: auto; 
-    align-self: flex-start; 
+.portfolio-card .button-pintu, .jurnal-card .button-pintu, .game-section .portfolio-card .button-pintu {
+    margin-top: auto; /* PENTING: Ini akan mendorong tombol ke bawah jika parent adalah flex container dengan flex-direction: column */
+    align-self: flex-start; /* BARU: Memastikan tombol tetap rata kiri di dalam kolomnya jika perlu */
 }
 
 .jurnal-card { display: block; }
