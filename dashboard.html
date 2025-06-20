@@ -84,6 +84,7 @@
             <div class="dashboard-nav">
                 <button class="dashboard-tab-button active" data-target="panel-ringkasan">Ringkasan</button>
                 <button class="dashboard-tab-button" data-target="panel-akun">Manajemen Akun</button>
+                <button id="admin-portfolio-tab" class="dashboard-tab-button hidden" data-target="panel-admin-portfolio">Manajemen Portofolio</button>
                 <button id="admin-links-tab" class="dashboard-tab-button hidden" data-target="panel-admin-links">Manajemen Tautan</button>
                 <button id="admin-users-tab" class="dashboard-tab-button hidden" data-target="panel-admin-users">Manajemen Pengguna</button>
             </div>
@@ -132,6 +133,45 @@
                     </div>
                 </div>
 
+                <div id="panel-admin-portfolio" class="dashboard-panel">
+                    <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Manajemen Portofolio</h2>
+                    
+                    <div class="admin-management-section">
+                        <h3 id="portfolio-form-title" style="margin-bottom: var(--space-md);">Tambah Proyek Baru</h3>
+                        <form id="portfolio-form" class="auth-form" style="max-width: none; margin: 0; padding: 0; background: none; border: none;">
+                            <input type="hidden" id="portfolio-id">
+                            <div class="form-group">
+                                <label for="portfolio-title">Judul Proyek</label>
+                                <input type="text" id="portfolio-title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="portfolio-description">Deskripsi</label>
+                                <textarea id="portfolio-description" rows="4" required style="height: auto;"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="portfolio-link">URL Proyek (Opsional)</label>
+                                <input type="url" id="portfolio-link" placeholder="https://contoh.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="portfolio-image">Gambar Proyek (Max 2MB)</label>
+                                <input type="file" id="portfolio-image" accept="image/jpeg, image/png, image/webp">
+                                <small id="current-image-info" style="color: var(--text-muted-color); margin-top: 5px; display: block;"></small>
+                            </div>
+                            <div style="display: flex; gap: 1rem;">
+                                <button type="submit" class="button-pintu">Simpan Proyek</button>
+                                <button type="button" id="clear-portfolio-form" class="button-pintu" style="background: var(--border-hover-color);">Batal/Proyek Baru</button>
+                            </div>
+                        </form>
+                        <div id="portfolio-message" style="margin-top: 1rem;"></div>
+                    </div>
+            
+                    <div>
+                        <h3 style="margin-top: var(--space-xl); margin-bottom: var(--space-md);">Daftar Proyek</h3>
+                        <p id="loading-portfolio-admin">Memuat daftar proyek...</p>
+                        <ul id="portfolio-list-admin" class="mood-history-list"></ul>
+                    </div>
+                </div>
+
                 <div id="panel-admin-links" class="dashboard-panel">
                     <div id="admin-section">
                         <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Manajemen Tautan</h2>
@@ -147,19 +187,19 @@
                 </div>
                 
                 <div id="panel-admin-users" class="dashboard-panel">
-    <div id="admin-users-section">
-        <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Manajemen Pengguna</h2>
-        
-        <div class="search-container">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="search" id="user-search-input" placeholder="Cari berdasarkan email pengguna...">
-        </div>
-        <div id="user-management-container">
-            <p id="loading-users">Memuat daftar pengguna...</p>
-            <ul id="user-list" class="mood-history-list"></ul>
-        </div>
-    </div>
-</div>
+                    <div id="admin-users-section">
+                        <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Manajemen Pengguna</h2>
+                        
+                        <div class="search-container">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <input type="search" id="user-search-input" placeholder="Cari berdasarkan email pengguna...">
+                        </div>
+                        <div id="user-management-container">
+                            <p id="loading-users">Memuat daftar pengguna...</p>
+                            <ul id="user-list" class="mood-history-list"></ul>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </div>

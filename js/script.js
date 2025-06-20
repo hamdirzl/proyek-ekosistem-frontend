@@ -112,7 +112,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const data = await refreshResponse.json();
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
                 console.log("Access token berhasil didapatkan untuk sesi ini.");
-                // Panggil setup ulang jika berada di halaman dasbor
                 if (document.body.contains(document.getElementById('dashboard-main'))) {
                     setupDashboardPage();
                 }
@@ -128,6 +127,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Panggil fungsi setup berdasarkan halaman
     if (document.body.contains(document.getElementById('dashboard-main'))) {
         setupDashboardPage();
+    } else if (document.title.includes("Portofolio")) {
+        setupPortfolioPage();
     } else if (document.title.includes("Tools")) {
         setupToolsPage();
     } else if (document.getElementById('login-form')) {
@@ -148,6 +149,56 @@ function decodeJwt(token) {
 }
 
 // ===================================
+// === LOGIKA HALAMAN PORTOFOLIO   ===
+// ===================================
+
+function setupPortfolioPage() {
+    const portfolioGrid = document.querySelector('.portfolio-grid');
+    if (!portfolioGrid) return;
+
+    async function fetchAndRenderPortfolio() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/portfolio`);
+            if (!response.ok) throw new Error('Gagal memuat data portofolio.');
+
+            const projects = await response.json();
+            portfolioGrid.innerHTML = ''; 
+
+            if (projects.length === 0) {
+                portfolioGrid.innerHTML = '<p style="text-align: center; color: var(--text-muted-color);">Belum ada proyek portofolio untuk ditampilkan.</p>';
+                return;
+            }
+
+            projects.forEach(project => {
+                const projectCard = document.createElement('div');
+                projectCard.className = 'portfolio-card';
+                projectCard.setAttribute('data-aos', 'fade-up');
+
+                const projectImage = project.image_url ? `${API_BASE_URL}${project.image_url}` : 'https://images.unsplash.com/photo-1587620962725-abab7fe55159?auto=format&fit=crop&w=1331&q=80';
+                const projectLink = project.project_link ? `<a href="${project.project_link}" target="_blank" class="button-pintu">Lihat Detail</a>` : '';
+
+                projectCard.innerHTML = `
+                    <img src="${projectImage}" alt="Gambar proyek ${project.title}">
+                    <div class="card-content">
+                        <h3>${project.title}</h3>
+                        <p>${project.description}</p>
+                        ${projectLink}
+                    </div>
+                `;
+                portfolioGrid.appendChild(projectCard);
+            });
+
+        } catch (error) {
+            console.error('Error:', error);
+            portfolioGrid.innerHTML = `<p style="text-align: center; color: var(--text-muted-color);">${error.message}</p>`;
+        }
+    }
+
+    fetchAndRenderPortfolio();
+}
+
+
+// ===================================
 // === LOGIKA HALAMAN DASHBOARD    ===
 // ===================================
 
@@ -160,17 +211,14 @@ function setupDashboardPage() {
         return;
     }
     
-    // Pastikan access token ada sebelum melanjutkan
     if (!accessToken) {
-        // Jika tidak ada, fungsi di DOMContentLoaded akan mencoba mengambilnya.
-        // Kita bisa menunggu sejenak atau membiarkannya berjalan.
         console.log("Menunggu access token dari proses refresh...");
         return; 
     }
 
     const decodedToken = decodeJwt(accessToken);
     populateUserInfo(decodedToken);
-    populateUserDashboard(); // Dihapus parameternya agar tidak membingungkan
+    populateUserDashboard(); 
     
     if (decodedToken && decodedToken.role === 'admin') {
         setupAdminPanels();
@@ -191,7 +239,6 @@ async function populateUserDashboard() {
     const statsLinkCountEl = document.getElementById('stats-link-count');
     const statsLastLoginEl = document.getElementById('stats-last-login');
 
-    // Ambil dan tampilkan statistik
     try {
         const statsResponse = await fetchWithAuth(`${API_BASE_URL}/api/user/dashboard-stats`);
         if (!statsResponse.ok) throw new Error('Gagal memuat data statistik.');
@@ -210,7 +257,6 @@ async function populateUserDashboard() {
         statsLastLoginEl.textContent = 'Gagal memuat';
     }
 
-    // Ambil dan tampilkan riwayat tautan (5 terakhir)
     const historyList = document.getElementById('user-links-list');
     const loadingMessage = document.getElementById('loading-user-links');
     if (!historyList || !loadingMessage) return;
@@ -238,11 +284,10 @@ function setupAdminPanels() {
     const userEmailElement = document.getElementById('user-email');
     if (userEmailElement) userEmailElement.innerHTML += ' <span style="color: var(--accent-color); font-size: 0.9em;">(Admin)</span>';
 
-    // Tampilkan tombol tab untuk admin
+    document.getElementById('admin-portfolio-tab')?.classList.remove('hidden');
     document.getElementById('admin-links-tab')?.classList.remove('hidden');
     document.getElementById('admin-users-tab')?.classList.remove('hidden');
 
-    // Logika untuk fetch data dan event listener pencarian tetap sama
     const adminSection = document.getElementById('admin-section');
     const adminUsersSection = document.getElementById('admin-users-section');
 
@@ -268,6 +313,8 @@ function setupAdminPanels() {
         });
         fetchAndDisplayUsers();
     }
+    
+    setupAdminPortfolioPanel();
 }
 
 async function fetchAndDisplayLinks(searchQuery = '') {
@@ -322,7 +369,6 @@ async function fetchAndDisplayLinks(searchQuery = '') {
     }
 }
 
-// PERBAIKAN: Menggunakan currentTarget untuk memastikan event listener mengambil elemen yang benar (button, bukan svg/path di dalamnya)
 async function handleDeleteLink(event) {
     const button = event.currentTarget;
     const slugToDelete = button.dataset.slug;
@@ -443,6 +489,144 @@ async function deleteUser(event) {
         console.error(error);
     }
 }
+
+// === LOGIKA MANAJEMEN PORTOFOLIO ADMIN ===
+function setupAdminPortfolioPanel() {
+    const form = document.getElementById('portfolio-form');
+    if (!form) return;
+
+    const formTitle = document.getElementById('portfolio-form-title');
+    const hiddenId = document.getElementById('portfolio-id');
+    const titleInput = document.getElementById('portfolio-title');
+    const descriptionInput = document.getElementById('portfolio-description');
+    const linkInput = document.getElementById('portfolio-link');
+    const imageInput = document.getElementById('portfolio-image');
+    const messageDiv = document.getElementById('portfolio-message');
+    const clearButton = document.getElementById('clear-portfolio-form');
+    const currentImageInfo = document.getElementById('current-image-info');
+
+    function resetPortfolioForm() {
+        form.reset();
+        hiddenId.value = '';
+        formTitle.textContent = 'Tambah Proyek Baru';
+        messageDiv.textContent = '';
+        messageDiv.className = '';
+        currentImageInfo.textContent = '';
+    }
+
+    clearButton.addEventListener('click', resetPortfolioForm);
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('title', titleInput.value);
+        formData.append('description', descriptionInput.value);
+        formData.append('project_link', linkInput.value);
+        
+        if (imageInput.files[0]) {
+            formData.append('image', imageInput.files[0]);
+        }
+        
+        const id = hiddenId.value;
+        const url = id ? `${API_BASE_URL}/api/admin/portfolio/${id}` : `${API_BASE_URL}/api/admin/portfolio`;
+        const method = id ? 'PUT' : 'POST';
+
+        try {
+            const response = await fetchWithAuth(url, { method, body: formData });
+            const result = await response.json();
+
+            if (!response.ok) throw new Error(result.error || 'Terjadi kesalahan.');
+
+            messageDiv.className = 'success';
+            messageDiv.textContent = id ? 'Proyek berhasil diperbarui!' : 'Proyek berhasil ditambahkan!';
+            
+            resetPortfolioForm();
+            fetchAndDisplayPortfolioAdmin();
+
+        } catch (error) {
+            messageDiv.className = 'error';
+            messageDiv.textContent = `Error: ${error.message}`;
+        }
+    });
+
+    fetchAndDisplayPortfolioAdmin();
+}
+
+async function fetchAndDisplayPortfolioAdmin() {
+    const listContainer = document.getElementById('portfolio-list-admin');
+    const loadingMessage = document.getElementById('loading-portfolio-admin');
+    if (!listContainer || !loadingMessage) return;
+
+    loadingMessage.style.display = 'block';
+    listContainer.innerHTML = '';
+    
+    try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio`);
+        const projects = await response.json();
+        if (!response.ok) throw new Error(projects.error || 'Gagal memuat proyek.');
+        
+        loadingMessage.style.display = 'none';
+
+        if (projects.length === 0) {
+            listContainer.innerHTML = '<li><p>Belum ada proyek ditambahkan.</p></li>';
+            return;
+        }
+
+        projects.forEach(project => renderAdminPortfolioItem(project, listContainer));
+    } catch (error) {
+        loadingMessage.textContent = `Error: ${error.message}`;
+    }
+}
+
+function renderAdminPortfolioItem(project, container) {
+    const listItem = document.createElement('li');
+    listItem.className = 'mood-item';
+    listItem.id = `portfolio-item-${project.id}`;
+
+    listItem.innerHTML = `
+        <div class="mood-item-header">
+            <span><strong>${project.title}</strong></span>
+            <div class="mood-item-actions">
+                <button class="mood-icon-button edit-portfolio-btn" data-id="${project.id}" aria-label="Edit Proyek">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                </button>
+                <button class="mood-icon-button delete-portfolio-btn delete-button" data-id="${project.id}" aria-label="Hapus Proyek">
+                    ${trashIconSvg}
+                </button>
+            </div>
+        </div>
+        <p class="mood-notes">${project.description.substring(0, 100)}...</p>
+        <small class="mood-date">Dibuat: ${new Date(project.created_at).toLocaleString('id-ID')}</small>
+    `;
+    container.appendChild(listItem);
+
+    listItem.querySelector('.edit-portfolio-btn').addEventListener('click', async () => {
+        document.getElementById('portfolio-form-title').textContent = 'Edit Proyek';
+        document.getElementById('portfolio-id').value = project.id;
+        document.getElementById('portfolio-title').value = project.title;
+        document.getElementById('portfolio-description').value = project.description;
+        document.getElementById('portfolio-link').value = project.project_link || '';
+        document.getElementById('current-image-info').textContent = `Gambar saat ini: ${project.image_url}. Kosongkan jika tidak ingin ganti.`;
+        document.getElementById('portfolio-form').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    listItem.querySelector('.delete-portfolio-btn').addEventListener('click', async () => {
+        if (!confirm(`Yakin ingin menghapus proyek "${project.title}"?`)) return;
+        
+        try {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio/${project.id}`, { method: 'DELETE' });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error);
+            
+            alert('Proyek berhasil dihapus.');
+            fetchAndDisplayPortfolioAdmin();
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        }
+    });
+}
+
 
 // ===================================
 // === LOGIKA HALAMAN TOOLS        ===
@@ -1085,14 +1269,11 @@ function setupDashboardTabs() {
         const clickedButton = e.target.closest('.dashboard-tab-button');
         if (!clickedButton) return;
 
-        // Nonaktifkan semua tombol dan panel
         tabButtons.forEach(button => button.classList.remove('active'));
         contentPanels.forEach(panel => panel.classList.remove('active'));
 
-        // Aktifkan tombol yang diklik
         clickedButton.classList.add('active');
 
-        // Temukan dan aktifkan panel yang sesuai
         const targetPanelId = clickedButton.dataset.target;
         const targetPanel = document.getElementById(targetPanelId);
         if (targetPanel) {
