@@ -1,5 +1,5 @@
 /* =================================================================== */
-/* ==       V2.0: FINAL STYLE - DENGAN HEADER PROFESIONAL         == */
+/* ==   V12: FINAL STYLE - DEFINITIVE FIX FOR OVERLAPPING ICON    == */
 /* =================================================================== */
 
 /* === PENGATURAN GLOBAL: DESIGN SYSTEM === */
@@ -59,262 +59,55 @@ html, body {
 }
 
 
-/* =================================================================== */
-/* ==          HEADER PROFESIONAL - OLEH GEMINI (VERSI 2.0)         == */
-/* =================================================================== */
+/* === KOMPONEN UMUM === */
 
-/* --- 1. Tata Letak Navbar Utama --- */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.navbar { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
     padding: var(--space-sm) clamp(var(--space-md), 5vw, var(--space-xl));
     position: sticky;
-    top: 0;
-    z-index: 1000;
+    top: 0; 
+    z-index: 1000; 
+    transition: background-color 0.3s ease;
     background-color: rgba(18, 18, 18, 0.7);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-color);
-    transition: background-color 0.3s ease;
 }
 
-/* --- 2. Logo --- */
-.logo a {
-    font-family: var(--font-heading);
-    font-weight: 700;
-    text-decoration: none;
+.logo a { 
+    font-family: var(--font-heading); 
+    font-size: 1.5rem; 
+    font-weight: 700; 
+    text-decoration: none; 
     color: #ffffff;
+    transition: color 0.3s ease; 
+}
+.logo a:hover { color: var(--accent-color); }
+
+.nav-links { list-style: none; display: flex; align-items: center; gap: var(--space-lg); }
+.nav-links li { margin-left: 0; }
+.nav-links a { 
+    text-decoration: none; 
+    color: var(--text-muted-color); 
+    font-weight: 500; 
     transition: color 0.3s ease;
+    padding: var(--space-xs) 0;
+    position: relative;
 }
-
-.logo a:hover {
-    color: var(--accent-color);
-}
-
-.logo-desktop {
-    font-size: 1.8rem;
-    line-height: 1.2;
-    text-align: center;
-}
-
-.logo-mobile {
-    font-size: 1.5rem;
-}
-
-/* --- 3. Tombol Hamburger & Navigasi Mobile --- */
-.hamburger {
-    display: none; /* Sembunyi di desktop, muncul di mobile */
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    z-index: 1001; /* Di atas segalanya */
-}
-
-.hamburger span {
-    background-color: var(--text-color);
-    display: block;
-    width: 25px;
-    height: 3px;
-    margin: 5px 0;
-    border-radius: 3px;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-/* Animasi Hamburger menjadi 'X' */
-.hamburger.active span:nth-child(1) {
-    transform: translateY(8px) rotate(45deg);
-}
-.hamburger.active span:nth-child(2) {
-    opacity: 0;
-}
-.hamburger.active span:nth-child(3) {
-    transform: translateY(-8px) rotate(-45deg);
-}
-
-/* Overlay menu saat mobile aktif */
-.menu-overlay {
-    position: fixed;
-    top: 0;
+.nav-links a::after { 
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    z-index: 998; /* Di bawah sidebar, di atas konten */
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    visibility: hidden;
+    background-color: var(--accent-color);
+    transition: width 0.3s ease;
 }
-
-.menu-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Mencegah scroll body saat menu mobile terbuka */
-body.menu-open,
-html.menu-open {
-    overflow: hidden;
-}
-
-/* ============================================== */
-/* ===         GAYA TAMPILAN DESKTOP          === */
-/* ============================================== */
-@media (min-width: 769px) {
-    .logo-mobile { display: none; } /* Sembunyikan logo mobile di desktop */
-
-    .nav-links {
-        list-style: none;
-        display: flex;
-        align-items: center;
-        gap: var(--space-sm); /* Jarak konsisten antar item */
-    }
-
-    .nav-links li > a,
-    .nav-links li > .nav-button {
-        display: flex;
-        flex-direction: column; /* Ikon di atas, teks di bawah */
-        align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        border-radius: 8px;
-        text-decoration: none;
-        color: var(--text-muted-color);
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    .nav-links li > a:hover,
-    .nav-links li > .nav-button:hover {
-        background-color: var(--border-color);
-        color: var(--text-color);
-    }
-    
-    .nav-links li svg {
-        width: 22px;
-        height: 22px;
-    }
-
-    .nav-links li span {
-        font-size: 0.8rem;
-        font-weight: 500;
-        font-family: var(--font-body);
-    }
-    
-    #nav-logout .button-pintu {
-        background-color: var(--accent-color) !important;
-        border-radius: 50px;
-        padding: 10px 20px;
-        color: #000000;
-    }
-    #nav-logout .button-pintu:hover {
-         background-color: var(--accent-hover) !important;
-    }
-}
-
-
-/* ============================================= */
-/* ===         GAYA TAMPILAN MOBILE          === */
-/* ============================================= */
-@media (max-width: 768px) {
-    .logo-desktop { display: none; } /* Sembunyikan logo desktop di mobile */
-    .hamburger { display: block; } /* Tampilkan hamburger di mobile */
-
-    /* Mengatur tata letak header mobile menjadi 3 kolom untuk presisi */
-    .navbar {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr; /* Kiri, Tengah, Kanan */
-        padding: var(--space-sm) var(--space-md);
-    }
-
-    .navbar nav {
-        grid-column: 1 / 2;
-        justify-self: start;
-    }
-
-    .navbar .logo {
-        grid-column: 2 / 3;
-        justify-self: center;
-    }
-    
-    /* Sidebar Menu Mobile */
-    .nav-links {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 85%;
-        max-width: 320px;
-        height: 100vh;
-        background-color: rgba(24, 24, 24, 0.98);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        padding: var(--space-xl) 0;
-        list-style: none;
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-xs);
-        transform: translateX(-100%);
-        transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-        z-index: 999;
-    }
-
-    .nav-links.active {
-        transform: translateX(0);
-    }
-    
-    .nav-links li {
-        width: 100%;
-    }
-
-    .nav-links li > a,
-    .nav-links li > .nav-button {
-        display: flex;
-        flex-direction: row; /* Ikon di samping teks */
-        align-items: center;
-        gap: var(--space-md);
-        padding: var(--space-sm) var(--space-lg);
-        text-decoration: none;
-        font-size: 1.05rem;
-        font-weight: 500;
-        color: var(--text-muted-color);
-        background: none;
-        border: none;
-        width: 100%;
-        text-align: left;
-        cursor: pointer;
-        transition: color 0.3s ease, background-color 0.3s ease;
-    }
-
-    .nav-links li > a:hover,
-    .nav-links li > .nav-button:hover {
-        background-color: rgba(255, 255, 255, 0.05);
-        color: var(--text-color);
-    }
-    
-    .nav-links li svg {
-        width: 20px;
-        height: 20px;
-    }
-    
-    /* Mendorong Tombol Logout ke paling bawah */
-    .nav-logout-item {
-        margin-top: auto;
-        padding: var(--space-md) var(--space-lg);
-    }
-    
-    #logout-button-nav {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-
-/* =================================================================== */
-/* ==                     SISA KODE CSS ANDA (UTUH)                 == */
-/* =================================================================== */
+.nav-links a:hover { color: var(--text-color); }
+.nav-links a:hover::after { width: 100%; }
 
 .button-pintu, .login-button { 
     display: inline-block; 
@@ -673,7 +466,177 @@ input:focus, textarea:focus, select:focus {
 .mood-icon-button.delete-button:hover { border-color: #ff4d4d; }
 .mood-icon-button.delete-button:hover svg { color: #ff4d4d; }
 
+/* === HAMBURGER & RESPONSIVE === */
+.hamburger { display: none; background: transparent; border: none; cursor: pointer; padding: 0; z-index: 1001; }
+.hamburger span { background-color: var(--text-color); display: block; width: 25px; height: 3px; margin: 5px 0; border-radius: 3px; transition: all 0.3s ease-in-out; }
+
+/* === TAMBAHKAN CSS UNTUK ANIMASI HAMBURGER === */
+.hamburger.active span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+.hamburger.active span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+/* === CSS BARU UNTUK OVERLAY MENU === */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    visibility: hidden; /* Start hidden */
+}
+.menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+
 @media (max-width: 768px) {
+   .navbar .logo {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.navbar nav {
+    order: -1;
+    width: 50px; /* Beri lebar tetap untuk simetri */
+    display: flex;
+    justify-content: center;
+}
+
+.navbar::after {
+    content: '';
+    display: block;
+    width: 50px; /* Lebarnya HARUS SAMA dengan elemen <nav> di atas */
+}
+
+.hamburger {
+    margin-right: 0;
+}
+
+    nav {
+        display: flex;
+    }
+    .hamburger { 
+        display: block; 
+        order: -1; 
+        margin-right: var(--space-sm);
+    }
+    
+    .nav-links { 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        bottom: 0; 
+        width: 85%;
+        max-width: 320px; 
+        height: 100vh; /* Pastikan tinggi penuh */
+        background-color: rgba(24, 24, 24, 0.98); 
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: var(--space-xl) 0; /* Ubah padding vertikal */
+        transform: translateX(-100%); 
+        transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+        display: flex; /* Aktifkan flexbox */
+        flex-direction: column; /* Atur item secara vertikal */
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 0; /* Hapus gap utama, atur di item */
+        box-shadow: 5px 0 25px rgba(0,0,0,0.4); 
+        z-index: 1000; 
+    }
+    
+    .nav-links.active { 
+        transform: translateX(0); 
+    }
+    
+    body.menu-open, html.menu-open { overflow: hidden; }
+
+    .nav-links li { 
+        margin: 0; 
+        width: 100%; 
+        text-align: left;
+        opacity: 0;
+        transform: translateX(-20px); 
+        transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .nav-links.active li {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    .nav-links.active li:nth-child(1) { transition-delay: 0.1s; }
+    .nav-links.active li:nth-child(2) { transition-delay: 0.15s; }
+    .nav-links.active li:nth-child(3) { transition-delay: 0.2s; }
+    .nav-links.active li:nth-child(4) { transition-delay: 0.25s; }
+    .nav-links.active li:nth-child(5) { transition-delay: 0.3s; }
+    .nav-links.active li:nth-child(6) { transition-delay: 0.35s; }
+    .nav-links.active li:nth-child(7) { transition-delay: 0.4s; }
+
+    /* Ganti gaya untuk link dan tombol di menu */
+    .nav-links a, .nav-links .nav-button { 
+        display: flex; /* Gunakan flex untuk ikon dan teks */
+        align-items: center;
+        gap: var(--space-md); /* Jarak antara ikon dan teks */
+        padding: var(--space-sm) var(--space-lg);
+        width: 100%; 
+        border-radius: 0; 
+        font-size: 1.0rem;
+        font-weight: 500;
+        color: var(--text-muted-color);
+        transition: color 0.3s ease, background-color 0.3s ease;
+    }
+    
+    .nav-links a:hover, .nav-links .nav-button:hover { 
+      background-color: rgba(255, 255, 255, 0.05);
+      color: var(--text-color); 
+    }
+
+    .nav-links a::after { display: none; }
+    
+    /* Atur ikon di dalam link */
+    .nav-links a svg, .nav-links .nav-button svg {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0; /* Mencegah ikon menyusut */
+        color: var(--text-muted-color);
+        transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover svg, .nav-links .nav-button:hover svg {
+        color: var(--text-color);
+    }
+
+    /* Tombol login asli */
+    .nav-links a.login-button { 
+        margin: var(--space-md) var(--space-lg);
+        width: calc(100% - (var(--space-lg) * 2));
+        text-align: center;
+        display: block; /* Kembalikan ke block karena tidak ada ikon */
+    }
+    
+    /* CSS BARU UNTUK TOMBOL LOGOUT */
+    .nav-logout-item {
+        margin-top: auto; /* INI KUNCINYA: Mendorong item ini ke bawah */
+        padding: var(--space-md) var(--space-lg);
+    }
+    
+    .nav-logout-item button {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: var(--space-sm);
+        padding: 0.8rem 1.6rem;
+    }
+
     .mood-item-header { flex-direction: column; align-items: flex-start; }
     .mood-item-actions { width: 100%; justify-content: flex-end; } 
     .mood-item-header strong { margin-right: 0; } 
@@ -1288,6 +1251,108 @@ input:focus, textarea:focus, select:focus {
     overflow-wrap: break-word;
     word-wrap: break-word;
     word-break: break-word;
+}
+
+/* ================================================= */
+/* == BLOK FINAL HEADER (DESKTOP & MOBILE) - V3   == */
+/* ================================================= */
+
+/* [GLOBAL] Mengatur logo menjadi dua baris */
+.logo a {
+    line-height: 1.2;
+    display: inline-block;
+    text-align: center;
+}
+
+/* [GLOBAL] Menghapus efek garis bawah nav-link lama */
+.nav-links a::after {
+    display: none;
+}
+
+/* [UMUM] Aturan dasar untuk semua elemen interaktif di navigasi */
+.nav-links li > a,
+.nav-links li > .nav-button {
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s, color 0.3s;
+    text-decoration: none;
+}
+
+/* [DESKTOP] Aturan untuk header di layar lebar (769px ke atas) */
+@media (min-width: 769px) {
+    /* Mengatur item nav menjadi vertikal (ikon di atas, teks di bawah) */
+    .nav-links li > a,
+    .nav-links li > .nav-button {
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 8px;
+    }
+
+    .nav-links li > a:hover,
+    .nav-links li > .nav-button:hover {
+        background-color: var(--border-color);
+        color: var(--text-color);
+    }
+
+    .nav-links li svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .nav-links li span {
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    /* Pengaturan tombol logout di desktop */
+    #nav-logout .button-pintu {
+        flex-direction: row;
+        gap: 8px;
+        border-radius: 50px;
+        padding: 10px 20px;
+        color: #000000;
+    }
+}
+
+/* [MOBILE] Aturan untuk menu hamburger (768px ke bawah) */
+@media (max-width: 768px) {
+    /* Mengatur item nav menjadi horizontal (ikon di samping teks) di dalam sidebar */
+    .nav-links li > a,
+    .nav-links li > .nav-button {
+        flex-direction: row;
+        gap: var(--space-md);
+    }
+}
+
+/* ================================================= */
+/* == BLOK FINAL V6 UNTUK LOGO (DESKTOP & MOBILE) == */
+/* ================================================= */
+
+/* Aturan untuk menyembunyikan logo mobile di layar besar (DESKTOP) */
+.logo-mobile {
+    display: none !important;
+}
+
+/* Aturan untuk menampilkan logo desktop di layar besar (DESKTOP) */
+.logo-desktop {
+    display: inline-block !important;
+    line-height: 1.2;
+    text-align: center;
+}
+
+/* Aturan untuk layar kecil (MOBILE) */
+@media (max-width: 768px) {
+    /* Tampilkan logo mobile dan atur gayanya */
+    .logo-mobile {
+        display: inline-block !important;
+        font-size: 1.5rem;
+    }
+
+    /* SEMBUNYIKAN logo desktop */
+    .logo-desktop {
+        display: none !important;
+    }
 }
 
 /* Penyesuaian Footer untuk Mobile */
