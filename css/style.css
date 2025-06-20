@@ -113,8 +113,7 @@ html, body {
     display: inline-block; 
     background: var(--accent-color); 
     color: #000000;
-    padding: 0.5rem 1.2rem;
-    font-size: 0.95rem; 
+    padding: 0.7rem 1.6rem; 
     border: 2px solid var(--accent-color); 
     border-radius: 8px;
     font-weight: 700;
@@ -301,11 +300,7 @@ footer {
 .page-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h1); color: #ffffff; margin-bottom: var(--space-sm); }
 .page-subtitle { text-align: center; font-size: var(--font-size-base); color: var(--text-muted-color); margin-bottom: var(--space-xl); max-width: 600px; margin-left: auto; margin-right: auto; }
 
-.portfolio-grid, .jurnal-grid { 
-    display: grid; 
-    gap: var(--space-lg); 
-    align-items: stretch;
-}
+.portfolio-grid, .jurnal-grid { display: grid; gap: var(--space-lg); }
 .portfolio-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 
 .portfolio-card, .jurnal-card, .game-section .portfolio-card { 
@@ -338,9 +333,7 @@ footer {
     padding: var(--space-md);
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* Penting: Pastikan ini ada */
-    justify-content: space-between; /* BARU: Ini adalah kunci untuk mendorong tombol ke bawah */
-    height: 100%; /* BARU: Memastikan konten mengisi tinggi yang tersedia dari parent-nya */
+    flex-grow: 1;
 }
 
 .portfolio-card h3, .jurnal-card h3, .game-section .portfolio-card h3 { 
@@ -349,27 +342,13 @@ footer {
     margin-bottom: var(--space-xs);
 }
 .portfolio-card p, .jurnal-card p, .game-section .portfolio-card p {
-    color: var(--text-muted-color);
-    flex-grow: 1; /* Pastikan ini ada dan bernilai 1 */
-    margin-bottom: var(--space-md); /* Jaga jarak dengan tombol */
-
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* Batasi maksimal 3 baris */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis; /* Tambahkan elipsis jika teks terpotong */
-    min-height: 60px; /* Jaring pengaman: Pastikan tinggi minimum yang cukup untuk 3 baris teks. Sesuaikan nilai ini jika 60px tidak cukup untuk 3 baris di font Anda. */
-
-    /* BARU: Tambahkan properti standar untuk kompatibilitas */
-    display: -webkit-box; /* Tetap pertahankan ini untuk kompatibilitas lama */
-    -webkit-box-orient: vertical; /* Tetap pertahankan ini */
-    -webkit-line-clamp: 3; /* Tetap pertahankan ini */
-    line-clamp: 3; /* STANDAR: Tambahkan properti ini! */
-    box-orient: vertical; /* STANDAR: Tambahkan properti ini! */
+    color: var(--text-muted-color); 
+    flex-grow: 1; 
+    margin-bottom: var(--space-md);
 }
-.portfolio-card .button-pintu, .jurnal-card .button-pintu, .game-section .portfolio-card .button-pintu {
-    margin-top: auto; /* PENTING: Ini akan mendorong tombol ke bawah jika parent adalah flex container dengan flex-direction: column */
-    align-self: flex-start; /* BARU: Memastikan tombol tetap rata kiri di dalam kolomnya jika perlu */
+.portfolio-card .button-pintu, .jurnal-card .button-pintu, .game-section .portfolio-card .button-pintu { 
+    margin-top: auto; 
+    align-self: flex-start; 
 }
 
 .jurnal-card { display: block; }
@@ -392,77 +371,28 @@ footer {
 #shortener-form input[type="url"] { grid-column: 1 / -1; }
 #shortener-form #custom-slug { flex-grow: 1; }
 
-input[type="url"], input[type="email"], input[type="password"], input[type="text"], textarea, select, input[type="number"] {
-    /* ... properti yang sudah ada ... */
-    background-color: #252525; /* UBAH INI */
-    color: var(--text-color);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+input[type="url"], input[type="email"], input[type="password"], input[type="text"], textarea, select, input[type="number"] { 
+    width: 100%;
+    padding: var(--space-sm); 
+    border: 1px solid var(--border-color); 
+    border-radius: 8px; 
+    font-size: var(--font-size-base); 
+    font-family: var(--font-body); 
+    background-color: #2a2a2a;
+    color: var(--text-color); 
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; 
 }
 input::placeholder, textarea::placeholder {
     color: var(--text-muted-color);
-    opacity: 0.8; /* UBAH INI */
-    transition: opacity 0.3s ease; /* TAMBAHKAN INI */
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
 }
-input:focus::placeholder, textarea:focus::placeholder { opacity: 0.5; } /* TAMBAHKAN INI */
-input:focus, textarea:focus, select:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(0, 245, 160, 0.3); /* UBAH INI */
+input:focus::placeholder, textarea:focus::placeholder { opacity: 0.4; }
+input:focus, textarea:focus, select:focus { 
+    outline: none; 
+    border-color: var(--accent-color); 
+    box-shadow: 0 0 0 3px rgba(0, 245, 160, 0.2); 
 }
-
-/* Stylisasi untuk input file */
-input[type="file"] {
-    width: 100%;
-    padding: var(--space-sm);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: var(--font-size-base);
-    font-family: var(--font-body);
-    background-color: #252525; /* Sama dengan input teks */
-    color: var(--text-color);
-    cursor: pointer;
-}
-
-/* Menyembunyikan tombol "Choose File" bawaan dan memberikan custom style */
-input[type="file"]::-webkit-file-upload-button {
-    visibility: hidden;
-    width: 0;
-}
-input[type="file"]::before {
-    content: 'Pilih File'; /* Teks kustom untuk tombol */
-    display: inline-block;
-    background: var(--accent-color);
-    color: #000000;
-    border: none;
-    border-radius: 6px; /* Lebih kecil dari border input */
-    padding: 0.5rem 1rem; /* Padding tombol di dalam input file */
-    outline: none;
-    white-space: nowrap;
-    -webkit-user-select: none;
-    user-select: none;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem; /* Ukuran font lebih kecil dari tombol utama */
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-input[type="file"]:hover::before {
-    background: var(--accent-hover);
-    transform: translateY(-1px);
-}
-
-/* Untuk teks "No file chosen" atau nama file yang dipilih */
-input[type="file"]::file-selector-button {
-    visibility: hidden;
-    width: 0;
-}
-input[type="file"]::after {
-    content: attr(data-file-chosen); /* Akan diisi JavaScript */
-    color: var(--text-muted-color);
-    margin-left: 0.8rem;
-    font-size: 0.95rem;
-}
-
 
 .password-container { position: relative; }
 .password-container .toggle-password {
@@ -489,16 +419,12 @@ input[type="file"]::after {
     box-shadow: var(--soft-shadow); 
     text-align: center; 
 }
-.auth-form .form-group {
-    margin-bottom: var(--space-md); /* Jaga jarak antar grup input */
-    text-align: left;
-}
-.auth-form label {
-    display: block;
-    font-weight: 500;
-    color: var(--text-color); /* UBAH INI */
-    margin-bottom: var(--space-xs);
-    font-size: 0.95rem; /* TAMBAHKAN INI */
+.auth-form .form-group { margin-bottom: var(--space-md); text-align: left; }
+.auth-form label { 
+    display: block; 
+    font-weight: 500; 
+    color: var(--text-muted-color); 
+    margin-bottom: var(--space-xs); 
 }
 .auth-form input { text-align: left; }
 .auth-form button { width: 100%; padding: 0.9rem; }
@@ -1645,70 +1571,4 @@ input[type="file"]::after {
 /* Memastikan efek hover tetap berjalan */
 .portfolio-link-card:hover {
     color: inherit; 
-}
-
-/* Container untuk tombol, agar bisa diatur layoutnya */
-.admin-management-section div[style="display: flex; gap: 1rem;"] {
-    display: flex;
-    gap: var(--space-md); /* Menambahkan jarak yang konsisten antar tombol */
-    justify-content: flex-start; /* Merata kirikan tombol */
-    margin-top: var(--space-md); /* Jarak dari input di atasnya */
-}
-
-/* Tombol "Simpan Proyek" (Utama) */
-.button-pintu {
-    /* Pertahankan properti umum .button-pintu di bagian atas file */
-    /* Jika Anda sudah menyesuaikan padding/font-size di atas, tidak perlu ulangi di sini */
-    padding: 0.8rem 1.8rem; /* Sedikit lebih besar dari tombol lain, menonjolkan */
-    font-size: 1rem;
-    font-weight: 700;
-    background: var(--accent-color);
-    color: #000000;
-    border: 2px solid var(--accent-color);
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 245, 160, 0.3); /* Bayangan lebih kuat */
-    flex-grow: 1; /* Biarkan tombol ini sedikit melebar jika ada ruang */
-    max-width: 200px; /* Batasi lebar maksimum */
-}
-.button-pintu:hover {
-    background: var(--accent-hover);
-    border-color: var(--accent-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 245, 160, 0.4);
-}
-
-/* Tombol "Batal/Proyek Baru" (Sekunder) */
-#clear-portfolio-form {
-    background: var(--card-bg-color); /* Warna background kartu */
-    color: var(--text-color); /* Warna teks biasa */
-    border: 1px solid var(--border-color); /* Border normal */
-    box-shadow: none; /* Tanpa bayangan */
-    padding: 0.8rem 1.8rem; /* Sama dengan tombol utama */
-    font-size: 1rem;
-    font-weight: 600; /* Sedikit lebih ringan dari utama */
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    flex-grow: 1;
-    max-width: 200px;
-}
-#clear-portfolio-form:hover {
-    background: var(--border-hover-color); /* Warna hover dari border */
-    border-color: var(--text-muted-color);
-    transform: translateY(-2px);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Responsif untuk tombol di mobile */
-@media (max-width: 600px) {
-    .admin-management-section div[style="display: flex; gap: 1rem;"] {
-        flex-direction: column; /* Tombol jadi tumpuk di mobile */
-        gap: var(--space-sm);
-        max-width: 300px; /* Batasi lebar container tombol di mobile */
-        margin-left: auto;
-        margin-right: auto;
-    }
-    .button-pintu, #clear-portfolio-form {
-        width: 100%; /* Tombol melebar penuh */
-        max-width: none; /* Hapus batasan lebar */
-    }
 }
