@@ -565,6 +565,46 @@ function setupAdminPortfolioPanel() {
     const clearButton = document.getElementById('clear-portfolio-form');
     const currentImageInfo = document.getElementById('current-image-info');
 
+    // script.js
+
+function setupAdminPortfolioPanel() {
+    const form = document.getElementById('portfolio-form');
+    if (!form) return;
+
+    const formTitle = document.getElementById('portfolio-form-title');
+    const hiddenId = document.getElementById('portfolio-id');
+    const titleInput = document.getElementById('portfolio-title');
+    const descriptionInput = document.getElementById('portfolio-description');
+    const linkInput = document.getElementById('portfolio-link');
+    const imageInput = document.getElementById('portfolio-image'); // Pastikan ini ada
+    const messageDiv = document.getElementById('portfolio-message');
+    const clearButton = document.getElementById('clear-portfolio-form');
+    const currentImageInfo = document.getElementById('current-image-info');
+
+    // TAMBAHKAN KODE INI DI SINI
+    if (imageInput) {
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                this.setAttribute('data-file-chosen', this.files[0].name);
+            } else {
+                this.setAttribute('data-file-chosen', 'No file chosen');
+            }
+        });
+        // Inisialisasi awal jika ada file yang sudah terpilih (misal saat edit)
+        if (imageInput.files && imageInput.files.length > 0) {
+            imageInput.setAttribute('data-file-chosen', imageInput.files[0].name);
+        } else {
+            imageInput.setAttribute('data-file-chosen', 'No file chosen');
+        }
+    }
+    // AKHIR KODE YANG DITAMBAHKAN
+
+    function resetPortfolioForm() {
+        // ... kode lainnya ...
+    }
+    // ... kode lainnya ...
+}
+
     function resetPortfolioForm() {
         form.reset();
         hiddenId.value = '';
