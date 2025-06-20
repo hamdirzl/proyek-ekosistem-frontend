@@ -1,5 +1,5 @@
 // ===================================================================
-// ==   FILE FINAL SCRIPT.JS (KOMPATIBEL DENGAN MENU KIRI/KANAN)  ==
+// ==   FILE FINAL SCRIPT.JS (V2 - DENGAN PERBAIKAN DASHBOARD)    ==
 // ===================================================================
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
@@ -112,6 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const data = await refreshResponse.json();
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
                 console.log("Access token berhasil didapatkan untuk sesi ini.");
+                // Panggil setup ulang jika berada di halaman dasbor
                 if (document.body.contains(document.getElementById('dashboard-main'))) {
                     setupDashboardPage();
                 }
@@ -124,6 +125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Panggil fungsi setup berdasarkan halaman
     if (document.body.contains(document.getElementById('dashboard-main'))) {
         setupDashboardPage();
     } else if (document.title.includes("Tools")) {
@@ -136,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupMobileMenu();
     setupAllPasswordToggles();
     setupChatBubble();
-    setupAccountManagement(); // Tambahkan pemanggilan ini
+    setupAccountManagement();
 });
 
 
@@ -149,21 +151,28 @@ function decodeJwt(token) {
 // ===================================
 
 function setupDashboardPage() {
-    if (!localStorage.getItem('jwt_refresh_token')) {
+    const refreshToken = localStorage.getItem('jwt_refresh_token');
+    const accessToken = sessionStorage.getItem('jwt_access_token');
+    
+    if (!refreshToken) {
         window.location.href = 'auth.html';
         return;
     }
+    
+    // Pastikan access token ada sebelum melanjutkan
+    if (!accessToken) {
+        // Jika tidak ada, fungsi di DOMContentLoaded akan mencoba mengambilnya.
+        // Kita bisa menunggu sejenak atau membiarkannya berjalan.
+        console.log("Menunggu access token dari proses refresh...");
+        return; 
+    }
 
-    const accessToken = sessionStorage.getItem('jwt_access_token');
-    if (accessToken) {
-        const decodedToken = decodeJwt(accessToken);
-        populateUserInfo(decodedToken);
-        
-        populateUserDashboard(decodedToken); 
-        
-        if (decodedToken && decodedToken.role === 'admin') {
-            setupAdminPanels();
-        }
+    const decodedToken = decodeJwt(accessToken);
+    populateUserInfo(decodedToken);
+    populateUserDashboard(); // Dihapus parameternya agar tidak membingungkan
+    
+    if (decodedToken && decodedToken.role === 'admin') {
+        setupAdminPanels();
     }
 }
 
@@ -174,27 +183,33 @@ function populateUserInfo(decodedToken) {
     }
 }
 
-async function populateUserDashboard(decodedToken) {
+async function populateUserDashboard() {
     const userDashboardSection = document.getElementById('user-dashboard-section');
     if (!userDashboardSection) return;
 
+    const statsLinkCountEl = document.getElementById('stats-link-count');
+    const statsLastLoginEl = document.getElementById('stats-last-login');
+
+    // Ambil dan tampilkan statistik
     try {
         const statsResponse = await fetchWithAuth(`${API_BASE_URL}/api/user/dashboard-stats`);
+        if (!statsResponse.ok) throw new Error('Gagal memuat data statistik.');
+        
         const stats = await statsResponse.json();
-
-        if (statsResponse.ok) {
-            document.getElementById('stats-link-count').textContent = stats.linkCount;
-            const lastLoginEl = document.getElementById('stats-last-login');
-            if (stats.lastLogin) {
-                lastLoginEl.innerHTML = `${stats.lastLogin.time}<br><small style="font-weight: 400; color: var(--text-muted-color);">${stats.lastLogin.ip}</small>`;
-            } else {
-                lastLoginEl.textContent = 'Belum ada data.';
-            }
+        
+        statsLinkCountEl.textContent = stats.linkCount;
+        if (stats.lastLogin) {
+            statsLastLoginEl.innerHTML = `${stats.lastLogin.time}<br><small style="font-weight: 400; color: var(--text-muted-color);">${stats.lastLogin.ip}</small>`;
+        } else {
+            statsLastLoginEl.textContent = 'Belum ada data.';
         }
     } catch (error) {
         console.error('Gagal memuat statistik dasbor:', error);
+        statsLinkCountEl.textContent = 'Error';
+        statsLastLoginEl.textContent = 'Gagal memuat';
     }
 
+    // Ambil dan tampilkan riwayat tautan (5 terakhir)
     const historyList = document.getElementById('user-links-list');
     const loadingMessage = document.getElementById('loading-user-links');
     if (!historyList || !loadingMessage) return;
@@ -202,6 +217,8 @@ async function populateUserDashboard(decodedToken) {
     loadingMessage.textContent = 'Memuat riwayat tautan...';
     try {
         const linksResponse = await fetchWithAuth(`${API_BASE_URL}/api/user/links`);
+        if (!linksResponse.ok) throw new Error('Gagal memuat riwayat tautan.');
+
         const links = await linksResponse.json();
         
         historyList.innerHTML = '';
@@ -301,8 +318,10 @@ async function fetchAndDisplayLinks(searchQuery = '') {
     }
 }
 
+// PERBAIKAN: Menggunakan currentTarget untuk memastikan event listener mengambil elemen yang benar (button, bukan svg/path di dalamnya)
 async function handleDeleteLink(event) {
-    const slugToDelete = event.target.dataset.slug;
+    const button = event.currentTarget;
+    const slugToDelete = button.dataset.slug;
     if (!confirm(`Anda yakin ingin menghapus link dengan slug "${slugToDelete}"?`)) return;
 
     try {
@@ -340,7 +359,7 @@ async function fetchAndDisplayUsers(searchQuery = '') {
         loadingMessage.style.display = 'none';
 
         if (users.length === 0) {
-            userList.innerHTML = '<li><p>No users found.</p></li>';
+            userList.innerHTML = '<li><p>Tidak ada pengguna yang cocok ditemukan.</p></li>';
             return;
         }
 
@@ -402,7 +421,8 @@ async function toggleUserRole(event) {
 }
 
 async function deleteUser(event) {
-    const userId = event.currentTarget.dataset.userId;
+    const button = event.currentTarget;
+    const userId = button.dataset.userId;
     if (!confirm(`Anda yakin ingin menghapus pengguna ini secara permanen? Tindakan ini tidak bisa dibatalkan.`)) return;
 
     try {
@@ -839,7 +859,8 @@ function renderUserLinkItem(link, container) {
 }
 
 async function handleDeleteUserLink(event) {
-    const slugToDelete = event.currentTarget.dataset.slug;
+    const button = event.currentTarget;
+    const slugToDelete = button.dataset.slug;
     if (!confirm(`Anda yakin ingin menghapus tautan ${slugToDelete} dari riwayat Anda?`)) return;
 
     try {
