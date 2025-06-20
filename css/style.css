@@ -345,7 +345,14 @@ footer {
     color: var(--text-muted-color); 
     flex-grow: 1; 
     margin-bottom: var(--space-md);
+
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Tampilkan maksimal 3 baris. Anda bisa ubah angka ini */
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
 .portfolio-card .button-pintu, .jurnal-card .button-pintu, .game-section .portfolio-card .button-pintu { 
     margin-top: auto; 
     align-self: flex-start; 
