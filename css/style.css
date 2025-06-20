@@ -113,7 +113,8 @@ html, body {
     display: inline-block; 
     background: var(--accent-color); 
     color: #000000;
-    padding: 0.7rem 1.6rem; 
+    padding: 0.5rem 1.2rem;
+    font-size: 0.95rem; 
     border: 2px solid var(--accent-color); 
     border-radius: 8px;
     font-weight: 700;
@@ -346,17 +347,13 @@ footer {
     margin-bottom: var(--space-xs);
 }
 .portfolio-card p, .jurnal-card p, .game-section .portfolio-card p {
-    color: var(--text-muted-color); 
-    flex-grow: 1; 
-    margin-bottom: var(--space-md);
-
+    /* Properti yang sudah ada di sini, seperti color, flex-grow, margin-bottom */
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* Tampilkan maksimal 3 baris. Anda bisa ubah angka ini */
-    -webkit-box-orient: vertical;  
+    -webkit-line-clamp: 3; /* Ini membatasi 3 baris. Anda bisa mengubah angka ini. */
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis; /* Menambahkan "..." jika teks terpotong */
 }
-
 .portfolio-card .button-pintu, .jurnal-card .button-pintu, .game-section .portfolio-card .button-pintu { 
     margin-top: auto; 
     align-self: flex-start; 
