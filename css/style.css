@@ -1380,3 +1380,80 @@ input:focus, textarea:focus, select:focus {
         justify-content: center;
     }
 }
+
+/* ============================================= */
+/* ==      GAYA BARU UNTUK DASBOR TABBED      == */
+/* ============================================= */
+
+.dashboard-container {
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: var(--space-lg);
+    margin-top: var(--space-lg);
+}
+
+.dashboard-nav {
+    display: flex;
+    flex-wrap: wrap; /* Agar tombol turun ke bawah di mobile */
+    gap: var(--space-xs);
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: var(--space-lg);
+}
+
+.dashboard-tab-button {
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-body);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--text-muted-color);
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: -2px; /* Agar border bawah menimpa border container */
+}
+
+.dashboard-tab-button:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+}
+
+.dashboard-tab-button.active {
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+}
+
+.dashboard-panel {
+    display: none; /* Semua panel disembunyikan secara default */
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.dashboard-panel.active {
+    display: block; /* Hanya panel aktif yang ditampilkan */
+}
+
+/* Animasi fade-in sederhana untuk panel */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Hilangkan styling berlebih dari section lama di dalam tab */
+.dashboard-panel .history-section,
+.dashboard-panel #user-dashboard-section,
+.dashboard-panel #account-management-section,
+.dashboard-panel #admin-section,
+.dashboard-panel #admin-users-section {
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: none;
+}

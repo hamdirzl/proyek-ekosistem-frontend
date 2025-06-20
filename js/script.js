@@ -235,14 +235,18 @@ async function populateUserDashboard() {
 }
 
 function setupAdminPanels() {
+    const userEmailElement = document.getElementById('user-email');
+    if (userEmailElement) userEmailElement.innerHTML += ' <span style="color: var(--accent-color); font-size: 0.9em;">(Admin)</span>';
+
+    // Tampilkan tombol tab untuk admin
+    document.getElementById('admin-links-tab')?.classList.remove('hidden');
+    document.getElementById('admin-users-tab')?.classList.remove('hidden');
+
+    // Logika untuk fetch data dan event listener pencarian tetap sama
     const adminSection = document.getElementById('admin-section');
     const adminUsersSection = document.getElementById('admin-users-section');
-    const userEmailElement = document.getElementById('user-email');
 
-    if (userEmailElement) userEmailElement.innerHTML += ' <span style="color: var(--accent-color); font-size: 0.9em;">(Admin)</span>';
-    
     if (adminSection) {
-        adminSection.classList.remove('hidden');
         const linkSearchInput = document.getElementById('link-search-input');
         let linkSearchTimeout;
         linkSearchInput.addEventListener('input', (e) => {
@@ -254,7 +258,6 @@ function setupAdminPanels() {
         fetchAndDisplayLinks();
     }
     if (adminUsersSection) {
-        adminUsersSection.classList.remove('hidden');
         const userSearchInput = document.getElementById('user-search-input');
         let userSearchTimeout;
         userSearchInput.addEventListener('input', (e) => {
