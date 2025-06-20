@@ -300,7 +300,11 @@ footer {
 .page-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h1); color: #ffffff; margin-bottom: var(--space-sm); }
 .page-subtitle { text-align: center; font-size: var(--font-size-base); color: var(--text-muted-color); margin-bottom: var(--space-xl); max-width: 600px; margin-left: auto; margin-right: auto; }
 
-.portfolio-grid, .jurnal-grid { display: grid; gap: var(--space-lg); }
+.portfolio-grid, .jurnal-grid { 
+    display: grid; 
+    gap: var(--space-lg); 
+    align-items: stretch;
+}
 .portfolio-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 
 .portfolio-card, .jurnal-card, .game-section .portfolio-card { 
