@@ -1462,6 +1462,10 @@ input:focus, textarea:focus, select:focus {
 /* ==   PERBAIKAN SIMETRI DASBOR MOBILE V2    == */
 /* ============================================= */
 
+/* ============================================= */
+/* ==   PERBAIKAN SIMETRI DASBOR MOBILE V3    == */
+/* ============================================= */
+
 /* Kita targetkan layar yang lebih kecil, seperti ponsel */
 @media (max-width: 600px) {
     .dashboard-nav {
@@ -1472,9 +1476,11 @@ input:focus, textarea:focus, select:focus {
     }
 
     .dashboard-tab-button {
-        justify-content: center; /* Pastikan teks di dalam tombol terpusat */
+        /* PERBAIKAN DI SINI: Mengganti justify-content dengan text-align */
+        text-align: center; /* Ini akan membuat teks di dalam tombol menjadi rata tengah */
         border-bottom: 3px solid var(--border-color); /* Pindahkan garis ke masing-masing tombol */
         margin-bottom: 0;
+        padding: var(--space-sm) var(--space-xs); /* Sedikit mengurangi padding horizontal untuk teks panjang */
     }
 
     .dashboard-tab-button.active {
