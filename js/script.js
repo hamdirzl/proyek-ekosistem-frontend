@@ -68,7 +68,6 @@ async function fetchWithAuth(url, options = {}) {
 
 /* === FUNGSI GLOBAL === */
 document.addEventListener('DOMContentLoaded', async () => {
-    // Definisi elemen navigasi
     const navDasbor = document.getElementById('nav-dasbor');
     const navLogin = document.getElementById('nav-login');
     const navLogout = document.getElementById('nav-logout');
@@ -76,14 +75,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const refreshToken = localStorage.getItem('jwt_refresh_token');
 
-    // Logika untuk menampilkan/menyembunyikan elemen navigasi
     if (refreshToken) {
-        // Jika Pengguna LOGIN
         if (navDasbor) navDasbor.style.display = 'list-item';
         if (navLogin) navLogin.style.display = 'none';
         if (navLogout) navLogout.style.display = 'list-item';
 
-        // Event listener untuk tombol logout di NAVIGASI
         if (logoutButtonNav) {
             logoutButtonNav.addEventListener('click', async () => {
                 try {
@@ -98,13 +94,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
     } else {
-        // Jika Pengguna LOGOUT
         if (navDasbor) navDasbor.style.display = 'none';
         if (navLogin) navLogin.style.display = 'list-item';
         if (navLogout) navLogout.style.display = 'none';
     }
     
-    // Logika untuk mendapatkan access token jika sesi baru
     if (refreshToken && !sessionStorage.getItem('jwt_access_token')) {
         console.log("Sesi baru, mencoba mendapatkan access token...");
         try {
@@ -130,7 +124,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Inisialisasi fungsi lain
     if (document.body.contains(document.getElementById('dashboard-main'))) {
         setupDashboardPage();
     } else if (document.title.includes("Tools")) {
@@ -143,6 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupMobileMenu();
     setupAllPasswordToggles();
     setupChatBubble();
+    setupAccountManagement(); // Tambahkan pemanggilan ini
 });
 
 
@@ -160,67 +154,113 @@ function setupDashboardPage() {
         return;
     }
 
-    const logoutButton = document.getElementById('logout-button');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', async () => {
-            try {
-                await fetchWithAuth(`${API_BASE_URL}/api/logout`, { method: 'POST' });
-            } catch (e) {
-                console.error("Gagal logout di server, tapi tetap lanjut logout di client.", e);
-            } finally {
-                forceLogout();
-                window.location.href = 'index.html';
-            }
-        });
-    }
-
     const accessToken = sessionStorage.getItem('jwt_access_token');
     if (accessToken) {
-        populateUserInfo(accessToken);
-        checkUserRoleAndSetupAdminPanel(accessToken);
+        const decodedToken = decodeJwt(accessToken);
+        populateUserInfo(decodedToken);
+        
+        populateUserDashboard(decodedToken); 
+        
+        if (decodedToken && decodedToken.role === 'admin') {
+            setupAdminPanels();
+        }
     }
 }
 
-function populateUserInfo(token) {
-    const decodedToken = decodeJwt(token);
+function populateUserInfo(decodedToken) {
     if (decodedToken && decodedToken.email) {
         const userEmailElement = document.getElementById('user-email');
         if (userEmailElement) userEmailElement.textContent = decodedToken.email;
     }
 }
 
-function checkUserRoleAndSetupAdminPanel(token) {
-    const decodedToken = decodeJwt(token);
-    if (decodedToken && decodedToken.role === 'admin') {
-        const adminSection = document.getElementById('admin-section');
-        const adminUsersSection = document.getElementById('admin-users-section');
-        const userEmailElement = document.getElementById('user-email');
+async function populateUserDashboard(decodedToken) {
+    const userDashboardSection = document.getElementById('user-dashboard-section');
+    if (!userDashboardSection) return;
 
-        if (adminSection) {
-            adminSection.classList.remove('hidden');
-            fetchAndDisplayLinks();
+    try {
+        const statsResponse = await fetchWithAuth(`${API_BASE_URL}/api/user/dashboard-stats`);
+        const stats = await statsResponse.json();
+
+        if (statsResponse.ok) {
+            document.getElementById('stats-link-count').textContent = stats.linkCount;
+            const lastLoginEl = document.getElementById('stats-last-login');
+            if (stats.lastLogin) {
+                lastLoginEl.innerHTML = `${stats.lastLogin.time}<br><small style="font-weight: 400; color: var(--text-muted-color);">${stats.lastLogin.ip}</small>`;
+            } else {
+                lastLoginEl.textContent = 'Belum ada data.';
+            }
         }
-        if (adminUsersSection) {
-            adminUsersSection.classList.remove('hidden');
-            fetchAndDisplayUsers();
+    } catch (error) {
+        console.error('Gagal memuat statistik dasbor:', error);
+    }
+
+    const historyList = document.getElementById('user-links-list');
+    const loadingMessage = document.getElementById('loading-user-links');
+    if (!historyList || !loadingMessage) return;
+    
+    loadingMessage.textContent = 'Memuat riwayat tautan...';
+    try {
+        const linksResponse = await fetchWithAuth(`${API_BASE_URL}/api/user/links`);
+        const links = await linksResponse.json();
+        
+        historyList.innerHTML = '';
+        if (links.length === 0) {
+            loadingMessage.textContent = 'Anda belum pernah membuat tautan pendek.';
+        } else {
+            loadingMessage.style.display = 'none';
+            links.slice(0, 5).forEach(link => renderUserLinkItem(link, historyList));
         }
-        if (userEmailElement) userEmailElement.innerHTML += ' (Admin)';
+    } catch (error) {
+        loadingMessage.textContent = `Error: ${error.message}`;
     }
 }
 
-async function fetchAndDisplayLinks() {
+function setupAdminPanels() {
+    const adminSection = document.getElementById('admin-section');
+    const adminUsersSection = document.getElementById('admin-users-section');
+    const userEmailElement = document.getElementById('user-email');
+
+    if (userEmailElement) userEmailElement.innerHTML += ' <span style="color: var(--accent-color); font-size: 0.9em;">(Admin)</span>';
+    
+    if (adminSection) {
+        adminSection.classList.remove('hidden');
+        const linkSearchInput = document.getElementById('link-search-input');
+        let linkSearchTimeout;
+        linkSearchInput.addEventListener('input', (e) => {
+            clearTimeout(linkSearchTimeout);
+            linkSearchTimeout = setTimeout(() => {
+                fetchAndDisplayLinks(e.target.value);
+            }, 300);
+        });
+        fetchAndDisplayLinks();
+    }
+    if (adminUsersSection) {
+        adminUsersSection.classList.remove('hidden');
+        const userSearchInput = document.getElementById('user-search-input');
+        let userSearchTimeout;
+        userSearchInput.addEventListener('input', (e) => {
+            clearTimeout(userSearchTimeout);
+            userSearchTimeout = setTimeout(() => {
+                fetchAndDisplayUsers(e.target.value);
+            }, 300);
+        });
+        fetchAndDisplayUsers();
+    }
+}
+
+async function fetchAndDisplayLinks(searchQuery = '') {
     const linkList = document.getElementById('link-list');
     const loadingMessage = document.getElementById('loading-links');
     if (!linkList || !loadingMessage) return;
 
-    // Definisikan ikon sampah di sini agar bisa digunakan
     const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
 
     loadingMessage.textContent = 'Memuat semua tautan...';
     loadingMessage.style.display = 'block';
 
     try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/links`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/links?search=${encodeURIComponent(searchQuery)}`);
         if (!response.ok) throw new Error('Gagal mengambil data link. Pastikan Anda adalah admin.');
 
         const links = await response.json();
@@ -228,7 +268,7 @@ async function fetchAndDisplayLinks() {
         linkList.innerHTML = '';
 
         if (links.length === 0) {
-            linkList.innerHTML = '<li><p>Belum ada link yang dibuat.</p></li>';
+            linkList.innerHTML = '<li><p>Tidak ada link yang cocok ditemukan.</p></li>';
             return;
         }
 
@@ -260,6 +300,7 @@ async function fetchAndDisplayLinks() {
         console.error(error);
     }
 }
+
 async function handleDeleteLink(event) {
     const slugToDelete = event.target.dataset.slug;
     if (!confirm(`Anda yakin ingin menghapus link dengan slug "${slugToDelete}"?`)) return;
@@ -279,7 +320,7 @@ async function handleDeleteLink(event) {
     }
 }
 
-async function fetchAndDisplayUsers() {
+async function fetchAndDisplayUsers(searchQuery = '') {
     const userList = document.getElementById('user-list');
     const loadingMessage = document.getElementById('loading-users');
     if (!userList || !loadingMessage) return;
@@ -289,7 +330,7 @@ async function fetchAndDisplayUsers() {
     userList.innerHTML = '';
 
     try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/users`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/users?search=${encodeURIComponent(searchQuery)}`);
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || 'Failed to fetch users.');
@@ -825,9 +866,6 @@ async function handleDeleteUserLink(event) {
 // ==========================================================
 // ===         LOGIKA UNTUK HALAMAN AUTENTIKASI           ===
 // ==========================================================
-// ==========================================================
-// ===         LOGIKA UNTUK HALAMAN AUTENTIKASI           ===
-// ==========================================================
 function setupAuthPage() {
     const loginSection = document.getElementById('login-section');
     const registerSection = document.getElementById('register-section');
@@ -965,6 +1003,52 @@ if (resetForm) {
 // ==========================================================
 // ===         LOGIKA UNTUK ELEMEN UI UMUM                ===
 // ==========================================================
+
+function setupAccountManagement() {
+    const form = document.getElementById('change-password-form');
+    if (!form) return;
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const confirmNewPassword = document.getElementById('confirm-new-password').value;
+        const messageDiv = document.getElementById('change-password-message');
+        const submitButton = form.querySelector('button');
+
+        messageDiv.className = '';
+        messageDiv.textContent = '';
+
+        if (newPassword !== confirmNewPassword) {
+            messageDiv.className = 'error';
+            messageDiv.textContent = 'Error: Password baru dan konfirmasi tidak cocok.';
+            return;
+        }
+
+        submitButton.disabled = true;
+        messageDiv.textContent = 'Memproses...';
+
+        try {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/user/change-password`, {
+                method: 'POST',
+                body: JSON.stringify({ currentPassword, newPassword })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+
+            messageDiv.className = 'success';
+            messageDiv.textContent = data.message;
+            form.reset();
+
+        } catch (error) {
+            messageDiv.className = 'error';
+            messageDiv.textContent = `Error: ${error.message}`;
+        } finally {
+            submitButton.disabled = false;
+        }
+    });
+}
+
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');

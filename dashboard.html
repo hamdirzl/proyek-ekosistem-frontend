@@ -80,8 +80,48 @@
             <p>Selamat datang kembali, <strong id="user-email">...</strong>!</p>
         </div>
 
-        <section id="admin-section" class="history-section admin-management-section hidden" data-aos="fade-up" data-aos-delay="100">
+        <section id="user-dashboard-section" data-aos="fade-up">
+            <div class="portfolio-grid" style="margin-bottom: var(--space-xl);">
+                <div class="pintu" style="text-align: left; padding: var(--space-md);">
+                    <h4 style="color: var(--text-muted-color); font-family: var(--font-body); font-weight: 500;">Total Tautan Anda</h4>
+                    <p id="stats-link-count" style="font-size: 2rem; font-weight: 700; color: var(--accent-color); margin-bottom: 0;">...</p>
+                </div>
+                <div class="pintu" style="text-align: left; padding: var(--space-md);">
+                    <h4 style="color: var(--text-muted-color); font-family: var(--font-body); font-weight: 500;">Login Terakhir</h4>
+                    <p id="stats-last-login" style="font-size: 1.2rem; font-weight: 700; color: var(--text-color); margin-bottom: 0;">...</p>
+                </div>
+            </div>
+
+            <div class="history-section">
+                <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Riwayat Tautan Terakhir Anda</h2>
+                <p id="loading-user-links">Memuat riwayat...</p>
+                <ul id="user-links-list" class="mood-history-list"></ul>
+            </div>
+        </section>
+
+        <section id="account-management-section" class="history-section" data-aos="fade-up" data-aos-delay="100">
+            <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Manajemen Akun</h2>
+            <form id="change-password-form" class="auth-form" style="max-width: 500px; margin: 0; text-align: left;">
+                <div class="form-group">
+                    <label for="current-password">Password Saat Ini</label>
+                    <input type="password" id="current-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-password">Password Baru</label>
+                    <input type="password" id="new-password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-new-password">Konfirmasi Password Baru</label>
+                    <input type="password" id="confirm-new-password" required>
+                </div>
+                <button type="submit" class="button-pintu">Ubah Password</button>
+            </form>
+            <div id="change-password-message" style="margin-top: 1rem; max-width: 500px;"></div>
+        </section>
+
+        <section id="admin-section" class="history-section admin-management-section hidden" data-aos="fade-up" data-aos-delay="200">
             <h2 class="section-title">Manajemen Tautan</h2>
+            <input type="search" id="link-search-input" placeholder="Cari berdasarkan slug atau URL asli..." style="margin-bottom: 1rem; width: 100%;">
             <div id="link-management-container">
                 <p id="loading-links">Memuat semua tautan...</p>
                 <ul id="link-list" class="mood-history-list">
@@ -89,8 +129,9 @@
             </div>
         </section>
 
-        <section id="admin-users-section" class="history-section admin-management-section hidden" data-aos="fade-up" data-aos-delay="200">
+        <section id="admin-users-section" class="history-section admin-management-section hidden" data-aos="fade-up" data-aos-delay="300">
             <h2 class="section-title">Manajemen Pengguna</h2>
+            <input type="search" id="user-search-input" placeholder="Cari berdasarkan email pengguna..." style="margin-bottom: 1rem; width: 100%;">
             <div id="user-management-container">
                 <p id="loading-users">Memuat daftar pengguna...</p>
                 <ul id="user-list" class="mood-history-list">
