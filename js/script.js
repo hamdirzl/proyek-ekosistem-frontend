@@ -139,6 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupAllPasswordToggles();
     setupChatBubble();
     setupAccountManagement();
+    setupDashboardTabs();
 });
 
 
@@ -1066,6 +1067,33 @@ function setupAccountManagement() {
             messageDiv.textContent = `Error: ${error.message}`;
         } finally {
             submitButton.disabled = false;
+        }
+    });
+}
+
+function setupDashboardTabs() {
+    const dashboardNav = document.querySelector('.dashboard-nav');
+    if (!dashboardNav) return;
+
+    const tabButtons = dashboardNav.querySelectorAll('.dashboard-tab-button');
+    const contentPanels = document.querySelectorAll('.dashboard-panel');
+
+    dashboardNav.addEventListener('click', (e) => {
+        const clickedButton = e.target.closest('.dashboard-tab-button');
+        if (!clickedButton) return;
+
+        // Nonaktifkan semua tombol dan panel
+        tabButtons.forEach(button => button.classList.remove('active'));
+        contentPanels.forEach(panel => panel.classList.remove('active'));
+
+        // Aktifkan tombol yang diklik
+        clickedButton.classList.add('active');
+
+        // Temukan dan aktifkan panel yang sesuai
+        const targetPanelId = clickedButton.dataset.target;
+        const targetPanel = document.getElementById(targetPanelId);
+        if (targetPanel) {
+            targetPanel.classList.add('active');
         }
     });
 }

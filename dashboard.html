@@ -17,7 +17,7 @@
     <div class="logo">
     <a href="index.html" class="logo-desktop">HAMDI<br>RIZAL</a>
     <a href="index.html" class="logo-mobile">HAMDI RIZAL</a>
-</div>
+    </div>
     <nav>
         <ul class="nav-links">
             <li id="nav-dasbor" style="display: none;">
@@ -80,65 +80,82 @@
             <p>Selamat datang kembali, <strong id="user-email">...</strong>!</p>
         </div>
 
-        <section id="user-dashboard-section" data-aos="fade-up">
-            <div class="portfolio-grid" style="margin-bottom: var(--space-xl);">
-                <div class="pintu" style="text-align: left; padding: var(--space-md);">
-                    <h4 style="color: var(--text-muted-color); font-family: var(--font-body); font-weight: 500;">Total Tautan Anda</h4>
-                    <p id="stats-link-count" style="font-size: 2rem; font-weight: 700; color: var(--accent-color); margin-bottom: 0;">...</p>
-                </div>
-                <div class="pintu" style="text-align: left; padding: var(--space-md);">
-                    <h4 style="color: var(--text-muted-color); font-family: var(--font-body); font-weight: 500;">Login Terakhir</h4>
-                    <p id="stats-last-login" style="font-size: 1.2rem; font-weight: 700; color: var(--text-color); margin-bottom: 0;">...</p>
-                </div>
+        <div class="dashboard-container" data-aos="fade-up">
+            <div class="dashboard-nav">
+                <button class="dashboard-tab-button active" data-target="panel-ringkasan">Ringkasan</button>
+                <button class="dashboard-tab-button" data-target="panel-akun">Manajemen Akun</button>
+                <button id="admin-links-tab" class="dashboard-tab-button hidden" data-target="panel-admin-links">Manajemen Tautan</button>
+                <button id="admin-users-tab" class="dashboard-tab-button hidden" data-target="panel-admin-users">Manajemen Pengguna</button>
             </div>
 
-            <div class="history-section">
-                <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Riwayat Tautan Terakhir Anda</h2>
-                <p id="loading-user-links">Memuat riwayat...</p>
-                <ul id="user-links-list" class="mood-history-list"></ul>
-            </div>
-        </section>
+            <div class="dashboard-content">
 
-        <section id="account-management-section" class="history-section" data-aos="fade-up" data-aos-delay="100">
-            <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Manajemen Akun</h2>
-            <form id="change-password-form" class="auth-form" style="max-width: 500px; margin: 0; text-align: left;">
-                <div class="form-group">
-                    <label for="current-password">Password Saat Ini</label>
-                    <input type="password" id="current-password" required>
+                <div id="panel-ringkasan" class="dashboard-panel active">
+                    <div id="user-dashboard-section">
+                        <div class="portfolio-grid" style="margin-bottom: var(--space-xl);">
+                            <div class="pintu" style="text-align: left; padding: var(--space-md);">
+                                <h4 style="color: var(--text-muted-color); font-family: var(--font-body); font-weight: 500;">Total Tautan Anda</h4>
+                                <p id="stats-link-count" style="font-size: 2rem; font-weight: 700; color: var(--accent-color); margin-bottom: 0;">...</p>
+                            </div>
+                            <div class="pintu" style="text-align: left; padding: var(--space-md);">
+                                <h4 style="color: var(--text-muted-color); font-family: var(--font-body); font-weight: 500;">Login Terakhir</h4>
+                                <p id="stats-last-login" style="font-size: 1.2rem; font-weight: 700; color: var(--text-color); margin-bottom: 0;">...</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Riwayat Tautan Terakhir Anda</h2>
+                            <p id="loading-user-links">Memuat riwayat...</p>
+                            <ul id="user-links-list" class="mood-history-list"></ul>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="new-password">Password Baru</label>
-                    <input type="password" id="new-password" required minlength="6">
+
+                <div id="panel-akun" class="dashboard-panel">
+                    <div id="account-management-section">
+                        <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Ubah Password Anda</h2>
+                        <form id="change-password-form" class="auth-form" style="max-width: 500px; margin: 0; text-align: left; background: none; border: none; padding: 0;">
+                            <div class="form-group">
+                                <label for="current-password">Password Saat Ini</label>
+                                <input type="password" id="current-password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password">Password Baru</label>
+                                <input type="password" id="new-password" required minlength="6">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-new-password">Konfirmasi Password Baru</label>
+                                <input type="password" id="confirm-new-password" required>
+                            </div>
+                            <button type="submit" class="button-pintu">Ubah Password</button>
+                        </form>
+                        <div id="change-password-message" style="margin-top: 1rem; max-width: 500px;"></div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="confirm-new-password">Konfirmasi Password Baru</label>
-                    <input type="password" id="confirm-new-password" required>
+
+                <div id="panel-admin-links" class="dashboard-panel">
+                    <div id="admin-section">
+                        <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Manajemen Tautan</h2>
+                        <input type="search" id="link-search-input" placeholder="Cari berdasarkan slug atau URL asli..." style="margin-bottom: 1rem; width: 100%;">
+                        <div id="link-management-container">
+                            <p id="loading-links">Memuat semua tautan...</p>
+                            <ul id="link-list" class="mood-history-list"></ul>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="button-pintu">Ubah Password</button>
-            </form>
-            <div id="change-password-message" style="margin-top: 1rem; max-width: 500px;"></div>
-        </section>
+                
+                <div id="panel-admin-users" class="dashboard-panel">
+                    <div id="admin-users-section">
+                        <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Manajemen Pengguna</h2>
+                        <input type="search" id="user-search-input" placeholder="Cari berdasarkan email pengguna..." style="margin-bottom: 1rem; width: 100%;">
+                        <div id="user-management-container">
+                            <p id="loading-users">Memuat daftar pengguna...</p>
+                            <ul id="user-list" class="mood-history-list"></ul>
+                        </div>
+                    </div>
+                </div>
 
-        <section id="admin-section" class="history-section admin-management-section hidden" data-aos="fade-up" data-aos-delay="200">
-            <h2 class="section-title">Manajemen Tautan</h2>
-            <input type="search" id="link-search-input" placeholder="Cari berdasarkan slug atau URL asli..." style="margin-bottom: 1rem; width: 100%;">
-            <div id="link-management-container">
-                <p id="loading-links">Memuat semua tautan...</p>
-                <ul id="link-list" class="mood-history-list">
-                    </ul>
             </div>
-        </section>
-
-        <section id="admin-users-section" class="history-section admin-management-section hidden" data-aos="fade-up" data-aos-delay="300">
-            <h2 class="section-title">Manajemen Pengguna</h2>
-            <input type="search" id="user-search-input" placeholder="Cari berdasarkan email pengguna..." style="margin-bottom: 1rem; width: 100%;">
-            <div id="user-management-container">
-                <p id="loading-users">Memuat daftar pengguna...</p>
-                <ul id="user-list" class="mood-history-list">
-                    </ul>
-            </div>
-        </section>
-
+        </div>
     </main>
 
     <div id="about-modal" class="modal-overlay hidden">
@@ -155,38 +172,7 @@
     <div id="menu-overlay" class="menu-overlay"></div>
 
     <footer>
-        <div class="footer-container">
-            <div class="footer-logo">
-                <a href="index.html" class="logo-desktop">HAMDI<br>RIZAL</a>
-            </div>
-            <div class="footer-links">
-                <h4>Navigasi</h4>
-                <ul>
-                    <li><a href="portfolio.html">Portofolio</a></li>
-                    <li><a href="jurnal.html">Jurnal</a></li>
-                    <li><a href="arena.html">Arena</a></li>
-                    <li><a href="tools.html">Tools</a></li>
-                </ul>
-            </div>
-            <div class="footer-social">
-                <h4>Terhubung</h4>
-                <div class="social-icons">
-                    <a href="https://www.instagram.com/hamdirzl/" target="_blank" aria-label="Instagram">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-instagram"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                    </a>
-                    <a href="https://github.com/hamdirzl" target="_blank" aria-label="GitHub">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-                    </a>
-                    <a href="https://open.spotify.com/user/pw7cyaxhvilcfmrpdddu33bvu?si=9d2ef3b1e0794b83" target="_blank" aria-label="Spotify">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-spotify"><circle cx="12" cy="12" r="10"></circle><path d="M7 11.5c2.5-1 5.5-1.5 8 0"></path><path d="M7 14.5c3-1.5 6.5-2 10 0"></path><path d="M7 17.5c3.5-2 8-2.5 12 0"></path></svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2025 HAMDI RIZAL. Hak Cipta Dilindungi.</p>
-        </div>
-    </footer>
+        </footer>
     
     <script src="js/script.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
