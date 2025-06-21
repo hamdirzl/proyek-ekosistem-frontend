@@ -131,6 +131,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupProjectDetailPage();
     } else if (document.title.includes("Jurnal - HAMDI RIZAL")) { // Pemicu untuk halaman jurnal
         setupJurnalPage();
+    } else if (document.title.includes("Detail Jurnal")) { // INI YANG DITAMBAHKAN
+    setupJurnalDetailPage();
     } else if (document.title.includes("Tools")) {
         setupToolsPage();
     } else if (document.getElementById('login-form')) {
@@ -248,7 +250,53 @@ function setupJurnalPage() {
     fetchAndRenderJurnal();
 }
 
+// =======================================
+// === LOGIKA HALAMAN DETAIL JURNAL    ===
+// =======================================
+function setupJurnalDetailPage() {
+    const titleElement = document.getElementById('jurnal-title');
+    const metaElement = document.getElementById('jurnal-meta');
+    const imageElement = document.getElementById('jurnal-image');
+    const contentElement = document.getElementById('jurnal-content');
+    const mainContent = document.getElementById('main-content');
+    const loadingIndicator = document.getElementById('loading-indicator');
 
+    async function fetchJurnalDetails() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const jurnalId = params.get('id');
+
+            if (!jurnalId) {
+                throw new Error('ID Jurnal tidak ditemukan di URL.');
+            }
+
+            const response = await fetch(`<span class="math-inline">\{API\_BASE\_URL\}/api/jurnal/</span>{jurnalId}`);
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error || 'Entri jurnal tidak ditemukan.');
+            }
+
+            const entry = await response.json();
+
+            document.title = `${entry.title} - Detail Jurnal`;
+            titleElement.textContent = entry.title;
+            metaElement.textContent = `Dipublikasikan pada ${new Date(entry.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+
+            imageElement.src = entry.image_url; 
+            imageElement.alt = `Gambar untuk ${entry.title}`;
+            contentElement.innerHTML = entry.content.replace(/\n/g, '<br>');
+
+            loadingIndicator.style.display = 'none';
+            mainContent.style.display = 'block';
+
+        } catch (error) {
+            console.error(error);
+            loadingIndicator.innerHTML = `<p style="color: #ff4d4d;">Error: ${error.message}</p>`;
+        }
+    }
+
+    fetchJurnalDetails();
+}
 // =======================================
 // === LOGIKA HALAMAN DETAIL PROYEK    ===
 // =======================================
