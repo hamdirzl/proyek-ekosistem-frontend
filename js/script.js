@@ -125,12 +125,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Panggil fungsi setup berdasarkan halaman
     if (document.body.contains(document.getElementById('dashboard-main'))) {
         setupDashboardPage();
-    } else if (document.title.includes("Portofolio - HAMDI RIZAL")) { // Lebih spesifik
+    } else if (document.title.includes("Portofolio - HAMDI RIZAL")) {
         setupPortfolioPage();
-    } else if (document.title.includes("Detail Proyek")) { // Kondisi baru
+    } else if (document.title.includes("Detail Proyek")) {
         setupProjectDetailPage();
-    } else if (document.title.includes("Jurnal - HAMDI RIZAL")) { // <-- Tambahkan ini
+    } else if (document.title.includes("Jurnal - HAMDI RIZAL")) {
         setupJurnalPage();
+    } else if (document.title.includes("Detail Jurnal")) { // <-- KONDISI BARU UNTUK HALAMAN DETAIL JURNAL
+        setupJurnalDetailPage();
     } else if (document.title.includes("Tools")) {
         setupToolsPage();
     } else if (document.getElementById('login-form')) {
@@ -177,7 +179,6 @@ function setupPortfolioPage() {
                 projectCard.href = `project-detail.html?id=${project.id}`;
                 projectCard.setAttribute('data-aos', 'fade-up');
 
-                // PERUBAHAN DI SINI: Langsung gunakan URL dari Supabase
                 const projectImage = project.image_url || 'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=500&q=80'; 
                 
                 const projectLinkButton = `<span class="button-pintu">Lihat Detail</span>`;
@@ -233,7 +234,6 @@ function setupProjectDetailPage() {
             document.title = `${project.title} - Detail Proyek`;
             titleElement.textContent = project.title;
             
-            // PERUBAHAN DI SINI: Langsung gunakan URL dari Supabase
             imageElement.src = project.image_url; 
             imageElement.alt = `Gambar proyek ${project.title}`;
             descriptionElement.innerHTML = project.description.replace(/\n/g, '<br>');
@@ -256,6 +256,7 @@ function setupProjectDetailPage() {
 
     fetchProjectDetails();
 }
+
 // ===================================
 // === LOGIKA HALAMAN DASHBOARD    ===
 // ===================================
@@ -343,7 +344,7 @@ function setupAdminPanels() {
     if (userEmailElement) userEmailElement.innerHTML += ' <span style="color: var(--accent-color); font-size: 0.9em;">(Admin)</span>';
 
     document.getElementById('admin-portfolio-tab')?.classList.remove('hidden');
-    document.getElementById('admin-jurnal-tab')?.classList.remove('hidden'); // <-- TAMBAHKAN INI
+    document.getElementById('admin-jurnal-tab')?.classList.remove('hidden');
     document.getElementById('admin-links-tab')?.classList.remove('hidden');
     document.getElementById('admin-users-tab')?.classList.remove('hidden');
 
@@ -374,7 +375,7 @@ function setupAdminPanels() {
     }
     
     setupAdminPortfolioPanel();
-    setupAdminJurnalPanel(); // <-- TAMBAHKAN INI
+    setupAdminJurnalPanel();
 }
 
 async function fetchAndDisplayLinks(searchQuery = '') {
@@ -724,8 +725,7 @@ function setupJurnalPage() {
                         <h3>${post.title}</h3>
                         <p class="post-meta">Dipublikasikan pada ${new Date(post.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                         <p>${excerpt}</p>
-                        // Opsi: Tambahkan link ke halaman detail jika Anda membuatnya
-                        // <a href="jurnal-detail.html?id=${post.id}" class="button-pintu">Baca Selengkapnya</a>
+                        <a href="jurnal-detail.html?id=${post.id}" class="button-pintu">Baca Selengkapnya</a>
                     </div>
                 `;
                 jurnalGrid.appendChild(postCard);
@@ -737,6 +737,53 @@ function setupJurnalPage() {
         }
     }
     fetchAndRenderJurnal();
+}
+
+// ==========================================
+// === LOGIKA HALAMAN DETAIL JURNAL (BARU) ===
+// ==========================================
+function setupJurnalDetailPage() {
+    const titleElement = document.getElementById('jurnal-title');
+    const metaElement = document.getElementById('jurnal-meta');
+    const imageElement = document.getElementById('jurnal-image');
+    const contentElement = document.getElementById('jurnal-content');
+    const mainContent = document.getElementById('main-content');
+    const loadingIndicator = document.getElementById('loading-indicator');
+
+    async function fetchJurnalDetails() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const postId = params.get('id');
+
+            if (!postId) {
+                throw new Error('ID Postingan tidak ditemukan di URL.');
+            }
+
+            const response = await fetch(`${API_BASE_URL}/api/jurnal/${postId}`);
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error || 'Postingan tidak ditemukan.');
+            }
+
+            const post = await response.json();
+
+            document.title = `${post.title} - Detail Jurnal`;
+            titleElement.textContent = post.title;
+            metaElement.textContent = `Dipublikasikan pada ${new Date(post.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+            imageElement.src = post.image_url;
+            imageElement.alt = `Gambar untuk ${post.title}`;
+            contentElement.innerHTML = post.content.replace(/\n/g, '<br>');
+
+            loadingIndicator.style.display = 'none';
+            mainContent.style.display = 'block';
+
+        } catch (error) {
+            console.error(error);
+            loadingIndicator.innerHTML = `<p style="color: #ff4d4d;">Error: ${error.message}</p>`;
+        }
+    }
+
+    fetchJurnalDetails();
 }
 
 // === LOGIKA MANAJEMEN JURNAL ADMIN (BARU) ===
