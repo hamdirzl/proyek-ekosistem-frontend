@@ -63,7 +63,6 @@ async function fetchWithAuth(url, options = {}) {
     return response;
 }
 
-
 /* === FUNGSI GLOBAL === */
 document.addEventListener('DOMContentLoaded', async () => {
     const navDasbor = document.getElementById('nav-dasbor');
@@ -123,16 +122,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Panggil fungsi setup berdasarkan halaman
+    // URUTAN DIPERBAIKI DI SINI:
     if (document.body.contains(document.getElementById('dashboard-main'))) {
         setupDashboardPage();
     } else if (document.title.includes("Portofolio - HAMDI RIZAL")) {
         setupPortfolioPage();
     } else if (document.title.includes("Detail Proyek")) {
         setupProjectDetailPage();
-    } else if (document.title.includes("Jurnal - HAMDI RIZAL")) {
-        setupJurnalPage();
-    } else if (document.title.includes("Detail Jurnal")) { // <-- KONDISI BARU UNTUK HALAMAN DETAIL JURNAL
+    } else if (document.title.includes("Detail Jurnal")) { // <-- Kondisi ini sekarang di atas
         setupJurnalDetailPage();
+    } else if (document.title.includes("Jurnal - HAMDI RIZAL")) { // <-- Kondisi ini sekarang di bawah
+        setupJurnalPage();
     } else if (document.title.includes("Tools")) {
         setupToolsPage();
     } else if (document.getElementById('login-form')) {
@@ -146,7 +146,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupAccountManagement();
     setupDashboardTabs();
 });
-
 
 function decodeJwt(token) {
     try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
