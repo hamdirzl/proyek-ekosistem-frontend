@@ -1,6 +1,4 @@
-// ===================================================================
-// ==   FILE FINAL SCRIPT.JS (DENGAN HALAMAN DETAIL PORTOFOLIO)   ==
-// ===================================================================
+// VERSI FINAL DENGAN PENGAMBILAN GAMBAR DARI URL PUBLIK SUPABASE
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
@@ -172,17 +170,14 @@ function setupPortfolioPage() {
             }
 
             projects.forEach(project => {
-                // 1. UBAH DARI 'div' MENJADI 'a' (LINK)
                 const projectCard = document.createElement('a'); 
-                
-                // 2. TAMBAHKAN CLASS BARU & SETel URL-NYA
                 projectCard.className = 'portfolio-card portfolio-link-card';
                 projectCard.href = `project-detail.html?id=${project.id}`;
                 projectCard.setAttribute('data-aos', 'fade-up');
 
-                // INI PERBAIKANNYA
-                const projectImage = project.image_url ? `${API_BASE_URL}/api/images/${project.image_url}` : '...'; // INI PERBAIKANNYA
-                // 3. UBAH TOMBOL DARI LINK <a> MENJADI <span> AGAR TIDAK ADA LINK DI DALAM LINK
+                // PERUBAHAN DI SINI: Langsung gunakan URL dari Supabase
+                const projectImage = project.image_url || 'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=500&q=80'; 
+                
                 const projectLinkButton = `<span class="button-pintu">Lihat Detail</span>`;
 
                 projectCard.innerHTML = `
@@ -233,11 +228,11 @@ function setupProjectDetailPage() {
 
             const project = await response.json();
 
-            // Mengisi konten halaman
             document.title = `${project.title} - Detail Proyek`;
             titleElement.textContent = project.title;
-            // INI PERBAIKANNYA
-            imageElement.src = `${API_BASE_URL}/api/images/${project.image_url}`; // INI PERBAIKANNYA
+            
+            // PERUBAHAN DI SINI: Langsung gunakan URL dari Supabase
+            imageElement.src = project.image_url; 
             imageElement.alt = `Gambar proyek ${project.title}`;
             descriptionElement.innerHTML = project.description.replace(/\n/g, '<br>');
 
@@ -644,6 +639,7 @@ function renderAdminPortfolioItem(project, container) {
     const listItem = document.createElement('li');
     listItem.className = 'mood-item';
     listItem.id = `portfolio-item-${project.id}`;
+    const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
 
     listItem.innerHTML = `
         <div class="mood-item-header">
