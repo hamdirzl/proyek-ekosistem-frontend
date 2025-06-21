@@ -129,6 +129,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupPortfolioPage();
     } else if (document.title.includes("Detail Proyek")) { // Kondisi baru
         setupProjectDetailPage();
+    } else if (document.title.includes("Jurnal - HAMDI RIZAL")) { // <-- Tambahkan ini
+        setupJurnalPage();
     } else if (document.title.includes("Tools")) {
         setupToolsPage();
     } else if (document.getElementById('login-form')) {
@@ -341,6 +343,7 @@ function setupAdminPanels() {
     if (userEmailElement) userEmailElement.innerHTML += ' <span style="color: var(--accent-color); font-size: 0.9em;">(Admin)</span>';
 
     document.getElementById('admin-portfolio-tab')?.classList.remove('hidden');
+    document.getElementById('admin-jurnal-tab')?.classList.remove('hidden'); // <-- TAMBAHKAN INI
     document.getElementById('admin-links-tab')?.classList.remove('hidden');
     document.getElementById('admin-users-tab')?.classList.remove('hidden');
 
@@ -371,6 +374,7 @@ function setupAdminPanels() {
     }
     
     setupAdminPortfolioPanel();
+    setupAdminJurnalPanel(); // <-- TAMBAHKAN INI
 }
 
 async function fetchAndDisplayLinks(searchQuery = '') {
@@ -678,6 +682,202 @@ function renderAdminPortfolioItem(project, container) {
             
             alert('Proyek berhasil dihapus.');
             fetchAndDisplayPortfolioAdmin();
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        }
+    });
+}
+
+
+// ===================================
+// === LOGIKA HALAMAN JURNAL (BARU) ==
+// ===================================
+
+function setupJurnalPage() {
+    const jurnalGrid = document.querySelector('.jurnal-grid');
+    if (!jurnalGrid) return;
+
+    async function fetchAndRenderJurnal() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/jurnal`);
+            if (!response.ok) throw new Error('Gagal memuat data jurnal.');
+
+            const posts = await response.json();
+            jurnalGrid.innerHTML = ''; // Kosongkan konten statis
+
+            if (posts.length === 0) {
+                jurnalGrid.innerHTML = '<p style="text-align: center; color: var(--text-muted-color);">Belum ada tulisan untuk ditampilkan.</p>';
+                return;
+            }
+
+            posts.forEach(post => {
+                const postCard = document.createElement('article');
+                postCard.className = 'jurnal-card';
+                postCard.setAttribute('data-aos', 'fade-up');
+
+                const postImage = post.image_url || 'https://images.unsplash.com/photo-1489549132488-d00b7d8818e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80';
+                const excerpt = post.content.substring(0, 150) + (post.content.length > 150 ? '...' : '');
+
+                postCard.innerHTML = `
+                    <img src="${postImage}" alt="Gambar untuk ${post.title}">
+                    <div class="jurnal-content">
+                        <h3>${post.title}</h3>
+                        <p class="post-meta">Dipublikasikan pada ${new Date(post.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                        <p>${excerpt}</p>
+                        // Opsi: Tambahkan link ke halaman detail jika Anda membuatnya
+                        // <a href="jurnal-detail.html?id=${post.id}" class="button-pintu">Baca Selengkapnya</a>
+                    </div>
+                `;
+                jurnalGrid.appendChild(postCard);
+            });
+
+        } catch (error) {
+            console.error('Error:', error);
+            jurnalGrid.innerHTML = `<p style="text-align: center; color: var(--text-muted-color);">${error.message}</p>`;
+        }
+    }
+    fetchAndRenderJurnal();
+}
+
+// === LOGIKA MANAJEMEN JURNAL ADMIN (BARU) ===
+function setupAdminJurnalPanel() {
+    const form = document.getElementById('jurnal-form');
+    if (!form) return;
+
+    const formTitle = document.getElementById('jurnal-form-title');
+    const hiddenId = document.getElementById('jurnal-id');
+    const titleInput = document.getElementById('jurnal-title');
+    const contentInput = document.getElementById('jurnal-content');
+    const imageInput = document.getElementById('jurnal-image');
+    const messageDiv = document.getElementById('jurnal-message');
+    const clearButton = document.getElementById('clear-jurnal-form');
+    const currentImageInfo = document.getElementById('current-jurnal-image-info');
+    const fileNameLabel = document.getElementById('jurnal-file-name');
+
+    function resetJurnalForm() {
+        form.reset();
+        hiddenId.value = '';
+        formTitle.textContent = 'Tambah Postingan Baru';
+        messageDiv.textContent = '';
+        messageDiv.className = '';
+        currentImageInfo.textContent = '';
+        fileNameLabel.textContent = 'Tidak ada file dipilih';
+    }
+
+    clearButton.addEventListener('click', resetJurnalForm);
+    
+    imageInput.addEventListener('change', () => {
+        if (imageInput.files.length > 0) {
+            fileNameLabel.textContent = imageInput.files[0].name;
+        } else {
+            fileNameLabel.textContent = 'Tidak ada file dipilih';
+        }
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('title', titleInput.value);
+        formData.append('content', contentInput.value);
+        
+        if (imageInput.files[0]) {
+            formData.append('image', imageInput.files[0]);
+        }
+        
+        const id = hiddenId.value;
+        const url = id ? `${API_BASE_URL}/api/admin/jurnal/${id}` : `${API_BASE_URL}/api/admin/jurnal`;
+        const method = id ? 'PUT' : 'POST';
+
+        try {
+            const response = await fetchWithAuth(url, { method, body: formData });
+            const result = await response.json();
+
+            if (!response.ok) throw new Error(result.error || 'Terjadi kesalahan.');
+
+            messageDiv.className = 'success';
+            messageDiv.textContent = id ? 'Postingan berhasil diperbarui!' : 'Postingan berhasil ditambahkan!';
+            
+            resetJurnalForm();
+            fetchAndDisplayJurnalAdmin();
+
+        } catch (error) {
+            messageDiv.className = 'error';
+            messageDiv.textContent = `Error: ${error.message}`;
+        }
+    });
+
+    fetchAndDisplayJurnalAdmin();
+}
+
+async function fetchAndDisplayJurnalAdmin() {
+    const listContainer = document.getElementById('jurnal-list-admin');
+    const loadingMessage = document.getElementById('loading-jurnal-admin');
+    if (!listContainer || !loadingMessage) return;
+
+    loadingMessage.style.display = 'block';
+    listContainer.innerHTML = '';
+    
+    try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal`);
+        const posts = await response.json();
+        if (!response.ok) throw new Error(posts.error || 'Gagal memuat postingan.');
+        
+        loadingMessage.style.display = 'none';
+
+        if (posts.length === 0) {
+            listContainer.innerHTML = '<li><p>Belum ada postingan jurnal ditambahkan.</p></li>';
+            return;
+        }
+
+        posts.forEach(post => renderAdminJurnalItem(post, listContainer));
+    } catch (error) {
+        loadingMessage.textContent = `Error: ${error.message}`;
+    }
+}
+
+function renderAdminJurnalItem(post, container) {
+    const listItem = document.createElement('li');
+    listItem.className = 'mood-item';
+    listItem.id = `jurnal-item-${post.id}`;
+    const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+
+    listItem.innerHTML = `
+        <div class="mood-item-header">
+            <span><strong>${post.title}</strong></span>
+            <div class="mood-item-actions">
+                <button class="mood-icon-button edit-jurnal-btn" data-id="${post.id}" aria-label="Edit Postingan">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                </button>
+                <button class="mood-icon-button delete-jurnal-btn delete-button" data-id="${post.id}" aria-label="Hapus Postingan">
+                    ${trashIconSvg}
+                </button>
+            </div>
+        </div>
+        <p class="mood-notes">${post.content.substring(0, 100)}...</p>
+        <small class="mood-date">Dibuat: ${new Date(post.created_at).toLocaleString('id-ID')}</small>
+    `;
+    container.appendChild(listItem);
+
+    listItem.querySelector('.edit-jurnal-btn').addEventListener('click', async () => {
+        document.getElementById('jurnal-form-title').textContent = 'Edit Postingan';
+        document.getElementById('jurnal-id').value = post.id;
+        document.getElementById('jurnal-title').value = post.title;
+        document.getElementById('jurnal-content').value = post.content;
+        document.getElementById('current-jurnal-image-info').textContent = `Gambar saat ini: ${post.image_url}. Kosongkan jika tidak ingin ganti.`;
+        document.getElementById('jurnal-form').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    listItem.querySelector('.delete-jurnal-btn').addEventListener('click', async () => {
+        if (!confirm(`Yakin ingin menghapus postingan "${post.title}"?`)) return;
+        
+        try {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/${post.id}`, { method: 'DELETE' });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error);
+            
+            alert('Postingan berhasil dihapus.');
+            fetchAndDisplayJurnalAdmin();
         } catch (error) {
             alert(`Error: ${error.message}`);
         }
