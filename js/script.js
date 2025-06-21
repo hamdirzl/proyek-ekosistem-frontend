@@ -180,7 +180,7 @@ function setupPortfolioPage() {
                 projectCard.href = `project-detail.html?id=${project.id}`;
                 projectCard.setAttribute('data-aos', 'fade-up');
 
-                const projectImage = `<span class="math-inline">\{API\_BASE\_URL\}/api/images/</span>{project.image_url}`; // INI BENAR
+                const projectImage = `<span class="math-inline">\{API\_BASE\_URL\}/api/images/</span>{project.image_url}`;
                 // 3. UBAH TOMBOL DARI LINK <a> MENJADI <span> AGAR TIDAK ADA LINK DI DALAM LINK
                 const projectLinkButton = `<span class="button-pintu">Lihat Detail</span>`;
 
@@ -235,7 +235,7 @@ function setupProjectDetailPage() {
             // Mengisi konten halaman
             document.title = `${project.title} - Detail Proyek`;
             titleElement.textContent = project.title;
-            imageElement.src = `<span class="math-inline">\{API\_BASE\_URL\}/api/images/</span>{project.image_url}`; // INI BENAR
+            imageElement.src = `<span class="math-inline">\{API\_BASE\_URL\}/api/images/</span>{project.image_url}`;
             imageElement.alt = `Gambar proyek ${project.title}`;
             descriptionElement.innerHTML = project.description.replace(/\n/g, '<br>');
 
