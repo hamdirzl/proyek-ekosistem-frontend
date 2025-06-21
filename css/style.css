@@ -1646,3 +1646,69 @@ input:focus, textarea:focus, select:focus {
 .portfolio-link-card:hover {
     color: inherit; 
 }
+
+/* === STYLE UNTUK MEMBUAT KARTU MENJADI LINK === */
+.portfolio-link-card {
+    display: block; /* Membuat tag <a> berperilaku seperti div */
+    text-decoration: none; /* Menghapus garis bawah dari link */
+    color: inherit; /* Membuat warna teks mengikuti style aslinya */
+}
+
+/* Memastikan efek hover tetap berjalan */
+.portfolio-link-card:hover {
+    color: inherit; 
+}
+
+/* ============================================= */
+/* ==      [BARU] MODAL CROPPING GAMBAR       == */
+/* ============================================= */
+.crop-modal-content {
+    max-width: 80vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.crop-container {
+    width: 100%;
+    height: 60vh; /* Tinggi yang bisa disesuaikan */
+    background-color: #000;
+    margin-bottom: var(--space-md);
+    overflow: hidden;
+}
+
+#image-to-crop {
+    display: block;
+    max-width: 100%;
+    /* Cropper.js akan menangani tinggi */
+}
+
+.crop-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-md);
+    margin-top: auto; /* Mendorong tombol ke bawah */
+}
+
+/* ============================================= */
+/* ==   [BARU] GAYA KONTEN DETAIL JURNAL      == */
+/* ============================================= */
+.jurnal-detail-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: var(--space-md) 0;
+    border: 1px solid var(--border-color);
+}
+
+/* ============================================= */
+/* == [BARU] PENYESUAIAN TEMA UNTUK TINYMCE   == */
+/* ============================================= */
+/* Pastikan editor TinyMCE terlihat bagus di tema gelap */
+.tox .tox-edit-area__iframe {
+    background-color: #2a2a2a !important;
+}
+
+.tox .tox-body, .tox .tox-content-preview {
+    color: var(--text-color);
+}
