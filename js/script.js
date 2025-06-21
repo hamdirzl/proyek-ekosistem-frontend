@@ -208,7 +208,7 @@ function showCropModal(imageSrc, callback, aspectRatio = 16 / 9) {
     }
 
     cropper = new Cropper(imageToCropElement, {
-        aspectRatio: aspectRatio,
+        aspectRatio: NaN,
         viewMode: 1,
         background: false,
         autoCropArea: 0.9,
