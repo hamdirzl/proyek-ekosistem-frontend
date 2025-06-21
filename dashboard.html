@@ -85,7 +85,6 @@
                 <button class="dashboard-tab-button active" data-target="panel-ringkasan">Ringkasan</button>
                 <button class="dashboard-tab-button" data-target="panel-akun">Manajemen Akun</button>
                 <button id="admin-portfolio-tab" class="dashboard-tab-button hidden" data-target="panel-admin-portfolio">Manajemen Portofolio</button>
-                <button id="admin-jurnal-tab" class="dashboard-tab-button hidden" data-target="panel-admin-jurnal">Manajemen Jurnal</button>
                 <button id="admin-links-tab" class="dashboard-tab-button hidden" data-target="panel-admin-links">Manajemen Tautan</button>
                 <button id="admin-users-tab" class="dashboard-tab-button hidden" data-target="panel-admin-users">Manajemen Pengguna</button>
             </div>
@@ -177,48 +176,6 @@
                         <h3 style="margin-top: var(--space-xl); margin-bottom: var(--space-md);">Daftar Proyek</h3>
                         <p id="loading-portfolio-admin">Memuat daftar proyek...</p>
                         <ul id="portfolio-list-admin" class="mood-history-list"></ul>
-                    </div>
-                </div>
-                
-                <div id="panel-admin-jurnal" class="dashboard-panel">
-                    <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Manajemen Jurnal</h2>
-                    
-                    <div class="admin-management-section">
-                        <h3 id="jurnal-form-title" style="margin-bottom: var(--space-md);">Tambah Entri Baru</h3>
-                        <form id="jurnal-form" class="auth-form" style="max-width: none; margin: 0; padding: 0; background: none; border: none;">
-                            <input type="hidden" id="jurnal-id">
-                            <div class="form-group">
-                                <label for="jurnal-title">Judul Entri</label>
-                                <input type="text" id="jurnal-title" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="jurnal-content">Konten</label>
-                                <textarea id="jurnal-content" rows="6" required style="height: auto;"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="jurnal-image">Gambar Utama (Max 2MB)</label>
-                                <div class="custom-file-input-wrapper">
-                                    <input type="file" id="jurnal-image" accept="image/jpeg, image/png, image/webp">
-                                    <span class="custom-file-button">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                        Pilih File
-                                    </span>
-                                    <span class="custom-file-label" id="file-name-jurnal">Tidak ada file dipilih</span>
-                                    <small id="current-jurnal-image-info" style="color: var(--text-muted-color); margin-top: 5px; display: block;"></small>
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: 1rem;">
-                                <button type="submit" class="button-pintu">Simpan Entri</button>
-                                <button type="button" id="clear-jurnal-form" class="button-pintu button-secondary">Batal/Entri Baru</button>
-                            </div>
-                        </form>
-                        <div id="jurnal-message" style="margin-top: 1rem;"></div>
-                    </div>
-            
-                    <div>
-                        <h3 style="margin-top: var(--space-xl); margin-bottom: var(--space-md);">Daftar Entri Jurnal</h3>
-                        <p id="loading-jurnal-admin">Memuat daftar entri...</p>
-                        <ul id="jurnal-list-admin" class="mood-history-list"></ul>
                     </div>
                 </div>
 

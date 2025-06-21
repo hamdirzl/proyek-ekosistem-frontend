@@ -122,24 +122,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Panggil fungsi setup berdasarkan halaman (Versi Baru yang Lebih Andal)
-const pathname = window.location.pathname;
-
-if (pathname.endsWith('dashboard.html')) {
-    setupDashboardPage();
-} else if (pathname.endsWith('portfolio.html')) {
-    setupPortfolioPage();
-} else if (pathname.endsWith('project-detail.html')) {
-    setupProjectDetailPage();
-} else if (pathname.endsWith('jurnal.html')) {
-    setupJurnalPage();
-} else if (pathname.endsWith('jurnal-detail.html')) {
-    setupJurnalDetailPage();
-} else if (pathname.endsWith('tools.html')) {
-    setupToolsPage();
-} else if (pathname.endsWith('auth.html') || pathname.endsWith('forgot-password.html') || pathname.endsWith('reset-password.html')) {
-    setupAuthPage();
-}
+    // Panggil fungsi setup berdasarkan halaman
+    if (document.body.contains(document.getElementById('dashboard-main'))) {
+        setupDashboardPage();
+    } else if (document.title.includes("Portofolio - HAMDI RIZAL")) { // Lebih spesifik
+        setupPortfolioPage();
+    } else if (document.title.includes("Detail Proyek")) { // Kondisi baru
+        setupProjectDetailPage();
+    } else if (document.title.includes("Tools")) {
+        setupToolsPage();
+    } else if (document.getElementById('login-form')) {
+        setupAuthPage();
+    }
 
     setupAboutModal();
     setupMobileMenu();
@@ -180,7 +174,8 @@ function setupPortfolioPage() {
                 projectCard.className = 'portfolio-card portfolio-link-card';
                 projectCard.href = `project-detail.html?id=${project.id}`;
                 projectCard.setAttribute('data-aos', 'fade-up');
-                
+
+                // PERUBAHAN DI SINI: Langsung gunakan URL dari Supabase
                 const projectImage = project.image_url || 'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=500&q=80'; 
                 
                 const projectLinkButton = `<span class="button-pintu">Lihat Detail</span>`;
@@ -205,100 +200,6 @@ function setupPortfolioPage() {
     fetchAndRenderPortfolio();
 }
 
-// ===================================
-// === LOGIKA HALAMAN JURNAL       ===
-// ===================================
-function setupJurnalPage() {
-    const jurnalGrid = document.querySelector('.jurnal-grid');
-    if (!jurnalGrid) return;
-
-    async function fetchAndRenderJurnal() {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/jurnal`);
-            if (!response.ok) throw new Error('Gagal memuat data jurnal.');
-
-            const entries = await response.json();
-            jurnalGrid.innerHTML = ''; 
-
-            if (entries.length === 0) {
-                jurnalGrid.innerHTML = '<p style="text-align: center; color: var(--text-muted-color);">Belum ada entri jurnal untuk ditampilkan.</p>';
-                return;
-            }
-
-            entries.forEach(entry => {
-                const entryCard = document.createElement('article');
-                entryCard.className = 'jurnal-card';
-                entryCard.setAttribute('data-aos', 'fade-up');
-                
-                const snippet = entry.content.substring(0, 150) + '...';
-
-                entryCard.innerHTML = `
-                    <img src="${entry.image_url}" alt="Gambar untuk ${entry.title}">
-                    <div class="jurnal-content">
-                        <h3>${entry.title}</h3>
-                        <p class="post-meta">Dipublikasikan pada ${new Date(entry.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                        <p>${snippet}</p>
-                        <a href="jurnal-detail.html?id=${entry.id}" class="button-pintu">Baca Selengkapnya</a>
-                    </div>
-                `;
-                jurnalGrid.appendChild(entryCard);
-            });
-
-        } catch (error) {
-            console.error('Error:', error);
-            jurnalGrid.innerHTML = `<p style="text-align: center; color: var(--text-muted-color);">${error.message}</p>`;
-        }
-    }
-    fetchAndRenderJurnal();
-}
-
-// =======================================
-// === LOGIKA HALAMAN DETAIL JURNAL    ===
-// =======================================
-function setupJurnalDetailPage() {
-    const titleElement = document.getElementById('jurnal-title');
-    const metaElement = document.getElementById('jurnal-meta');
-    const imageElement = document.getElementById('jurnal-image');
-    const contentElement = document.getElementById('jurnal-content');
-    const mainContent = document.getElementById('main-content');
-    const loadingIndicator = document.getElementById('loading-indicator');
-
-    async function fetchJurnalDetails() {
-        try {
-            const params = new URLSearchParams(window.location.search);
-            const jurnalId = params.get('id');
-
-            if (!jurnalId) {
-                throw new Error('ID Jurnal tidak ditemukan di URL.');
-            }
-
-            const response = await fetch(`<span class="math-inline">\{API\_BASE\_URL\}/api/jurnal/</span>{jurnalId}`);
-            if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.error || 'Entri jurnal tidak ditemukan.');
-            }
-
-            const entry = await response.json();
-
-            document.title = `${entry.title} - Detail Jurnal`;
-            titleElement.textContent = entry.title;
-            metaElement.textContent = `Dipublikasikan pada ${new Date(entry.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}`;
-
-            imageElement.src = entry.image_url; 
-            imageElement.alt = `Gambar untuk ${entry.title}`;
-            contentElement.innerHTML = entry.content.replace(/\n/g, '<br>');
-
-            loadingIndicator.style.display = 'none';
-            mainContent.style.display = 'block';
-
-        } catch (error) {
-            console.error(error);
-            loadingIndicator.innerHTML = `<p style="color: #ff4d4d;">Error: ${error.message}</p>`;
-        }
-    }
-
-    fetchJurnalDetails();
-}
 // =======================================
 // === LOGIKA HALAMAN DETAIL PROYEK    ===
 // =======================================
@@ -330,6 +231,7 @@ function setupProjectDetailPage() {
             document.title = `${project.title} - Detail Proyek`;
             titleElement.textContent = project.title;
             
+            // PERUBAHAN DI SINI: Langsung gunakan URL dari Supabase
             imageElement.src = project.image_url; 
             imageElement.alt = `Gambar proyek ${project.title}`;
             descriptionElement.innerHTML = project.description.replace(/\n/g, '<br>');
@@ -439,7 +341,6 @@ function setupAdminPanels() {
     if (userEmailElement) userEmailElement.innerHTML += ' <span style="color: var(--accent-color); font-size: 0.9em;">(Admin)</span>';
 
     document.getElementById('admin-portfolio-tab')?.classList.remove('hidden');
-    document.getElementById('admin-jurnal-tab')?.classList.remove('hidden');
     document.getElementById('admin-links-tab')?.classList.remove('hidden');
     document.getElementById('admin-users-tab')?.classList.remove('hidden');
 
@@ -470,7 +371,6 @@ function setupAdminPanels() {
     }
     
     setupAdminPortfolioPanel();
-    setupAdminJurnalPanel();
 }
 
 async function fetchAndDisplayLinks(searchQuery = '') {
@@ -778,151 +678,6 @@ function renderAdminPortfolioItem(project, container) {
             
             alert('Proyek berhasil dihapus.');
             fetchAndDisplayPortfolioAdmin();
-        } catch (error) {
-            alert(`Error: ${error.message}`);
-        }
-    });
-}
-
-// === LOGIKA MANAJEMEN JURNAL ADMIN ===
-function setupAdminJurnalPanel() {
-    const form = document.getElementById('jurnal-form');
-    if (!form) return;
-
-    const formTitle = document.getElementById('jurnal-form-title');
-    const hiddenId = document.getElementById('jurnal-id');
-    const titleInput = document.getElementById('jurnal-title');
-    const contentInput = document.getElementById('jurnal-content');
-    const imageInput = document.getElementById('jurnal-image');
-    const messageDiv = document.getElementById('jurnal-message');
-    const clearButton = document.getElementById('clear-jurnal-form');
-    const currentImageInfo = document.getElementById('current-jurnal-image-info');
-    const fileNameLabel = document.getElementById('file-name-jurnal');
-
-    imageInput.addEventListener('change', () => {
-        if (imageInput.files.length > 0) {
-            fileNameLabel.textContent = imageInput.files[0].name;
-        } else {
-            fileNameLabel.textContent = 'Tidak ada file dipilih';
-        }
-    });
-
-    function resetJurnalForm() {
-        form.reset();
-        hiddenId.value = '';
-        formTitle.textContent = 'Tambah Entri Baru';
-        messageDiv.textContent = '';
-        messageDiv.className = '';
-        currentImageInfo.textContent = '';
-        fileNameLabel.textContent = 'Tidak ada file dipilih';
-    }
-
-    clearButton.addEventListener('click', resetJurnalForm);
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData();
-        formData.append('title', titleInput.value);
-        formData.append('content', contentInput.value);
-        
-        if (imageInput.files[0]) {
-            formData.append('image', imageInput.files[0]);
-        }
-        
-        const id = hiddenId.value;
-        const url = id ? `${API_BASE_URL}/api/admin/jurnal/${id}` : `${API_BASE_URL}/api/admin/jurnal`;
-        const method = id ? 'PUT' : 'POST';
-
-        try {
-            const response = await fetchWithAuth(url, { method, body: formData });
-            const result = await response.json();
-
-            if (!response.ok) throw new Error(result.error || 'Terjadi kesalahan.');
-
-            messageDiv.className = 'success';
-            messageDiv.textContent = id ? 'Entri berhasil diperbarui!' : 'Entri berhasil ditambahkan!';
-            
-            resetJurnalForm();
-            fetchAndDisplayJurnalAdmin();
-
-        } catch (error) {
-            messageDiv.className = 'error';
-            messageDiv.textContent = `Error: ${error.message}`;
-        }
-    });
-
-    fetchAndDisplayJurnalAdmin();
-}
-
-async function fetchAndDisplayJurnalAdmin() {
-    const listContainer = document.getElementById('jurnal-list-admin');
-    const loadingMessage = document.getElementById('loading-jurnal-admin');
-    if (!listContainer || !loadingMessage) return;
-
-    loadingMessage.style.display = 'block';
-    listContainer.innerHTML = '';
-    
-    try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal`);
-        const entries = await response.json();
-        if (!response.ok) throw new Error(entries.error || 'Gagal memuat entri jurnal.');
-        
-        loadingMessage.style.display = 'none';
-
-        if (entries.length === 0) {
-            listContainer.innerHTML = '<li><p>Belum ada entri jurnal ditambahkan.</p></li>';
-            return;
-        }
-
-        entries.forEach(entry => renderAdminJurnalItem(entry, listContainer));
-    } catch (error) {
-        loadingMessage.textContent = `Error: ${error.message}`;
-    }
-}
-
-function renderAdminJurnalItem(entry, container) {
-    const listItem = document.createElement('li');
-    listItem.className = 'mood-item';
-    listItem.id = `jurnal-item-${entry.id}`;
-    const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
-
-    listItem.innerHTML = `
-        <div class="mood-item-header">
-            <span><strong>${entry.title}</strong></span>
-            <div class="mood-item-actions">
-                <button class="mood-icon-button edit-jurnal-btn" data-id="${entry.id}" aria-label="Edit Entri">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                </button>
-                <button class="mood-icon-button delete-jurnal-btn delete-button" data-id="${entry.id}" aria-label="Hapus Entri">
-                    ${trashIconSvg}
-                </button>
-            </div>
-        </div>
-        <p class="mood-notes">${entry.content.substring(0, 100)}...</p>
-        <small class="mood-date">Dibuat: ${new Date(entry.created_at).toLocaleString('id-ID')}</small>
-    `;
-    container.appendChild(listItem);
-
-    listItem.querySelector('.edit-jurnal-btn').addEventListener('click', () => {
-        document.getElementById('jurnal-form-title').textContent = 'Edit Entri';
-        document.getElementById('jurnal-id').value = entry.id;
-        document.getElementById('jurnal-title').value = entry.title;
-        document.getElementById('jurnal-content').value = entry.content;
-        document.getElementById('current-jurnal-image-info').textContent = `Gambar saat ini: ${entry.image_url}. Kosongkan jika tidak ingin ganti.`;
-        document.getElementById('jurnal-form').scrollIntoView({ behavior: 'smooth' });
-    });
-
-    listItem.querySelector('.delete-jurnal-btn').addEventListener('click', async () => {
-        if (!confirm(`Yakin ingin menghapus entri "${entry.title}"?`)) return;
-        
-        try {
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/${entry.id}`, { method: 'DELETE' });
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error);
-            
-            alert('Entri berhasil dihapus.');
-            fetchAndDisplayJurnalAdmin();
         } catch (error) {
             alert(`Error: ${error.message}`);
         }
