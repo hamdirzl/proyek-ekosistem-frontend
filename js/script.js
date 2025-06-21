@@ -181,7 +181,7 @@ function setupPortfolioPage() {
                 projectCard.setAttribute('data-aos', 'fade-up');
 
                 // INI PERBAIKANNYA
-                const projectImage = project.image_url ? `${API_BASE_URL}/api/images/${project.image_url}` : 'https://images.unsplash.com/photo-1587620962725-abab7fe55159?auto=format&fit=crop&w=1331&q=80';
+                const projectImage = project.image_url ? `${API_BASE_URL}/api/images/${project.image_url}` : '...'; // INI PERBAIKANNYA
                 // 3. UBAH TOMBOL DARI LINK <a> MENJADI <span> AGAR TIDAK ADA LINK DI DALAM LINK
                 const projectLinkButton = `<span class="button-pintu">Lihat Detail</span>`;
 
@@ -237,7 +237,7 @@ function setupProjectDetailPage() {
             document.title = `${project.title} - Detail Proyek`;
             titleElement.textContent = project.title;
             // INI PERBAIKANNYA
-            imageElement.src = `${API_BASE_URL}/api/images/${project.image_url}`;
+            imageElement.src = `${API_BASE_URL}/api/images/${project.image_url}`; // INI PERBAIKANNYA
             imageElement.alt = `Gambar proyek ${project.title}`;
             descriptionElement.innerHTML = project.description.replace(/\n/g, '<br>');
 
