@@ -1726,12 +1726,20 @@ function setupChatBubble() {
     const sendChatButton = document.getElementById('send-chat-button');
     let chatChannel = null;
 
-    if (!chatBubble || !openChatButton || !localStorage.getItem('jwt_refresh_token')) {
-        openChatButton?.classList.add('hidden');
+    // === PERBAIKAN UTAMA ADA DI SINI ===
+    // Jika elemen dasar untuk chat tidak ada di halaman ini,
+    // segera hentikan eksekusi fungsi agar tidak terjadi crash.
+    if (!chatBubble || !openChatButton) {
+        return; // Hentikan fungsi di sini
+    }
+    // ===================================
+
+    if (!localStorage.getItem('jwt_refresh_token')) {
+        openChatButton.classList.add('hidden');
         return;
     };
 
-    openChatButton?.classList.remove('hidden');
+    openChatButton.classList.remove('hidden');
 
     function getOrCreateChatSessionId() {
         let sessionId = sessionStorage.getItem('chat_session_id');
