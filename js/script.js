@@ -194,6 +194,7 @@ function setupChatBubble() {
     if (!chatBubble || !chatWindow) return;
 
     let ws = null;
+    let isConnecting = false;
     const backendWsUrl = 'wss://server-pribadi-hamdi-docker.onrender.com';
 
     let typingTimeout;
@@ -266,49 +267,59 @@ function setupChatBubble() {
         }
     };
     
-    const connect = () => {
-        const session = JSON.parse(localStorage.getItem('chatSession'));
-        if (!session || (ws && ws.readyState === WebSocket.OPEN)) {
-            return;
-        }
+    // GANTI FUNGSI const connect = () => { ... } YANG LAMA DENGAN YANG INI
+const connect = () => {
+    const session = JSON.parse(localStorage.getItem('chatSession'));
+    // Cegah koneksi ganda jika sedang menyambung atau sudah tersambung
+    if (isConnecting || (ws && ws.readyState === WebSocket.OPEN) || !session) {
+        return;
+    }
 
-        ws = new WebSocket(backendWsUrl);
+    isConnecting = true;
+    updateStatus('menghubungi');
 
-        ws.onopen = () => {
-            console.log('Terhubung ke WebSocket. Mengidentifikasi sesi...');
-            ws.send(JSON.stringify({ type: 'identify', session: session }));
-        };
+    ws = new WebSocket(backendWsUrl);
 
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            switch (data.type) {
-                case 'chat':
-                    showTypingIndicator(false);
-                    appendMessage(data.content, 'admin');
-                    if (chatWindow.classList.contains('hidden')) {
-                        new Audio('https://cdn.pixabay.com/audio/2022/10/14/audio_94305374f6.mp3').play().catch(e => console.log("Gagal memainkan suara:", e));
-                    }
-                    break;
-                case 'status_update':
-                    updateStatus(data.status);
-                    break;
-                case 'typing':
-                    showTypingIndicator(data.isTyping);
-                    break;
-            }
-        };
-
-        ws.onclose = () => {
-            console.log('Koneksi WebSocket terputus.');
-            updateStatus('offline');
-            ws = null;
-        };
-
-        ws.onerror = (error) => {
-            console.error('WebSocket error:', error);
-            if(ws) ws.close();
-        };
+    ws.onopen = () => {
+        isConnecting = false;
+        console.log('Terhubung ke WebSocket. Mengidentifikasi sesi...');
+        ws.send(JSON.stringify({ type: 'identify', session: session }));
     };
+
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        switch (data.type) {
+            case 'chat':
+                showTypingIndicator(false);
+                appendMessage(data.content, 'admin');
+                if (chatWindow.classList.contains('hidden')) {
+                    new Audio('https://cdn.pixabay.com/audio/2022/10/14/audio_94305374f6.mp3').play().catch(e => console.log("Gagal memainkan suara:", e));
+                }
+                break;
+            case 'status_update':
+                updateStatus(data.status);
+                break;
+            case 'typing':
+                showTypingIndicator(data.isTyping);
+                break;
+        }
+    };
+
+    ws.onclose = () => {
+        isConnecting = false;
+        console.log('Koneksi WebSocket terputus.');
+        updateStatus('offline');
+        ws = null;
+        // Coba sambungkan kembali setelah 3 detik
+        setTimeout(connect, 3000);
+    };
+
+    ws.onerror = (error) => {
+        isConnecting = false;
+        console.error('WebSocket error:', error);
+        if(ws) ws.close(); // Ini akan memicu onclose dan reconnect
+    };
+};
 
     chatBubble.addEventListener('click', () => {
         chatWindow.classList.remove('hidden');
