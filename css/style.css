@@ -1,24 +1,24 @@
 /* =================================================================== */
-/* ==   V12: FINAL STYLE - DEFINITIVE FIX FOR OVERLAPPING ICON    == */
+/* ==   V12: FINAL STYLE - LIGHT, PROFESSIONAL, MINIMALIST THEME  == */
 /* =================================================================== */
 
 /* === PENGATURAN GLOBAL: DESIGN SYSTEM === */
 :root {
-    /* Palet Warna */
-    --background-color: #121212;
-    --card-bg-color: #1e1e1e;
-    --text-color: #e0e0e0;
-    --text-muted-color: #a0a0a0;
-    --border-color: #333333;
-    --accent-color: #00f5a0;
-    --accent-hover: #00d98c;
-    --border-hover-color: #444444;
+    /* Palet Warna - TEMA TERANG BARU */
+    --background-color: #f8f9fa; /* Abu-abu sangat terang */
+    --card-bg-color: #ffffff;      /* Putih bersih untuk kartu */
+    --text-color: #212529;         /* Hitam pekat untuk teks */
+    --text-muted-color: #6c757d;   /* Abu-abu untuk teks sekunder */
+    --border-color: #dee2e6;       /* Abu-abu terang untuk border */
+    --accent-color: #007bff;       /* Biru profesional sebagai aksen */
+    --accent-hover: #0056b3;       /* Biru lebih gelap untuk hover */
+    --border-hover-color: #adb5bd; /* Abu-abu lebih gelap untuk hover border */
 
-    /* Font */
+    /* Font (tetap sama, sudah bagus) */
     --font-heading: 'Poppins', sans-serif;
     --font-body: 'Inter', sans-serif;
 
-    /* Skala Spasi */
+    /* Skala Spasi (tetap sama) */
     --space-xs: 0.5rem;   /* 8px */
     --space-sm: 1rem;     /* 16px */
     --space-md: 1.5rem;   /* 24px */
@@ -26,16 +26,17 @@
     --space-xl: 4rem;     /* 64px */
     --space-xxl: 6rem;    /* 96px */
 
-    /* Ukuran font responsif */
+    /* Ukuran font responsif (tetap sama) */
     --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
     --font-size-h1:   clamp(2.2rem, 1.5rem + 3.5vw, 3.5rem);
     --font-size-h2:   clamp(1.8rem, 1.25rem + 2.5vw, 2.5rem);
     --font-size-h3:   clamp(1.25rem, 1.1rem + 1.5vw, 1.75rem);
     
-    /* Bayangan */
-    --soft-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    /* Bayangan (disesuaikan untuk latar belakang terang) */
+    --soft-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
+
 
 /* Global reset and foundational styles */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -49,9 +50,7 @@ body {
     font-size: var(--font-size-base);
     -webkit-font-smoothing: antialiased; 
     -moz-osx-font-smoothing: grayscale;
-    background-image: 
-        radial-gradient(at 20% 20%, hsla(160, 100%, 48%, 0.08) 0px, transparent 50%),
-        radial-gradient(at 80% 80%, hsla(200, 100%, 50%, 0.08) 0px, transparent 50%);
+    /* background-image dihapus untuk tampilan minimalis */
 }
 
 html, body {
@@ -70,11 +69,10 @@ html, body {
     top: 0; 
     z-index: 1000; 
     transition: background-color 0.3s ease;
-    /* Nilai transparansi diubah di sini */
-    background-color: rgba(18, 18, 18, 0.25); /* Sedikit lapisan warna, tidak 100% transparan */
+    background-color: rgba(255, 255, 255, 0.5); /* Latar belakang putih transparan */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(51, 51, 51, 0.2);
+    border-bottom: 1px solid var(--border-color); /* Menggunakan variabel border baru */
 }
 
 .logo a { 
@@ -82,7 +80,7 @@ html, body {
     font-size: 1.5rem; 
     font-weight: 700; 
     text-decoration: none; 
-    color: #ffffff;
+    color: var(--text-color); /* Menggunakan variabel teks utama */
     transition: color 0.3s ease; 
 }
 .logo a:hover { color: var(--accent-color); }
@@ -113,7 +111,7 @@ html, body {
 .button-pintu { 
     display: inline-block; 
     background: var(--accent-color); 
-    color: #000000;
+    color: #ffffff; /* Warna teks diubah menjadi putih agar kontras dengan biru */
     padding: 0.7rem 1.6rem; 
     border: 2px solid var(--accent-color); 
     border-radius: 8px;
@@ -121,11 +119,11 @@ html, body {
     font-family: var(--font-heading); 
     text-decoration: none; 
     transition: all 0.3s ease; 
-    box-shadow: 0 2px 8px rgba(0, 245, 160, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
     cursor: pointer;
 }
 .login-button { 
-    color: #000000 !important; 
+    color: #ffffff !important; /* Warna teks diubah menjadi putih */
     padding: 0.6rem 1.2rem !important;
     background-color: var(--accent-color) !important;
 }
@@ -133,7 +131,7 @@ html, body {
     background: var(--accent-hover) !important; 
     border-color: var(--accent-hover);
     transform: translateY(-2px); 
-    box-shadow: 0 6px 20px rgba(0, 245, 160, 0.25);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.25);
 }
 
 /* New: Secondary Button Style */
@@ -178,7 +176,7 @@ footer {
     font-size: 1.8rem;
     font-weight: 700;
     text-decoration: none;
-    color: #ffffff;
+    color: var(--text-color);
     line-height: 1.2;
     transition: color 0.3s ease;
 }
@@ -231,8 +229,8 @@ footer {
     text-align: center; 
     padding: var(--space-xl) clamp(var(--space-md), 5vw, var(--space-xl));
     min-height: 80vh; 
-    color: #ffffff; 
-    background: linear-gradient(rgba(18, 18, 18, 0.8), rgba(18, 18, 18, 0.9)), url('https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80') no-repeat center center/cover; 
+    color: var(--text-color); 
+    background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.8)), url('https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80') no-repeat center center/cover; 
 }
 .hero-content { 
     max-width: 850px; 
@@ -250,10 +248,7 @@ footer {
     letter-spacing: -1px;
 }
 .hero h1 span { 
-    background: linear-gradient(45deg, var(--accent-color), #00c4ff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--accent-color);
 }
 .hero p { 
     font-size: var(--font-size-base); 
@@ -266,8 +261,8 @@ footer {
 
 .button-highlight {
     display: inline-block;
-    background: linear-gradient(90deg, #00f5a0, #00c4ff);
-    color: #121212;
+    background: var(--accent-color);
+    color: #ffffff;
     padding: 0.5rem 1.2rem;
     border: none;
     border-radius: 6px;
@@ -275,18 +270,18 @@ footer {
     font-family: var(--font-body);
     text-decoration: none;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 245, 160, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
     font-size: 0.95rem;
     margin-top: var(--space-sm);
 }
 .button-highlight:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 245, 160, 0.3);
-    opacity: 0.9;
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+    background: var(--accent-hover);
 }
 
 .pintu-utama { padding: var(--space-xl) clamp(var(--space-md), 5vw, var(--space-xl)); } 
-.section-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h2); color: #ffffff; margin-bottom: var(--space-xl); }
+.section-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h2); color: var(--text-color); margin-bottom: var(--space-xl); }
 
 .pintu-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-lg); margin-top: var(--space-xl); }
 
@@ -304,8 +299,8 @@ footer {
 }
 .pintu:hover { 
     transform: translateY(-8px); 
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-    border-color: var(--border-hover-color);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    border-color: var(--accent-color);
 }
 .pintu-icon { margin-bottom: var(--space-md); color: var(--accent-color); }
 .pintu h3 { font-size: var(--font-size-h3); color: var(--text-color); margin-bottom: var(--space-xs); }
@@ -314,7 +309,7 @@ footer {
 
 /* === HALAMAN LAINNYA === */
 .page-container { max-width: 1200px; margin: 0 auto; padding: var(--space-xl) var(--space-md); } 
-.page-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h1); color: #ffffff; margin-bottom: var(--space-sm); }
+.page-title { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-h1); color: var(--text-color); margin-bottom: var(--space-sm); }
 .page-subtitle { text-align: center; font-size: var(--font-size-base); color: var(--text-muted-color); margin-bottom: var(--space-xl); max-width: 600px; margin-left: auto; margin-right: auto; }
 
 .portfolio-grid, .jurnal-grid { display: grid; gap: var(--space-lg); }
@@ -332,18 +327,17 @@ footer {
 }
 .portfolio-card:hover, .jurnal-card:hover, .game-section .portfolio-card:hover { 
     transform: translateY(-8px); 
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
 }
 .portfolio-card img, .jurnal-card img, .game-section .portfolio-card img { 
     width: 100%; 
     height: 220px; 
     object-fit: cover; 
     transition: transform 0.4s ease;
-    filter: brightness(0.8); 
+    filter: brightness(1); 
 }
 .portfolio-card:hover img, .jurnal-card:hover img, .game-section .portfolio-card:hover img { 
     transform: scale(1.05); 
-    filter: brightness(1);
 }
 
 .portfolio-card .card-content, .jurnal-content, .game-section .card-content {
@@ -355,7 +349,7 @@ footer {
 
 .portfolio-card h3, .jurnal-card h3, .game-section .portfolio-card h3 { 
     font-size: var(--font-size-h3); 
-    color: #ffffff;
+    color: var(--text-color);
     margin-bottom: var(--space-xs);
 }
 .portfolio-card p, .jurnal-card p, .game-section .portfolio-card p {
@@ -395,7 +389,7 @@ input[type="url"], input[type="email"], input[type="password"], input[type="text
     border-radius: 8px; 
     font-size: var(--font-size-base); 
     font-family: var(--font-body); 
-    background-color: #2a2a2a;
+    background-color: var(--card-bg-color);
     color: var(--text-color); 
     transition: border-color 0.3s ease, box-shadow 0.3s ease; 
 }
@@ -408,7 +402,7 @@ input:focus::placeholder, textarea:focus::placeholder { opacity: 0.4; }
 input:focus, textarea:focus, select:focus { 
     outline: none; 
     border-color: var(--accent-color); 
-    box-shadow: 0 0 0 3px rgba(0, 245, 160, 0.2); 
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); 
 }
 
 /* NEW: Custom file input */
@@ -435,7 +429,7 @@ input:focus, textarea:focus, select:focus {
     display: inline-flex; /* Use flex to align icon and text */
     align-items: center;
     justify-content: center; /* Center content horizontally */
-    background-color: var(--border-hover-color);
+    background-color: var(--card-bg-color);
     color: var(--text-color);
     padding: 0.7rem 1.2rem;
     border: 1px solid var(--border-color);
@@ -450,7 +444,7 @@ input:focus, textarea:focus, select:focus {
 .custom-file-button:hover {
     background-color: var(--accent-color);
     border-color: var(--accent-color);
-    color: #000000;
+    color: #ffffff;
 }
 
 .custom-file-button svg {
@@ -508,8 +502,8 @@ input:focus, textarea:focus, select:focus {
 .auth-toggle a:hover { text-decoration: underline; }
 
 #auth-message { padding: var(--space-sm); border-radius: 8px; margin-top: var(--space-md); text-align: center;}
-#auth-message.success { background-color: rgba(0, 245, 160, 0.1); color: var(--accent-color); border: 1px solid var(--accent-color); }
-#auth-message.error { background-color: rgba(248, 87, 87, 0.1); color: #f89696; border: 1px solid #f85757;}
+#auth-message.success { background-color: rgba(25, 135, 84, 0.1); color: #198754; border: 1px solid #a3cfbb; }
+#auth-message.error { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; border: 1px solid #f1b0b7;}
 
 /* === RIWAYAT TAUTAN (LINK HISTORY) === */
 .mood-history-list { list-style: none; padding: 0; margin-top: var(--space-md); }
@@ -526,7 +520,7 @@ input:focus, textarea:focus, select:focus {
 }
 .mood-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     border-color: var(--accent-color); 
 }
 .mood-item-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-xs); font-weight: 500; }
@@ -535,7 +529,7 @@ input:focus, textarea:focus, select:focus {
 .mood-item .mood-date { font-size: 0.75rem; color: var(--text-muted-color); text-align: right; width: 100%; margin-top: var(--space-xs); }
 .mood-item-actions { display: flex; gap: 5px; flex-shrink: 0; }
 .mood-icon-button { background: var(--background-color); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; line-height: 1; }
-.mood-icon-button:hover { background-color: var(--border-hover-color); border-color: var(--accent-color); transform: translateY(-1px); }
+.mood-icon-button:hover { background-color: #e9ecef; border-color: var(--accent-color); transform: translateY(-1px); }
 .mood-icon-button svg { width: 16px; height: 16px; color: var(--text-muted-color); transition: color 0.2s ease; }
 .mood-icon-button:hover svg { color: var(--accent-color); }
 .mood-icon-button.delete-button:hover { border-color: #ff4d4d; }
@@ -545,7 +539,7 @@ input:focus, textarea:focus, select:focus {
 .hamburger { display: none; background: transparent; border: none; cursor: pointer; padding: 0; z-index: 1001; }
 .hamburger span { background-color: var(--text-color); display: block; width: 25px; height: 3px; margin: 5px 0; border-radius: 3px; transition: all 0.3s ease-in-out; }
 
-/* === TAMBAHKAN CSS UNTUK ANIMASI HAMBURGER === */
+/* === ANIMASI HAMBURGER === */
 .hamburger.active span:nth-child(1) {
     transform: translateY(8px) rotate(45deg);
 }
@@ -555,7 +549,7 @@ input:focus, textarea:focus, select:focus {
 .hamburger.active span:nth-child(3) {
     transform: translateY(-8px) rotate(-45deg);
 }
-/* === CSS BARU UNTUK OVERLAY MENU === */
+/* === OVERLAY MENU === */
 .menu-overlay {
     position: fixed;
     top: 0;
@@ -614,7 +608,7 @@ input:focus, textarea:focus, select:focus {
         width: 85%;
         max-width: 320px; 
         height: 100vh; /* Pastikan tinggi penuh */
-        background-color: rgba(24, 24, 24, 0.98); 
+        background-color: rgba(248, 249, 250, 0.98); 
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         padding: var(--space-xl) 0; /* Ubah padding vertikal */
@@ -625,7 +619,7 @@ input:focus, textarea:focus, select:focus {
         align-items: flex-start;
         justify-content: flex-start;
         gap: 0; /* Hapus gap utama, atur di item */
-        box-shadow: 5px 0 25px rgba(0,0,0,0.4); 
+        box-shadow: 5px 0 25px rgba(0,0,0,0.1); 
         z-index: 1000; 
     }
     
@@ -670,7 +664,7 @@ input:focus, textarea:focus, select:focus {
     }
     
     .nav-links a:hover, .nav-links .nav-button:hover { 
-      background-color: rgba(255, 255, 255, 0.05);
+      background-color: rgba(0, 0, 0, 0.05);
       color: var(--text-color); 
     }
 
@@ -751,7 +745,7 @@ input:focus, textarea:focus, select:focus {
 /* === MODAL (POP-UP) TENTANG SAYA === */
 .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(5px);
     display: flex; justify-content: center; align-items: center;
     z-index: 2000; opacity: 0; visibility: hidden;
@@ -782,7 +776,7 @@ input:focus, textarea:focus, select:focus {
 /* === FITUR SALIN LINK === */
 .result-box {
     display: none; justify-content: space-between; align-items: center;
-    border: 1px dashed var(--accent-color); background-color: #2a2a2a;
+    border: 1px dashed var(--accent-color); background-color: #e9f2ff;
     padding: var(--space-sm) var(--space-md); margin-top: var(--space-md);
     border-radius: 8px;
     flex-wrap: wrap; 
@@ -841,7 +835,7 @@ input:focus, textarea:focus, select:focus {
     border-radius: 8px;
     font-size: var(--font-size-base); 
     font-family: var(--font-body); 
-    background-color: #2a2a2a;
+    background-color: #ffffff;
     color: var(--text-color);
 }
 #qr-generator-form input[type="color"] {
@@ -864,7 +858,7 @@ input:focus, textarea:focus, select:focus {
     margin-top: var(--space-md);
     width: 100%;
     padding: 0.9rem;
-    box-shadow: 0 2px 8px rgba(0, 245, 160, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
 }
 #qr-code-message {
     text-align: center;
@@ -873,14 +867,14 @@ input:focus, textarea:focus, select:focus {
     border-radius: 8px;
 }
 #qr-code-message.success {
-    background-color: rgba(0, 245, 160, 0.1);
-    color: var(--accent-color);
-    border: 1px solid var(--accent-color);
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+    border: 1px solid #a3cfbb;
 }
 #qr-code-message.error {
-    background-color: rgba(248, 87, 87, 0.1);
-    color: #f89696;
-    border: 1px solid #f85757;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid #f1b0b7;
 }
 #qr-code-display {
     display: flex;
@@ -908,13 +902,13 @@ input:focus, textarea:focus, select:focus {
     text-decoration: none;
     transition: all 0.3s ease;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 245, 160, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
 }
 #download-qr-button:hover {
     background: var(--accent-color);
-    color: #000000;
+    color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 245, 160, 0.25);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.25);
 }
 
 /* === IMAGE COMPRESSOR LAYOUT & SYMMETRY === */
@@ -948,7 +942,7 @@ input:focus, textarea:focus, select:focus {
     padding: var(--space-sm);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    background-color: #2a2a2a;
+    background-color: #ffffff;
     color: var(--text-color);
     font-size: var(--font-size-base);
     font-family: var(--font-body);
@@ -970,7 +964,7 @@ input:focus, textarea:focus, select:focus {
     margin-top: var(--space-md);
     width: 100%;
     padding: 0.9rem;
-    box-shadow: 0 2px 8px rgba(0, 245, 160, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
 }
 #image-compressor-message {
     text-align: center;
@@ -1003,13 +997,13 @@ input:focus, textarea:focus, select:focus {
     text-decoration: none;
     transition: all 0.3s ease;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 245, 160, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
 }
 #download-compressed-button:hover {
     background: var(--accent-color);
-    color: #000000;
+    color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 245, 160, 0.25);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.25);
 }
 
 /* === AUDIO CUTTER LAYOUT & SYMMETRY === */
@@ -1042,7 +1036,7 @@ input:focus, textarea:focus, select:focus {
     padding: var(--space-sm);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    background-color: #2a2a2a;
+    background-color: #ffffff;
     color: var(--text-color);
     font-size: var(--font-size-base);
     font-family: var(--font-body);
@@ -1057,8 +1051,8 @@ input:focus, textarea:focus, select:focus {
 #waveform {
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    background-color: #1a1a1a;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+    background-color: #f1f3f5;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
 }
 #audio-cutter-form .button-pintu {
     grid-column: auto;
@@ -1072,24 +1066,24 @@ input:focus, textarea:focus, select:focus {
 #waveform-play-pause-button {
     background-color: var(--text-muted-color);
     border-color: var(--text-muted-color);
-    color: #000000;
+    color: #ffffff;
 }
 #waveform-play-pause-button:hover {
-    background-color: #888888;
-    border-color: #888888;
+    background-color: #5a6268;
+    border-color: #5a6268;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(160, 160, 160, 0.25);
 }
 #waveform-stop-button {
-    background-color: #cc3333;
-    border-color: #cc3333;
+    background-color: #dc3545;
+    border-color: #dc3545;
     color: #ffffff;
 }
 #waveform-stop-button:hover {
-    background-color: #ff4d4d;
-    border-color: #ff4d4d;
+    background-color: #c82333;
+    border-color: #c82333;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(204, 51, 51, 0.25);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.25);
 }
 #audio-cutter-message {
     text-align: center;
@@ -1098,14 +1092,14 @@ input:focus, textarea:focus, select:focus {
     border-radius: 8px;
 }
 #audio-cutter-message.success {
-    background-color: rgba(0, 245, 160, 0.1);
-    color: var(--accent-color);
-    border: 1px solid var(--accent-color);
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+    border: 1px solid #a3cfbb;
 }
 #audio-cutter-message.error {
-    background-color: rgba(248, 87, 87, 0.1);
-    color: #f89696;
-    border: 1px solid #f85757;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid #f1b0b7;
 }
 #audio-player-display {
     display: flex;
@@ -1117,7 +1111,7 @@ input:focus, textarea:focus, select:focus {
 #cut-audio-preview {
     width: 100%;
     max-width: 400px;
-    background-color: #2a2a2a;
+    background-color: #ffffff;
     border-radius: 8px;
     padding: 5px;
     box-shadow: var(--card-shadow);
@@ -1133,13 +1127,13 @@ input:focus, textarea:focus, select:focus {
     text-decoration: none;
     transition: all 0.3s ease;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 245, 160, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
 }
 #download-cut-audio-button:hover {
     background: var(--accent-color);
-    color: #000000;
+    color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 245, 160, 0.25);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.25);
 }
 @media (max-width: 480px) {
     #audio-cutter-form {
@@ -1171,7 +1165,7 @@ input:focus, textarea:focus, select:focus {
 }
 .chat-header {
     background-color: var(--accent-color);
-    color: #000000;
+    color: #ffffff;
     padding: var(--space-sm);
     border-top-left-radius: 11px;
     border-top-right-radius: 11px;
@@ -1189,7 +1183,7 @@ input:focus, textarea:focus, select:focus {
     background: none;
     border: none;
     font-size: 1.8rem;
-    color: #000000;
+    color: #ffffff;
     cursor: pointer;
     line-height: 1;
     opacity: 0.8;
@@ -1202,7 +1196,7 @@ input:focus, textarea:focus, select:focus {
     flex-grow: 1;
     padding: var(--space-sm);
     overflow-y: auto;
-    background-color: #1a1a1a;
+    background-color: #f1f3f5;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -1216,13 +1210,13 @@ input:focus, textarea:focus, select:focus {
 }
 .user-message {
     align-self: flex-end;
-    background-color: #0056b3;
+    background-color: var(--accent-color);
     color: #ffffff;
     border-bottom-right-radius: 5px;
 }
 .ai-message {
     align-self: flex-start;
-    background-color: #333333;
+    background-color: #e9ecef;
     color: var(--text-color);
     border-bottom-left-radius: 5px;
 }
@@ -1237,14 +1231,14 @@ input:focus, textarea:focus, select:focus {
     border-radius: 20px;
     padding: 8px 15px;
     border: 1px solid var(--border-color);
-    background-color: #2a2a2a;
+    background-color: #ffffff;
     color: var(--text-color);
     margin-right: 10px;
     font-size: 0.9rem;
 }
 .chat-input button {
     background-color: var(--accent-color);
-    color: #000000;
+    color: #ffffff;
     border: none;
     border-radius: 20px;
     padding: 8px 15px;
@@ -1262,7 +1256,7 @@ input:focus, textarea:focus, select:focus {
     bottom: 20px;
     right: 20px;
     background-color: var(--accent-color);
-    color: #000000;
+    color: #ffffff;
     border: none;
     border-radius: 50%;
     width: 50px;
@@ -1366,7 +1360,7 @@ input:focus, textarea:focus, select:focus {
 
     .nav-links li > a:hover,
     .nav-links li > .nav-button:hover {
-        background-color: var(--border-color);
+        background-color: #e9ecef;
         color: var(--text-color);
     }
 
@@ -1386,7 +1380,7 @@ input:focus, textarea:focus, select:focus {
         gap: 8px;
         border-radius: 50px;
         padding: 10px 20px;
-        color: #000000;
+        color: #ffffff;
     }
 }
 
@@ -1492,7 +1486,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 .dashboard-tab-button:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(0, 0, 0, 0.03);
     color: var(--text-color);
 }
 
@@ -1535,10 +1529,6 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* ============================================= */
-/* ==   PERBAIKAN SIMETRI DASBOR MOBILE V2    == */
-/* ============================================= */
-
-/* ============================================= */
 /* ==   PERBAIKAN SIMETRI DASBOR MOBILE V3    == */
 /* ============================================= */
 
@@ -1552,7 +1542,6 @@ input:focus, textarea:focus, select:focus {
     }
 
     .dashboard-tab-button {
-        /* PERBAIKAN DI SINI: Mengganti justify-content dengan text-align */
         text-align: center; /* Ini akan membuat teks di dalam tombol menjadi rata tengah */
         border-bottom: 3px solid var(--border-color); /* Pindahkan garis ke masing-masing tombol */
         margin-bottom: 0;
@@ -1571,14 +1560,11 @@ input:focus, textarea:focus, select:focus {
 .stats-grid {
     display: grid;
     gap: var(--space-lg);
-    /* Secara default (mobile), hanya ada 1 kolom, jadi kartu akan tersusun ke bawah */
     grid-template-columns: 1fr; 
 }
 
-/* Terapkan 2 kolom hanya jika lebar layar 768px atau lebih */
 @media (min-width: 768px) {
     .stats-grid {
-        /* Di layar besar, ubah menjadi 2 kolom */
         grid-template-columns: 1fr 1fr;
     }
 }
@@ -1587,14 +1573,12 @@ input:focus, textarea:focus, select:focus {
 /* ==   GAYA BARU UNTUK KOLOM PENCARIAN (V2)  == */
 /* ============================================= */
 
-/* Wrapper untuk input dan ikon */
 .search-container {
     position: relative;
     width: 100%;
     margin-bottom: var(--space-lg);
 }
 
-/* Styling Ikon SVG di dalam search-container */
 .search-container .search-icon {
     position: absolute;
     top: 50%;
@@ -1603,63 +1587,47 @@ input:focus, textarea:focus, select:focus {
     color: var(--text-muted-color);
     pointer-events: none;
     transition: color 0.3s ease;
-    z-index: 2; /* Pastikan ikon di atas input */
+    z-index: 2;
 }
 
-/* Styling untuk input pencarian */
 .search-container input[type="search"] {
     width: 100%;
-    padding: var(--space-sm) var(--space-sm) var(--space-sm) 50px; /* Padding kiri untuk ikon */
+    padding: var(--space-sm) var(--space-sm) var(--space-sm) 50px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: var(--font-size-base);
     font-family: var(--font-body);
-    background-color: #2a2a2a; /* Sedikit beda dari background utama */
+    background-color: var(--card-bg-color);
     color: var(--text-color);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Menghilangkan tombol 'x' bawaan dari input search di Chrome */
 .search-container input[type="search"]::-webkit-search-cancel-button {
     -webkit-appearance: none;
     appearance: none;
 }
 
-/* Efek saat input di-fokus */
 .search-container input[type="search"]:focus {
     outline: none;
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(0, 245, 160, 0.2);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
 }
 
-/* Saat CONTAINER-nya fokus (karena input di dalamnya fokus), ubah warna ikon */
 .search-container:focus-within .search-icon {
     color: var(--accent-color);
 }
 
 /* === STYLE UNTUK MEMBUAT KARTU MENJADI LINK === */
 .portfolio-link-card {
-    display: block; /* Membuat tag <a> berperilaku seperti div */
-    text-decoration: none; /* Menghapus garis bawah dari link */
-    color: inherit; /* Membuat warna teks mengikuti style aslinya */
+    display: block;
+    text-decoration: none;
+    color: inherit;
 }
 
-/* Memastikan efek hover tetap berjalan */
 .portfolio-link-card:hover {
     color: inherit; 
 }
 
-/* === STYLE UNTUK MEMBUAT KARTU MENJADI LINK === */
-.portfolio-link-card {
-    display: block; /* Membuat tag <a> berperilaku seperti div */
-    text-decoration: none; /* Menghapus garis bawah dari link */
-    color: inherit; /* Membuat warna teks mengikuti style aslinya */
-}
-
-/* Memastikan efek hover tetap berjalan */
-.portfolio-link-card:hover {
-    color: inherit; 
-}
 
 /* ============================================= */
 /* ==      [BARU] MODAL CROPPING GAMBAR       == */
@@ -1673,7 +1641,7 @@ input:focus, textarea:focus, select:focus {
 
 .crop-container {
     width: 100%;
-    height: 60vh; /* Tinggi yang bisa disesuaikan */
+    height: 60vh;
     background-color: #000;
     margin-bottom: var(--space-md);
     overflow: hidden;
@@ -1682,14 +1650,13 @@ input:focus, textarea:focus, select:focus {
 #image-to-crop {
     display: block;
     max-width: 100%;
-    /* Cropper.js akan menangani tinggi */
 }
 
 .crop-actions {
     display: flex;
     justify-content: flex-end;
     gap: var(--space-md);
-    margin-top: auto; /* Mendorong tombol ke bawah */
+    margin-top: auto;
 }
 
 /* ============================================= */
@@ -1706,14 +1673,9 @@ input:focus, textarea:focus, select:focus {
 /* ============================================= */
 /* == [BARU] PENYESUAIAN TEMA UNTUK TINYMCE   == */
 /* ============================================= */
-/* Pastikan editor TinyMCE terlihat bagus di tema gelap */
-.tox .tox-edit-area__iframe {
-    background-color: #2a2a2a !important;
-}
+/* Dikosongkan agar menggunakan tema default (terang) dari TinyMCE */
 
-.tox .tox-body, .tox .tox-content-preview {
-    color: var(--text-color);
-}
+
 /* KODE UNTUK MEMBUAT HEADER MELAYANG DI HALAMAN UTAMA */
 .is-homepage .navbar {
     position: absolute;
