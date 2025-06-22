@@ -1013,7 +1013,6 @@ function setupJurnalPage() {
 function setupJurnalDetailPage() {
     const titleElement = document.getElementById('jurnal-title');
     const metaElement = document.getElementById('jurnal-meta');
-    const imageElement = document.getElementById('jurnal-image');
     const contentElement = document.getElementById('jurnal-content');
     const mainContent = document.getElementById('main-content');
     const loadingIndicator = document.getElementById('loading-indicator');
@@ -1036,17 +1035,7 @@ function setupJurnalDetailPage() {
             document.title = `${post.title} - Detail Jurnal`;
             titleElement.textContent = post.title;
             metaElement.textContent = `Dipublikasikan pada ${new Date(post.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
-            
-            const firstImageMatch = post.content.match(/<img[^>]+src="([^">]+)"/);
-            const mainImage = post.image_url || (firstImageMatch ? firstImageMatch[1] : null);
-            
-            if (mainImage) {
-                imageElement.src = mainImage;
-                imageElement.alt = `Gambar untuk ${post.title}`;
-                imageElement.style.display = 'block';
-            } else {
-                imageElement.style.display = 'none';
-            }
+
             
             contentElement.innerHTML = post.content;
 
