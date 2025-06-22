@@ -346,23 +346,65 @@ function setupAdminPanels() {
 }
 
 // === FUNGSI MANAJEMEN PORTOFOLIO (DIPERBARUI) ===
+// GANTI SELURUH FUNGSI setupAdminPortfolioPanel DENGAN KODE INI
 function setupAdminPortfolioPanel() {
     const form = document.getElementById('portfolio-form');
     if (!form) return;
 
-    // Inisialisasi Quill untuk deskripsi portofolio
+    // Opsi toolbar yang lengkap, sama seperti di Jurnal
+    const fullToolbarOptions = [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['link', 'image', 'code-block'],
+        ['clean']
+    ];
+
+    // Inisialisasi Quill untuk deskripsi portofolio dengan toolbar lengkap
     const portfolioQuill = new Quill('#portfolio-description', {
         theme: 'snow',
         modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline'],
-                [{'list': 'ordered'}, {'list': 'bullet'}],
-                ['link'],
-                ['clean']
-            ]
+            toolbar: fullToolbarOptions
         }
     });
 
+    // MENAMBAHKAN FUNGSI UNGGAH GAMBAR, SAMA SEPERTI JURNAL
+    portfolioQuill.getModule('toolbar').addHandler('image', () => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+
+        input.onchange = async () => {
+            const file = input.files[0];
+            if (!file || !/^image\//.test(file.type)) {
+                alert('Anda hanya bisa mengunggah file gambar.');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                // Menggunakan endpoint yang sama karena fungsinya identik
+                const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/upload-image`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Gagal mengunggah gambar');
+
+                const range = portfolioQuill.getSelection(true);
+                portfolioQuill.insertEmbed(range.index, 'image', data.location);
+                portfolioQuill.setSelection(range.index + 1);
+            } catch (error) {
+                console.error('Error saat unggah gambar untuk Portofolio:', error);
+                alert('Gagal mengunggah gambar: ' + error.message);
+            }
+        };
+    });
+
+    // Sisa dari fungsi ini sama seperti sebelumnya, hanya mengambil referensi elemen
     const formTitle = document.getElementById('portfolio-form-title');
     const hiddenId = document.getElementById('portfolio-id');
     const titleInput = document.getElementById('portfolio-title');
@@ -384,7 +426,7 @@ function setupAdminPortfolioPanel() {
         fileNameLabel.style.color = '';
         currentImageInfo.textContent = '';
         croppedPortfolioBlob = null;
-        portfolioQuill.root.innerHTML = ''; // Membersihkan editor Quill
+        portfolioQuill.root.innerHTML = '';
     }
 
     clearButton.addEventListener('click', resetPortfolioForm);
