@@ -229,8 +229,8 @@ footer {
     text-align: center; 
     padding: var(--space-xl) clamp(var(--space-md), 5vw, var(--space-xl));
     min-height: 80vh; 
-    color: var(--text-color); 
-    background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.8)), url('https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80') no-repeat center center/cover; 
+    color: #ffffff;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80') no-repeat center center/cover; 
 }
 .hero-content { 
     max-width: 850px; 
@@ -246,6 +246,7 @@ footer {
     margin-bottom: var(--space-xs);
     line-height: 1.2; 
     letter-spacing: -1px;
+    text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.7);
 }
 .hero h1 span { 
     color: var(--accent-color);
@@ -255,7 +256,8 @@ footer {
     max-width: 600px;  
     margin-left: auto; 
     margin-right: auto;
-    color: var(--text-muted-color); 
+    color: #ffffff;
+    text-shadow: 0px 2px 8px rgba(0, 0, 0, 0.7);
     margin-bottom: var(--space-md);
 }
 
@@ -1684,4 +1686,46 @@ input:focus, textarea:focus, select:focus {
 
 .is-homepage .hero {
     padding-top: 10rem;
+}
+
+/* ================================================= */
+/* ==   PERBAIKAN WARNA HEADER DI HOMEPAGE      == */
+/* ================================================= */
+.is-homepage .logo a,
+.is-homepage .nav-links li > a,
+.is-homepage .nav-links li > .nav-button {
+    color: #ffffff; /* Warna teks putih */
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5); /* Bayangan agar mudah terbaca */
+}
+
+/* Mengubah warna ikon SVG di navigasi menjadi putih */
+.is-homepage .nav-links li svg {
+    color: #ffffff;
+}
+
+/* Mengembalikan warna tombol Login agar tetap menonjol */
+.is-homepage .login-button {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: #ffffff !important;
+}
+.is-homepage .login-button:hover {
+    background-color: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
+}
+
+/* Menghilangkan efek latar belakang saat hover di menu desktop (khusus homepage) */
+@media (min-width: 769px) {
+    .is-homepage .nav-links li > a:hover,
+    .is-homepage .nav-links li > .nav-button:hover {
+        background-color: transparent;
+        color: #f0f0f0; /* Sedikit redup saat hover untuk feedback */
+    }
+}
+
+.is-homepage .navbar {
+    background-color: rgba(0, 0, 0, 0.3); /* Latar belakang gelap transparan */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Garis batas tipis */
 }
