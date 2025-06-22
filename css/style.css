@@ -1737,3 +1737,13 @@ input:focus, textarea:focus, select:focus {
 .is-homepage .hamburger.active span {
     background-color: var(--text-color);
 }
+
+/* PERBAIKAN: Mengubah warna ikon 'X' di menu mobile homepage agar terlihat */
+.is-homepage .hamburger.active span {
+    background-color: var(--text-color);
+}
+
+/* PERBAIKAN BARU: Mengubah warna ikon menu di sidebar homepage agar terlihat */
+.is-homepage .nav-links.active li svg {
+    color: var(--text-muted-color);
+}
