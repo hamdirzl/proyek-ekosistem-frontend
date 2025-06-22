@@ -1,4 +1,4 @@
-// VERSI FINAL DAN LENGKAP - DENGAN RICH TEXT EDITOR (QUILL.JS) & CROPPING
+// VERSI FINAL DAN LENGKAP - DENGAN RICH TEXT EDITOR, CROPPING, & LIVE CHAT
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
@@ -10,6 +10,15 @@ let cropModal = null;
 let confirmCropBtn = null;
 let cancelCropBtn = null;
 let currentCropCallback = null;
+
+// --- Variabel Global untuk Live Chat Admin ---
+let adminWebSocket = null;
+let currentAdminChatTarget = null;
+let userChatList = null;
+let activeChatMessages = null;
+let adminChatForm = null;
+let adminChatInput = null;
+const allChatHistories = {}; // Objek untuk menyimpan riwayat chat per user
 
 function forceLogout() {
     localStorage.removeItem('jwt_refresh_token');
@@ -119,7 +128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
                 console.log("Access token berhasil didapatkan untuk sesi ini.");
                 if (document.body.contains(document.getElementById('dashboard-main'))) {
-                    setupDashboardPage();
+                    await setupDashboardPage();
                 }
             } else {
                 forceLogout();
@@ -132,8 +141,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Panggil fungsi setup berdasarkan halaman
     if (document.body.contains(document.getElementById('dashboard-main'))) {
-        setupDashboardPage();
-        setupCropModal(); // Setup modal crop
+        await setupDashboardPage();
+        setupCropModal();
     } else if (document.title.includes("Portofolio - HAMDI RIZAL")) {
         setupPortfolioPage();
     } else if (document.title.includes("Detail Proyek")) {
@@ -151,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupAboutModal();
     setupMobileMenu();
     setupAllPasswordToggles();
-    setupChatBubble();
+    setupChatBubble(); // Panggil fungsi live chat
     setupAccountManagement();
     setupDashboardTabs();
 });
@@ -160,6 +169,232 @@ document.addEventListener('DOMContentLoaded', async () => {
 function decodeJwt(token) {
     try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
 }
+
+// ===================================
+// [BARU] LOGIKA LIVE CHAT
+// ===================================
+function setupChatBubble() {
+    const chatBubble = document.getElementById('chat-bubble');
+    const chatWindow = document.getElementById('chat-window');
+    const closeChatBtn = document.getElementById('close-chat-btn');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatStatus = document.getElementById('chat-status');
+
+    // Jika kita berada di halaman dasbor, jangan tampilkan bubble chat pengunjung
+    if (window.location.pathname.includes('dashboard.htm')) {
+        if(chatBubble) chatBubble.style.display = 'none';
+        if(chatWindow) chatWindow.style.display = 'none';
+        return; 
+    }
+    
+    if (!chatBubble) return;
+
+    chatBubble.addEventListener('click', () => {
+        chatWindow.classList.toggle('hidden');
+    });
+
+    closeChatBtn.addEventListener('click', () => {
+        chatWindow.classList.add('hidden');
+    });
+
+    let userId = null;
+    let ws = null;
+    const backendWsUrl = 'wss://server-pribadi-hamdi-docker.onrender.com';
+
+    function connect() {
+        ws = new WebSocket(backendWsUrl);
+
+        ws.onopen = () => {
+            console.log('Terhubung ke server WebSocket.');
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            
+            switch (data.type) {
+                case 'init':
+                    userId = data.userId;
+                    console.log(`Mendapat ID pengguna: ${userId}`);
+                    break;
+                case 'chat':
+                    appendMessage(data.content, 'admin'); // Pesan dari admin
+                    // Mainkan suara jika jendela chat tidak terlihat
+                    if (chatWindow.classList.contains('hidden')) {
+                         new Audio('https://cdn.pixabay.com/audio/2022/10/14/audio_94305374f6.mp3').play().catch(e => console.log("Gagal memainkan suara:", e));
+                    }
+                    break;
+                case 'status_update':
+                    updateStatus(data.status);
+                    break;
+            }
+        };
+
+        ws.onclose = () => {
+            console.log('Koneksi WebSocket terputus. Mencoba menghubungkan kembali...');
+            updateStatus('offline');
+            setTimeout(connect, 5000);
+        };
+
+        ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+            ws.close();
+        };
+    }
+
+    function appendMessage(content, type) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}`;
+        messageDiv.textContent = content;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function updateStatus(status) {
+        if (!chatStatus) return;
+        if (status === 'terhubung') {
+            chatStatus.textContent = 'Terhubung dengan admin';
+            chatStatus.style.color = '#198754';
+        } else if (status === 'menghubungi') {
+            chatStatus.textContent = 'Sedang menghubungi admin...';
+            chatStatus.style.color = 'var(--text-muted-color)';
+        } else {
+             chatStatus.textContent = 'Koneksi terputus';
+             chatStatus.style.color = '#dc3545';
+        }
+    }
+
+    chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const message = chatInput.value.trim();
+        if (message && ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'user_message', content: message }));
+            appendMessage(message, 'user');
+            chatInput.value = '';
+        }
+    });
+    
+    connect();
+}
+
+async function setupAdminChatUI() {
+    const adminChatTab = document.getElementById('admin-chat-tab');
+    if (adminChatTab) adminChatTab.classList.remove('hidden');
+
+    // Inisialisasi variabel global di sini
+    userChatList = document.getElementById('user-chat-list');
+    activeChatMessages = document.getElementById('active-chat-messages');
+    adminChatForm = document.getElementById('admin-chat-form');
+    adminChatInput = document.getElementById('admin-chat-input');
+
+    if (!userChatList) return; // Hentikan jika elemen UI admin tidak ada
+
+    const accessToken = sessionStorage.getItem('jwt_access_token');
+    if (!accessToken) return;
+
+    const backendWsUrl = `wss://server-pribadi-hamdi-docker.onrender.com?token=${accessToken}`;
+    adminWebSocket = new WebSocket(backendWsUrl);
+    
+    adminWebSocket.onopen = () => {
+        console.log("Koneksi WebSocket Admin berhasil dibuka.");
+    };
+    
+    adminWebSocket.onclose = () => {
+        console.log("Koneksi WebSocket Admin ditutup.");
+        // Mungkin tambahkan logika untuk reconnect di sini jika diperlukan
+    };
+
+    adminWebSocket.onerror = (error) => {
+        console.error("Error pada WebSocket Admin:", error);
+    };
+
+    adminWebSocket.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'chat') {
+            const userId = data.sender;
+            
+            // Simpan pesan ke riwayat lokal
+            if (!allChatHistories[userId]) {
+                allChatHistories[userId] = [];
+            }
+            allChatHistories[userId].push({ sender: 'user', content: data.content });
+
+            let userEntry = document.getElementById(`chat-user-${userId}`);
+            if (!userEntry) {
+                userEntry = document.createElement('div');
+                userEntry.id = `chat-user-${userId}`;
+                userEntry.className = 'chat-user-entry';
+                userEntry.innerHTML = `<span>Pengunjung ${userId.substring(0, 6)}...</span><span class="unread-dot hidden"></span>`;
+                userChatList.prepend(userEntry);
+                
+                userEntry.addEventListener('click', async () => {
+                    document.querySelectorAll('.chat-user-entry.active').forEach(el => el.classList.remove('active'));
+                    userEntry.classList.add('active');
+
+                    currentAdminChatTarget = userId;
+                    adminChatForm.style.display = 'flex';
+                    activeChatMessages.innerHTML = 'Memuat riwayat percakapan...';
+                    
+                    userEntry.querySelector('.unread-dot').classList.add('hidden');
+
+                    try {
+                        const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/chat/history/${userId}`);
+                        if (!res.ok) throw new Error('Gagal mengambil riwayat');
+                        const history = await res.json();
+                        allChatHistories[userId] = history;
+                        
+                        activeChatMessages.innerHTML = ''; // Kosongkan setelah berhasil fetch
+                        allChatHistories[userId].forEach(msg => {
+                            const type = (msg.sender_type === 'admin' || msg.sender === 'admin') ? 'admin' : 'user';
+                            appendAdminMessage(msg.content, type);
+                        });
+                    } catch(e) { 
+                        console.error("Gagal fetch riwayat chat:", e); 
+                        activeChatMessages.innerHTML = '<p style="color: red;">Gagal memuat riwayat.</p>';
+                    }
+                });
+            }
+            
+            if (currentAdminChatTarget !== userId) {
+                 userEntry.querySelector('.unread-dot').classList.remove('hidden');
+            } else {
+                appendAdminMessage(data.content, 'user');
+            }
+        } else if (data.type === 'user_disconnected') {
+             const userEntry = document.getElementById(`chat-user-${data.userId}`);
+             if (userEntry) userEntry.style.opacity = '0.5';
+        }
+    };
+
+    adminChatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const message = adminChatInput.value.trim();
+        if (message && currentAdminChatTarget && adminWebSocket.readyState === WebSocket.OPEN) {
+             adminWebSocket.send(JSON.stringify({
+                 type: 'admin_message',
+                 content: message,
+                 targetUserId: currentAdminChatTarget
+             }));
+             appendAdminMessage(message, 'admin');
+             if (allChatHistories[currentAdminChatTarget]) {
+                allChatHistories[currentAdminChatTarget].push({ sender: 'admin', content: message });
+             }
+             adminChatInput.value = '';
+        }
+    });
+
+    function appendAdminMessage(content, type) {
+        if (!activeChatMessages) return;
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}`;
+        messageDiv.textContent = content;
+        activeChatMessages.appendChild(messageDiv);
+        activeChatMessages.scrollTop = activeChatMessages.scrollHeight;
+    }
+}
+
 
 // ===================================
 // FUNGSI-FUNGSI UNTUK CROPPING GAMBAR
@@ -250,7 +485,7 @@ async function uploadCroppedImageForEditor(blob, successCallback, failureCallbac
 // ===================================
 // === LOGIKA HALAMAN DASHBOARD    ===
 // ===================================
-function setupDashboardPage() {
+async function setupDashboardPage() {
     const refreshToken = localStorage.getItem('jwt_refresh_token');
     if (!refreshToken) {
         window.location.href = 'auth.html';
@@ -269,6 +504,7 @@ function setupDashboardPage() {
     
     if (decodedToken && decodedToken.role === 'admin') {
         setupAdminPanels();
+        await setupAdminChatUI(); // Panggil UI Admin Chat
     }
 }
 
@@ -365,7 +601,7 @@ function setupAdminPanels() {
     }
 }
 
-// === [KODE BARU] LOGIKA MANAJEMEN PORTOFOLIO ADMIN (SAMA SEPERTI JURNAL) ===
+// === LOGIKA MANAJEMEN PORTOFOLIO ADMIN (SAMA SEPERTI JURNAL) ===
 function setupAdminPortfolioPanel() {
     const form = document.getElementById('portfolio-form');
     if (!form) return;
@@ -379,7 +615,6 @@ function setupAdminPortfolioPanel() {
     const clearButton = document.getElementById('clear-portfolio-form');
     const editorDiv = document.getElementById('quill-portfolio-editor');
 
-    // 1. Konfigurasi Toolbar sama seperti Jurnal
     const toolbarOptions = [
         [{ 'header': [1, 2, 3, false] }],
         ['bold', 'italic', 'underline'],
@@ -388,17 +623,15 @@ function setupAdminPortfolioPanel() {
         ['clean']
     ];
 
-    // 2. Inisialisasi Quill untuk Portofolio
     if (editorDiv) {
         portfolioQuill = new Quill(editorDiv, {
             modules: { toolbar: toolbarOptions },
             theme: 'snow',
             placeholder: 'Jelaskan detail proyek Anda di sini...'
         });
-        editorDiv.__quill = portfolioQuill; // Simpan referensi
+        editorDiv.__quill = portfolioQuill;
     }
 
-    // 3. Handler untuk upload gambar dari toolbar editor (menggunakan fungsi yang sudah ada)
     if (portfolioQuill) {
         portfolioQuill.getModule('toolbar').addHandler('image', () => {
             const input = document.createElement('input');
@@ -427,7 +660,6 @@ function setupAdminPortfolioPanel() {
         });
     }
 
-    // 4. Fungsi Reset Form
     function resetPortfolioForm() {
         form.reset();
         hiddenId.value = '';
@@ -441,13 +673,12 @@ function setupAdminPortfolioPanel() {
 
     clearButton.addEventListener('click', resetPortfolioForm);
 
-    // 5. Handler untuk Submit Form (diubah menjadi JSON, bukan FormData)
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const id = hiddenId.value;
         const title = titleInput.value;
-        const description = portfolioQuill.root.innerHTML; // Ambil konten dari Quill
+        const description = portfolioQuill.root.innerHTML;
         
         if (!title || portfolioQuill.getLength() <= 1) {
             messageDiv.className = 'error';
@@ -464,7 +695,7 @@ function setupAdminPortfolioPanel() {
         try {
             const response = await fetchWithAuth(url, { 
                 method, 
-                body: JSON.stringify({ title, description }) // Kirim sebagai JSON
+                body: JSON.stringify({ title, description })
             });
             const result = await response.json();
             if (!response.ok) throw new Error(result.error || 'Terjadi kesalahan.');
@@ -489,7 +720,6 @@ function setupAdminJurnalPanel() {
     const form = document.getElementById('jurnal-form');
     if (!form) return;
 
-    // Variabel untuk menampung instance Quill
     let quill;
 
     const formTitle = document.getElementById('jurnal-form-title');
@@ -499,7 +729,6 @@ function setupAdminJurnalPanel() {
     const clearButton = document.getElementById('clear-jurnal-form');
     const editorDiv = document.getElementById('quill-editor');
 
-    // 1. Konfigurasi Toolbar Quill
     const toolbarOptions = [
         [{ 'header': [1, 2, 3, false] }],
         ['bold', 'italic', 'underline'],
@@ -508,7 +737,6 @@ function setupAdminJurnalPanel() {
         ['clean']
     ];
 
-    // 2. Inisialisasi Quill
     if (editorDiv) {
         quill = new Quill(editorDiv, {
             modules: {
@@ -517,12 +745,10 @@ function setupAdminJurnalPanel() {
             theme: 'snow',
             placeholder: 'Tuliskan pemikiran Anda di sini...'
         });
-        // Simpan referensi instance Quill ke elemennya agar bisa diakses dari fungsi lain
         editorDiv.__quill = quill;
     }
 
 
-    // 3. Meng-handle Upload Gambar (Menggunakan fungsi cropping yang sudah ada)
     if (quill) {
         quill.getModule('toolbar').addHandler('image', () => {
             const input = document.createElement('input');
@@ -536,11 +762,11 @@ function setupAdminJurnalPanel() {
                     handleImageSelectionForCropping(file, (blob) => {
                         uploadCroppedImageForEditor(
                             blob,
-                            (location) => { // Success
+                            (location) => {
                                 const range = quill.getSelection(true);
                                 quill.insertEmbed(range.index, 'image', location);
                             },
-                            (errorText) => { // Failure
+                            (errorText) => {
                                 console.error(errorText);
                                 alert(`Gagal mengunggah gambar: ${errorText}`);
                             }
@@ -551,7 +777,6 @@ function setupAdminJurnalPanel() {
         });
     }
 
-    // 4. Fungsi untuk mereset form Jurnal
     function resetJurnalForm() {
         form.reset();
         hiddenId.value = '';
@@ -565,7 +790,6 @@ function setupAdminJurnalPanel() {
 
     clearButton.addEventListener('click', resetJurnalForm);
 
-    // 5. Meng-handle submit form Jurnal
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -634,14 +858,12 @@ async function fetchAndDisplayPortfolioAdmin() {
     }
 }
 
-// === [KODE BARU] FUNGSI RENDER DAN EDIT PORTOFOLIO ===
 function renderAdminPortfolioItem(project, container) {
     const listItem = document.createElement('li');
     listItem.className = 'mood-item';
     listItem.id = `portfolio-item-${project.id}`;
     const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
 
-    // Deskripsi yang ditampilkan adalah teks tanpa tag HTML
     const strippedDescription = project.description.replace(/<[^>]+>/g, ' ');
 
     listItem.innerHTML = `
@@ -661,13 +883,11 @@ function renderAdminPortfolioItem(project, container) {
     `;
     container.appendChild(listItem);
 
-    // Event listener untuk tombol Edit
     listItem.querySelector('.edit-portfolio-btn').addEventListener('click', async () => {
         document.getElementById('portfolio-form-title').textContent = 'Edit Proyek';
         document.getElementById('portfolio-id').value = project.id;
         document.getElementById('portfolio-title').value = project.title;
         
-        // Isi editor Quill dengan konten deskripsi HTML
         const editorDiv = document.getElementById('quill-portfolio-editor');
         if (editorDiv && editorDiv.__quill) {
             editorDiv.__quill.root.innerHTML = project.description;
@@ -676,7 +896,6 @@ function renderAdminPortfolioItem(project, container) {
         document.getElementById('portfolio-form').scrollIntoView({ behavior: 'smooth' });
     });
 
-    // Event listener untuk tombol Hapus
     listItem.querySelector('.delete-portfolio-btn').addEventListener('click', async () => {
         if (!confirm(`Yakin ingin menghapus proyek "${project.title}"?`)) return;
         
@@ -961,7 +1180,7 @@ function setupPortfolioPage() {
             projects.forEach(project => {
                 const projectCard = document.createElement('a'); 
                 projectCard.className = 'portfolio-card portfolio-link-card';
-                projectCard.href = `project-detail.html?id=${project.id}`; // Mengarah ke file baru
+                projectCard.href = `project-detail.html?id=${project.id}`;
                 projectCard.setAttribute('data-aos', 'fade-up');
 
                 const projectImage = project.image_url || 'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=500&q=80'; 
@@ -987,9 +1206,7 @@ function setupPortfolioPage() {
     fetchAndRenderPortfolio();
 }
 
-// === [FUNGSI BARU DAN TELAH DIPERBAIKI] UNTUK HALAMAN DETAIL PROYEK ===
 function setupProjectDetailPage() {
-    // Nama ID di sini diubah agar sama dengan jurnal-detail
     const titleElement = document.getElementById('jurnal-title');
     const metaElement = document.getElementById('jurnal-meta');
     const imageElement = document.getElementById('jurnal-image');
@@ -1029,7 +1246,6 @@ function setupProjectDetailPage() {
             
             contentElement.innerHTML = project.description;
 
-            // Logika untuk menampilkan tombol "Kunjungi Proyek" tetap ada jika link tersedia di data
             if (project.project_link) {
                 linkElement.href = project.project_link;
                 linkElement.style.display = 'inline-block';

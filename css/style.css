@@ -1538,6 +1538,12 @@ input:focus, textarea:focus, select:focus {
 /* ================================================= */
 /* ==   PERBAIKAN WARNA HEADER DI HOMEPAGE      == */
 /* ================================================= */
+.is-homepage .navbar {
+    background-color: rgba(0, 0, 0, 0.3); /* Latar belakang gelap transparan */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Garis batas tipis */
+}
 .is-homepage .logo a,
 .is-homepage .nav-links li > a,
 .is-homepage .nav-links li > .nav-button {
@@ -1569,20 +1575,9 @@ input:focus, textarea:focus, select:focus {
         color: #f0f0f0; /* Sedikit redup saat hover untuk feedback */
     }
 }
-
-.is-homepage .navbar {
-    background-color: rgba(0, 0, 0, 0.3); /* Latar belakang gelap transparan */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Garis batas tipis */
-}
 /* Penambahan: Mengubah warna ikon hamburger di homepage menjadi putih */
 .is-homepage .hamburger span {
     background-color: #ffffff;
-}
-
-.is-homepage .hamburger.active span {
-    background-color: var(--text-color);
 }
 
 /* PERBAIKAN: Mengubah warna ikon 'X' di menu mobile homepage agar terlihat */
@@ -1695,4 +1690,205 @@ input:focus, textarea:focus, select:focus {
 .ql-container.ql-snow:focus-within {
     border-color: var(--accent-color); 
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); 
+}
+
+
+/* ============================================= */
+/* ==         [BARU] GAYA UNTUK LIVE CHAT       == */
+/* ============================================= */
+
+.chat-bubble-container {
+    position: fixed;
+    bottom: var(--space-lg);
+    right: var(--space-lg);
+    width: 60px;
+    height: 60px;
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    z-index: 1050;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.chat-bubble-container:hover {
+    transform: scale(1.1);
+    background-color: var(--accent-hover);
+}
+
+.chat-window-container {
+    position: fixed;
+    bottom: calc(var(--space-lg) + 75px);
+    right: var(--space-lg);
+    width: 350px;
+    max-width: 90vw;
+    height: 500px;
+    max-height: 70vh;
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--soft-shadow);
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform-origin: bottom right;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: scale(0.95);
+    opacity: 0;
+}
+
+.chat-window-container:not(.hidden) {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.chat-header {
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--background-color);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+#chat-status {
+    font-size: 0.8rem;
+    color: var(--text-muted-color);
+    margin-left: auto;
+    margin-right: var(--space-md);
+}
+
+#close-chat-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted-color);
+}
+
+.chat-messages {
+    flex-grow: 1;
+    padding: var(--space-md);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    margin-bottom: var(--space-sm);
+    padding: 0.7rem 1rem;
+    border-radius: 18px;
+    max-width: 85%;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.message.user {
+    background-color: var(--accent-color);
+    color: white;
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+}
+
+.message.admin {
+    background-color: #e9ecef;
+    color: var(--text-color);
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+}
+
+.message.server-info {
+    font-size: 0.8rem;
+    text-align: center;
+    color: var(--text-muted-color);
+    background: none;
+    width: 100%;
+    max-width: 100%;
+    align-self: center;
+}
+
+.chat-form {
+    display: flex;
+    border-top: 1px solid var(--border-color);
+    padding: var(--space-sm);
+    flex-shrink: 0;
+}
+
+#chat-input, #admin-chat-input {
+    flex-grow: 1;
+    border: none;
+    padding: 0.5rem;
+    background-color: transparent;
+    color: var(--text-color);
+}
+#chat-input:focus, #admin-chat-input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.chat-form button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--accent-color);
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#admin-chat-form button {
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.2s ease;
+}
+#admin-chat-form button:hover {
+    background-color: var(--accent-hover);
+}
+
+
+/* Admin Chat Panel Styles */
+#user-chat-list .chat-user-entry {
+    padding: var(--space-sm);
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 6px;
+    margin-bottom: var(--space-xs);
+}
+#user-chat-list .chat-user-entry:hover {
+    background-color: #f1f3f5;
+}
+#user-chat-list .chat-user-entry.active {
+    background-color: #e9f2ff;
+    font-weight: bold;
+    border-left: 4px solid var(--accent-color);
+    padding-left: calc(var(--space-sm) - 4px);
+}
+.unread-dot {
+    width: 10px;
+    height: 10px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+.unread-dot.hidden {
+    transform: scale(0);
 }

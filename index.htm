@@ -175,6 +175,27 @@
     </div>
 </footer>
 
+    <div id="chat-bubble" class="chat-bubble-container">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </div>
+
+    <div id="chat-window" class="chat-window-container hidden">
+        <div class="chat-header">
+            <h3>Live Chat</h3>
+            <span id="chat-status">Menghubungi admin...</span>
+            <button id="close-chat-btn" aria-label="Tutup Chat">×</button>
+        </div>
+        <div id="chat-messages" class="chat-messages">
+            <div class="message server-info">Selamat datang! Ada yang bisa kami bantu?</div>
+        </div>
+        <form id="chat-form" class="chat-form">
+            <input type="text" id="chat-input" placeholder="Ketik pesan Anda..." autocomplete="off" required>
+            <button type="submit" aria-label="Kirim">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </form>
+    </div>
+
     <script src="js/script.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>

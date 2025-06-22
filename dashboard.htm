@@ -96,6 +96,7 @@
                 <button id="admin-jurnal-tab" class="dashboard-tab-button hidden" data-target="panel-admin-jurnal">Manajemen Jurnal</button>
                 <button id="admin-links-tab" class="dashboard-tab-button hidden" data-target="panel-admin-links">Manajemen Tautan</button>
                 <button id="admin-users-tab" class="dashboard-tab-button hidden" data-target="panel-admin-users">Manajemen Pengguna</button>
+                <button id="admin-chat-tab" class="dashboard-tab-button hidden" data-target="panel-admin-chat">Live Chat</button>
             </div>
 
             <div class="dashboard-content">
@@ -234,6 +235,24 @@
                         </div>
                     </div>
                 </div>
+                
+                <div id="panel-admin-chat" class="dashboard-panel">
+                    <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Manajemen Live Chat</h2>
+                    <div id="admin-chat-container" style="display: flex; gap: 1rem; height: 60vh;">
+                        <div id="user-chat-list" style="width: 30%; border-right: 1px solid var(--border-color); overflow-y: auto; padding-right: 1rem;">
+                            <p id="no-active-chats">Tidak ada percakapan aktif.</p>
+                        </div>
+                        <div id="active-chat-area" style="width: 70%; display: flex; flex-direction: column;">
+                            <div id="active-chat-messages" style="flex-grow: 1; overflow-y: auto; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1rem;">
+                                <p>Pilih percakapan dari daftar di sebelah kiri.</p>
+                            </div>
+                            <form id="admin-chat-form" class="chat-form" style="display: none;">
+                                <input type="text" id="admin-chat-input" placeholder="Balas pesan..." autocomplete="off" required>
+                                <button type="submit" class="button-pintu" aria-label="Kirim">Kirim</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -302,6 +321,26 @@
         <p>© 2025 HAMDI RIZAL. Hak Cipta Dilindungi.</p>
     </div>
 </footer>
+<div id="chat-bubble" class="chat-bubble-container">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </div>
+
+    <div id="chat-window" class="chat-window-container hidden">
+        <div class="chat-header">
+            <h3>Live Chat</h3>
+            <span id="chat-status">Menghubungi admin...</span>
+            <button id="close-chat-btn" aria-label="Tutup Chat">×</button>
+        </div>
+        <div id="chat-messages" class="chat-messages">
+            <div class="message server-info">Selamat datang! Ada yang bisa kami bantu?</div>
+        </div>
+        <form id="chat-form" class="chat-form">
+            <input type="text" id="chat-input" placeholder="Ketik pesan Anda..." autocomplete="off" required>
+            <button type="submit" aria-label="Kirim">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </form>
+    </div>
     <script src="js/script.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
