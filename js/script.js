@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (document.title.includes("Portofolio - HAMDI RIZAL")) {
         setupPortfolioPage();
     } else if (document.title.includes("Detail Proyek")) {
-        setupProjectDetailPage(); // <-- Logika baru ditambahkan di sini
+        setupProjectDetailPage();
     } else if (document.title.includes("Detail Jurnal")) {
         setupJurnalDetailPage();
     } else if (document.title.includes("Jurnal - HAMDI RIZAL")) {
@@ -987,12 +987,13 @@ function setupPortfolioPage() {
     fetchAndRenderPortfolio();
 }
 
-// === [FUNGSI BARU] UNTUK HALAMAN DETAIL PROYEK ===
+// === [FUNGSI BARU DAN TELAH DIPERBAIKI] UNTUK HALAMAN DETAIL PROYEK ===
 function setupProjectDetailPage() {
-    const titleElement = document.getElementById('project-title');
-    const metaElement = document.getElementById('project-meta');
-    const imageElement = document.getElementById('project-image');
-    const descriptionElement = document.getElementById('project-description');
+    // Nama ID di sini diubah agar sama dengan jurnal-detail
+    const titleElement = document.getElementById('jurnal-title');
+    const metaElement = document.getElementById('jurnal-meta');
+    const imageElement = document.getElementById('jurnal-image');
+    const contentElement = document.getElementById('jurnal-content');
     const linkElement = document.getElementById('project-link');
     const mainContent = document.getElementById('main-content');
     const loadingIndicator = document.getElementById('loading-indicator');
@@ -1016,17 +1017,19 @@ function setupProjectDetailPage() {
 
             document.title = `${project.title} - Detail Proyek`;
             titleElement.textContent = project.title;
-            
-            // Menggunakan image_url yang diekstrak dari konten
+            metaElement.textContent = `Dipublikasikan pada ${new Date(project.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+
             if (project.image_url) {
                 imageElement.src = project.image_url;
                 imageElement.alt = `Gambar utama untuk ${project.title}`;
                 imageElement.style.display = 'block';
+            } else {
+                 imageElement.style.display = 'none';
             }
             
-            descriptionElement.innerHTML = project.description;
+            contentElement.innerHTML = project.description;
 
-            // Menggunakan project_link yang mungkin masih ada dari data lama
+            // Logika untuk menampilkan tombol "Kunjungi Proyek" tetap ada jika link tersedia di data
             if (project.project_link) {
                 linkElement.href = project.project_link;
                 linkElement.style.display = 'inline-block';
