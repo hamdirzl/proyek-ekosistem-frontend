@@ -228,7 +228,7 @@ footer {
     justify-content: center; 
     text-align: center; 
     padding: var(--space-xl) clamp(var(--space-md), 5vw, var(--space-xl));
-    min-height: 100vh; 
+    min-height: 110vh; 
     color: #ffffff;
     background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80') no-repeat center center/cover; 
 }
