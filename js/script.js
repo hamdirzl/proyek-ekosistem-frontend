@@ -10,7 +10,6 @@ let cropModal = null;
 let confirmCropBtn = null;
 let cancelCropBtn = null;
 let currentCropCallback = null;
-let croppedPortfolioBlob = null; // Khusus untuk menyimpan blob portofolio
 
 function forceLogout() {
     localStorage.removeItem('jwt_refresh_token');
@@ -366,105 +365,107 @@ function setupAdminPanels() {
     }
 }
 
-// === LOGIKA MANAJEMEN PORTOFOLIO ADMIN (DENGAN QUILL.JS) ===
+// === [KODE BARU] LOGIKA MANAJEMEN PORTOFOLIO ADMIN (SAMA SEPERTI JURNAL) ===
 function setupAdminPortfolioPanel() {
     const form = document.getElementById('portfolio-form');
     if (!form) return;
 
-    // Variabel untuk instance Quill khusus portofolio
     let portfolioQuill;
 
     const formTitle = document.getElementById('portfolio-form-title');
     const hiddenId = document.getElementById('portfolio-id');
     const titleInput = document.getElementById('portfolio-title');
-    const linkInput = document.getElementById('portfolio-link');
-    const imageTrigger = document.getElementById('portfolio-image-trigger');
-    const imageInput = document.getElementById('portfolio-image');
-    const fileNameLabel = document.getElementById('portfolio-file-name');
     const messageDiv = document.getElementById('portfolio-message');
     const clearButton = document.getElementById('clear-portfolio-form');
-    const currentImageInfo = document.getElementById('current-image-info');
     const editorDiv = document.getElementById('quill-portfolio-editor');
 
-    // Inisialisasi Quill untuk editor portofolio
-    portfolioQuill = new Quill(editorDiv, {
-        modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['link'],
-                ['clean']
-            ]
-        },
-        theme: 'snow',
-        placeholder: 'Jelaskan detail proyek Anda di sini...'
-    });
-    // Simpan referensi instance ke elemennya
+    // 1. Konfigurasi Toolbar sama seperti Jurnal
+    const toolbarOptions = [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['link', 'image', 'video'],
+        ['clean']
+    ];
+
+    // 2. Inisialisasi Quill untuk Portofolio
     if (editorDiv) {
-        editorDiv.__quill = portfolioQuill;
+        portfolioQuill = new Quill(editorDiv, {
+            modules: { toolbar: toolbarOptions },
+            theme: 'snow',
+            placeholder: 'Jelaskan detail proyek Anda di sini...'
+        });
+        editorDiv.__quill = portfolioQuill; // Simpan referensi
     }
 
+    // 3. Handler untuk upload gambar dari toolbar editor (menggunakan fungsi yang sudah ada)
+    if (portfolioQuill) {
+        portfolioQuill.getModule('toolbar').addHandler('image', () => {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.click();
+
+            input.onchange = () => {
+                const file = input.files[0];
+                if (file) {
+                    handleImageSelectionForCropping(file, (blob) => {
+                        uploadCroppedImageForEditor(
+                            blob,
+                            (location) => {
+                                const range = portfolioQuill.getSelection(true);
+                                portfolioQuill.insertEmbed(range.index, 'image', location);
+                            },
+                            (errorText) => {
+                                console.error(errorText);
+                                alert(`Gagal mengunggah gambar: ${errorText}`);
+                            }
+                        );
+                    }, 16 / 9);
+                }
+            };
+        });
+    }
+
+    // 4. Fungsi Reset Form
     function resetPortfolioForm() {
         form.reset();
         hiddenId.value = '';
         formTitle.textContent = 'Tambah Proyek Baru';
         messageDiv.textContent = '';
         messageDiv.className = '';
-        fileNameLabel.textContent = 'Tidak ada file dipilih';
-        fileNameLabel.style.color = '';
-        currentImageInfo.textContent = '';
-        croppedPortfolioBlob = null;
-        // Kosongkan editor Quill
         if (portfolioQuill) {
             portfolioQuill.setText('');
         }
     }
 
     clearButton.addEventListener('click', resetPortfolioForm);
-    imageTrigger.addEventListener('click', () => imageInput.click());
 
-    imageInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files.length > 0) {
-            const file = e.target.files[0];
-            const callback = (blob) => {
-                croppedPortfolioBlob = blob;
-                fileNameLabel.textContent = `Gambar siap diunggah (${(blob.size / 1024).toFixed(1)} KB)`;
-                fileNameLabel.style.color = 'var(--accent-color)';
-            };
-            handleImageSelectionForCropping(file, callback, 16 / 9);
-        }
-    });
-
+    // 5. Handler untuk Submit Form (diubah menjadi JSON, bukan FormData)
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const id = hiddenId.value;
-        if (!id && !croppedPortfolioBlob) {
+        const title = titleInput.value;
+        const description = portfolioQuill.root.innerHTML; // Ambil konten dari Quill
+        
+        if (!title || portfolioQuill.getLength() <= 1) {
             messageDiv.className = 'error';
-            messageDiv.textContent = 'Error: Gambar utama proyek wajib diisi.';
+            messageDiv.textContent = 'Error: Judul dan deskripsi tidak boleh kosong.';
             return;
         }
-
-        // Ambil konten deskripsi dari Quill
-        const descriptionContent = portfolioQuill.root.innerHTML;
-
-        const formData = new FormData();
-        formData.append('title', titleInput.value);
-        formData.append('description', descriptionContent); // Masukkan konten HTML dari Quill
-        formData.append('project_link', linkInput.value);
-        
-        if (croppedPortfolioBlob) {
-            formData.append('image', croppedPortfolioBlob, 'portfolio-image.jpg');
-        }
-        
-        const url = id ? `${API_BASE_URL}/api/admin/portfolio/${id}` : `${API_BASE_URL}/api/admin/portfolio`;
-        const method = id ? 'PUT' : 'POST';
 
         messageDiv.className = '';
         messageDiv.textContent = "Menyimpan proyek...";
 
+        const url = id ? `${API_BASE_URL}/api/admin/portfolio/${id}` : `${API_BASE_URL}/api/admin/portfolio`;
+        const method = id ? 'PUT' : 'POST';
+
         try {
-            const response = await fetchWithAuth(url, { method, body: formData });
+            const response = await fetchWithAuth(url, { 
+                method, 
+                body: JSON.stringify({ title, description }) // Kirim sebagai JSON
+            });
             const result = await response.json();
             if (!response.ok) throw new Error(result.error || 'Terjadi kesalahan.');
 
@@ -633,12 +634,14 @@ async function fetchAndDisplayPortfolioAdmin() {
     }
 }
 
+// === [KODE BARU] FUNGSI RENDER DAN EDIT PORTOFOLIO ===
 function renderAdminPortfolioItem(project, container) {
     const listItem = document.createElement('li');
     listItem.className = 'mood-item';
     listItem.id = `portfolio-item-${project.id}`;
     const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
 
+    // Deskripsi yang ditampilkan adalah teks tanpa tag HTML
     const strippedDescription = project.description.replace(/<[^>]+>/g, ' ');
 
     listItem.innerHTML = `
@@ -658,13 +661,13 @@ function renderAdminPortfolioItem(project, container) {
     `;
     container.appendChild(listItem);
 
+    // Event listener untuk tombol Edit
     listItem.querySelector('.edit-portfolio-btn').addEventListener('click', async () => {
         document.getElementById('portfolio-form-title').textContent = 'Edit Proyek';
         document.getElementById('portfolio-id').value = project.id;
         document.getElementById('portfolio-title').value = project.title;
-        document.getElementById('portfolio-link').value = project.project_link || '';
-        document.getElementById('current-image-info').textContent = `Gambar saat ini digunakan. Pilih gambar baru untuk mengganti.`;
         
+        // Isi editor Quill dengan konten deskripsi HTML
         const editorDiv = document.getElementById('quill-portfolio-editor');
         if (editorDiv && editorDiv.__quill) {
             editorDiv.__quill.root.innerHTML = project.description;
@@ -673,6 +676,7 @@ function renderAdminPortfolioItem(project, container) {
         document.getElementById('portfolio-form').scrollIntoView({ behavior: 'smooth' });
     });
 
+    // Event listener untuk tombol Hapus
     listItem.querySelector('.delete-portfolio-btn').addEventListener('click', async () => {
         if (!confirm(`Yakin ingin menghapus proyek "${project.title}"?`)) return;
         
