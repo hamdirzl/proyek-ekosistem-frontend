@@ -1,4 +1,4 @@
-// VERSI FINAL DAN LENGKAP - DENGAN RICH TEXT EDITOR, CROPPING, & LIVE CHAT (PERSISTENT)
+// VERSI FINAL (PERBAIKAN) - DENGAN RICH TEXT EDITOR, CROPPING, & LIVE CHAT (PERSISTENT)
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
@@ -23,7 +23,6 @@ const allChatHistories = {}; // Objek untuk menyimpan riwayat chat per user
 function forceLogout() {
     localStorage.removeItem('jwt_refresh_token');
     sessionStorage.removeItem('jwt_access_token');
-    // Hapus juga sesi chat jika ada
     localStorage.removeItem('chatSession'); 
     if (!window.location.pathname.endsWith('auth.html')) {
         alert('Sesi Anda telah berakhir. Silakan login kembali.');
@@ -173,7 +172,7 @@ function decodeJwt(token) {
 }
 
 // ===================================================================
-// [FINAL] LOGIKA LIVE CHAT DENGAN NAMA & SESI PERSISTENT
+// [FINAL - PERBAIKAN] LOGIKA LIVE CHAT DENGAN NAMA & SESI PERSISTENT
 // ===================================================================
 function setupChatBubble() {
     const chatBubble = document.getElementById('chat-bubble');
@@ -181,7 +180,6 @@ function setupChatBubble() {
     const closeChatBtn = document.getElementById('close-chat-btn');
     const chatStatus = document.getElementById('chat-status');
 
-    // Elemen dari modifikasi HTML
     const chatStartForm = document.getElementById('chat-start-form');
     const chatUserNameInput = document.getElementById('chat-user-name');
     const chatMain = document.getElementById('chat-main');
@@ -189,11 +187,10 @@ function setupChatBubble() {
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
 
-    // Jika di halaman dasbor, jangan tampilkan bubble chat
     if (window.location.pathname.includes('dashboard.html')) {
-        if (chatBubble) chatBubble.style.display = 'none';
-        if (chatWindow) chatWindow.style.display = 'none';
-        return;
+        if(chatBubble) chatBubble.style.display = 'none';
+        if(chatWindow) chatWindow.style.display = 'none';
+        return; 
     }
     
     if (!chatBubble || !chatWindow) return;
@@ -204,7 +201,7 @@ function setupChatBubble() {
     const appendMessage = (content, type) => {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${type}`;
-        messageDiv.textContent = content; // Mencegah HTML injection
+        messageDiv.textContent = content;
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     };
@@ -218,29 +215,29 @@ function setupChatBubble() {
             chatStatus.textContent = 'Sedang menghubungi admin...';
             chatStatus.style.color = 'var(--text-muted-color)';
         } else {
-            chatStatus.textContent = 'Koneksi terputus';
-            chatStatus.style.color = '#dc3545';
+             chatStatus.textContent = 'Koneksi terputus';
+             chatStatus.style.color = '#dc3545';
         }
     };
 
     const loadChatHistory = async (userId) => {
         if (!userId) return;
+        chatMessages.innerHTML = '<div class="message server-info">Memuat riwayat...</div>';
         try {
             const response = await fetch(`${API_BASE_URL}/api/chat/history/${userId}`);
             if (!response.ok) throw new Error('Gagal memuat riwayat');
             const history = await response.json();
             
-            chatMessages.innerHTML = ''; // Kosongkan pesan saat ini
+            chatMessages.innerHTML = ''; 
             if (history.length > 0) {
-                appendMessage('Ini adalah riwayat percakapan Anda sebelumnya.', 'server-info');
+                 appendMessage('Ini adalah riwayat percakapan Anda sebelumnya.', 'server-info');
             } else {
-                const session = JSON.parse(localStorage.getItem('chatSession'));
-                const welcomeName = session ? session.userName : 'Pengunjung';
-                appendMessage(`Halo ${welcomeName}! Ada yang bisa kami bantu?`, 'server-info');
+                 const session = JSON.parse(localStorage.getItem('chatSession'));
+                 const welcomeName = session ? session.userName : 'Pengunjung';
+                 appendMessage(`Halo ${welcomeName}! Ada yang bisa kami bantu?`, 'admin');
             }
 
             history.forEach(msg => {
-                // sender_type di database harus 'user' atau 'admin'
                 appendMessage(msg.content, msg.sender_type);
             });
         } catch (error) {
@@ -259,9 +256,7 @@ function setupChatBubble() {
 
         ws.onopen = () => {
             console.log('Terhubung ke WebSocket. Mengidentifikasi sesi...');
-            // Kirim data sesi untuk identifikasi di backend
             ws.send(JSON.stringify({ type: 'identify', session: session }));
-            loadChatHistory(session.userId);
         };
 
         ws.onmessage = (event) => {
@@ -270,7 +265,7 @@ function setupChatBubble() {
                 case 'chat':
                     appendMessage(data.content, 'admin');
                     if (chatWindow.classList.contains('hidden')) {
-                         new Audio('https://cdn.pixabay.com/audio/2022/10/14/audio_94305374f6.mp3').play().catch(e => console.log("Gagal memainkan suara:", e));
+                        new Audio('https://cdn.pixabay.com/audio/2022/10/14/audio_94305374f6.mp3').play().catch(e => console.log("Gagal memainkan suara:", e));
                     }
                     break;
                 case 'status_update':
@@ -282,7 +277,7 @@ function setupChatBubble() {
         ws.onclose = () => {
             console.log('Koneksi WebSocket terputus.');
             updateStatus('offline');
-            ws = null; // Set ws ke null agar bisa reconnect
+            ws = null;
         };
 
         ws.onerror = (error) => {
@@ -291,7 +286,6 @@ function setupChatBubble() {
         };
     };
 
-    // Logika utama saat bubble chat diklik
     chatBubble.addEventListener('click', () => {
         chatWindow.classList.remove('hidden');
         const session = JSON.parse(localStorage.getItem('chatSession'));
@@ -313,8 +307,7 @@ function setupChatBubble() {
         chatWindow.classList.add('hidden');
     });
     
-    // Logika saat form nama di-submit
-    chatStartForm.addEventListener('submit', (e) => {
+    chatStartForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const userName = chatUserNameInput.value.trim();
         if (!userName) {
@@ -322,21 +315,20 @@ function setupChatBubble() {
             return;
         }
 
-        // Buat sesi baru
         const newSession = {
-            userId: crypto.randomUUID(), // API browser standar untuk membuat UUID
+            userId: crypto.randomUUID(),
             userName: userName
         };
         localStorage.setItem('chatSession', JSON.stringify(newSession));
         
-        // Ganti UI dan mulai koneksi
         chatStartForm.style.display = 'none';
         chatMain.classList.remove('hidden');
         chatMain.style.display = 'flex';
+        // Muat riwayat (yang seharusnya kosong) dan tampilkan pesan selamat datang
+        await loadChatHistory(newSession.userId); 
         connect();
     });
 
-    // Logika saat form chat utama di-submit
     chatForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const message = chatInput.value.trim();
@@ -346,16 +338,22 @@ function setupChatBubble() {
             chatInput.value = '';
         } else if (!ws || ws.readyState !== WebSocket.OPEN) {
             appendMessage('Koneksi terputus, mencoba menyambungkan kembali...', 'server-info');
-            connect(); // Coba sambungkan lagi jika koneksi terputus
+            connect();
         }
     });
 
-    // Panggil connect() di awal jika sesi sudah ada, agar status admin bisa langsung update
-    if (JSON.parse(localStorage.getItem('chatSession'))) {
-        // Cek jika jendela chat terbuka, baru connect. Jika tidak, connect saat bubble di klik.
-        if (!chatWindow.classList.contains('hidden')) {
-           connect();
-        }
+    // *** INI PERUBAHAN UTAMA UNTUK FIX MASALAH REFRESH ***
+    // Jika sesi sudah ada di localStorage, langsung hubungkan & muat riwayat saat halaman dimuat
+    const existingSession = JSON.parse(localStorage.getItem('chatSession'));
+    if (existingSession && existingSession.userId) {
+        // Tampilkan UI yang benar dari awal
+        chatStartForm.style.display = 'none';
+        chatMain.classList.remove('hidden');
+        chatMain.style.display = 'flex';
+        // Muat riwayat terlebih dahulu
+        loadChatHistory(existingSession.userId);
+        // Kemudian hubungkan websocket
+        connect();
     }
 }
 
@@ -384,7 +382,6 @@ async function setupAdminChatUI() {
     
     adminWebSocket.onclose = () => {
         console.log("Koneksi WebSocket Admin ditutup.");
-        // Mungkin tambahkan logika untuk reconnect di sini jika diperlukan
     };
 
     adminWebSocket.onerror = (error) => {
@@ -398,7 +395,6 @@ async function setupAdminChatUI() {
             const userId = data.sender;
             const userName = data.userName || `Pengunjung ${userId.substring(0, 6)}`;
             
-            // Simpan pesan ke riwayat lokal
             if (!allChatHistories[userId]) {
                 allChatHistories[userId] = [];
             }
@@ -428,7 +424,7 @@ async function setupAdminChatUI() {
                         const history = await res.json();
                         allChatHistories[userId] = history;
                         
-                        activeChatMessages.innerHTML = ''; // Kosongkan setelah berhasil fetch
+                        activeChatMessages.innerHTML = '';
                         allChatHistories[userId].forEach(msg => {
                             const type = (msg.sender_type === 'admin' || msg.sender === 'admin') ? 'admin' : 'user';
                             appendAdminMessage(msg.content, type);
@@ -438,6 +434,9 @@ async function setupAdminChatUI() {
                         activeChatMessages.innerHTML = '<p style="color: red;">Gagal memuat riwayat.</p>';
                     }
                 });
+            } else {
+                 // Update nama jika berubah
+                userEntry.querySelector('span').textContent = userName;
             }
             
             if (currentAdminChatTarget !== userId) {
@@ -478,6 +477,8 @@ async function setupAdminChatUI() {
     }
 }
 
+
+// ... (Sisa kode dari sini ke bawah tetap sama, tidak perlu diubah)
 
 // ===================================
 // FUNGSI-FUNGSI UNTUK CROPPING GAMBAR
