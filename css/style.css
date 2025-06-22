@@ -70,10 +70,11 @@ html, body {
     top: 0; 
     z-index: 1000; 
     transition: background-color 0.3s ease;
-    background-color: transparent; /* Diubah menjadi transparan */
+    /* Nilai transparansi diubah di sini */
+    background-color: rgba(18, 18, 18, 0.25); /* Sedikit lapisan warna, tidak 100% transparan */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(51, 51, 51, 0.2); /* Diubah menjadi border transparan agar lebih halus */
+    border-bottom: 1px solid rgba(51, 51, 51, 0.2);
 }
 
 .logo a { 
