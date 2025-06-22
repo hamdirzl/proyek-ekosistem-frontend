@@ -346,12 +346,10 @@ function setupAdminPanels() {
 }
 
 // === FUNGSI MANAJEMEN PORTOFOLIO (DIPERBARUI) ===
-// GANTI SELURUH FUNGSI setupAdminPortfolioPanel DENGAN KODE INI
 function setupAdminPortfolioPanel() {
     const form = document.getElementById('portfolio-form');
     if (!form) return;
 
-    // Opsi toolbar yang lengkap, sama seperti di Jurnal
     const fullToolbarOptions = [
         [{ 'header': [1, 2, 3, false] }],
         ['bold', 'italic', 'underline', 'strike'],
@@ -360,15 +358,11 @@ function setupAdminPortfolioPanel() {
         ['clean']
     ];
 
-    // Inisialisasi Quill untuk deskripsi portofolio dengan toolbar lengkap
     const portfolioQuill = new Quill('#portfolio-description', {
         theme: 'snow',
-        modules: {
-            toolbar: fullToolbarOptions
-        }
+        modules: { toolbar: fullToolbarOptions }
     });
 
-    // MENAMBAHKAN FUNGSI UNGGAH GAMBAR, SAMA SEPERTI JURNAL
     portfolioQuill.getModule('toolbar').addHandler('image', () => {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
@@ -377,44 +371,30 @@ function setupAdminPortfolioPanel() {
 
         input.onchange = async () => {
             const file = input.files[0];
-            if (!file || !/^image\//.test(file.type)) {
-                alert('Anda hanya bisa mengunggah file gambar.');
-                return;
-            }
-            
+            if (!file) return;
             const formData = new FormData();
             formData.append('file', file);
-
             try {
-                // Menggunakan endpoint yang sama karena fungsinya identik
                 const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/upload-image`, {
                     method: 'POST',
                     body: formData,
                 });
                 const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Gagal mengunggah gambar');
-
+                if (!res.ok) throw new Error(data.error);
                 const range = portfolioQuill.getSelection(true);
                 portfolioQuill.insertEmbed(range.index, 'image', data.location);
-                portfolioQuill.setSelection(range.index + 1);
             } catch (error) {
-                console.error('Error saat unggah gambar untuk Portofolio:', error);
-                alert('Gagal mengunggah gambar: ' + error.message);
+                alert('Gagal unggah gambar: ' + error.message);
             }
         };
     });
 
-    // Sisa dari fungsi ini sama seperti sebelumnya, hanya mengambil referensi elemen
     const formTitle = document.getElementById('portfolio-form-title');
     const hiddenId = document.getElementById('portfolio-id');
     const titleInput = document.getElementById('portfolio-title');
     const linkInput = document.getElementById('portfolio-link');
-    const imageTrigger = document.getElementById('portfolio-image-trigger');
-    const imageInput = document.getElementById('portfolio-image');
-    const fileNameLabel = document.getElementById('portfolio-file-name');
     const messageDiv = document.getElementById('portfolio-message');
     const clearButton = document.getElementById('clear-portfolio-form');
-    const currentImageInfo = document.getElementById('current-image-info');
 
     function resetPortfolioForm() {
         form.reset();
@@ -422,68 +402,42 @@ function setupAdminPortfolioPanel() {
         formTitle.textContent = 'Tambah Proyek Baru';
         messageDiv.textContent = '';
         messageDiv.className = '';
-        fileNameLabel.textContent = 'Tidak ada file dipilih';
-        fileNameLabel.style.color = '';
-        currentImageInfo.textContent = '';
-        croppedPortfolioBlob = null;
         portfolioQuill.root.innerHTML = '';
     }
 
     clearButton.addEventListener('click', resetPortfolioForm);
-    imageTrigger.addEventListener('click', () => imageInput.click());
-
-    imageInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files.length > 0) {
-            const file = e.target.files[0];
-            const callback = (blob) => {
-                croppedPortfolioBlob = blob;
-                fileNameLabel.textContent = `Gambar siap diunggah (${(blob.size / 1024).toFixed(1)} KB)`;
-                fileNameLabel.style.color = 'var(--accent-color)';
-            };
-            handleImageSelectionForCropping(file, callback, 16 / 9);
-        }
-    });
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        const id = hiddenId.value;
-        const descriptionContent = portfolioQuill.root.innerHTML;
 
-        if (!id && !croppedPortfolioBlob) {
-            messageDiv.className = 'error';
-            messageDiv.textContent = 'Error: Gambar utama proyek wajib diisi.';
-            return;
-        }
-         if (!titleInput.value || descriptionContent === '<p><br></p>') {
+        const id = hiddenId.value;
+        const title = titleInput.value;
+        const description = portfolioQuill.root.innerHTML;
+        const project_link = linkInput.value;
+
+        if (!title || description === '<p><br></p>') {
             messageDiv.className = 'error';
             messageDiv.textContent = 'Error: Judul dan deskripsi wajib diisi.';
             return;
         }
 
-        const formData = new FormData();
-        formData.append('title', titleInput.value);
-        formData.append('description', descriptionContent);
-        formData.append('project_link', linkInput.value);
-        
-        if (croppedPortfolioBlob) {
-            formData.append('image', croppedPortfolioBlob, 'portfolio-image.jpg');
-        }
-        
-        const url = id ? `${API_BASE_URL}/api/admin/portfolio/${id}` : `${API_BASE_URL}/api/admin/portfolio`;
+        const url = id ? `<span class="math-inline">\{API\_BASE\_URL\}/api/admin/portfolio/</span>{id}` : `${API_BASE_URL}/api/admin/portfolio`;
         const method = id ? 'PUT' : 'POST';
 
         messageDiv.className = '';
         messageDiv.textContent = "Menyimpan proyek...";
 
         try {
-            const response = await fetchWithAuth(url, { method, body: formData });
+            const response = await fetchWithAuth(url, {
+                method,
+                body: JSON.stringify({ title, description, project_link })
+            });
             const result = await response.json();
             if (!response.ok) throw new Error(result.error || 'Terjadi kesalahan.');
 
             messageDiv.className = 'success';
             messageDiv.textContent = id ? 'Proyek berhasil diperbarui!' : 'Proyek berhasil ditambahkan!';
-            
+
             resetPortfolioForm();
             fetchAndDisplayPortfolioAdmin();
         } catch (error) {
@@ -505,7 +459,7 @@ function renderAdminPortfolioItem(project, container) {
 
     listItem.innerHTML = `
         <div class="mood-item-header">
-            <span><strong>${project.title}</strong></span>
+            <span><strong><span class="math-inline">\{project\.title\}</strong\></span\>
             <div class="mood-item-actions">
                 <button class="mood-icon-button edit-portfolio-btn" data-id="${project.id}" aria-label="Edit Proyek">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
