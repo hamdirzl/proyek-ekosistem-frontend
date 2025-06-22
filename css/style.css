@@ -1892,3 +1892,32 @@ input:focus, textarea:focus, select:focus {
 .unread-dot.hidden {
     transform: scale(0);
 }
+
+/* ============================================= */
+/* ==   [BARU] PENYESUAIAN LIVE CHAT MOBILE   == */
+/* ============================================= */
+
+@media (max-width: 768px) {
+    /* 1. Perkecil balon chat dan posisikan lebih dekat ke tepi */
+    .chat-bubble-container {
+        width: 50px;
+        height: 50px;
+        bottom: var(--space-md); /* Jarak dari bawah: 1.5rem */
+        right: var(--space-md);  /* Jarak dari kanan: 1.5rem */
+    }
+
+    /* Perkecil ikon di dalam balon chat agar proporsional */
+    .chat-bubble-container svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    /* 2. Atur ulang posisi dan ukuran jendela chat agar simetris */
+    .chat-window-container {
+        width: auto; /* Biarkan lebar diatur oleh properti left & right */
+        left: var(--space-sm);  /* Jarak dari kiri layar: 1rem */
+        right: var(--space-sm); /* Jarak dari kanan layar: 1rem */
+        bottom: calc(var(--space-md) + 50px + var(--space-xs)); /* Posisikan di atas balon baru */
+        max-height: 80vh; /* Izinkan jendela chat mengambil lebih banyak ruang vertikal di mobile */
+    }
+}
