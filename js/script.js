@@ -1,4 +1,4 @@
-// VERSI FINAL DAN LENGKAP - DENGAN RICH TEXT EDITOR, CROPPING, & LIVE CHAT
+// VERSI FINAL DAN LENGKAP - DENGAN RICH TEXT EDITOR, CROPPING, & LIVE CHAT (PERSISTENT)
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
@@ -23,6 +23,8 @@ const allChatHistories = {}; // Objek untuk menyimpan riwayat chat per user
 function forceLogout() {
     localStorage.removeItem('jwt_refresh_token');
     sessionStorage.removeItem('jwt_access_token');
+    // Hapus juga sesi chat jika ada
+    localStorage.removeItem('chatSession'); 
     if (!window.location.pathname.endsWith('auth.html')) {
         alert('Sesi Anda telah berakhir. Silakan login kembali.');
         window.location.href = 'auth.html';
@@ -170,57 +172,103 @@ function decodeJwt(token) {
     try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
 }
 
-// ===================================
-// [BARU] LOGIKA LIVE CHAT
-// ===================================
+// ===================================================================
+// [FINAL] LOGIKA LIVE CHAT DENGAN NAMA & SESI PERSISTENT
+// ===================================================================
 function setupChatBubble() {
     const chatBubble = document.getElementById('chat-bubble');
     const chatWindow = document.getElementById('chat-window');
     const closeChatBtn = document.getElementById('close-chat-btn');
-    const chatForm = document.getElementById('chat-form');
-    const chatInput = document.getElementById('chat-input');
-    const chatMessages = document.getElementById('chat-messages');
     const chatStatus = document.getElementById('chat-status');
 
-    // Jika kita berada di halaman dasbor, jangan tampilkan bubble chat pengunjung
-    if (window.location.pathname.includes('dashboard.htm')) {
-        if(chatBubble) chatBubble.style.display = 'none';
-        if(chatWindow) chatWindow.style.display = 'none';
-        return; 
+    // Elemen dari modifikasi HTML
+    const chatStartForm = document.getElementById('chat-start-form');
+    const chatUserNameInput = document.getElementById('chat-user-name');
+    const chatMain = document.getElementById('chat-main');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+
+    // Jika di halaman dasbor, jangan tampilkan bubble chat
+    if (window.location.pathname.includes('dashboard.html')) {
+        if (chatBubble) chatBubble.style.display = 'none';
+        if (chatWindow) chatWindow.style.display = 'none';
+        return;
     }
     
-    if (!chatBubble) return;
+    if (!chatBubble || !chatWindow) return;
 
-    chatBubble.addEventListener('click', () => {
-        chatWindow.classList.toggle('hidden');
-    });
-
-    closeChatBtn.addEventListener('click', () => {
-        chatWindow.classList.add('hidden');
-    });
-
-    let userId = null;
     let ws = null;
     const backendWsUrl = 'wss://server-pribadi-hamdi-docker.onrender.com';
 
-    function connect() {
+    const appendMessage = (content, type) => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}`;
+        messageDiv.textContent = content; // Mencegah HTML injection
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    };
+    
+    const updateStatus = (status) => {
+        if (!chatStatus) return;
+        if (status === 'terhubung') {
+            chatStatus.textContent = 'Terhubung dengan admin';
+            chatStatus.style.color = '#198754';
+        } else if (status === 'menghubungi') {
+            chatStatus.textContent = 'Sedang menghubungi admin...';
+            chatStatus.style.color = 'var(--text-muted-color)';
+        } else {
+            chatStatus.textContent = 'Koneksi terputus';
+            chatStatus.style.color = '#dc3545';
+        }
+    };
+
+    const loadChatHistory = async (userId) => {
+        if (!userId) return;
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/chat/history/${userId}`);
+            if (!response.ok) throw new Error('Gagal memuat riwayat');
+            const history = await response.json();
+            
+            chatMessages.innerHTML = ''; // Kosongkan pesan saat ini
+            if (history.length > 0) {
+                appendMessage('Ini adalah riwayat percakapan Anda sebelumnya.', 'server-info');
+            } else {
+                const session = JSON.parse(localStorage.getItem('chatSession'));
+                const welcomeName = session ? session.userName : 'Pengunjung';
+                appendMessage(`Halo ${welcomeName}! Ada yang bisa kami bantu?`, 'server-info');
+            }
+
+            history.forEach(msg => {
+                // sender_type di database harus 'user' atau 'admin'
+                appendMessage(msg.content, msg.sender_type);
+            });
+        } catch (error) {
+            console.error("Gagal memuat riwayat chat:", error);
+            appendMessage('Gagal memuat riwayat percakapan.', 'server-info');
+        }
+    };
+    
+    const connect = () => {
+        const session = JSON.parse(localStorage.getItem('chatSession'));
+        if (!session || (ws && ws.readyState === WebSocket.OPEN)) {
+            return;
+        }
+
         ws = new WebSocket(backendWsUrl);
 
         ws.onopen = () => {
-            console.log('Terhubung ke server WebSocket.');
+            console.log('Terhubung ke WebSocket. Mengidentifikasi sesi...');
+            // Kirim data sesi untuk identifikasi di backend
+            ws.send(JSON.stringify({ type: 'identify', session: session }));
+            loadChatHistory(session.userId);
         };
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            
             switch (data.type) {
-                case 'init':
-                    userId = data.userId;
-                    console.log(`Mendapat ID pengguna: ${userId}`);
-                    break;
                 case 'chat':
-                    appendMessage(data.content, 'admin'); // Pesan dari admin
-                    // Mainkan suara jika jendela chat tidak terlihat
+                    appendMessage(data.content, 'admin');
                     if (chatWindow.classList.contains('hidden')) {
                          new Audio('https://cdn.pixabay.com/audio/2022/10/14/audio_94305374f6.mp3').play().catch(e => console.log("Gagal memainkan suara:", e));
                     }
@@ -232,39 +280,63 @@ function setupChatBubble() {
         };
 
         ws.onclose = () => {
-            console.log('Koneksi WebSocket terputus. Mencoba menghubungkan kembali...');
+            console.log('Koneksi WebSocket terputus.');
             updateStatus('offline');
-            setTimeout(connect, 5000);
+            ws = null; // Set ws ke null agar bisa reconnect
         };
 
         ws.onerror = (error) => {
             console.error('WebSocket error:', error);
-            ws.close();
+            if(ws) ws.close();
         };
-    }
+    };
 
-    function appendMessage(content, type) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${type}`;
-        messageDiv.textContent = content;
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+    // Logika utama saat bubble chat diklik
+    chatBubble.addEventListener('click', () => {
+        chatWindow.classList.remove('hidden');
+        const session = JSON.parse(localStorage.getItem('chatSession'));
 
-    function updateStatus(status) {
-        if (!chatStatus) return;
-        if (status === 'terhubung') {
-            chatStatus.textContent = 'Terhubung dengan admin';
-            chatStatus.style.color = '#198754';
-        } else if (status === 'menghubungi') {
-            chatStatus.textContent = 'Sedang menghubungi admin...';
-            chatStatus.style.color = 'var(--text-muted-color)';
+        if (session && session.userId && session.userName) {
+            chatStartForm.style.display = 'none';
+            chatMain.classList.remove('hidden');
+            chatMain.style.display = 'flex';
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                connect();
+            }
         } else {
-             chatStatus.textContent = 'Koneksi terputus';
-             chatStatus.style.color = '#dc3545';
+            chatStartForm.style.display = 'flex';
+            chatMain.classList.add('hidden');
         }
-    }
+    });
 
+    closeChatBtn.addEventListener('click', () => {
+        chatWindow.classList.add('hidden');
+    });
+    
+    // Logika saat form nama di-submit
+    chatStartForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const userName = chatUserNameInput.value.trim();
+        if (!userName) {
+            alert('Nama tidak boleh kosong.');
+            return;
+        }
+
+        // Buat sesi baru
+        const newSession = {
+            userId: crypto.randomUUID(), // API browser standar untuk membuat UUID
+            userName: userName
+        };
+        localStorage.setItem('chatSession', JSON.stringify(newSession));
+        
+        // Ganti UI dan mulai koneksi
+        chatStartForm.style.display = 'none';
+        chatMain.classList.remove('hidden');
+        chatMain.style.display = 'flex';
+        connect();
+    });
+
+    // Logika saat form chat utama di-submit
     chatForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const message = chatInput.value.trim();
@@ -272,11 +344,21 @@ function setupChatBubble() {
             ws.send(JSON.stringify({ type: 'user_message', content: message }));
             appendMessage(message, 'user');
             chatInput.value = '';
+        } else if (!ws || ws.readyState !== WebSocket.OPEN) {
+            appendMessage('Koneksi terputus, mencoba menyambungkan kembali...', 'server-info');
+            connect(); // Coba sambungkan lagi jika koneksi terputus
         }
     });
-    
-    connect();
+
+    // Panggil connect() di awal jika sesi sudah ada, agar status admin bisa langsung update
+    if (JSON.parse(localStorage.getItem('chatSession'))) {
+        // Cek jika jendela chat terbuka, baru connect. Jika tidak, connect saat bubble di klik.
+        if (!chatWindow.classList.contains('hidden')) {
+           connect();
+        }
+    }
 }
+
 
 async function setupAdminChatUI() {
     const adminChatTab = document.getElementById('admin-chat-tab');
@@ -314,6 +396,7 @@ async function setupAdminChatUI() {
         
         if (data.type === 'chat') {
             const userId = data.sender;
+            const userName = data.userName || `Pengunjung ${userId.substring(0, 6)}`;
             
             // Simpan pesan ke riwayat lokal
             if (!allChatHistories[userId]) {
@@ -326,7 +409,7 @@ async function setupAdminChatUI() {
                 userEntry = document.createElement('div');
                 userEntry.id = `chat-user-${userId}`;
                 userEntry.className = 'chat-user-entry';
-                userEntry.innerHTML = `<span>Pengunjung ${userId.substring(0, 6)}...</span><span class="unread-dot hidden"></span>`;
+                userEntry.innerHTML = `<span>${userName}</span><span class="unread-dot hidden"></span>`;
                 userChatList.prepend(userEntry);
                 
                 userEntry.addEventListener('click', async () => {

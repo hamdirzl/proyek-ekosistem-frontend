@@ -139,14 +139,27 @@
     </div>
 
     <div id="chat-window" class="chat-window-container hidden">
-        <div class="chat-header">
-            <h3>Live Chat</h3>
-            <span id="chat-status">Menghubungi admin...</span>
-            <button id="close-chat-btn" aria-label="Tutup Chat">×</button>
+    <div class="chat-header">
+        <h3>Live Chat</h3>
+        <span id="chat-status">Menghubungi admin...</span>
+        <button id="close-chat-btn" aria-label="Tutup Chat">×</button>
+    </div>
+    
+    <form id="chat-start-form" class="chat-form" style="padding: 1rem; flex-direction: column; gap: 1rem; display: none;">
+        <h4 style="margin-bottom: 0;">Mulai Percakapan</h4>
+        <p style="color: var(--text-muted-color); font-size: 0.9em;">
+            Masukkan nama Anda untuk memulai percakapan dengan admin.
+        </p>
+        <div class="form-group" style="margin-bottom: 0; text-align: left;">
+            <label for="chat-user-name">Nama Anda</label>
+            <input type="text" id="chat-user-name" placeholder="Tulis nama Anda di sini..." required>
         </div>
+        <button type="submit" class="button-pintu">Mulai Chat</button>
+    </form>
+
+    <div id="chat-main" class="hidden" style="display: flex; flex-direction: column; height: 100%; flex-grow: 1;">
         <div id="chat-messages" class="chat-messages">
-            <div class="message server-info">Selamat datang! Ada yang bisa kami bantu?</div>
-        </div>
+            </div>
         <form id="chat-form" class="chat-form">
             <input type="text" id="chat-input" placeholder="Ketik pesan Anda..." autocomplete="off" required>
             <button type="submit" aria-label="Kirim">
@@ -154,6 +167,7 @@
             </button>
         </form>
     </div>
+</div>
     <script src="js/script.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
