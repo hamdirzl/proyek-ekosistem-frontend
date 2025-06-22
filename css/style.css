@@ -1747,3 +1747,29 @@ input:focus, textarea:focus, select:focus {
 .is-homepage .nav-links.active li svg {
     color: var(--text-muted-color);
 }
+
+/* 1. Mengubah warna ikon 'X' hamburger saat menu aktif */
+.is-homepage .hamburger.active span {
+    background-color: var(--text-color);
+}
+
+/* 2. Mengubah warna ikon dan tulisan di dalam sidebar saat menu aktif */
+.is-homepage .nav-links.active li > a,
+.is-homepage .nav-links.active li > .nav-button {
+    color: var(--text-muted-color); /* Mengembalikan warna tulisan menjadi abu-abu */
+    text-shadow: none; /* Menghapus bayangan teks */
+}
+
+.is-homepage .nav-links.active li svg {
+    color: var(--text-muted-color); /* Mengembalikan warna ikon menjadi abu-abu */
+}
+
+/* 3. (Opsional) Efek hover agar konsisten dengan halaman lain */
+.is-homepage .nav-links.active li > a:hover,
+.is-homepage .nav-links.active li > .nav-button:hover {
+    color: var(--text-color); /* Membuat tulisan menjadi hitam saat disentuh */
+}
+.is-homepage .nav-links.active li a:hover svg,
+.is-homepage .nav-links.active li .nav-button:hover svg {
+    color: var(--text-color); /* Membuat ikon menjadi hitam saat disentuh */
+}
