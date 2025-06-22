@@ -1733,3 +1733,7 @@ input:focus, textarea:focus, select:focus {
 .is-homepage .hamburger span {
     background-color: #ffffff;
 }
+
+.is-homepage .hamburger.active span {
+    background-color: var(--text-color);
+}
