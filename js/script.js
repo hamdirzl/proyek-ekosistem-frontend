@@ -1,4 +1,4 @@
-// VERSI FINAL DAN LENGKAP - DENGAN RICH TEXT EDITOR & CROPPING
+// VERSI FINAL DAN LENGKAP - DENGAN RICH TEXT EDITOR (QUILL.JS) & CROPPING
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
@@ -232,7 +232,7 @@ async function uploadCroppedImageForEditor(blob, successCallback, failureCallbac
     formData.append('file', blob, 'cropped-image.jpg');
 
     try {
-        const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/upload-image`, {
+        const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/upload-image`, { //
             method: 'POST',
             body: formData,
         });
@@ -240,7 +240,7 @@ async function uploadCroppedImageForEditor(blob, successCallback, failureCallbac
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Gagal mengunggah gambar');
         
-        successCallback(data.location);
+        successCallback(data.location); //
 
     } catch (error) {
         console.error(error);
@@ -455,68 +455,95 @@ function setupAdminPortfolioPanel() {
 }
 
 
-// === LOGIKA MANAJEMEN JURNAL ADMIN (DENGAN EDITOR & CROP) ===
+// === LOGIKA MANAJEMEN JURNAL ADMIN (DENGAN EDITOR QUILL.JS) ===
 function setupAdminJurnalPanel() {
     const form = document.getElementById('jurnal-form');
     if (!form) return;
 
-    tinymce.init({
-        selector: '#jurnal-content-editor',
-        plugins: 'image link lists media wordcount code',
-        toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist | link image media | code',
-        height: 500,
-        skin: 'oxide-dark',
-        content_css: 'dark',
-        image_title: true,
-        automatic_uploads: true,
-        file_picker_types: 'image',
-        file_picker_callback: (cb, value, meta) => {
-            const input = document.createElement('input');
-            input.setAttribute('type', 'file');
-            input.setAttribute('accept', 'image/*');
-            
-            input.onchange = () => {
-                const file = input.files[0];
-                const cropCallback = (blob) => {
-                    uploadCroppedImageForEditor(
-                        blob, 
-                        (location) => cb(location, { title: file.name }),
-                        (errorText) => tinymce.activeEditor.notificationManager.open({ text: errorText, type: 'error' })
-                    );
-                };
-                handleImageSelectionForCropping(file, cropCallback, 16 / 9);
-            };
-            input.click();
-        },
-    });
+    // Variabel untuk menampung instance Quill
+    let quill;
 
     const formTitle = document.getElementById('jurnal-form-title');
     const hiddenId = document.getElementById('jurnal-id');
     const titleInput = document.getElementById('jurnal-title');
     const messageDiv = document.getElementById('jurnal-message');
     const clearButton = document.getElementById('clear-jurnal-form');
+    const editorDiv = document.getElementById('quill-editor');
 
+    // 1. Konfigurasi Toolbar Quill
+    const toolbarOptions = [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['link', 'image', 'video'],
+        ['clean']
+    ];
+
+    // 2. Inisialisasi Quill
+    quill = new Quill(editorDiv, {
+        modules: {
+            toolbar: toolbarOptions
+        },
+        theme: 'snow',
+        placeholder: 'Tuliskan pemikiran Anda di sini...'
+    });
+    // Simpan referensi instance Quill ke elemennya agar bisa diakses dari fungsi lain
+    editorDiv.__quill = quill;
+
+    // 3. Meng-handle Upload Gambar (Menggunakan fungsi cropping yang sudah ada)
+    quill.getModule('toolbar').addHandler('image', () => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+
+        input.onchange = () => {
+            const file = input.files[0];
+            if (file) {
+                // Panggil fungsi cropping yang sudah ada
+                handleImageSelectionForCropping(file, (blob) => {
+                    // Setelah dicrop, unggah blob.
+                    // Gunakan kembali fungsi upload yang sudah ada.
+                    uploadCroppedImageForEditor(
+                        blob,
+                        (location) => { // Success
+                            const range = quill.getSelection(true);
+                            quill.insertEmbed(range.index, 'image', location);
+                        },
+                        (errorText) => { // Failure
+                            console.error(errorText);
+                            alert(`Gagal mengunggah gambar: ${errorText}`);
+                        }
+                    );
+                }, 16 / 9);
+            }
+        };
+    });
+
+    // 4. Fungsi untuk mereset form Jurnal
     function resetJurnalForm() {
         form.reset();
         hiddenId.value = '';
         formTitle.textContent = 'Tambah Postingan Baru';
         messageDiv.textContent = '';
         messageDiv.className = '';
-        if(tinymce.get('jurnal-content-editor')) {
-            tinymce.get('jurnal-content-editor').setContent('');
+        if (quill) {
+            quill.setText('');
         }
     }
 
     clearButton.addEventListener('click', resetJurnalForm);
 
+    // 5. Meng-handle submit form Jurnal
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const id = hiddenId.value;
         const title = titleInput.value;
-        const content = tinymce.get('jurnal-content-editor').getContent();
+        // Mengambil konten dari Quill sebagai HTML
+        const content = quill.root.innerHTML;
         
-        if (!title || !content) {
+        if (!title || quill.getLength() <= 1) {
             messageDiv.className = 'error';
             messageDiv.textContent = 'Error: Judul dan konten tidak boleh kosong.';
             return;
@@ -546,9 +573,10 @@ function setupAdminJurnalPanel() {
             messageDiv.textContent = `Error: ${error.message}`;
         }
     });
-
+    
     fetchAndDisplayJurnalAdmin();
 }
+
 
 async function fetchAndDisplayPortfolioAdmin() {
     const listContainer = document.getElementById('portfolio-list-admin');
@@ -672,11 +700,18 @@ function renderAdminJurnalItem(post, container) {
     `;
     container.appendChild(listItem);
 
+    // MODIFIKASI INTI ADA DI SINI
     listItem.querySelector('.edit-jurnal-btn').addEventListener('click', async () => {
         document.getElementById('jurnal-form-title').textContent = 'Edit Postingan';
         document.getElementById('jurnal-id').value = post.id;
         document.getElementById('jurnal-title').value = post.title;
-        tinymce.get('jurnal-content-editor').setContent(post.content);
+        
+        const editorDiv = document.getElementById('quill-editor');
+        // Gunakan referensi __quill yang kita simpan di elemen DOM
+        if (editorDiv && editorDiv.__quill) {
+            editorDiv.__quill.root.innerHTML = post.content;
+        }
+        
         document.getElementById('jurnal-form').scrollIntoView({ behavior: 'smooth' });
     });
 
@@ -1063,7 +1098,6 @@ function setupJurnalDetailPage() {
 
 // === LOGIKA HALAMAN TOOLS ===
 function setupToolsPage() {
-    // ... (Fungsi ini dan semua fungsi-helpernya seperti attach...Listener tetap sama seperti di file asli Anda)
     const wrappers = [
         document.getElementById('shortener-wrapper'), document.getElementById('history-section'),
         document.getElementById('converter-wrapper'), document.getElementById('image-merger-wrapper'),
@@ -1494,7 +1528,6 @@ async function handleDeleteUserLink(event) {
     }
 }
 function setupAuthPage() {
-    // ... (Fungsi ini tetap sama seperti di file asli Anda)
     const loginSection = document.getElementById('login-section');
     const registerSection = document.getElementById('register-section');
     const loginForm = document.getElementById('login-form');
