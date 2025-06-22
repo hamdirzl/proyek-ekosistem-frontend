@@ -1720,19 +1720,20 @@ function setupAllPasswordToggles() {
 function setupChatBubble() {
     const chatBubble = document.getElementById('chat-bubble');
     const openChatButton = document.getElementById('open-chat-button');
+    
+    // === TAMBAHKAN PENGECEKAN INI ===
+    // Jika salah satu elemen penting untuk chat tidak ada di halaman ini,
+    // segera hentikan eksekusi fungsi agar tidak terjadi crash.
+    if (!chatBubble || !openChatButton) {
+        return; // Hentikan fungsi di sini
+    }
+    // ================================
+
     const closeChatButton = document.getElementById('close-chat');
     const chatMessages = document.getElementById('chat-messages');
     const chatInputText = document.getElementById('chat-input-text');
     const sendChatButton = document.getElementById('send-chat-button');
     let chatChannel = null;
-
-    // === PERBAIKAN UTAMA ADA DI SINI ===
-    // Jika elemen dasar untuk chat tidak ada di halaman ini,
-    // segera hentikan eksekusi fungsi agar tidak terjadi crash.
-    if (!chatBubble || !openChatButton) {
-        return; // Hentikan fungsi di sini
-    }
-    // ===================================
 
     if (!localStorage.getItem('jwt_refresh_token')) {
         openChatButton.classList.add('hidden');
@@ -1740,6 +1741,7 @@ function setupChatBubble() {
     };
 
     openChatButton.classList.remove('hidden');
+
 
     function getOrCreateChatSessionId() {
         let sessionId = sessionStorage.getItem('chat_session_id');
