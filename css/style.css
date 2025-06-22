@@ -1390,6 +1390,7 @@ input:focus, textarea:focus, select:focus {
     }
 }
 
+
 /* [MOBILE] Aturan untuk menu hamburger (768px ke bawah) */
 @media (max-width: 768px) {
     /* Mengatur item nav menjadi horizontal (ikon di samping teks) di dalam sidebar */
@@ -1717,4 +1718,8 @@ input:focus, textarea:focus, select:focus {
 .is-homepage .navbar {
     position: absolute;
     width: 100%;
+}
+
+.is-homepage .hero {
+    padding-top: 10rem;
 }
