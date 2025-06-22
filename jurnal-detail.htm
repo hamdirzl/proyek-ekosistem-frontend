@@ -3,24 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arena Game - HAMDI RIZAL</title>
+    <title>Detail Jurnal - HAMDI RIZAL</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+    <style>
+        /* Style khusus untuk halaman detail */
+        .jurnal-detail-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--space-xl) var(--space-md);
+        }
+        .jurnal-detail-image {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: var(--space-lg);
+            border: 1px solid var(--border-color);
+        }
+        .jurnal-detail-title {
+            font-family: var(--font-heading);
+            font-size: var(--font-size-h1);
+            color: #ffffff;
+            margin-bottom: var(--space-md);
+            line-height: 1.3;
+        }
+        .jurnal-detail-meta {
+            color: var(--text-muted-color);
+            margin-bottom: var(--space-lg);
+            font-size: 0.9rem;
+        }
+        .jurnal-detail-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-muted-color);
+            margin-bottom: var(--space-lg);
+        }
+        #loading-indicator {
+            text-align: center;
+            color: var(--text-muted-color);
+            padding: var(--space-xxl) 0;
+        }
+    </style>
 </head>
 <body>
 
     <header class="navbar">
         <div class="logo">
-    <a href="index.html" class="logo-desktop">HAMDI<br>RIZAL</a>
-    <a href="index.html" class="logo-mobile">HAMDI RIZAL</a>
-</div>
+            <a href="index.html" class="logo-desktop">HAMDI<br>RIZAL</a>
+            <a href="index.html" class="logo-mobile">HAMDI RIZAL</a>
+        </div>
         <nav>
             <ul class="nav-links">
                 <li id="nav-dasbor" style="display: none;">
@@ -53,7 +90,7 @@
                         <span>Tools Hamdi</span>
                     </a>
                 </li>
-                <li>
+                 <li>
                     <button id="about-button" class="nav-button">
                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         <span>Tentang Saya</span>
@@ -77,25 +114,17 @@
         </nav>
     </header>
 
-    <main class="page-container">
-        <div data-aos="fade-down">
-            <h1 class="page-title">Arena Game</h1>
-            <p class="page-subtitle">Selamat datang di arena! Silakan mainkan game yang saya buat.</p>
+    <main id="main-content" class="page-container" style="display: none;">
+        <div class="jurnal-detail-container" data-aos="fade-up">
+            <h1 id="jurnal-title" class="jurnal-detail-title"></h1>
+            <p id="jurnal-meta" class="jurnal-detail-meta"></p>
+            <img id="jurnal-image" src="" alt="Gambar Jurnal" class="jurnal-detail-image">
+            <div id="jurnal-content" class="jurnal-detail-content"></div>
         </div>
-
-        <section class="game-section" data-aos="fade-up">
-            <h2 class="section-title">Game Buatan Saya</h2>
-            <div class="portfolio-grid">
-                <div class="portfolio-card" data-aos="zoom-in-up">
-                    <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80" alt="Ruangan dengan setup gaming modern dan lampu neon">
-                    <h3>Nama Game Satu</h3>
-                    <p>Deskripsi singkat tentang game ini dan cara memainkannya.</p>
-                    <a href="#" class="button-pintu">Mainkan Sekarang</a>
-                </div>
-            </div>
-        </section>
-
     </main>
+    <div id="loading-indicator">
+        <p>Memuat detail postingan...</p>
+    </div>
 
     <div id="about-modal" class="modal-overlay hidden">
         <div class="modal-content" data-aos="zoom-in" data-aos-duration="400">
@@ -109,7 +138,7 @@
     </div>
 
     <div id="menu-overlay" class="menu-overlay"></div>
-
+    
     <footer>
     <div class="footer-container">
         <div class="footer-logo">

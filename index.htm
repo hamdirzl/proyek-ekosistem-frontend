@@ -3,21 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lupa Password - HAMDI RIZAL</title>
+    <title>Ekosistem Digital HAMDI RIZAL</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
 </head>
-<body>
-
+<body class="is-homepage">
     <header class="navbar">
-       <div class="logo">
+        <div class="logo">
     <a href="index.html" class="logo-desktop">HAMDI<br>RIZAL</a>
     <a href="index.html" class="logo-mobile">HAMDI RIZAL</a>
 </div>
@@ -77,23 +73,75 @@
         </nav>
     </header>
 
-    <main class="page-container">
-        <div data-aos="zoom-in">
-            <h1 class="page-title">Lupa Password</h1>
-            <p class="page-subtitle">Masukkan alamat email Anda. Kami akan mengirimkan link untuk mereset password Anda.</p>
-            <div class="auth-container">
-                <form id="forgot-form" class="auth-form">
-                    <div class="form-group">
-                        <label for="forgot-email">Email</label>
-                        <input type="email" id="forgot-email" required placeholder="email.anda@contoh.com">
-                    </div>
-                    <button type="submit" class="button-pintu">Kirim Link Reset</button>
-                </form>
-                <div id="auth-message" style="margin-top: 1rem;"></div>
-                <p class="auth-toggle"><a href="auth.html">Kembali ke Login</a></p>
+    <main>
+       <section class="hero">
+            <div class="hero-content" data-aos="zoom-in">
+                <h1>Platform Kreatif & Utilitas <span>Pribadi.</span></h1>
+                <p>Selamat datang di markas digital saya. Tempat untuk bekerja, bermain, dan bertumbuh.</p>
+                <a href="tools.html" class="button-highlight">Coba Tools Hamdi</a>
             </div>
-        </div>
+        </section>
+
+        <section class="pintu-utama">
+            <h2 class="section-title" data-aos="fade-up">Jelajahi Ekosistem Saya</h2>
+            <div class="pintu-container">
+                
+                <div class="pintu" data-aos="fade-up" data-aos-delay="100">
+                    <div class="pintu-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                    </div>
+                    <h3>Portofolio Profesional</h3>
+                    <p>Lihat proyek dan keahlian yang telah saya kembangkan selama ini.</p>
+                    <a href="portfolio.html" class="button-pintu">Lihat Portofolio</a>
+                </div>
+
+                <div class="pintu" data-aos="fade-up" data-aos-delay="200">
+                    <div class="pintu-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-play-circle">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                        </svg>
+                    </div>
+                    <h3>Arena Interaktif</h3>
+                    <p>Mainkan game buatan saya dan gunakan perkakas digital gratis.</p>
+                    <a href="arena.html" class="button-pintu">Masuk ke Arena</a>
+                </div>
+                
+                <div class="pintu" data-aos="fade-up" data-aos-delay="300">
+                    <div class="pintu-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                    </div>
+                    <h3>Jurnal Pemikiran</h3>
+                    <p>Baca tulisan dan refleksi saya tentang teknologi, kreativitas, dan kehidupan.</p>
+                    <a href="jurnal.html" class="button-pintu">Baca Jurnal</a>
+                </div>
+            </div>
+        </section>
     </main>
+
+    <div id="chat-bubble" class="chat-bubble hidden">
+        <div class="chat-header">
+            <h3>Chat dengan AI</h3>
+            <button id="close-chat" class="chat-close-button">×</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message ai-message">Halo! Ada yang bisa saya bantu?</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chat-input-text" placeholder="Ketik pesan Anda...">
+            <button id="send-chat-button">Kirim</button>
+        </div>
+    </div>
+
+    <button id="open-chat-button" class="open-chat-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </button>
 
     <div id="about-modal" class="modal-overlay hidden">
         <div class="modal-content" data-aos="zoom-in" data-aos-duration="400">
@@ -144,7 +192,7 @@
         <p>© 2025 HAMDI RIZAL. Hak Cipta Dilindungi.</p>
     </div>
 </footer>
-    
+
     <script src="js/script.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>

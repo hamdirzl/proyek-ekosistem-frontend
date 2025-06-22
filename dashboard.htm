@@ -10,14 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js" defer></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js" defer></script>
+    <script src="https://cdn.tiny.cloud/1/in9rzuu7t875ms7cwgn67bbfrw0o2m9c2xql7e8awcfppjfm/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+
 </head>
 <body>
 
@@ -96,25 +94,6 @@
                 <button id="admin-jurnal-tab" class="dashboard-tab-button hidden" data-target="panel-admin-jurnal">Manajemen Jurnal</button>
                 <button id="admin-links-tab" class="dashboard-tab-button hidden" data-target="panel-admin-links">Manajemen Tautan</button>
                 <button id="admin-users-tab" class="dashboard-tab-button hidden" data-target="panel-admin-users">Manajemen Pengguna</button>
-                <button id="admin-livechat-tab" class="dashboard-tab-button hidden" data-target="panel-admin-livechat">Live Chat</button>
-
-<div id="panel-admin-livechat" class="dashboard-panel">
-    <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Live Chat</h2>
-    <div style="display: flex; gap: 1rem;">
-        <div id="chat-sessions-list" style="width: 30%; border-right: 1px solid var(--border-color); padding-right: 1rem;">
-            <p>Memuat sesi...</p>
-        </div>
-        <div id="chat-conversation-view" style="width: 70%;">
-            <h3 id="chat-session-id-header">Pilih sesi untuk memulai percakapan</h3>
-            <div id="chat-messages-admin" style="height: 400px; overflow-y: auto; border: 1px solid var(--border-color); padding: 1rem; margin-bottom: 1rem;">
-                </div>
-            <form id="admin-reply-form" style="display: none;">
-                <textarea id="admin-reply-input" placeholder="Ketik balasan Anda..." required style="width: 100%;"></textarea>
-                <button type="submit" class="button-pintu" style="margin-top: 0.5rem;">Kirim Balasan</button>
-            </form>
-        </div>
-    </div>
-</div>
             </div>
 
             <div class="dashboard-content">
@@ -174,11 +153,23 @@
                             </div>
                             <div class="form-group">
                                 <label for="portfolio-description">Deskripsi</label>
-                                <div id="portfolio-description" style="height: 250px; background-color: #f8f9fa; color: #212529;"></div>
+                                <textarea id="portfolio-description" rows="4" required style="height: auto;"></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="portfolio-link">URL Proyek (Opsional)</label>
                                 <input type="url" id="portfolio-link" placeholder="https://contoh.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="portfolio-image">Gambar Utama Proyek (Wajib)</label>
+                                <div class="custom-file-input-wrapper">
+                                    <input type="file" id="portfolio-image" accept="image/jpeg, image/png, image/webp" style="display:none;">
+                                    <button type="button" id="portfolio-image-trigger" class="custom-file-button">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                        Pilih & Crop Gambar
+                                    </button>
+                                    <span class="custom-file-label" id="portfolio-file-name">Tidak ada file dipilih</span>
+                                </div>
+                                <small id="current-image-info" style="color: var(--text-muted-color); margin-top: 5px; display: block;"></small>
                             </div>
                             <div style="display: flex; gap: 1rem;">
                                 <button type="submit" class="button-pintu">Simpan Proyek</button>
@@ -208,7 +199,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="jurnal-content-editor">Konten Jurnal</label>
-                                <div id="jurnal-content-editor" style="height: 400px; background-color: #f8f9fa; color: #212529;"></div>
+                                <textarea id="jurnal-content-editor"></textarea>
                             </div>
                             
                             <div style="display: flex; gap: 1rem; margin-top: 1rem;">

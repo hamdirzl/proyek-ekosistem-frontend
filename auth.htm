@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jurnal - HAMDI RIZAL</title>
+    <title>Login & Registrasi - HAMDI RIZAL</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
 </head>
 <body>
 
@@ -21,7 +18,7 @@
     <a href="index.html" class="logo-desktop">HAMDI<br>RIZAL</a>
     <a href="index.html" class="logo-mobile">HAMDI RIZAL</a>
 </div>
-       <nav>
+        <nav>
             <ul class="nav-links">
                 <li id="nav-dasbor" style="display: none;">
                     <a href="dashboard.html">
@@ -78,13 +75,51 @@
     </header>
 
     <main class="page-container">
-        <div data-aos="fade-down">
-            <h1 class="page-title">Jurnal Pemikiran</h1>
-            <p class="page-subtitle">Kumpulan tulisan tentang perjalanan, ide, dan hal-hal yang saya pelajari.</p>
-        </div>
-
-        <div class="jurnal-grid">
+        <div data-aos="zoom-in">
+            <h1 id="auth-title" class="page-title">Login</h1>
+            <div class="auth-container">
+                <div id="login-section">
+                    <form id="login-form" class="auth-form">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <div class="password-container">
+                                <input type="password" id="login-password" required>
+                                <span class="toggle-password" id="toggle-login-password">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </span>
+                            </div>
+                        </div>
+                        <button type="submit" class="button-pintu">Login</button>
+                    </form>
+                    <p class="auth-toggle" style="margin-top: 1rem; margin-bottom: 1rem;"><a href="forgot-password.html">Lupa Password?</a></p>
+                    <p class="auth-toggle">Belum punya akun? <a href="#" id="show-register">Registrasi di sini</a></p>
+                </div>
+                <div id="register-section" class="hidden">
+                    <form id="register-form" class="auth-form">
+                        <div class="form-group">
+                            <label for="register-email">Email</label>
+                            <input type="email" id="register-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Password (min. 6 karakter)</label>
+                            <div class="password-container">
+                                <input type="password" id="register-password" required>
+                                <span class="toggle-password" id="toggle-register-password">
+                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </span>
+                            </div>
+                        </div>
+                        <button type="submit" class="button-pintu">Registrasi</button>
+                    </form>
+                     <p class="auth-toggle">Sudah punya akun? <a href="#" id="show-login">Login di sini</a></p>
+                </div>
+                <div id="auth-message"></div>
             </div>
+        </div>
     </main>
 
     <div id="about-modal" class="modal-overlay hidden">
@@ -98,8 +133,8 @@
         </div>
     </div>
 
-    <div id="menu-overlay" class="menu-overlay"></div>
-    
+<div id="menu-overlay" class="menu-overlay"></div>
+
     <footer>
     <div class="footer-container">
         <div class="footer-logo">
@@ -136,6 +171,7 @@
         <p>© 2025 HAMDI RIZAL. Hak Cipta Dilindungi.</p>
     </div>
 </footer>
+    
     <script src="js/script.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
