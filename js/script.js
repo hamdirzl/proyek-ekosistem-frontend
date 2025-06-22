@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (document.title.includes("Portofolio - HAMDI RIZAL")) {
         setupPortfolioPage();
     } else if (document.title.includes("Detail Proyek")) {
-        setupProjectDetailPage();
+        setupProjectDetailPage(); // <-- Logika baru ditambahkan di sini
     } else if (document.title.includes("Detail Jurnal")) {
         setupJurnalDetailPage();
     } else if (document.title.includes("Jurnal - HAMDI RIZAL")) {
@@ -961,7 +961,7 @@ function setupPortfolioPage() {
             projects.forEach(project => {
                 const projectCard = document.createElement('a'); 
                 projectCard.className = 'portfolio-card portfolio-link-card';
-                projectCard.href = `project-detail.html?id=${project.id}`;
+                projectCard.href = `project-detail.html?id=${project.id}`; // Mengarah ke file baru
                 projectCard.setAttribute('data-aos', 'fade-up');
 
                 const projectImage = project.image_url || 'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=500&q=80'; 
@@ -987,8 +987,10 @@ function setupPortfolioPage() {
     fetchAndRenderPortfolio();
 }
 
+// === [FUNGSI BARU] UNTUK HALAMAN DETAIL PROYEK ===
 function setupProjectDetailPage() {
     const titleElement = document.getElementById('project-title');
+    const metaElement = document.getElementById('project-meta');
     const imageElement = document.getElementById('project-image');
     const descriptionElement = document.getElementById('project-description');
     const linkElement = document.getElementById('project-link');
@@ -1015,10 +1017,16 @@ function setupProjectDetailPage() {
             document.title = `${project.title} - Detail Proyek`;
             titleElement.textContent = project.title;
             
-            imageElement.src = project.image_url; 
-            imageElement.alt = `Gambar proyek ${project.title}`;
-            descriptionElement.innerHTML = project.description; // Display as HTML
+            // Menggunakan image_url yang diekstrak dari konten
+            if (project.image_url) {
+                imageElement.src = project.image_url;
+                imageElement.alt = `Gambar utama untuk ${project.title}`;
+                imageElement.style.display = 'block';
+            }
+            
+            descriptionElement.innerHTML = project.description;
 
+            // Menggunakan project_link yang mungkin masih ada dari data lama
             if (project.project_link) {
                 linkElement.href = project.project_link;
                 linkElement.style.display = 'inline-block';
