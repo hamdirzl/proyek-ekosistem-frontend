@@ -1,19 +1,21 @@
-// VERSI FINAL DAN LENGKAP - DENGAN RICH TEXT EDITOR & CROPPING
+// VERSI FINAL DAN LENGKAP - SETELAH PERBAIKAN
 const SUPABASE_URL = 'https://klizqdegqfdedanzvrrp.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsaXpxZGVncWZkZWRhbnp2cnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NDEzMTIsImV4cCI6MjA2NjAxNzMxMn0.A3rriLAED8250W_FTdCP9TLXjzL8qiNKGKoyKzNc-Mk'; // Ganti dengan Kunci ANON (PUBLIC) Anda
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsaXpxZGVncWZkZWRhbnp2cnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NDEzMTIsImV4cCI6MjA2NjAxNzMxMn0.A3rriLAED8250W_FTdCP9TLXjzL8qiNKGKoyKzNc-Mk';
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
+
+// [DIPERBAIKI] Kesalahan fatal inisialisasi diperbaiki. Harusnya 'Supabase.createClient'.
+// Perhatikan: Library Supabase harus diimpor di HTML sebelum skrip ini, atau ini tidak akan berfungsi.
+// Asumsinya, Anda sudah mengimpornya dari CDN.
+const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
 
-// --- Variabel Global untuk Fitur Cropping & Editor ---
 let cropper = null;
 let imageToCropElement = null;
 let cropModal = null;
 let confirmCropBtn = null;
 let cancelCropBtn = null;
 let currentCropCallback = null;
-let croppedPortfolioBlob = null; // Khusus untuk menyimpan blob portofolio
 
 function forceLogout() {
     localStorage.removeItem('jwt_refresh_token');
@@ -27,7 +29,7 @@ function forceLogout() {
 async function fetchWithAuth(url, options = {}) {
     let accessToken = sessionStorage.getItem('jwt_access_token');
 
-    options.headers = { ...options.headers }; 
+    options.headers = { ...options.headers };
     if (accessToken) {
         options.headers['Authorization'] = `Bearer ${accessToken}`;
     }
@@ -75,9 +77,7 @@ async function fetchWithAuth(url, options = {}) {
     return response;
 }
 
-/* === FUNGSI GLOBAL === */
 document.addEventListener('DOMContentLoaded', async () => {
-    // Logika autentikasi navbar
     const navDasbor = document.getElementById('nav-dasbor');
     const navLogin = document.getElementById('nav-login');
     const navLogout = document.getElementById('nav-logout');
@@ -102,13 +102,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
         }
-
     } else {
         if (navDasbor) navDasbor.style.display = 'none';
         if (navLogin) navLogin.style.display = 'list-item';
         if (navLogout) navLogout.style.display = 'none';
     }
-    
+
     if (refreshToken && !sessionStorage.getItem('jwt_access_token')) {
         console.log("Sesi baru, mencoba mendapatkan access token...");
         try {
@@ -134,10 +133,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Panggil fungsi setup berdasarkan halaman
     if (document.body.contains(document.getElementById('dashboard-main'))) {
         setupDashboardPage();
-        setupCropModal(); // Setup modal crop
+        setupCropModal();
     } else if (document.title.includes("Portofolio - HAMDI RIZAL")) {
         setupPortfolioPage();
     } else if (document.title.includes("Detail Proyek")) {
@@ -150,24 +148,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupToolsPage();
     } else if (document.getElementById('login-form')) {
         setupAuthPage();
+    } else if (document.getElementById('forgot-form')) {
+        setupForgotPasswordPage();
+    } else if (document.getElementById('reset-form')) {
+        setupResetPasswordPage();
     }
 
     setupAboutModal();
     setupMobileMenu();
     setupAllPasswordToggles();
-    setupChatBubble();
+    setupChatBubble(); // Dipanggil sekali di sini untuk semua halaman
     setupAccountManagement();
     setupDashboardTabs();
 });
-
 
 function decodeJwt(token) {
     try { return JSON.parse(atob(token.split('.')[1])); } catch (e) { return null; }
 }
 
-// ===================================
-// FUNGSI-FUNGSI UNTUK CROPPING GAMBAR
-// ===================================
 function setupCropModal() {
     cropModal = document.getElementById('crop-modal');
     imageToCropElement = document.getElementById('image-to-crop');
@@ -220,19 +218,6 @@ function showCropModal(imageSrc, callback, aspectRatio = 16 / 9) {
     });
 }
 
-function handleImageSelectionForCropping(file, callback, aspectRatio) {
-    if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            showCropModal(e.target.result, callback, aspectRatio);
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-// ===================================
-// === LOGIKA HALAMAN DASHBOARD    ===
-// ===================================
 function setupDashboardPage() {
     const refreshToken = localStorage.getItem('jwt_refresh_token');
     if (!refreshToken) {
@@ -319,196 +304,27 @@ function setupAdminPanels() {
     document.getElementById('admin-links-tab')?.classList.remove('hidden');
     document.getElementById('admin-users-tab')?.classList.remove('hidden');
     document.getElementById('admin-livechat-tab')?.classList.remove('hidden');
-    setupAdminLiveChatPanel();
     
     setupAdminPortfolioPanel();
     setupAdminJurnalPanel();
-    
-    const adminSection = document.getElementById('admin-section');
-    if (adminSection) {
-        const linkSearchInput = document.getElementById('link-search-input');
-        let linkSearchTimeout;
-        linkSearchInput.addEventListener('input', (e) => {
-            clearTimeout(linkSearchTimeout);
-            linkSearchTimeout = setTimeout(() => {
-                fetchAndDisplayLinks(e.target.value);
-            }, 300);
-        });
-        fetchAndDisplayLinks();
-    }
-    const adminUsersSection = document.getElementById('admin-users-section');
-    if (adminUsersSection) {
-        const userSearchInput = document.getElementById('user-search-input');
-        let userSearchTimeout;
-        userSearchInput.addEventListener('input', (e) => {
-            clearTimeout(userSearchTimeout);
-            userSearchTimeout = setTimeout(() => {
-                fetchAndDisplayUsers(e.target.value);
-            }, 300);
-        });
-        fetchAndDisplayUsers();
-    }
+    setupAdminLinksPanel();
+    setupAdminUsersPanel();
+    setupAdminLiveChatPanel();
 }
 
-function setupAdminLiveChatPanel() {
-    const sessionsList = document.getElementById('chat-sessions-list');
-    const messagesView = document.getElementById('chat-messages-admin');
-    const sessionHeader = document.getElementById('chat-session-id-header');
-    const replyForm = document.getElementById('admin-reply-form');
-    const replyInput = document.getElementById('admin-reply-input');
-    let activeSessionId = null;
-    let adminChatChannel = null;
-
-    async function fetchSessions() {
-        try {
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/chat/sessions`);
-            const sessions = await response.json();
-            if (!sessionsList) return;
-            sessionsList.innerHTML = '';
-            if (sessions.length === 0) {
-                sessionsList.innerHTML = '<p>Belum ada sesi chat.</p>';
-                return;
-            }
-            sessions.forEach(session => {
-                const sessionEl = document.createElement('div');
-                sessionEl.className = 'mood-item';
-                sessionEl.style.cursor = 'pointer';
-                
-                // [DIPERBAIKI] Kode HTML dan sintaks ${...} diperbaiki
-                sessionEl.innerHTML = `
-                    <strong>Sesi: <small>${session.session_id.substring(0, 8)}...</small></strong>
-                    <p class="mood-notes">Pesan terakhir: ${session.last_message.substring(0, 30)}...</p>
-                    <small class="mood-date">Update: ${new Date(session.last_updated).toLocaleString('id-ID')}</small>
-                `;
-                
-                sessionEl.addEventListener('click', () => loadConversation(session.session_id));
-                sessionsList.appendChild(sessionEl);
-            });
-        } catch (error) {
-            if (sessionsList) sessionsList.innerHTML = '<p>Gagal memuat sesi.</p>';
-            console.error("Error fetching sessions:", error);
-        }
-    }
-
-    async function loadConversation(sessionId) {
-        activeSessionId = sessionId;
-        sessionHeader.textContent = `Percakapan Sesi: ${sessionId.substring(0, 8)}...`;
-        messagesView.innerHTML = '<p>Memuat pesan...</p>';
-        replyForm.style.display = 'block';
-
-        try {
-            // [DIPERBAIKI] URL diperbaiki menggunakan template literal yang benar
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/chat/messages/${sessionId}`);
-            const messages = await response.json();
-            messagesView.innerHTML = '';
-            messages.forEach(msg => {
-                const msgEl = document.createElement('div');
-                // Menggunakan class yang sama dengan chat bubble user untuk konsistensi
-                msgEl.classList.add('message', msg.sender_role === 'admin' ? 'user-message' : 'ai-message');
-                msgEl.textContent = msg.content;
-                messagesView.appendChild(msgEl);
-            });
-            messagesView.scrollTop = messagesView.scrollHeight;
-        } catch (error) {
-            messagesView.innerHTML = '<p>Gagal memuat pesan.</p>';
-        }
-    }
-
-    replyForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const content = replyInput.value.trim();
-        if (!content || !activeSessionId) return;
-
-        try {
-            await fetchWithAuth(`${API_BASE_URL}/api/chat/message`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    session_id: activeSessionId,
-                    content: content
-                })
-            });
-            replyInput.value = '';
-        } catch (error) {
-            alert('Gagal mengirim balasan.');
-        }
-    });
-
-    function listenForAdminUpdates() {
-        if (adminChatChannel) return;
-        adminChatChannel = supabase
-            .channel('live_chat_admin')
-            .on('postgres_changes', {
-                event: 'INSERT',
-                schema: 'public',
-                table: 'live_chat_messages'
-            }, (payload) => {
-                fetchSessions(); // Muat ulang daftar sesi agar "pesan terakhir" update
-                const newMessage = payload.new;
-                if (newMessage.session_id === activeSessionId) {
-                    const msgEl = document.createElement('div');
-                    msgEl.classList.add('message', newMessage.sender_role === 'admin' ? 'user-message' : 'ai-message');
-                    msgEl.textContent = newMessage.content;
-                    messagesView.appendChild(msgEl);
-                    messagesView.scrollTop = messagesView.scrollHeight;
-                }
-            })
-            .subscribe();
-    }
-
-    const adminChatTab = document.getElementById('admin-livechat-tab');
-    if (adminChatTab) {
-         adminChatTab.addEventListener('click', () => {
-            fetchSessions();
-            listenForAdminUpdates();
-        });
-    }
-}
-    function listenForAdminUpdates() {
-        if (adminChatChannel) return;
-        adminChatChannel = supabase
-            .channel('live_chat_admin')
-            .on('postgres_changes', {
-                event: 'INSERT',
-                schema: 'public',
-                table: 'live_chat_messages'
-            }, (payload) => {
-                fetchSessions(); 
-                const newMessage = payload.new;
-                if (newMessage.session_id === activeSessionId) {
-                    const msgEl = document.createElement('div');
-                    msgEl.classList.add('message', newMessage.sender_role === 'admin' ? 'user-message' : 'ai-message');
-                    msgEl.textContent = newMessage.content;
-                    messagesView.appendChild(msgEl);
-                    messagesView.scrollTop = messagesView.scrollHeight;
-                }
-            })
-            .subscribe();
-    }
-
-    const adminChatTab = document.getElementById('admin-livechat-tab');
-    if (adminChatTab) {
-         adminChatTab.addEventListener('click', () => {
-            fetchSessions();
-            listenForAdminUpdates();
-        });
-    }
-
-// === FUNGSI MANAJEMEN PORTOFOLIO (DIPERBARUI) ===
 function setupAdminPortfolioPanel() {
     const form = document.getElementById('portfolio-form');
     if (!form) return;
 
-    const fullToolbarOptions = [
-        [{ 'header': [1, 2, 3, false] }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        ['link', 'image', 'code-block'],
-        ['clean']
-    ];
-
     const portfolioQuill = new Quill('#portfolio-description', {
         theme: 'snow',
-        modules: { toolbar: fullToolbarOptions }
+        modules: { toolbar: [
+            [{ 'header': [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['link', 'image', 'code-block'],
+            ['clean']
+        ]}
     });
 
     portfolioQuill.getModule('toolbar').addHandler('image', () => {
@@ -524,8 +340,7 @@ function setupAdminPortfolioPanel() {
             formData.append('file', file);
             try {
                 const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/upload-image`, {
-                    method: 'POST',
-                    body: formData,
+                    method: 'POST', body: formData
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error);
@@ -557,7 +372,6 @@ function setupAdminPortfolioPanel() {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-
         const id = hiddenId.value;
         const title = titleInput.value;
         const description = portfolioQuill.root.innerHTML;
@@ -569,7 +383,7 @@ function setupAdminPortfolioPanel() {
             return;
         }
 
-        const url = id ? `<span class="math-inline">\{API\_BASE\_URL\}/api/admin/portfolio/</span>{id}` : `${API_BASE_URL}/api/admin/portfolio`;
+        const url = id ? `${API_BASE_URL}/api/admin/portfolio/${id}` : `${API_BASE_URL}/api/admin/portfolio`;
         const method = id ? 'PUT' : 'POST';
 
         messageDiv.className = '';
@@ -577,8 +391,7 @@ function setupAdminPortfolioPanel() {
 
         try {
             const response = await fetchWithAuth(url, {
-                method,
-                body: JSON.stringify({ title, description, project_link })
+                method, body: JSON.stringify({ title, description, project_link })
             });
             const result = await response.json();
             if (!response.ok) throw new Error(result.error || 'Terjadi kesalahan.');
@@ -595,62 +408,6 @@ function setupAdminPortfolioPanel() {
     });
 
     fetchAndDisplayPortfolioAdmin();
-}
-
-function renderAdminPortfolioItem(project, container) {
-    const listItem = document.createElement('li');
-    listItem.className = 'mood-item';
-    listItem.id = `portfolio-item-${project.id}`;
-    const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
-
-    const strippedDescription = project.description.replace(/<[^>]+>/g, ' ');
-
-    listItem.innerHTML = `
-        <div class="mood-item-header">
-            <span><strong><span class="math-inline">\{project\.title\}</strong\></span\>
-            <div class="mood-item-actions">
-                <button class="mood-icon-button edit-portfolio-btn" data-id="${project.id}" aria-label="Edit Proyek">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                </button>
-                <button class="mood-icon-button delete-portfolio-btn delete-button" data-id="${project.id}" aria-label="Hapus Proyek">
-                    ${trashIconSvg}
-                </button>
-            </div>
-        </div>
-        <p class="mood-notes">${strippedDescription.substring(0, 100)}...</p>
-        <small class="mood-date">Dibuat: ${new Date(project.created_at).toLocaleString('id-ID')}</small>
-    `;
-    container.appendChild(listItem);
-
-    listItem.querySelector('.edit-portfolio-btn').addEventListener('click', async () => {
-        document.getElementById('portfolio-form-title').textContent = 'Edit Proyek';
-        document.getElementById('portfolio-id').value = project.id;
-        document.getElementById('portfolio-title').value = project.title;
-        document.getElementById('portfolio-link').value = project.project_link || '';
-        
-        const portfolioQuill = Quill.find(document.querySelector('#portfolio-description'));
-        if (portfolioQuill) {
-            portfolioQuill.root.innerHTML = project.description;
-        }
-
-        document.getElementById('current-image-info').textContent = `Gambar saat ini digunakan. Pilih gambar baru untuk mengganti.`;
-        document.getElementById('portfolio-form').scrollIntoView({ behavior: 'smooth' });
-    });
-
-    listItem.querySelector('.delete-portfolio-btn').addEventListener('click', async () => {
-        if (!confirm(`Yakin ingin menghapus proyek "${project.title}"?`)) return;
-        
-        try {
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio/${project.id}`, { method: 'DELETE' });
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error);
-            
-            alert('Proyek berhasil dihapus.');
-            fetchAndDisplayPortfolioAdmin();
-        } catch (error) {
-            alert(`Error: ${error.message}`);
-        }
-    });
 }
 
 async function fetchAndDisplayPortfolioAdmin() {
@@ -673,30 +430,78 @@ async function fetchAndDisplayPortfolioAdmin() {
             return;
         }
 
-        projects.forEach(project => renderAdminPortfolioItem(project, listContainer));
+        projects.forEach(project => {
+            const listItem = document.createElement('li');
+            listItem.className = 'mood-item';
+            listItem.id = `portfolio-item-${project.id}`;
+            const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+
+            const strippedDescription = project.description.replace(/<[^>]+>/g, ' ');
+
+            // [DIPERBAIKI] Kesalahan sintaks HTML
+            listItem.innerHTML = `
+                <div class="mood-item-header">
+                    <span><strong>${project.title}</strong></span>
+                    <div class="mood-item-actions">
+                        <button class="mood-icon-button edit-portfolio-btn" data-id="${project.id}" aria-label="Edit Proyek">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                        </button>
+                        <button class="mood-icon-button delete-portfolio-btn delete-button" data-id="${project.id}" aria-label="Hapus Proyek">
+                            ${trashIconSvg}
+                        </button>
+                    </div>
+                </div>
+                <p class="mood-notes">${strippedDescription.substring(0, 100)}...</p>
+                <small class="mood-date">Dibuat: ${new Date(project.created_at).toLocaleString('id-ID')}</small>
+            `;
+            listContainer.appendChild(listItem);
+
+            listItem.querySelector('.edit-portfolio-btn').addEventListener('click', () => {
+                document.getElementById('portfolio-form-title').textContent = 'Edit Proyek';
+                document.getElementById('portfolio-id').value = project.id;
+                document.getElementById('portfolio-title').value = project.title;
+                document.getElementById('portfolio-link').value = project.project_link || '';
+                
+                const portfolioQuill = Quill.find(document.querySelector('#portfolio-description'));
+                if (portfolioQuill) {
+                    portfolioQuill.root.innerHTML = project.description;
+                }
+                
+                document.getElementById('portfolio-form').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            listItem.querySelector('.delete-portfolio-btn').addEventListener('click', async () => {
+                if (!confirm(`Yakin ingin menghapus proyek "${project.title}"?`)) return;
+                
+                try {
+                    const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio/${project.id}`, { method: 'DELETE' });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error);
+                    
+                    alert('Proyek berhasil dihapus.');
+                    fetchAndDisplayPortfolioAdmin();
+                } catch (error) {
+                    alert(`Error: ${error.message}`);
+                }
+            });
+        });
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
     }
 }
 
-
-// === FUNGSI MANAJEMEN JURNAL (DIPERBARUI) ===
 function setupAdminJurnalPanel() {
     const form = document.getElementById('jurnal-form');
     if (!form) return;
 
-    let quill = null;
-
-    const toolbarOptions = [
-        [{ 'header': [1, 2, 3, false] }],
-        ['bold', 'italic', 'underline'],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        ['link', 'image', 'code-block'],
-        ['clean']
-    ];
-
-    quill = new Quill('#jurnal-content-editor', {
-        modules: { toolbar: toolbarOptions },
+    const quill = new Quill('#jurnal-content-editor', {
+        modules: { toolbar: [
+             [{ 'header': [1, 2, 3, false] }],
+             ['bold', 'italic', 'underline'],
+             [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+             ['link', 'image', 'code-block'],
+             ['clean']
+        ]},
         theme: 'snow'
     });
 
@@ -718,8 +523,7 @@ function setupAdminJurnalPanel() {
 
             try {
                 const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/upload-image`, {
-                    method: 'POST',
-                    body: formData,
+                    method: 'POST', body: formData,
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Gagal mengunggah gambar');
@@ -746,9 +550,7 @@ function setupAdminJurnalPanel() {
         formTitle.textContent = 'Tambah Postingan Baru';
         messageDiv.textContent = '';
         messageDiv.className = '';
-        if (quill) {
-            quill.root.innerHTML = '';
-        }
+        quill.root.innerHTML = '';
     }
 
     clearButton.addEventListener('click', resetJurnalForm);
@@ -774,8 +576,7 @@ function setupAdminJurnalPanel() {
 
         try {
             const response = await fetchWithAuth(url, { 
-                method, 
-                body: JSON.stringify({ title, content })
+                method, body: JSON.stringify({ title, content })
             });
             const result = await response.json();
             if (!response.ok) throw new Error(result.error || 'Terjadi kesalahan.');
@@ -792,59 +593,6 @@ function setupAdminJurnalPanel() {
     });
 
     fetchAndDisplayJurnalAdmin();
-}
-
-function renderAdminJurnalItem(post, container) {
-    const listItem = document.createElement('li');
-    listItem.className = 'mood-item';
-    listItem.id = `jurnal-item-${post.id}`;
-    const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
-    const strippedContent = post.content.replace(/<[^>]+>/g, ''); 
-
-    listItem.innerHTML = `
-        <div class="mood-item-header">
-            <span><strong>${post.title}</strong></span>
-            <div class="mood-item-actions">
-                <button class="mood-icon-button edit-jurnal-btn" data-id="${post.id}" aria-label="Edit Postingan">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                </button>
-                <button class="mood-icon-button delete-jurnal-btn delete-button" data-id="${post.id}" aria-label="Hapus Postingan">
-                    ${trashIconSvg}
-                </button>
-            </div>
-        </div>
-        <p class="mood-notes">${strippedContent.substring(0, 100)}...</p>
-        <small class="mood-date">Dibuat: ${new Date(post.created_at).toLocaleString('id-ID')}</small>
-    `;
-    container.appendChild(listItem);
-
-    listItem.querySelector('.edit-jurnal-btn').addEventListener('click', async () => {
-        document.getElementById('jurnal-form-title').textContent = 'Edit Postingan';
-        document.getElementById('jurnal-id').value = post.id;
-        document.getElementById('jurnal-title').value = post.title;
-        
-        const editor = Quill.find(document.querySelector('#jurnal-content-editor'));
-        if (editor) {
-            editor.root.innerHTML = post.content;
-        }
-        
-        document.getElementById('jurnal-form').scrollIntoView({ behavior: 'smooth' });
-    });
-
-    listItem.querySelector('.delete-jurnal-btn').addEventListener('click', async () => {
-        if (!confirm(`Yakin ingin menghapus postingan "${post.title}"?`)) return;
-        
-        try {
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/${post.id}`, { method: 'DELETE' });
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error);
-            
-            alert('Postingan berhasil dihapus.');
-            fetchAndDisplayJurnalAdmin();
-        } catch (error) {
-            alert(`Error: ${error.message}`);
-        }
-    });
 }
 
 async function fetchAndDisplayJurnalAdmin() {
@@ -867,13 +615,77 @@ async function fetchAndDisplayJurnalAdmin() {
             return;
         }
 
-        posts.forEach(post => renderAdminJurnalItem(post, listContainer));
+        posts.forEach(post => {
+            const listItem = document.createElement('li');
+            listItem.className = 'mood-item';
+            listItem.id = `jurnal-item-${post.id}`;
+            const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+            const strippedContent = post.content.replace(/<[^>]+>/g, ''); 
+
+            listItem.innerHTML = `
+                <div class="mood-item-header">
+                    <span><strong>${post.title}</strong></span>
+                    <div class="mood-item-actions">
+                        <button class="mood-icon-button edit-jurnal-btn" data-id="${post.id}" aria-label="Edit Postingan">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                        </button>
+                        <button class="mood-icon-button delete-jurnal-btn delete-button" data-id="${post.id}" aria-label="Hapus Postingan">
+                            ${trashIconSvg}
+                        </button>
+                    </div>
+                </div>
+                <p class="mood-notes">${strippedContent.substring(0, 100)}...</p>
+                <small class="mood-date">Dibuat: ${new Date(post.created_at).toLocaleString('id-ID')}</small>
+            `;
+            listContainer.appendChild(listItem);
+
+            listItem.querySelector('.edit-jurnal-btn').addEventListener('click', () => {
+                document.getElementById('jurnal-form-title').textContent = 'Edit Postingan';
+                document.getElementById('jurnal-id').value = post.id;
+                document.getElementById('jurnal-title').value = post.title;
+                
+                const editor = Quill.find(document.querySelector('#jurnal-content-editor'));
+                if (editor) {
+                    editor.root.innerHTML = post.content;
+                }
+                
+                document.getElementById('jurnal-form').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            listItem.querySelector('.delete-jurnal-btn').addEventListener('click', async () => {
+                if (!confirm(`Yakin ingin menghapus postingan "${post.title}"?`)) return;
+                
+                try {
+                    const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/${post.id}`, { method: 'DELETE' });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error);
+                    
+                    alert('Postingan berhasil dihapus.');
+                    fetchAndDisplayJurnalAdmin();
+                } catch (error) {
+                    alert(`Error: ${error.message}`);
+                }
+            });
+        });
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
     }
 }
 
-// ... Sisa fungsi tidak berubah (fetchAndDisplayLinks, fetchAndDisplayUsers, dll.)
+function setupAdminLinksPanel() {
+    const adminSection = document.getElementById('admin-section');
+    if (!adminSection) return;
+    const linkSearchInput = document.getElementById('link-search-input');
+    let linkSearchTimeout;
+    linkSearchInput.addEventListener('input', (e) => {
+        clearTimeout(linkSearchTimeout);
+        linkSearchTimeout = setTimeout(() => {
+            fetchAndDisplayLinks(e.target.value);
+        }, 300);
+    });
+    fetchAndDisplayLinks();
+}
+
 async function fetchAndDisplayLinks(searchQuery = '') {
     const linkList = document.getElementById('link-list');
     const loadingMessage = document.getElementById('loading-links');
@@ -922,9 +734,41 @@ async function fetchAndDisplayLinks(searchQuery = '') {
 
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
-        console.error(error);
     }
 }
+
+async function handleDeleteLink(event) {
+    const button = event.currentTarget;
+    const slugToDelete = button.dataset.slug;
+    if (!confirm(`Anda yakin ingin menghapus link dengan slug "${slugToDelete}"?`)) return;
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/links/${slugToDelete}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Gagal menghapus link.');
+
+        alert(data.message);
+        document.getElementById(`link-${slugToDelete}`)?.remove();
+
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+    }
+}
+
+function setupAdminUsersPanel() {
+    const adminUsersSection = document.getElementById('admin-users-section');
+    if (!adminUsersSection) return;
+    const userSearchInput = document.getElementById('user-search-input');
+    let userSearchTimeout;
+    userSearchInput.addEventListener('input', (e) => {
+        clearTimeout(userSearchTimeout);
+        userSearchTimeout = setTimeout(() => {
+            fetchAndDisplayUsers(e.target.value);
+        }, 300);
+    });
+    fetchAndDisplayUsers();
+}
+
 async function fetchAndDisplayUsers(searchQuery = '') {
     const userList = document.getElementById('user-list');
     const loadingMessage = document.getElementById('loading-users');
@@ -975,28 +819,9 @@ async function fetchAndDisplayUsers(searchQuery = '') {
 
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
-        console.error(error);
     }
 }
-async function handleDeleteLink(event) {
-    const button = event.currentTarget;
-    const slugToDelete = button.dataset.slug;
-    if (!confirm(`Anda yakin ingin menghapus link dengan slug "${slugToDelete}"?`)) return;
 
-    try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/links/${slugToDelete}`, { method: 'DELETE' });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Gagal menghapus link.');
-
-        alert(data.message);
-        const listItemToRemove = document.getElementById(`link-${slugToDelete}`);
-        if (listItemToRemove) listItemToRemove.remove();
-
-    } catch (error) {
-        alert(`Error: ${error.message}`);
-        console.error(error);
-    }
-}
 async function toggleUserRole(event) {
     const button = event.currentTarget;
     const userId = button.dataset.userId;
@@ -1020,9 +845,9 @@ async function toggleUserRole(event) {
         }
     } catch (error) {
         alert(`Error: ${error.message}`);
-        console.error(error);
     }
 }
+
 async function deleteUser(event) {
     const button = event.currentTarget;
     const userId = button.dataset.userId;
@@ -1034,19 +859,17 @@ async function deleteUser(event) {
         if (!response.ok) throw new Error(data.error || 'Gagal menghapus pengguna.');
 
         alert(data.message);
-        const listItemToRemove = document.getElementById(`user-${userId}`);
-        if (listItemToRemove) listItemToRemove.remove();
-
+        document.getElementById(`user-${userId}`)?.remove();
     } catch (error) {
         alert(`Error: ${error.message}`);
-        console.error(error);
     }
 }
-// === LOGIKA HALAMAN PUBLIK (PORTOFOLIO, JURNAL, DLL) ===
+
 function setupPortfolioPage() {
     const portfolioGrid = document.querySelector('.portfolio-grid');
     if (!portfolioGrid) return;
 
+    portfolioGrid.innerHTML = '<p style="text-align: center; color: var(--text-muted-color);">Memuat proyek...</p>';
     async function fetchAndRenderPortfolio() {
         try {
             const response = await fetch(`${API_BASE_URL}/api/portfolio`);
@@ -1068,21 +891,18 @@ function setupPortfolioPage() {
 
                 const projectImage = project.image_url || 'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=500&q=80'; 
                 
-                const projectLinkButton = `<span class="button-pintu">Lihat Detail</span>`;
-
                 projectCard.innerHTML = `
                     <img src="${projectImage}" alt="Gambar proyek ${project.title}">
                     <div class="card-content">
                         <h3>${project.title}</h3>
                         <p>${project.description.replace(/<[^>]+>/g, ' ').substring(0, 150)}...</p>
-                        ${projectLinkButton}
+                        <span class="button-pintu">Lihat Detail</span>
                     </div>
                 `;
                 portfolioGrid.appendChild(projectCard);
             });
 
         } catch (error) {
-            console.error('Error:', error);
             portfolioGrid.innerHTML = `<p style="text-align: center; color: var(--text-muted-color);">${error.message}</p>`;
         }
     }
@@ -1117,8 +937,13 @@ function setupProjectDetailPage() {
             document.title = `${project.title} - Detail Proyek`;
             titleElement.textContent = project.title;
             
-            imageElement.src = project.image_url; 
-            imageElement.alt = `Gambar proyek ${project.title}`;
+            if (project.image_url) {
+                imageElement.src = project.image_url; 
+                imageElement.alt = `Gambar proyek ${project.title}`;
+            } else {
+                imageElement.style.display = 'none';
+            }
+            
             descriptionElement.innerHTML = project.description;
 
             if (project.project_link) {
@@ -1132,7 +957,6 @@ function setupProjectDetailPage() {
             mainContent.style.display = 'block';
 
         } catch (error) {
-            console.error(error);
             loadingIndicator.innerHTML = `<p style="color: #ff4d4d;">Error: ${error.message}</p>`;
         }
     }
@@ -1143,6 +967,7 @@ function setupJurnalPage() {
     const jurnalGrid = document.querySelector('.jurnal-grid');
     if (!jurnalGrid) return;
 
+    jurnalGrid.innerHTML = '<p style="text-align: center; color: var(--text-muted-color);">Memuat jurnal...</p>';
     async function fetchAndRenderJurnal() {
         try {
             const response = await fetch(`${API_BASE_URL}/api/jurnal`);
@@ -1161,8 +986,7 @@ function setupJurnalPage() {
                 postCard.className = 'jurnal-card';
                 postCard.setAttribute('data-aos', 'fade-up');
                 
-                const firstImageMatch = post.content.match(/<img[^>]+src="([^">]+)"/);
-                const postImage = post.image_url || (firstImageMatch ? firstImageMatch[1] : 'https://images.unsplash.com/photo-1489549132488-d00b7d8818e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80');
+                const postImage = post.image_url || 'https://images.unsplash.com/photo-1489549132488-d00b7d8818e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80';
                 
                 const strippedContent = post.content.replace(/<[^>]+>/g, ' ');
                 const excerpt = strippedContent.substring(0, 150).trim() + (strippedContent.length > 150 ? '...' : '');
@@ -1182,7 +1006,6 @@ function setupJurnalPage() {
             });
 
         } catch (error) {
-            console.error('Error:', error);
             jurnalGrid.innerHTML = `<p style="text-align: center; color: var(--text-muted-color);">${error.message}</p>`;
         }
     }
@@ -1214,22 +1037,18 @@ function setupJurnalDetailPage() {
             document.title = `${post.title} - Detail Jurnal`;
             titleElement.textContent = post.title;
             metaElement.textContent = `Dipublikasikan pada ${new Date(post.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
-
-            
             contentElement.innerHTML = post.content;
 
             loadingIndicator.style.display = 'none';
             mainContent.style.display = 'block';
 
         } catch (error) {
-            console.error(error);
             loadingIndicator.innerHTML = `<p style="color: #ff4d4d;">Error: ${error.message}</p>`;
         }
     }
     fetchJurnalDetails();
 }
 
-// === LOGIKA HALAMAN TOOLS ===
 function setupToolsPage() {
     const wrappers = [
         document.getElementById('shortener-wrapper'), document.getElementById('history-section'),
@@ -1242,8 +1061,8 @@ function setupToolsPage() {
     wrappers.forEach(el => el && el.classList.add('hidden'));
 
     if (localStorage.getItem('jwt_refresh_token')) {
-        if (loginPrompt) loginPrompt.classList.add('hidden');
-        if (toolSelectionSection) toolSelectionSection.classList.remove('hidden');
+        loginPrompt?.classList.add('hidden');
+        toolSelectionSection?.classList.remove('hidden');
 
         document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper'));
         document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper'));
@@ -1258,29 +1077,11 @@ function setupToolsPage() {
         attachImageCompressorListener();
 
     } else {
-        if (loginPrompt) loginPrompt.classList.remove('hidden');
-        if (toolSelectionSection) toolSelectionSection.classList.add('hidden');
-    }
-
-    const fileInput = document.getElementById('file-input');
-    const outputFormatSelect = document.getElementById('output-format');
-
-    if (fileInput && outputFormatSelect) {
-        fileInput.addEventListener('change', () => {
-            if (!fileInput.files || fileInput.files.length === 0) return;
-            const fileName = fileInput.files[0].name.toLowerCase();
-            const docxOption = outputFormatSelect.querySelector('option[value="docx"]');
-            if (fileName.endsWith('.pdf')) {
-                if (docxOption) {
-                    docxOption.disabled = true;
-                    if (outputFormatSelect.value === 'docx') outputFormatSelect.value = 'pdf';
-                }
-            } else {
-                if (docxOption) docxOption.disabled = false;
-            }
-        });
+        loginPrompt?.classList.remove('hidden');
+        toolSelectionSection?.classList.add('hidden');
     }
 }
+
 function showToolSection(sectionIdToShow) {
     const allToolSections = [
         document.getElementById('shortener-wrapper'), document.getElementById('converter-wrapper'),
@@ -1290,8 +1091,10 @@ function showToolSection(sectionIdToShow) {
     const historySection = document.getElementById('history-section');
 
     allToolSections.forEach(section => {
-        if (section && section.id === sectionIdToShow) section.classList.remove('hidden');
-        else section?.classList.add('hidden');
+        if (section) {
+            if (section.id === sectionIdToShow) section.classList.remove('hidden');
+            else section.classList.add('hidden');
+        }
     });
 
     if (historySection) {
@@ -1306,6 +1109,7 @@ function showToolSection(sectionIdToShow) {
     const targetSection = document.getElementById(sectionIdToShow);
     if (targetSection) targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
 function attachShortenerListener() {
     const form = document.getElementById('shortener-form');
     if (!form) return;
@@ -1345,15 +1149,14 @@ function attachShortenerListener() {
         }
     });
 
-    if (copyButton) {
-        copyButton.addEventListener('click', () => {
-            navigator.clipboard.writeText(resultText.textContent).then(() => {
-                copyIcon.style.display = 'none'; checkIcon.style.display = 'block';
-                setTimeout(() => { copyIcon.style.display = 'block'; checkIcon.style.display = 'none'; }, 2000);
-            });
+    copyButton?.addEventListener('click', () => {
+        navigator.clipboard.writeText(resultText.textContent).then(() => {
+            copyIcon.style.display = 'none'; checkIcon.style.display = 'block';
+            setTimeout(() => { copyIcon.style.display = 'block'; checkIcon.style.display = 'none'; }, 2000);
         });
-    }
+    });
 }
+
 function attachConverterListener() {
     const form = document.getElementById('converter-form');
     if (!form) return;
@@ -1398,6 +1201,7 @@ function attachConverterListener() {
         }
     });
 }
+
 function attachImageMergerListener() {
     const form = document.getElementById('image-merger-form');
     if (!form) return;
@@ -1445,6 +1249,7 @@ function attachImageMergerListener() {
         }
     });
 }
+
 function attachQrCodeGeneratorListener() {
     const form = document.getElementById('qr-generator-form');
     if (!form) return;
@@ -1499,6 +1304,7 @@ function attachQrCodeGeneratorListener() {
         document.body.removeChild(link);
     });
 }
+
 function attachImageCompressorListener() {
     const form = document.getElementById('image-compressor-form');
     if (!form) return;
@@ -1579,6 +1385,7 @@ function attachImageCompressorListener() {
         }
     });
 }
+
 async function fetchUserLinkHistory() {
     const historyList = document.getElementById('link-history-list');
     const loadingMessage = document.getElementById('loading-history');
@@ -1594,16 +1401,15 @@ async function fetchUserLinkHistory() {
         historyList.innerHTML = '';
         if (links.length === 0) {
             loadingMessage.textContent = 'Anda belum memiliki riwayat tautan.';
-            loadingMessage.style.display = 'block';
         } else {
             loadingMessage.style.display = 'none';
             links.forEach(link => renderUserLinkItem(link, historyList));
         }
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
-        loadingMessage.style.display = 'block';
     }
 }
+
 function renderUserLinkItem(link, container) {
     const shortUrl = `https://link.hamdirzl.my.id/${link.slug}`;
     const listItem = document.createElement('li');
@@ -1633,8 +1439,9 @@ function renderUserLinkItem(link, container) {
         });
     });
 
-    listItem.querySelector('.delete-user-link-btn').addEventListener('click', (e) => handleDeleteUserLink(e));
+    listItem.querySelector('.delete-user-link-btn').addEventListener('click', handleDeleteUserLink);
 }
+
 async function handleDeleteUserLink(event) {
     const button = event.currentTarget;
     const slugToDelete = button.dataset.slug;
@@ -1646,8 +1453,7 @@ async function handleDeleteUserLink(event) {
         if (!response.ok) throw new Error(data.error || 'Gagal menghapus tautan dari riwayat.');
 
         alert(data.message);
-        const listItemToRemove = document.getElementById(`user-link-${slugToDelete}`);
-        if (listItemToRemove) listItemToRemove.remove();
+        document.getElementById(`user-link-${slugToDelete}`)?.remove();
 
         const historyList = document.getElementById('link-history-list');
         const loadingMessage = document.getElementById('loading-history');
@@ -1657,9 +1463,9 @@ async function handleDeleteUserLink(event) {
         }
     } catch (error) {
         alert(`Error: ${error.message}`);
-        console.error('Error deleting user link:', error);
     }
 }
+
 function setupAuthPage() {
     const loginSection = document.getElementById('login-section');
     const registerSection = document.getElementById('register-section');
@@ -1670,69 +1476,67 @@ function setupAuthPage() {
     const authMessage = document.getElementById('auth-message');
     const authTitle = document.getElementById('auth-title');
 
-    if (showRegisterLink) {
-        showRegisterLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginSection.classList.add('hidden');
-            registerSection.classList.remove('hidden');
-            if (authTitle) authTitle.textContent = 'Registrasi';
-            authMessage.textContent = ''; authMessage.className = '';
-        });
-    }
-    if (showLoginLink) {
-        showLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            registerSection.classList.add('hidden');
-            loginSection.classList.remove('hidden');
-            if (authTitle) authTitle.textContent = 'Login';
-            authMessage.textContent = ''; authMessage.className = '';
-        });
-    }
-    if (registerForm) {
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            authMessage.textContent = 'Memproses...';
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error);
-                authMessage.textContent = 'Registrasi berhasil! Silakan login.';
-                authMessage.className = 'success';
-                if (showLoginLink) showLoginLink.click();
-            } catch (error) {
-                authMessage.textContent = `Error: ${error.message}`;
-                authMessage.className = 'error';
-            }
-        });
-    }
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            authMessage.textContent = 'Memproses...';
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error);
+    showRegisterLink?.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginSection?.classList.add('hidden');
+        registerSection?.classList.remove('hidden');
+        if (authTitle) authTitle.textContent = 'Registrasi';
+        if(authMessage) { authMessage.textContent = ''; authMessage.className = ''; }
+    });
 
-                localStorage.setItem('jwt_refresh_token', data.refreshToken);
-                sessionStorage.setItem('jwt_access_token', data.accessToken);
+    showLoginLink?.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerSection?.classList.add('hidden');
+        loginSection?.classList.remove('hidden');
+        if (authTitle) authTitle.textContent = 'Login';
+        if(authMessage) { authMessage.textContent = ''; authMessage.className = ''; }
+    });
+    
+    registerForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        authMessage.textContent = 'Memproses...';
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+            authMessage.textContent = 'Registrasi berhasil! Silakan login.';
+            authMessage.className = 'success';
+            showLoginLink?.click();
+        } catch (error) {
+            authMessage.textContent = `Error: ${error.message}`;
+            authMessage.className = 'error';
+        }
+    });
+    
+    loginForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        authMessage.textContent = 'Memproses...';
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
 
-                authMessage.textContent = 'Login berhasil! Mengalihkan ke halaman utama...';
-                authMessage.className = 'success';
-                setTimeout(() => { window.location.href = 'index.html'; }, 1000);
-            } catch (error) {
-                authMessage.textContent = `Error: ${error.message}`;
-                authMessage.className = 'error';
-            }
-        });
-    }
+            localStorage.setItem('jwt_refresh_token', data.refreshToken);
+            sessionStorage.setItem('jwt_access_token', data.accessToken);
+
+            authMessage.textContent = 'Login berhasil! Mengalihkan ke halaman utama...';
+            authMessage.className = 'success';
+            setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+        } catch (error) {
+            authMessage.textContent = `Error: ${error.message}`;
+            authMessage.className = 'error';
+        }
+    });
 }
-const forgotForm = document.getElementById('forgot-form');
-if (forgotForm) {
+
+function setupForgotPasswordPage() {
+    const forgotForm = document.getElementById('forgot-form');
+    if (!forgotForm) return;
+
     forgotForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('forgot-email').value;
@@ -1758,8 +1562,11 @@ if (forgotForm) {
         }
     });
 }
-const resetForm = document.getElementById('reset-form');
-if (resetForm) {
+
+function setupResetPasswordPage() {
+    const resetForm = document.getElementById('reset-form');
+    if (!resetForm) return;
+
     resetForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const messageDiv = document.getElementById('auth-message');
@@ -1789,6 +1596,7 @@ if (resetForm) {
         }
     });
 }
+
 function setupAccountManagement() {
     const form = document.getElementById('change-password-form');
     if (!form) return;
@@ -1833,6 +1641,7 @@ function setupAccountManagement() {
         }
     });
 }
+
 function setupDashboardTabs() {
     const dashboardNav = document.querySelector('.dashboard-nav');
     if (!dashboardNav) return;
@@ -1856,22 +1665,24 @@ function setupDashboardTabs() {
         }
     });
 }
+
 function setupMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
     const menuOverlay = document.getElementById('menu-overlay');
 
     const toggleMenu = () => {
-        if(hamburger) hamburger.classList.toggle('active');
-        if(navLinks) navLinks.classList.toggle('active');
-        if(menuOverlay) menuOverlay.classList.toggle('active');
+        hamburger?.classList.toggle('active');
+        navLinks?.classList.toggle('active');
+        menuOverlay?.classList.toggle('active');
         document.body.classList.toggle('menu-open');
         document.documentElement.classList.toggle('menu-open');
     };
 
-    if (hamburger) hamburger.addEventListener('click', toggleMenu);
-    if (menuOverlay) menuOverlay.addEventListener('click', toggleMenu);
+    hamburger?.addEventListener('click', toggleMenu);
+    menuOverlay?.addEventListener('click', toggleMenu);
 }
+
 function setupAboutModal() {
     const aboutButtons = document.querySelectorAll('#about-button');
     const modalOverlay = document.getElementById('about-modal');
@@ -1880,10 +1691,11 @@ function setupAboutModal() {
     const openModal = () => modalOverlay.classList.remove('hidden');
     const closeModal = () => modalOverlay.classList.add('hidden');
     aboutButtons.forEach(button => button.addEventListener('click', e => { e.preventDefault(); openModal(); }));
-    if (modalCloseButton) modalCloseButton.addEventListener('click', closeModal);
+    modalCloseButton?.addEventListener('click', closeModal);
     modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) closeModal(); });
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); });
 }
+
 function setupAllPasswordToggles() {
     const eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
     const eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
@@ -1903,7 +1715,7 @@ function setupAllPasswordToggles() {
     setupPasswordToggle('toggle-register-password', 'register-password');
     setupPasswordToggle('toggle-reset-password', 'reset-password');
     setupPasswordToggle('toggle-confirm-password', 'confirm-password');
-} // <-- Pastikan fungsi ini ditutup dengan benar
+}
 
 function setupChatBubble() {
     const chatBubble = document.getElementById('chat-bubble');
@@ -1914,7 +1726,12 @@ function setupChatBubble() {
     const sendChatButton = document.getElementById('send-chat-button');
     let chatChannel = null;
 
-    if (!chatBubble || !openChatButton || !localStorage.getItem('jwt_refresh_token')) return; // Hanya setup jika user login
+    if (!chatBubble || !openChatButton || !localStorage.getItem('jwt_refresh_token')) {
+        openChatButton?.classList.add('hidden');
+        return;
+    };
+
+    openChatButton?.classList.remove('hidden');
 
     function getOrCreateChatSessionId() {
         let sessionId = sessionStorage.getItem('chat_session_id');
@@ -1925,21 +1742,20 @@ function setupChatBubble() {
         return sessionId;
     }
     
-    // [BARU] Fungsi untuk menampilkan pesan di UI chat bubble
-    function appendMessage(text, type) { // 'user' atau 'admin'
+    function appendMessageToChat(text, type) {
+        if (!chatMessages) return;
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', type === 'user' ? 'user-message' : 'ai-message');
         messageElement.textContent = text;
         chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // [BARU] Fungsi untuk mengirim pesan dari chat bubble pengguna
-    async function sendMessage() {
+    async function sendMessageToChat() {
         const content = chatInputText.value.trim();
         if (!content) return;
 
-        appendMessage(content, 'user'); // Tampilkan pesan sendiri di UI
+        appendMessageToChat(content, 'user');
         chatInputText.value = '';
 
         try {
@@ -1952,7 +1768,7 @@ function setupChatBubble() {
             });
         } catch (error) {
             console.error('Gagal mengirim pesan:', error);
-            appendMessage('Gagal mengirim pesan. Coba lagi.', 'admin'); // Kasih feedback error
+            appendMessageToChat('Gagal mengirim pesan. Coba lagi.', 'admin');
         }
     }
 
@@ -1971,22 +1787,21 @@ function setupChatBubble() {
                 filter: `session_id=eq.${sessionId}`
             }, (payload) => {
                 const newMessage = payload.new;
-                // Hanya tampilkan pesan jika pengirimnya adalah admin
                 if (newMessage.sender_role === 'admin') {
-                    appendMessage(newMessage.content, 'admin');
+                    appendMessageToChat(newMessage.content, 'admin');
                 }
             })
             .subscribe();
     }
 
-    openChatButton.addEventListener('click', () => {
-        chatBubble.classList.remove('hidden');
+    openChatButton?.addEventListener('click', () => {
+        chatBubble?.classList.remove('hidden');
         openChatButton.classList.add('hidden');
         listenForReplies();
     });
 
-    closeChatButton.addEventListener('click', () => {
-        chatBubble.classList.add('hidden');
+    closeChatButton?.addEventListener('click', () => {
+        chatBubble?.classList.add('hidden');
         openChatButton.classList.remove('hidden');
         if (chatChannel) {
             supabase.removeChannel(chatChannel);
@@ -1994,13 +1809,114 @@ function setupChatBubble() {
         }
     });
 
-    sendChatButton.addEventListener('click', sendMessage);
-    chatInputText.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+    sendChatButton?.addEventListener('click', sendMessageToChat);
+    chatInputText?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessageToChat(); });
 }
 
-    function appendMessage(text, ...types) {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', ...types);
-        messageElement.textContent = text;
-        chatMessages.appendChild(messageElement);
+function setupAdminLiveChatPanel() {
+    const sessionsList = document.getElementById('chat-sessions-list');
+    const messagesView = document.getElementById('chat-messages-admin');
+    const sessionHeader = document.getElementById('chat-session-id-header');
+    const replyForm = document.getElementById('admin-reply-form');
+    const replyInput = document.getElementById('admin-reply-input');
+    let activeSessionId = null;
+    let adminChatChannel = null;
+
+    async function fetchSessions() {
+        try {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/chat/sessions`);
+            const sessions = await response.json();
+            if (!sessionsList) return;
+            sessionsList.innerHTML = '';
+            if (sessions.length === 0) {
+                sessionsList.innerHTML = '<p>Belum ada sesi chat.</p>';
+                return;
+            }
+            sessions.forEach(session => {
+                const sessionEl = document.createElement('div');
+                sessionEl.className = 'mood-item';
+                sessionEl.style.cursor = 'pointer';
+                
+                sessionEl.innerHTML = `
+                    <strong>Sesi: <small>${session.session_id.substring(0, 8)}...</small></strong>
+                    <p class="mood-notes">Pesan terakhir: ${session.last_message.substring(0, 30)}...</p>
+                    <small class="mood-date">Update: ${new Date(session.last_updated).toLocaleString('id-ID')}</small>
+                `;
+                
+                sessionEl.addEventListener('click', () => loadConversation(session.session_id));
+                sessionsList.appendChild(sessionEl);
+            });
+        } catch (error) {
+            if (sessionsList) sessionsList.innerHTML = '<p>Gagal memuat sesi.</p>';
+        }
     }
+
+    async function loadConversation(sessionId) {
+        activeSessionId = sessionId;
+        sessionHeader.textContent = `Percakapan Sesi: ${sessionId.substring(0, 8)}...`;
+        messagesView.innerHTML = '<p>Memuat pesan...</p>';
+        replyForm.style.display = 'flex'; // Use flex for better alignment
+
+        try {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/chat/messages/${sessionId}`);
+            const messages = await response.json();
+            messagesView.innerHTML = '';
+            messages.forEach(msg => {
+                const msgEl = document.createElement('div');
+                msgEl.classList.add('message', msg.sender_role === 'admin' ? 'user-message' : 'ai-message');
+                msgEl.textContent = msg.content;
+                messagesView.appendChild(msgEl);
+            });
+            messagesView.scrollTop = messagesView.scrollHeight;
+        } catch (error) {
+            messagesView.innerHTML = '<p>Gagal memuat pesan.</p>';
+        }
+    }
+
+    replyForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const content = replyInput.value.trim();
+        if (!content || !activeSessionId) return;
+
+        try {
+            await fetchWithAuth(`${API_BASE_URL}/api/chat/message`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    session_id: activeSessionId,
+                    content: content
+                })
+            });
+            replyInput.value = '';
+        } catch (error) {
+            alert('Gagal mengirim balasan.');
+        }
+    });
+
+    function listenForAdminUpdates() {
+        if (adminChatChannel) return;
+        adminChatChannel = supabase
+            .channel('live_chat_admin')
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'live_chat_messages'
+            }, (payload) => {
+                fetchSessions();
+                const newMessage = payload.new;
+                if (newMessage.session_id === activeSessionId) {
+                    const msgEl = document.createElement('div');
+                    msgEl.classList.add('message', newMessage.sender_role === 'admin' ? 'user-message' : 'ai-message');
+                    msgEl.textContent = newMessage.content;
+                    messagesView.appendChild(msgEl);
+                    messagesView.scrollTop = messagesView.scrollHeight;
+                }
+            })
+            .subscribe();
+    }
+
+    const adminChatTab = document.getElementById('admin-livechat-tab');
+    adminChatTab?.addEventListener('click', () => {
+        fetchSessions();
+        listenForAdminUpdates();
+    });
+}
