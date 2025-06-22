@@ -1713,3 +1713,8 @@ input:focus, textarea:focus, select:focus {
 .tox .tox-body, .tox .tox-content-preview {
     color: var(--text-color);
 }
+/* KODE UNTUK MEMBUAT HEADER MELAYANG DI HALAMAN UTAMA */
+.is-homepage .navbar {
+    position: absolute;
+    width: 100%;
+}
