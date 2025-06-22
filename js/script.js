@@ -232,7 +232,7 @@ async function uploadCroppedImageForEditor(blob, successCallback, failureCallbac
     formData.append('file', blob, 'cropped-image.jpg');
 
     try {
-        const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/upload-image`, { //
+        const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/upload-image`, {
             method: 'POST',
             body: formData,
         });
@@ -240,7 +240,7 @@ async function uploadCroppedImageForEditor(blob, successCallback, failureCallbac
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Gagal mengunggah gambar');
         
-        successCallback(data.location); //
+        successCallback(data.location);
 
     } catch (error) {
         console.error(error);
@@ -366,15 +366,17 @@ function setupAdminPanels() {
     }
 }
 
-// === LOGIKA MANAJEMEN PORTOFOLIO ADMIN (DENGAN CROP) ===
+// === LOGIKA MANAJEMEN PORTOFOLIO ADMIN (DENGAN QUILL.JS) ===
 function setupAdminPortfolioPanel() {
     const form = document.getElementById('portfolio-form');
     if (!form) return;
 
+    // Variabel untuk instance Quill khusus portofolio
+    let portfolioQuill;
+
     const formTitle = document.getElementById('portfolio-form-title');
     const hiddenId = document.getElementById('portfolio-id');
     const titleInput = document.getElementById('portfolio-title');
-    const descriptionInput = document.getElementById('portfolio-description');
     const linkInput = document.getElementById('portfolio-link');
     const imageTrigger = document.getElementById('portfolio-image-trigger');
     const imageInput = document.getElementById('portfolio-image');
@@ -382,6 +384,25 @@ function setupAdminPortfolioPanel() {
     const messageDiv = document.getElementById('portfolio-message');
     const clearButton = document.getElementById('clear-portfolio-form');
     const currentImageInfo = document.getElementById('current-image-info');
+    const editorDiv = document.getElementById('quill-portfolio-editor');
+
+    // Inisialisasi Quill untuk editor portofolio
+    portfolioQuill = new Quill(editorDiv, {
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['link'],
+                ['clean']
+            ]
+        },
+        theme: 'snow',
+        placeholder: 'Jelaskan detail proyek Anda di sini...'
+    });
+    // Simpan referensi instance ke elemennya
+    if (editorDiv) {
+        editorDiv.__quill = portfolioQuill;
+    }
 
     function resetPortfolioForm() {
         form.reset();
@@ -392,7 +413,11 @@ function setupAdminPortfolioPanel() {
         fileNameLabel.textContent = 'Tidak ada file dipilih';
         fileNameLabel.style.color = '';
         currentImageInfo.textContent = '';
-        croppedPortfolioBlob = null; 
+        croppedPortfolioBlob = null;
+        // Kosongkan editor Quill
+        if (portfolioQuill) {
+            portfolioQuill.setText('');
+        }
     }
 
     clearButton.addEventListener('click', resetPortfolioForm);
@@ -420,9 +445,12 @@ function setupAdminPortfolioPanel() {
             return;
         }
 
+        // Ambil konten deskripsi dari Quill
+        const descriptionContent = portfolioQuill.root.innerHTML;
+
         const formData = new FormData();
         formData.append('title', titleInput.value);
-        formData.append('description', descriptionInput.value);
+        formData.append('description', descriptionContent); // Masukkan konten HTML dari Quill
         formData.append('project_link', linkInput.value);
         
         if (croppedPortfolioBlob) {
@@ -480,45 +508,47 @@ function setupAdminJurnalPanel() {
     ];
 
     // 2. Inisialisasi Quill
-    quill = new Quill(editorDiv, {
-        modules: {
-            toolbar: toolbarOptions
-        },
-        theme: 'snow',
-        placeholder: 'Tuliskan pemikiran Anda di sini...'
-    });
-    // Simpan referensi instance Quill ke elemennya agar bisa diakses dari fungsi lain
-    editorDiv.__quill = quill;
+    if (editorDiv) {
+        quill = new Quill(editorDiv, {
+            modules: {
+                toolbar: toolbarOptions
+            },
+            theme: 'snow',
+            placeholder: 'Tuliskan pemikiran Anda di sini...'
+        });
+        // Simpan referensi instance Quill ke elemennya agar bisa diakses dari fungsi lain
+        editorDiv.__quill = quill;
+    }
+
 
     // 3. Meng-handle Upload Gambar (Menggunakan fungsi cropping yang sudah ada)
-    quill.getModule('toolbar').addHandler('image', () => {
-        const input = document.createElement('input');
-        input.setAttribute('type', 'file');
-        input.setAttribute('accept', 'image/*');
-        input.click();
+    if (quill) {
+        quill.getModule('toolbar').addHandler('image', () => {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.click();
 
-        input.onchange = () => {
-            const file = input.files[0];
-            if (file) {
-                // Panggil fungsi cropping yang sudah ada
-                handleImageSelectionForCropping(file, (blob) => {
-                    // Setelah dicrop, unggah blob.
-                    // Gunakan kembali fungsi upload yang sudah ada.
-                    uploadCroppedImageForEditor(
-                        blob,
-                        (location) => { // Success
-                            const range = quill.getSelection(true);
-                            quill.insertEmbed(range.index, 'image', location);
-                        },
-                        (errorText) => { // Failure
-                            console.error(errorText);
-                            alert(`Gagal mengunggah gambar: ${errorText}`);
-                        }
-                    );
-                }, 16 / 9);
-            }
-        };
-    });
+            input.onchange = () => {
+                const file = input.files[0];
+                if (file) {
+                    handleImageSelectionForCropping(file, (blob) => {
+                        uploadCroppedImageForEditor(
+                            blob,
+                            (location) => { // Success
+                                const range = quill.getSelection(true);
+                                quill.insertEmbed(range.index, 'image', location);
+                            },
+                            (errorText) => { // Failure
+                                console.error(errorText);
+                                alert(`Gagal mengunggah gambar: ${errorText}`);
+                            }
+                        );
+                    }, 16 / 9);
+                }
+            };
+        });
+    }
 
     // 4. Fungsi untuk mereset form Jurnal
     function resetJurnalForm() {
@@ -540,7 +570,6 @@ function setupAdminJurnalPanel() {
         
         const id = hiddenId.value;
         const title = titleInput.value;
-        // Mengambil konten dari Quill sebagai HTML
         const content = quill.root.innerHTML;
         
         if (!title || quill.getLength() <= 1) {
@@ -603,11 +632,14 @@ async function fetchAndDisplayPortfolioAdmin() {
         loadingMessage.textContent = `Error: ${error.message}`;
     }
 }
+
 function renderAdminPortfolioItem(project, container) {
     const listItem = document.createElement('li');
     listItem.className = 'mood-item';
     listItem.id = `portfolio-item-${project.id}`;
     const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+
+    const strippedDescription = project.description.replace(/<[^>]+>/g, ' ');
 
     listItem.innerHTML = `
         <div class="mood-item-header">
@@ -621,7 +653,7 @@ function renderAdminPortfolioItem(project, container) {
                 </button>
             </div>
         </div>
-        <p class="mood-notes">${project.description.substring(0, 100)}...</p>
+        <p class="mood-notes">${strippedDescription.substring(0, 100)}...</p>
         <small class="mood-date">Dibuat: ${new Date(project.created_at).toLocaleString('id-ID')}</small>
     `;
     container.appendChild(listItem);
@@ -630,9 +662,14 @@ function renderAdminPortfolioItem(project, container) {
         document.getElementById('portfolio-form-title').textContent = 'Edit Proyek';
         document.getElementById('portfolio-id').value = project.id;
         document.getElementById('portfolio-title').value = project.title;
-        document.getElementById('portfolio-description').value = project.description;
         document.getElementById('portfolio-link').value = project.project_link || '';
         document.getElementById('current-image-info').textContent = `Gambar saat ini digunakan. Pilih gambar baru untuk mengganti.`;
+        
+        const editorDiv = document.getElementById('quill-portfolio-editor');
+        if (editorDiv && editorDiv.__quill) {
+            editorDiv.__quill.root.innerHTML = project.description;
+        }
+
         document.getElementById('portfolio-form').scrollIntoView({ behavior: 'smooth' });
     });
 
@@ -651,6 +688,7 @@ function renderAdminPortfolioItem(project, container) {
         }
     });
 }
+
 async function fetchAndDisplayJurnalAdmin() {
     const listContainer = document.getElementById('jurnal-list-admin');
     const loadingMessage = document.getElementById('loading-jurnal-admin');
@@ -676,12 +714,13 @@ async function fetchAndDisplayJurnalAdmin() {
         loadingMessage.textContent = `Error: ${error.message}`;
     }
 }
+
 function renderAdminJurnalItem(post, container) {
     const listItem = document.createElement('li');
     listItem.className = 'mood-item';
     listItem.id = `jurnal-item-${post.id}`;
     const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
-    const strippedContent = post.content.replace(/<[^>]+>/g, ''); 
+    const strippedContent = post.content.replace(/<[^>]+>/g, ' '); 
 
     listItem.innerHTML = `
         <div class="mood-item-header">
@@ -700,14 +739,12 @@ function renderAdminJurnalItem(post, container) {
     `;
     container.appendChild(listItem);
 
-    // MODIFIKASI INTI ADA DI SINI
     listItem.querySelector('.edit-jurnal-btn').addEventListener('click', async () => {
         document.getElementById('jurnal-form-title').textContent = 'Edit Postingan';
         document.getElementById('jurnal-id').value = post.id;
         document.getElementById('jurnal-title').value = post.title;
         
         const editorDiv = document.getElementById('quill-editor');
-        // Gunakan referensi __quill yang kita simpan di elemen DOM
         if (editorDiv && editorDiv.__quill) {
             editorDiv.__quill.root.innerHTML = post.content;
         }
@@ -730,6 +767,7 @@ function renderAdminJurnalItem(post, container) {
         }
     });
 }
+
 async function fetchAndDisplayLinks(searchQuery = '') {
     const linkList = document.getElementById('link-list');
     const loadingMessage = document.getElementById('loading-links');
@@ -930,7 +968,7 @@ function setupPortfolioPage() {
                     <img src="${projectImage}" alt="Gambar proyek ${project.title}">
                     <div class="card-content">
                         <h3>${project.title}</h3>
-                        <p>${project.description}</p>
+                        <p>${project.description.replace(/<[^>]+>/g, ' ').substring(0, 150)}...</p>
                         ${projectLinkButton}
                     </div>
                 `;
@@ -975,7 +1013,7 @@ function setupProjectDetailPage() {
             
             imageElement.src = project.image_url; 
             imageElement.alt = `Gambar proyek ${project.title}`;
-            descriptionElement.innerHTML = project.description.replace(/\n/g, '<br>');
+            descriptionElement.innerHTML = project.description; // Display as HTML
 
             if (project.project_link) {
                 linkElement.href = project.project_link;

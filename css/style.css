@@ -1803,8 +1803,12 @@ input:focus, textarea:focus, select:focus {
     font-family: var(--font-body);
     font-size: var(--font-size-base);
     line-height: 1.7;
-    min-height: 300px; /* Pastikan tinggi minimal */
 }
+
+/* Beri tinggi minimal berbeda untuk setiap editor jika perlu */
+#quill-editor { min-height: 300px; }
+#quill-portfolio-editor { min-height: 150px; }
+
 
 /* Atur warna placeholder */
 .ql-editor.ql-blank::before {
