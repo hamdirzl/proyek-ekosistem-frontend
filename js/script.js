@@ -461,10 +461,10 @@ function setupAdminJurnalPanel() {
     if (!form) return;
 
     tinymce.init({
-        selector: '#jurnal-content-editor',
-        plugins: 'image link lists media wordcount code',
-        toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist | link image media | code',
-        height: 500,
+    selector: '#jurnal-content-editor',
+    plugins: 'image link lists media wordcount code fullscreen autoresize', // Plugin ditambahkan di sini
+    toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist | link image media | fullscreen | code', // Tombol fullscreen ditambahkan
+    height: 500,
         skin: 'oxide-dark',
         content_css: 'dark',
         image_title: true,
