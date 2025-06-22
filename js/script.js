@@ -72,48 +72,6 @@ async function fetchWithAuth(url, options = {}) {
     return response;
 }
 
-// [FUNGSI BARU] Untuk efek header saat scroll
-function setupHeaderScrollEffect() {
-    const header = document.querySelector('.navbar');
-    if (!header) return;
-
-    const scrollThreshold = 50; // Jarak scroll dalam pixel sebelum header berubah
-
-    const handleScroll = () => {
-        if (window.scrollY > scrollThreshold) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-}
-
-// [FUNGSI BARU] Untuk menandai navigasi yang aktif
-function setupActiveNavLinks() {
-    const navLinks = document.querySelectorAll('.nav-links a');
-    const currentPagePath = window.location.pathname;
-
-    navLinks.forEach(link => {
-        // Hapus kelas aktif dari semua link terlebih dahulu untuk kebersihan
-        link.classList.remove('active');
-
-        // URL href dari link
-        const linkPath = new URL(link.href).pathname;
-
-        // Penanganan khusus untuk halaman utama (index.html atau /)
-        if ((currentPagePath === '/' || currentPagePath.endsWith('/index.html')) && link.href.endsWith('index.html')) {
-             link.classList.add('active');
-        } 
-        // Untuk halaman lainnya, periksa apakah path halaman saat ini cocok dengan href link
-        else if (!currentPagePath.endsWith('/') && !currentPagePath.endsWith('/index.html') && currentPagePath.includes(linkPath) && !link.href.endsWith('index.html')) {
-             link.classList.add('active');
-        }
-    });
-}
-
-
 /* === FUNGSI GLOBAL === */
 document.addEventListener('DOMContentLoaded', async () => {
     // Logika autentikasi navbar
@@ -197,10 +155,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupChatBubble();
     setupAccountManagement();
     setupDashboardTabs();
-    
-    // PANGGIL FUNGSI HEADER BARU
-    setupHeaderScrollEffect();
-    setupActiveNavLinks();
 });
 
 
@@ -1109,6 +1063,7 @@ function setupJurnalDetailPage() {
 
 // === LOGIKA HALAMAN TOOLS ===
 function setupToolsPage() {
+    // ... (Fungsi ini dan semua fungsi-helpernya seperti attach...Listener tetap sama seperti di file asli Anda)
     const wrappers = [
         document.getElementById('shortener-wrapper'), document.getElementById('history-section'),
         document.getElementById('converter-wrapper'), document.getElementById('image-merger-wrapper'),
@@ -1539,6 +1494,7 @@ async function handleDeleteUserLink(event) {
     }
 }
 function setupAuthPage() {
+    // ... (Fungsi ini tetap sama seperti di file asli Anda)
     const loginSection = document.getElementById('login-section');
     const registerSection = document.getElementById('register-section');
     const loginForm = document.getElementById('login-form');
