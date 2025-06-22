@@ -373,8 +373,14 @@ function setupAdminLiveChatPanel() {
                 const sessionEl = document.createElement('div');
                 sessionEl.className = 'mood-item';
                 sessionEl.style.cursor = 'pointer';
-                // [Diperbaiki] Menghilangkan kode yang salah
-                sessionEl.innerHTML = `<strong>Sesi:</strong> <small><span class="math-inline">\{session\.session\_id\.substring\(0, 8\)\}\.\.\.</small\><p class\="mood\-notes"\></span>{session.last_message.substring(0, 30)}...</p>`;
+                
+                // [DIPERBAIKI] Kode HTML dan sintaks ${...} diperbaiki
+                sessionEl.innerHTML = `
+                    <strong>Sesi: <small>${session.session_id.substring(0, 8)}...</small></strong>
+                    <p class="mood-notes">Pesan terakhir: ${session.last_message.substring(0, 30)}...</p>
+                    <small class="mood-date">Update: ${new Date(session.last_updated).toLocaleString('id-ID')}</small>
+                `;
+                
                 sessionEl.addEventListener('click', () => loadConversation(session.session_id));
                 sessionsList.appendChild(sessionEl);
             });
@@ -391,12 +397,13 @@ function setupAdminLiveChatPanel() {
         replyForm.style.display = 'block';
 
         try {
-            // [Diperbaiki] Memperbaiki format URL
-            const response = await fetchWithAuth(`<span class="math-inline">\{API\_BASE\_URL\}/api/chat/messages/</span>{sessionId}`);
+            // [DIPERBAIKI] URL diperbaiki menggunakan template literal yang benar
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/chat/messages/${sessionId}`);
             const messages = await response.json();
             messagesView.innerHTML = '';
             messages.forEach(msg => {
                 const msgEl = document.createElement('div');
+                // Menggunakan class yang sama dengan chat bubble user untuk konsistensi
                 msgEl.classList.add('message', msg.sender_role === 'admin' ? 'user-message' : 'ai-message');
                 msgEl.textContent = msg.content;
                 messagesView.appendChild(msgEl);
@@ -435,7 +442,7 @@ function setupAdminLiveChatPanel() {
                 schema: 'public',
                 table: 'live_chat_messages'
             }, (payload) => {
-                fetchSessions(); 
+                fetchSessions(); // Muat ulang daftar sesi agar "pesan terakhir" update
                 const newMessage = payload.new;
                 if (newMessage.session_id === activeSessionId) {
                     const msgEl = document.createElement('div');
@@ -456,6 +463,35 @@ function setupAdminLiveChatPanel() {
         });
     }
 }
+    function listenForAdminUpdates() {
+        if (adminChatChannel) return;
+        adminChatChannel = supabase
+            .channel('live_chat_admin')
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'live_chat_messages'
+            }, (payload) => {
+                fetchSessions(); 
+                const newMessage = payload.new;
+                if (newMessage.session_id === activeSessionId) {
+                    const msgEl = document.createElement('div');
+                    msgEl.classList.add('message', newMessage.sender_role === 'admin' ? 'user-message' : 'ai-message');
+                    msgEl.textContent = newMessage.content;
+                    messagesView.appendChild(msgEl);
+                    messagesView.scrollTop = messagesView.scrollHeight;
+                }
+            })
+            .subscribe();
+    }
+
+    const adminChatTab = document.getElementById('admin-livechat-tab');
+    if (adminChatTab) {
+         adminChatTab.addEventListener('click', () => {
+            fetchSessions();
+            listenForAdminUpdates();
+        });
+    }
 
 // === FUNGSI MANAJEMEN PORTOFOLIO (DIPERBARUI) ===
 function setupAdminPortfolioPanel() {
@@ -1867,6 +1903,7 @@ function setupAllPasswordToggles() {
     setupPasswordToggle('toggle-register-password', 'register-password');
     setupPasswordToggle('toggle-reset-password', 'reset-password');
     setupPasswordToggle('toggle-confirm-password', 'confirm-password');
+} // <-- Pastikan fungsi ini ditutup dengan benar
 
 function setupChatBubble() {
     const chatBubble = document.getElementById('chat-bubble');
@@ -1877,7 +1914,7 @@ function setupChatBubble() {
     const sendChatButton = document.getElementById('send-chat-button');
     let chatChannel = null;
 
-    if (!chatBubble || !openChatButton) return;
+    if (!chatBubble || !openChatButton || !localStorage.getItem('jwt_refresh_token')) return; // Hanya setup jika user login
 
     function getOrCreateChatSessionId() {
         let sessionId = sessionStorage.getItem('chat_session_id');
@@ -1886,6 +1923,37 @@ function setupChatBubble() {
             sessionStorage.setItem('chat_session_id', sessionId);
         }
         return sessionId;
+    }
+    
+    // [BARU] Fungsi untuk menampilkan pesan di UI chat bubble
+    function appendMessage(text, type) { // 'user' atau 'admin'
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', type === 'user' ? 'user-message' : 'ai-message');
+        messageElement.textContent = text;
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
+    }
+
+    // [BARU] Fungsi untuk mengirim pesan dari chat bubble pengguna
+    async function sendMessage() {
+        const content = chatInputText.value.trim();
+        if (!content) return;
+
+        appendMessage(content, 'user'); // Tampilkan pesan sendiri di UI
+        chatInputText.value = '';
+
+        try {
+            await fetchWithAuth(`${API_BASE_URL}/api/chat/message`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    session_id: getOrCreateChatSessionId(),
+                    content: content,
+                })
+            });
+        } catch (error) {
+            console.error('Gagal mengirim pesan:', error);
+            appendMessage('Gagal mengirim pesan. Coba lagi.', 'admin'); // Kasih feedback error
+        }
     }
 
     function listenForReplies() {
@@ -1903,6 +1971,7 @@ function setupChatBubble() {
                 filter: `session_id=eq.${sessionId}`
             }, (payload) => {
                 const newMessage = payload.new;
+                // Hanya tampilkan pesan jika pengirimnya adalah admin
                 if (newMessage.sender_role === 'admin') {
                     appendMessage(newMessage.content, 'admin');
                 }
@@ -1935,4 +2004,3 @@ function setupChatBubble() {
         messageElement.textContent = text;
         chatMessages.appendChild(messageElement);
     }
-}
