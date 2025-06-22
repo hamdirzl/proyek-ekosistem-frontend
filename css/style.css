@@ -1729,3 +1729,7 @@ input:focus, textarea:focus, select:focus {
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Garis batas tipis */
 }
+/* Penambahan: Mengubah warna ikon hamburger di homepage menjadi putih */
+.is-homepage .hamburger span {
+    background-color: #ffffff;
+}
