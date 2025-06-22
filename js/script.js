@@ -460,34 +460,53 @@ function setupAdminJurnalPanel() {
     const form = document.getElementById('jurnal-form');
     if (!form) return;
 
-    tinymce.init({
-    selector: '#jurnal-content-editor',
-    plugins: 'image link lists media wordcount code fullscreen autoresize', // Plugin ditambahkan di sini
-    toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist | link image media | fullscreen | code', // Tombol fullscreen ditambahkan
-    height: 500,
-        skin: 'oxide-dark',
-        content_css: 'dark',
-        image_title: true,
-        automatic_uploads: true,
-        file_picker_types: 'image',
-        file_picker_callback: (cb, value, meta) => {
-            const input = document.createElement('input');
-            input.setAttribute('type', 'file');
-            input.setAttribute('accept', 'image/*');
-            
-            input.onchange = () => {
-                const file = input.files[0];
-                const cropCallback = (blob) => {
-                    uploadCroppedImageForEditor(
-                        blob, 
-                        (location) => cb(location, { title: file.name }),
-                        (errorText) => tinymce.activeEditor.notificationManager.open({ text: errorText, type: 'error' })
-                    );
-                };
-                handleImageSelectionForCropping(file, cropCallback, 16 / 9);
-            };
-            input.click();
-        },
+    let quill = null;
+
+    const toolbarOptions = [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['link', 'image', 'code-block'],
+        ['clean']
+    ];
+
+    quill = new Quill('#jurnal-content-editor', {
+        modules: { toolbar: toolbarOptions },
+        theme: 'snow'
+    });
+
+    quill.getModule('toolbar').addHandler('image', () => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+
+        input.onchange = async () => {
+            const file = input.files[0];
+            if (!file || !/^image\//.test(file.type)) {
+                alert('Anda hanya bisa mengunggah file gambar.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/upload-image`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Gagal mengunggah gambar');
+
+                const range = quill.getSelection(true);
+                quill.insertEmbed(range.index, 'image', data.location);
+                quill.setSelection(range.index + 1);
+            } catch (error) {
+                console.error('Error saat unggah gambar untuk Quill:', error);
+                alert('Gagal mengunggah gambar: ' + error.message);
+            }
+        };
     });
 
     const formTitle = document.getElementById('jurnal-form-title');
@@ -502,8 +521,8 @@ function setupAdminJurnalPanel() {
         formTitle.textContent = 'Tambah Postingan Baru';
         messageDiv.textContent = '';
         messageDiv.className = '';
-        if(tinymce.get('jurnal-content-editor')) {
-            tinymce.get('jurnal-content-editor').setContent('');
+        if (quill) {
+            quill.root.innerHTML = '';
         }
     }
 
@@ -511,21 +530,21 @@ function setupAdminJurnalPanel() {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const id = hiddenId.value;
         const title = titleInput.value;
-        const content = tinymce.get('jurnal-content-editor').getContent();
-        
-        if (!title || !content) {
+        const content = quill.root.innerHTML;
+
+        if (!title || content === '<p><br></p>') {
             messageDiv.className = 'error';
             messageDiv.textContent = 'Error: Judul dan konten tidak boleh kosong.';
             return;
         }
-        
+
         messageDiv.className = '';
         messageDiv.textContent = "Menyimpan postingan...";
 
-        const url = id ? `${API_BASE_URL}/api/admin/jurnal/${id}` : `${API_BASE_URL}/api/admin/jurnal`;
+        const url = id ? `<span class="math-inline">\{API\_BASE\_URL\}/api/admin/jurnal/</span>{id}` : `${API_BASE_URL}/api/admin/jurnal`;
         const method = id ? 'PUT' : 'POST';
 
         try {
@@ -538,7 +557,7 @@ function setupAdminJurnalPanel() {
 
             messageDiv.className = 'success';
             messageDiv.textContent = id ? 'Postingan berhasil diperbarui!' : 'Postingan berhasil ditambahkan!';
-            
+
             resetJurnalForm();
             fetchAndDisplayJurnalAdmin();
         } catch (error) {
@@ -676,7 +695,12 @@ function renderAdminJurnalItem(post, container) {
         document.getElementById('jurnal-form-title').textContent = 'Edit Postingan';
         document.getElementById('jurnal-id').value = post.id;
         document.getElementById('jurnal-title').value = post.title;
-        tinymce.get('jurnal-content-editor').setContent(post.content);
+        
+        const editor = Quill.find(document.querySelector('#jurnal-content-editor'));
+        if (editor) {
+            editor.root.innerHTML = post.content;
+        }
+        
         document.getElementById('jurnal-form').scrollIntoView({ behavior: 'smooth' });
     });
 
