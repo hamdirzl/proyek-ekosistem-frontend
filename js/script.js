@@ -1,4 +1,7 @@
 // VERSI FINAL DAN LENGKAP - DENGAN RICH TEXT EDITOR & CROPPING
+const SUPABASE_URL = 'https://klizqdegqfdedanzvrrp.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsaXpxZGVncWZkZWRhbnp2cnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NDEzMTIsImV4cCI6MjA2NjAxNzMxMn0.A3rriLAED8250W_FTdCP9TLXjzL8qiNKGKoyKzNc-Mk'; // Ganti dengan Kunci ANON (PUBLIC) Anda
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
@@ -315,6 +318,8 @@ function setupAdminPanels() {
     document.getElementById('admin-jurnal-tab')?.classList.remove('hidden');
     document.getElementById('admin-links-tab')?.classList.remove('hidden');
     document.getElementById('admin-users-tab')?.classList.remove('hidden');
+    document.getElementById('admin-livechat-tab')?.classList.remove('hidden');
+    setupAdminLiveChatPanel();
     
     setupAdminPortfolioPanel();
     setupAdminJurnalPanel();
@@ -342,6 +347,113 @@ function setupAdminPanels() {
             }, 300);
         });
         fetchAndDisplayUsers();
+    }
+}
+
+function setupAdminLiveChatPanel() {
+    const sessionsList = document.getElementById('chat-sessions-list');
+    const messagesView = document.getElementById('chat-messages-admin');
+    const sessionHeader = document.getElementById('chat-session-id-header');
+    const replyForm = document.getElementById('admin-reply-form');
+    const replyInput = document.getElementById('admin-reply-input');
+    let activeSessionId = null;
+    let adminChatChannel = null;
+
+    async function fetchSessions() {
+        try {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/chat/sessions`);
+            const sessions = await response.json();
+            if (!sessionsList) return;
+            sessionsList.innerHTML = '';
+            if (sessions.length === 0) {
+                sessionsList.innerHTML = '<p>Belum ada sesi chat.</p>';
+                return;
+            }
+            sessions.forEach(session => {
+                const sessionEl = document.createElement('div');
+                sessionEl.className = 'mood-item';
+                sessionEl.style.cursor = 'pointer';
+                // [Diperbaiki] Menghilangkan kode yang salah
+                sessionEl.innerHTML = `<strong>Sesi:</strong> <small><span class="math-inline">\{session\.session\_id\.substring\(0, 8\)\}\.\.\.</small\><p class\="mood\-notes"\></span>{session.last_message.substring(0, 30)}...</p>`;
+                sessionEl.addEventListener('click', () => loadConversation(session.session_id));
+                sessionsList.appendChild(sessionEl);
+            });
+        } catch (error) {
+            if (sessionsList) sessionsList.innerHTML = '<p>Gagal memuat sesi.</p>';
+            console.error("Error fetching sessions:", error);
+        }
+    }
+
+    async function loadConversation(sessionId) {
+        activeSessionId = sessionId;
+        sessionHeader.textContent = `Percakapan Sesi: ${sessionId.substring(0, 8)}...`;
+        messagesView.innerHTML = '<p>Memuat pesan...</p>';
+        replyForm.style.display = 'block';
+
+        try {
+            // [Diperbaiki] Memperbaiki format URL
+            const response = await fetchWithAuth(`<span class="math-inline">\{API\_BASE\_URL\}/api/chat/messages/</span>{sessionId}`);
+            const messages = await response.json();
+            messagesView.innerHTML = '';
+            messages.forEach(msg => {
+                const msgEl = document.createElement('div');
+                msgEl.classList.add('message', msg.sender_role === 'admin' ? 'user-message' : 'ai-message');
+                msgEl.textContent = msg.content;
+                messagesView.appendChild(msgEl);
+            });
+            messagesView.scrollTop = messagesView.scrollHeight;
+        } catch (error) {
+            messagesView.innerHTML = '<p>Gagal memuat pesan.</p>';
+        }
+    }
+
+    replyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const content = replyInput.value.trim();
+        if (!content || !activeSessionId) return;
+
+        try {
+            await fetchWithAuth(`${API_BASE_URL}/api/chat/message`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    session_id: activeSessionId,
+                    content: content
+                })
+            });
+            replyInput.value = '';
+        } catch (error) {
+            alert('Gagal mengirim balasan.');
+        }
+    });
+
+    function listenForAdminUpdates() {
+        if (adminChatChannel) return;
+        adminChatChannel = supabase
+            .channel('live_chat_admin')
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'live_chat_messages'
+            }, (payload) => {
+                fetchSessions(); 
+                const newMessage = payload.new;
+                if (newMessage.session_id === activeSessionId) {
+                    const msgEl = document.createElement('div');
+                    msgEl.classList.add('message', newMessage.sender_role === 'admin' ? 'user-message' : 'ai-message');
+                    msgEl.textContent = newMessage.content;
+                    messagesView.appendChild(msgEl);
+                    messagesView.scrollTop = messagesView.scrollHeight;
+                }
+            })
+            .subscribe();
+    }
+
+    const adminChatTab = document.getElementById('admin-livechat-tab');
+    if (adminChatTab) {
+         adminChatTab.addEventListener('click', () => {
+            fetchSessions();
+            listenForAdminUpdates();
+        });
     }
 }
 
@@ -1755,7 +1867,7 @@ function setupAllPasswordToggles() {
     setupPasswordToggle('toggle-register-password', 'register-password');
     setupPasswordToggle('toggle-reset-password', 'reset-password');
     setupPasswordToggle('toggle-confirm-password', 'confirm-password');
-}
+
 function setupChatBubble() {
     const chatBubble = document.getElementById('chat-bubble');
     const openChatButton = document.getElementById('open-chat-button');
@@ -1763,68 +1875,64 @@ function setupChatBubble() {
     const chatMessages = document.getElementById('chat-messages');
     const chatInputText = document.getElementById('chat-input-text');
     const sendChatButton = document.getElementById('send-chat-button');
+    let chatChannel = null;
 
     if (!chatBubble || !openChatButton) return;
+
+    function getOrCreateChatSessionId() {
+        let sessionId = sessionStorage.getItem('chat_session_id');
+        if (!sessionId) {
+            sessionId = crypto.randomUUID();
+            sessionStorage.setItem('chat_session_id', sessionId);
+        }
+        return sessionId;
+    }
+
+    function listenForReplies() {
+        const sessionId = getOrCreateChatSessionId();
+        if (chatChannel) {
+            supabase.removeChannel(chatChannel);
+        }
+
+        chatChannel = supabase
+            .channel(`chat_messages_${sessionId}`)
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'live_chat_messages',
+                filter: `session_id=eq.${sessionId}`
+            }, (payload) => {
+                const newMessage = payload.new;
+                if (newMessage.sender_role === 'admin') {
+                    appendMessage(newMessage.content, 'admin');
+                }
+            })
+            .subscribe();
+    }
 
     openChatButton.addEventListener('click', () => {
         chatBubble.classList.remove('hidden');
         openChatButton.classList.add('hidden');
-        if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+        listenForReplies();
     });
 
-    if (closeChatButton) {
-        closeChatButton.addEventListener('click', () => {
-            chatBubble.classList.add('hidden');
-            openChatButton.classList.remove('hidden');
-        });
-    }
-    
-    if (sendChatButton) sendChatButton.addEventListener('click', sendMessage);
-    if (chatInputText) chatInputText.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-
-    async function sendMessage() {
-        const userMessage = chatInputText.value.trim();
-        if (userMessage === '') return;
-
-        appendMessage(userMessage, 'user-message');
-        chatInputText.value = '';
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-        appendMessage('Mengetik...', 'ai-message', 'typing-indicator');
-
-        try {
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/chat-with-ai`, {
-                method: 'POST',
-                body: JSON.stringify({ message: userMessage })
-            });
-
-            if (!response.ok) {
-                 const error = await response.json().catch(() => ({error: "Gagal terhubung ke AI."}));
-                 if (response.status === 401 || response.status === 403) {
-                     throw new Error("Anda harus login untuk menggunakan fitur chat.");
-                 }
-                throw new Error(error.error);
-            }
-
-            const data = await response.json();
-            removeTypingIndicator();
-            appendMessage(data.reply || "Maaf, saya tidak mengerti.", 'ai-message');
-        } catch (error) {
-            console.error('Error sending message to AI:', error);
-            removeTypingIndicator();
-            appendMessage(`Error: ${error.message}`, 'ai-message');
+    closeChatButton.addEventListener('click', () => {
+        chatBubble.classList.add('hidden');
+        openChatButton.classList.remove('hidden');
+        if (chatChannel) {
+            supabase.removeChannel(chatChannel);
+            chatChannel = null;
         }
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+    });
+
+    sendChatButton.addEventListener('click', sendMessage);
+    chatInputText.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+}
 
     function appendMessage(text, ...types) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', ...types);
         messageElement.textContent = text;
         chatMessages.appendChild(messageElement);
-    }
-
-    function removeTypingIndicator() {
-        const typingIndicator = chatMessages.querySelector('.typing-indicator');
-        if (typingIndicator) typingIndicator.remove();
     }
 }

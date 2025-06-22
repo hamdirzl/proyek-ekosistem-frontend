@@ -94,6 +94,25 @@
                 <button id="admin-jurnal-tab" class="dashboard-tab-button hidden" data-target="panel-admin-jurnal">Manajemen Jurnal</button>
                 <button id="admin-links-tab" class="dashboard-tab-button hidden" data-target="panel-admin-links">Manajemen Tautan</button>
                 <button id="admin-users-tab" class="dashboard-tab-button hidden" data-target="panel-admin-users">Manajemen Pengguna</button>
+                <button id="admin-livechat-tab" class="dashboard-tab-button hidden" data-target="panel-admin-livechat">Live Chat</button>
+
+<div id="panel-admin-livechat" class="dashboard-panel">
+    <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Live Chat</h2>
+    <div style="display: flex; gap: 1rem;">
+        <div id="chat-sessions-list" style="width: 30%; border-right: 1px solid var(--border-color); padding-right: 1rem;">
+            <p>Memuat sesi...</p>
+        </div>
+        <div id="chat-conversation-view" style="width: 70%;">
+            <h3 id="chat-session-id-header">Pilih sesi untuk memulai percakapan</h3>
+            <div id="chat-messages-admin" style="height: 400px; overflow-y: auto; border: 1px solid var(--border-color); padding: 1rem; margin-bottom: 1rem;">
+                </div>
+            <form id="admin-reply-form" style="display: none;">
+                <textarea id="admin-reply-input" placeholder="Ketik balasan Anda..." required style="width: 100%;"></textarea>
+                <button type="submit" class="button-pintu" style="margin-top: 0.5rem;">Kirim Balasan</button>
+            </form>
+        </div>
+    </div>
+</div>
             </div>
 
             <div class="dashboard-content">
