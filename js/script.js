@@ -2108,15 +2108,6 @@ function setupAuthPage() {
     const showLoginLink = document.getElementById('show-login');
     const authMessage = document.getElementById('auth-message');
     const authTitle = document.getElementById('auth-title');
-    const googleLoginBtn = document.getElementById('google-login-btn');
-
-    if (googleLoginBtn) {
-        googleLoginBtn.addEventListener('click', () => {
-            // Langsung arahkan browser ke endpoint backend
-            window.location.href = `${API_BASE_URL}/auth/google`;
-        });
-    }
-}
 
     if (showRegisterLink) {
         showRegisterLink.addEventListener('click', (e) => {
@@ -2130,7 +2121,6 @@ function setupAuthPage() {
     if (showLoginLink) {
         showLoginLink.addEventListener('click', (e) => {
             e.preventDefault();
-
             registerSection.classList.add('hidden');
             loginSection.classList.remove('hidden');
             if (authTitle) authTitle.textContent = 'Login';
@@ -2179,7 +2169,7 @@ function setupAuthPage() {
             }
         });
     }
-    
+}
 const forgotForm = document.getElementById('forgot-form');
 if (forgotForm) {
     forgotForm.addEventListener('submit', async (e) => {
