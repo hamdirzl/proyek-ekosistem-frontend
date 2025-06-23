@@ -1921,3 +1921,47 @@ input:focus, textarea:focus, select:focus {
         max-height: 80vh; /* Izinkan jendela chat mengambil lebih banyak ruang vertikal di mobile */
     }
 }
+
+/* === [BARU] GAYA UNTUK TOMBOL ALAT CHAT === */
+.chat-tool-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted-color);
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.chat-tool-btn:hover {
+    color: var(--accent-color);
+}
+
+.chat-tool-btn.is-recording {
+    color: #dc3545; /* Merah saat merekam */
+}
+
+/* === [BARU] GAYA UNTUK KONTEN PESAN MEDIA === */
+.message img {
+    max-width: 100%;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.message audio {
+    width: 100%;
+    max-width: 250px;
+    height: 40px;
+    margin-top: 5px;
+}
+
+/* Penyesuaian audio player agar lebih rapi */
+.message audio::-webkit-media-controls-panel {
+    background-color: #e9ecef;
+}
+.message.user audio::-webkit-media-controls-panel {
+    background-color: var(--accent-hover);
+}

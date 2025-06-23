@@ -1,4 +1,4 @@
-// VERSI FINAL (PERBAIKAN) - DENGAN RICH TEXT EDITOR, CROPPING, & LIVE CHAT (PERSISTENT)
+// VERSI FINAL (PERBAIKAN) - DENGAN RICH TEXT EDITOR, CROPPING, & FITUR CHAT GAMBAR/SUARA
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
@@ -19,6 +19,29 @@ let activeChatMessages = null;
 let adminChatForm = null;
 let adminChatInput = null;
 const allChatHistories = {}; // Objek untuk menyimpan riwayat chat per user
+
+// === [BARU] FUNGSI HELPER UPLOAD FILE CHAT ===
+async function uploadChatFile(file, type) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const res = await fetchWithAuth(`${API_BASE_URL}/api/chat/upload`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.error || `Gagal mengunggah ${type}.`);
+        }
+        return { success: true, url: data.location };
+    } catch (error) {
+        console.error(`Error uploading ${type}:`, error);
+        return { success: false, message: error.message };
+    }
+}
+
 
 function forceLogout() {
     localStorage.removeItem('jwt_refresh_token');
@@ -185,6 +208,13 @@ function setupChatBubble() {
     const chatInput = document.getElementById('chat-input');
     const typingIndicator = document.getElementById('typing-indicator');
 
+    // === [BARU] Variabel untuk Tombol dan Media Recorder ===
+    const imageInput = document.getElementById('chat-image-input');
+    const micBtn = document.getElementById('chat-mic-btn');
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+
     if (window.location.pathname.includes('dashboard.html')) {
         if(chatBubble) chatBubble.style.display = 'none';
         if(chatWindow) chatWindow.style.display = 'none';
@@ -218,13 +248,39 @@ function setupChatBubble() {
         });
     }
 
-    const appendMessage = (content, type) => {
+    // === [MODIFIKASI] appendMessage menjadi lebih canggih ===
+    const appendMessage = (content, type, messageType = 'text') => {
         if (!chatMessages) return;
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${type}`;
-        messageDiv.textContent = content;
+
+        if (messageType === 'text') {
+            messageDiv.textContent = content;
+        } else if (messageType === 'image') {
+            const img = document.createElement('img');
+            img.src = content;
+            img.alt = 'Gambar terkirim';
+            img.onload = () => { // Scroll setelah gambar dimuat
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            };
+            messageDiv.appendChild(img);
+        } else if (messageType === 'audio') {
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.src = content;
+            messageDiv.appendChild(audio);
+        } else if (messageType === 'info-upload') {
+            // Gaya khusus untuk pesan info upload
+            messageDiv.className = 'message server-info'
+            messageDiv.style.fontStyle = 'italic';
+            messageDiv.style.color = 'var(--text-muted-color)';
+            messageDiv.textContent = content;
+        }
+        
         chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        if (messageType !== 'image') { // scroll langsung jika bukan gambar
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
     };
     
     const updateStatus = (status) => {
@@ -259,7 +315,7 @@ function setupChatBubble() {
             }
 
             history.forEach(msg => {
-                appendMessage(msg.content, msg.sender_type);
+                appendMessage(msg.content, msg.sender_type, msg.message_type);
             });
         } catch (error) {
             console.error("Gagal memuat riwayat chat:", error);
@@ -267,59 +323,56 @@ function setupChatBubble() {
         }
     };
     
-    // GANTI FUNGSI const connect = () => { ... } YANG LAMA DENGAN YANG INI
-const connect = () => {
-    const session = JSON.parse(localStorage.getItem('chatSession'));
-    // Cegah koneksi ganda jika sedang menyambung atau sudah tersambung
-    if (isConnecting || (ws && ws.readyState === WebSocket.OPEN) || !session) {
-        return;
-    }
-
-    isConnecting = true;
-    updateStatus('menghubungi');
-
-    ws = new WebSocket(backendWsUrl);
-
-    ws.onopen = () => {
-        isConnecting = false;
-        console.log('Terhubung ke WebSocket. Mengidentifikasi sesi...');
-        ws.send(JSON.stringify({ type: 'identify', session: session }));
-    };
-
-    ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        switch (data.type) {
-            case 'chat':
-                showTypingIndicator(false);
-                appendMessage(data.content, 'admin');
-                if (chatWindow.classList.contains('hidden')) {
-                    new Audio('https://cdn.pixabay.com/audio/2022/10/14/audio_94305374f6.mp3').play().catch(e => console.log("Gagal memainkan suara:", e));
-                }
-                break;
-            case 'status_update':
-                updateStatus(data.status);
-                break;
-            case 'typing':
-                showTypingIndicator(data.isTyping);
-                break;
+    const connect = () => {
+        const session = JSON.parse(localStorage.getItem('chatSession'));
+        if (isConnecting || (ws && ws.readyState === WebSocket.OPEN) || !session) {
+            return;
         }
-    };
 
-    ws.onclose = () => {
-        isConnecting = false;
-        console.log('Koneksi WebSocket terputus.');
-        updateStatus('offline');
-        ws = null;
-        // Coba sambungkan kembali setelah 3 detik
-        setTimeout(connect, 3000);
-    };
+        isConnecting = true;
+        updateStatus('menghubungi');
 
-    ws.onerror = (error) => {
-        isConnecting = false;
-        console.error('WebSocket error:', error);
-        if(ws) ws.close(); // Ini akan memicu onclose dan reconnect
+        ws = new WebSocket(backendWsUrl);
+
+        ws.onopen = () => {
+            isConnecting = false;
+            console.log('Terhubung ke WebSocket. Mengidentifikasi sesi...');
+            ws.send(JSON.stringify({ type: 'identify', session: session }));
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            switch (data.type) {
+                case 'chat':
+                    showTypingIndicator(false);
+                    appendMessage(data.content, 'admin', data.messageType);
+                    if (chatWindow.classList.contains('hidden')) {
+                        new Audio('https://cdn.pixabay.com/audio/2022/10/14/audio_94305374f6.mp3').play().catch(e => console.log("Gagal memainkan suara:", e));
+                    }
+                    break;
+                case 'status_update':
+                    updateStatus(data.status);
+                    break;
+                case 'typing':
+                    showTypingIndicator(data.isTyping);
+                    break;
+            }
+        };
+
+        ws.onclose = () => {
+            isConnecting = false;
+            console.log('Koneksi WebSocket terputus.');
+            updateStatus('offline');
+            ws = null;
+            setTimeout(connect, 3000);
+        };
+
+        ws.onerror = (error) => {
+            isConnecting = false;
+            console.error('WebSocket error:', error);
+            if(ws) ws.close();
+        };
     };
-};
 
     chatBubble.addEventListener('click', () => {
         chatWindow.classList.remove('hidden');
@@ -372,12 +425,84 @@ const connect = () => {
             }
             const message = chatInput.value.trim();
             if (message && ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'user_message', content: message }));
-                appendMessage(message, 'user');
+                ws.send(JSON.stringify({ type: 'user_message', content: message, messageType: 'text' }));
+                appendMessage(message, 'user', 'text');
                 chatInput.value = '';
             } else if (!ws || ws.readyState !== WebSocket.OPEN) {
-                appendMessage('Koneksi terputus, mencoba menyambungkan kembali...', 'server-info');
+                appendMessage('Koneksi terputus, mencoba menyambungkan kembali...', 'server-info', 'info-upload');
                 connect();
+            }
+        });
+    }
+
+    // === [BARU] Event Listener untuk Tombol Gambar ===
+    if (imageInput) {
+        imageInput.addEventListener('change', async () => {
+            const file = imageInput.files[0];
+            if (!file) return;
+
+            appendMessage('Mengunggah gambar...', 'server-info', 'info-upload');
+
+            const result = await uploadChatFile(file, 'gambar');
+
+            if (result.success) {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type: 'user_message', content: result.url, messageType: 'image' }));
+                    appendMessage(result.url, 'user', 'image');
+                }
+            } else {
+                appendMessage(`Gagal: ${result.message}`, 'server-info', 'info-upload');
+            }
+            imageInput.value = ''; // Reset input file
+        });
+    }
+
+    // === [BARU] Event Listener untuk Tombol Mikrofon ===
+    if (micBtn) {
+        micBtn.addEventListener('click', async () => {
+            if (isRecording) {
+                // Berhenti merekam
+                mediaRecorder.stop();
+                micBtn.classList.remove('is-recording');
+                isRecording = false;
+            } else {
+                // Mulai merekam
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.addEventListener("dataavailable", event => {
+                        audioChunks.push(event.data);
+                    });
+
+                    mediaRecorder.addEventListener("stop", async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const audioFile = new File([audioBlob], `pesan_suara_${Date.now()}.webm`, { type: 'audio/webm' });
+
+                        appendMessage('Mengunggah suara...', 'server-info', 'info-upload');
+                        const result = await uploadChatFile(audioFile, 'audio');
+
+                        if (result.success) {
+                            if (ws && ws.readyState === WebSocket.OPEN) {
+                                ws.send(JSON.stringify({ type: 'user_message', content: result.url, messageType: 'audio' }));
+                                appendMessage(result.url, 'user', 'audio');
+                            }
+                        } else {
+                             appendMessage(`Gagal: ${result.message}`, 'server-info', 'info-upload');
+                        }
+                        // Matikan track audio untuk mematikan ikon rekam di browser
+                        stream.getTracks().forEach(track => track.stop());
+                    });
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    micBtn.classList.add('is-recording');
+
+                } catch (err) {
+                    console.error("Error accessing microphone:", err);
+                    alert("Tidak dapat mengakses mikrofon. Pastikan Anda telah memberikan izin.");
+                }
             }
         });
     }
@@ -444,7 +569,6 @@ async function setupAdminChatUI() {
                 typingSpan.textContent = ' mengetik...';
                 typingSpan.style.fontStyle = 'italic';
                 typingSpan.style.color = 'var(--text-muted-color)';
-                // Perbaikan: Pastikan elemen target ada sebelum appendChild
                 const userNameSpanContainer = userEntry.querySelector('span:first-child');
                 if (userNameSpanContainer) {
                     userNameSpanContainer.appendChild(typingSpan);
@@ -456,6 +580,35 @@ async function setupAdminChatUI() {
             }
         }
     };
+    
+    // === [MODIFIKASI] appendAdminMessage menjadi lebih canggih ===
+    function appendAdminMessage(content, type, messageType = 'text') {
+        if (!activeChatMessages) return;
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}`;
+
+        if (messageType === 'text') {
+            messageDiv.textContent = content;
+        } else if (messageType === 'image') {
+            const img = document.createElement('img');
+            img.src = content;
+            img.alt = 'Gambar terkirim';
+            img.onload = () => {
+                activeChatMessages.scrollTop = activeChatMessages.scrollHeight;
+            };
+            messageDiv.appendChild(img);
+        } else if (messageType === 'audio') {
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.src = content;
+            messageDiv.appendChild(audio);
+        }
+
+        activeChatMessages.appendChild(messageDiv);
+        if (messageType !== 'image') {
+            activeChatMessages.scrollTop = activeChatMessages.scrollHeight;
+        }
+    }
 
     adminWebSocket.onmessage = async (event) => {
         const data = JSON.parse(event.data);
@@ -466,7 +619,7 @@ async function setupAdminChatUI() {
             
             if (!allChatHistories[userId]) allChatHistories[userId] = [];
             
-            allChatHistories[userId].push({ sender: 'user', content: data.content });
+            allChatHistories[userId].push({ sender: 'user', content: data.content, message_type: data.messageType });
             updateUserEntryTypingStatus(userId, false);
 
             let userEntry = document.getElementById(`chat-user-${userId}`);
@@ -492,7 +645,7 @@ async function setupAdminChatUI() {
                         activeChatMessages.innerHTML = '';
                         allChatHistories[userId].forEach(msg => {
                             const type = (msg.sender_type === 'admin' || msg.sender === 'admin') ? 'admin' : 'user';
-                            appendAdminMessage(msg.content, type);
+                            appendAdminMessage(msg.content, type, msg.message_type);
                         });
                     } catch(e) { 
                         console.error("Gagal fetch riwayat chat:", e); 
@@ -506,7 +659,7 @@ async function setupAdminChatUI() {
             if (currentAdminChatTarget !== userId) {
                  userEntry.querySelector('.unread-dot').classList.remove('hidden');
             } else {
-                appendAdminMessage(data.content, 'user');
+                appendAdminMessage(data.content, 'user', data.messageType);
             }
         } else if (data.type === 'user_disconnected') {
              const userEntry = document.getElementById(`chat-user-${data.userId}`);
@@ -529,28 +682,22 @@ async function setupAdminChatUI() {
                  adminWebSocket.send(JSON.stringify({
                      type: 'admin_message',
                      content: message,
-                     targetUserId: currentAdminChatTarget
+                     targetUserId: currentAdminChatTarget,
+                     messageType: 'text' // Admin untuk saat ini hanya mengirim teks
                  }));
-                 appendAdminMessage(message, 'admin');
+                 appendAdminMessage(message, 'admin', 'text');
                  if (allChatHistories[currentAdminChatTarget]) {
-                    allChatHistories[currentAdminChatTarget].push({ sender: 'admin', content: message });
+                    allChatHistories[currentAdminChatTarget].push({ sender: 'admin', content: message, message_type: 'text' });
                  }
                  adminChatInput.value = '';
             }
         });
     }
-
-    function appendAdminMessage(content, type) {
-        if (!activeChatMessages) return;
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${type}`;
-        messageDiv.textContent = content;
-        activeChatMessages.appendChild(messageDiv);
-        activeChatMessages.scrollTop = activeChatMessages.scrollHeight;
-    }
 }
 
-// ... (Sisa kode dari sini ke bawah tetap sama)
+
+// Sisa kode dari sini ke bawah tetap sama, tidak perlu diubah.
+// ... (seluruh fungsi lainnya dari setupDashboardPage sampai akhir)
 // ===================================
 // FUNGSI-FUNGSI UNTUK CROPPING GAMBAR
 // ===================================
