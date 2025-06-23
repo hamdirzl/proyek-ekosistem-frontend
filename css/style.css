@@ -1965,3 +1965,6 @@ input:focus, textarea:focus, select:focus {
 .message.user audio::-webkit-media-controls-panel {
     background-color: var(--accent-hover);
 }
+#chat-main {
+    min-height: 0;
+}
