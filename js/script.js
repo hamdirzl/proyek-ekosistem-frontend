@@ -1320,6 +1320,7 @@ async function fetchAndDisplayLinks(searchQuery = '') {
             const listItem = document.createElement('li');
             listItem.className = 'mood-item';
             listItem.id = `link-${link.slug}`;
+            // [FIX] Hapus backslash `\` sebelum backtick
             listItem.innerHTML = `
                 <div class="mood-item-header">
                     <span><strong>Slug:</strong> ${link.slug}</span>
