@@ -210,7 +210,6 @@ function setupChatBubble() {
     const chatInput = document.getElementById('chat-input');
     const typingIndicator = document.getElementById('typing-indicator');
 
-    // === [BARU] Variabel untuk Tombol dan Media Recorder ===
     const imageInput = document.getElementById('chat-image-input');
     const micBtn = document.getElementById('chat-mic-btn');
     let mediaRecorder;
@@ -250,7 +249,6 @@ function setupChatBubble() {
         });
     }
 
-    // === [MODIFIKASI] appendMessage menjadi lebih canggih ===
     const appendMessage = (content, type, messageType = 'text') => {
         if (!chatMessages) return;
         const messageDiv = document.createElement('div');
@@ -262,7 +260,7 @@ function setupChatBubble() {
             const img = document.createElement('img');
             img.src = content;
             img.alt = 'Gambar terkirim';
-            img.onload = () => { // Scroll setelah gambar dimuat
+            img.onload = () => {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             };
             messageDiv.appendChild(img);
@@ -272,7 +270,6 @@ function setupChatBubble() {
             audio.src = content;
             messageDiv.appendChild(audio);
         } else if (messageType === 'info-upload') {
-            // Gaya khusus untuk pesan info upload
             messageDiv.className = 'message server-info'
             messageDiv.style.fontStyle = 'italic';
             messageDiv.style.color = 'var(--text-muted-color)';
@@ -280,7 +277,7 @@ function setupChatBubble() {
         }
 
         chatMessages.appendChild(messageDiv);
-        if (messageType !== 'image') { // scroll langsung jika bukan gambar
+        if (messageType !== 'image') {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     };
@@ -437,14 +434,12 @@ function setupChatBubble() {
         });
     }
 
-    // === [BARU] Event Listener untuk Tombol Gambar ===
     if (imageInput) {
         imageInput.addEventListener('change', async () => {
             const file = imageInput.files[0];
             if (!file) return;
 
             appendMessage('Mengunggah gambar...', 'server-info', 'info-upload');
-
             const result = await uploadChatFile(file, 'gambar');
 
             if (result.success) {
@@ -455,36 +450,29 @@ function setupChatBubble() {
             } else {
                 appendMessage(`Gagal: ${result.message}`, 'server-info', 'info-upload');
             }
-            imageInput.value = ''; // Reset input file
+            imageInput.value = '';
         });
     }
 
-    // === [BARU] Event Listener untuk Tombol Mikrofon ===
     if (micBtn) {
         micBtn.addEventListener('click', async () => {
             if (isRecording) {
-                // Berhenti merekam
                 mediaRecorder.stop();
                 micBtn.classList.remove('is-recording');
                 isRecording = false;
             } else {
-                // Mulai merekam
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     mediaRecorder = new MediaRecorder(stream);
                     audioChunks = [];
-
                     mediaRecorder.addEventListener("dataavailable", event => {
                         audioChunks.push(event.data);
                     });
-
                     mediaRecorder.addEventListener("stop", async () => {
                         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                         const audioFile = new File([audioBlob], `pesan_suara_${Date.now()}.webm`, { type: 'audio/webm' });
-
                         appendMessage('Mengunggah suara...', 'server-info', 'info-upload');
                         const result = await uploadChatFile(audioFile, 'audio');
-
                         if (result.success) {
                             if (ws && ws.readyState === WebSocket.OPEN) {
                                 ws.send(JSON.stringify({ type: 'user_message', content: result.url, messageType: 'audio' }));
@@ -493,14 +481,11 @@ function setupChatBubble() {
                         } else {
                             appendMessage(`Gagal: ${result.message}`, 'server-info', 'info-upload');
                         }
-                        // Matikan track audio untuk mematikan ikon rekam di browser
                         stream.getTracks().forEach(track => track.stop());
                     });
-
                     mediaRecorder.start();
                     isRecording = true;
                     micBtn.classList.add('is-recording');
-
                 } catch (err) {
                     console.error("Error accessing microphone:", err);
                     alert("Tidak dapat mengakses mikrofon. Pastikan Anda telah memberikan izin.");
@@ -583,7 +568,6 @@ async function setupAdminChatUI() {
         }
     };
 
-    // === [MODIFIKASI] appendAdminMessage menjadi lebih canggih ===
     function appendAdminMessage(content, type, messageType = 'text') {
         if (!activeChatMessages) return;
         const messageDiv = document.createElement('div');
@@ -685,7 +669,7 @@ async function setupAdminChatUI() {
                     type: 'admin_message',
                     content: message,
                     targetUserId: currentAdminChatTarget,
-                    messageType: 'text' // Admin untuk saat ini hanya mengirim teks
+                    messageType: 'text'
                 }));
                 appendAdminMessage(message, 'admin', 'text');
                 if (allChatHistories[currentAdminChatTarget]) {
@@ -697,9 +681,6 @@ async function setupAdminChatUI() {
     }
 }
 
-// ===================================
-// FUNGSI-FUNGSI UNTUK CROPPING GAMBAR
-// ===================================
 function setupCropModal() {
     cropModal = document.getElementById('crop-modal');
     imageToCropElement = document.getElementById('image-to-crop');
@@ -783,9 +764,6 @@ async function uploadCroppedImageForEditor(blob, successCallback, failureCallbac
     }
 }
 
-// ===================================
-// === LOGIKA HALAMAN DASHBOARD    ===
-// ===================================
 async function setupDashboardPage() {
     const refreshToken = localStorage.getItem('jwt_refresh_token');
     if (!refreshToken) {
@@ -805,7 +783,7 @@ async function setupDashboardPage() {
 
     if (decodedToken && decodedToken.role === 'admin') {
         setupAdminPanels();
-        await setupAdminChatUI(); // Panggil UI Admin Chat
+        await setupAdminChatUI();
     }
 }
 
@@ -902,7 +880,6 @@ function setupAdminPanels() {
     }
 }
 
-// === LOGIKA MANAJEMEN PORTOFOLIO ADMIN (SAMA SEPERTI JURNAL) ===
 function setupAdminPortfolioPanel() {
     const form = document.getElementById('portfolio-form');
     if (!form) return;
@@ -1015,8 +992,6 @@ function setupAdminPortfolioPanel() {
     fetchAndDisplayPortfolioAdmin();
 }
 
-
-// === LOGIKA MANAJEMEN JURNAL ADMIN (DENGAN EDITOR QUILL.JS) ===
 function setupAdminJurnalPanel() {
     const form = document.getElementById('jurnal-form');
     if (!form) return;
@@ -1460,7 +1435,6 @@ async function deleteUser(event) {
         console.error(error);
     }
 }
-// === LOGIKA HALAMAN PUBLIK (PORTOFOLIO, JURNAL, DLL) ===
 function setupPortfolioPage() {
     const portfolioGrid = document.querySelector('.portfolio-grid');
     if (!portfolioGrid) return;
@@ -1666,7 +1640,6 @@ function setupJurnalDetailPage() {
     fetchJurnalDetails();
 }
 
-// === [FUNGSI BARU] Logika untuk Input dan Dropdown Kustom ===
 function setupCustomFileInputs() {
     document.querySelectorAll('.custom-file-upload input[type="file"]').forEach(inputElement => {
         const container = inputElement.closest('.custom-file-upload');
@@ -1696,7 +1669,6 @@ function setupCustomDropdowns() {
         const select = wrapper.querySelector('select');
         if (!select) return;
 
-        // Hapus elemen custom yang mungkin sudah ada agar tidak duplikat
         wrapper.querySelector('.select-trigger')?.remove();
         wrapper.querySelector('.select-options')?.remove();
 
@@ -1750,8 +1722,6 @@ function setupCustomDropdowns() {
     });
 }
 
-
-// === LOGIKA HALAMAN TOOLS (VERSI BARU UNTUK AKSES PUBLIK) ===
 function setupToolsPage() {
     const wrappers = [
         document.getElementById('shortener-wrapper'), document.getElementById('history-section'),
@@ -1772,7 +1742,7 @@ function setupToolsPage() {
 
     attachShortenerListener();
     attachConverterListener();
-    attachImageMergerListener(); // Memanggil fungsi yang sudah diperbaiki
+    attachImageMergerListener();
     attachQrCodeGeneratorListener();
     attachImageCompressorListener();
 
@@ -1811,12 +1781,10 @@ function setupToolsPage() {
                 outputFormatSelect.appendChild(optionElement);
             });
             
-            // Panggil setupCustomDropdowns lagi untuk meregenerasi tampilan dropdown kustom
             setupCustomDropdowns();
         });
     }
 
-    // Panggil fungsi setup untuk elemen kustom
     setupCustomFileInputs();
     setupCustomDropdowns();
 }
@@ -1899,7 +1867,7 @@ function attachShortenerListener() {
         });
     }
 }
-// Ganti fungsi attachConverterListener yang lama dengan ini
+
 function attachConverterListener() {
     const form = document.getElementById('converter-form');
     if (!form) return;
@@ -1913,7 +1881,6 @@ function attachConverterListener() {
         const progressBar = document.getElementById('converter-progress-bar');
         const progressText = progressWrapper.querySelector('.progress-bar-text');
 
-        // Reset UI
         messageDiv.textContent = '';
         messageDiv.className = '';
         progressWrapper.classList.remove('hidden');
@@ -1923,9 +1890,8 @@ function attachConverterListener() {
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', `${API_BASE_URL}/api/convert`, true);
-        xhr.responseType = 'blob'; // Penting agar bisa diunduh
+        xhr.responseType = 'blob';
 
-        // Event listener untuk progres unggahan
         xhr.upload.addEventListener('progress', (e) => {
             if (e.lengthComputable) {
                 const percentComplete = Math.round((e.loaded / e.total) * 100);
@@ -1934,7 +1900,6 @@ function attachConverterListener() {
             }
         });
 
-        // Event listener untuk saat request selesai
         xhr.onload = function () {
             if (this.status === 200) {
                 progressText.textContent = 'Konversi berhasil! File sedang diunduh.';
@@ -1953,7 +1918,6 @@ function attachConverterListener() {
                 if (fileLabel) fileLabel.textContent = 'Tidak ada file yang dipilih';
 
             } else {
-                // Coba parse error dari respons JSON
                 try {
                     const reader = new FileReader();
                     reader.onload = function() {
@@ -1968,12 +1932,10 @@ function attachConverterListener() {
                 }
             }
 
-            // Sembunyikan progress bar setelah selesai
             setTimeout(() => progressWrapper.classList.add('hidden'), 2000);
             submitButton.disabled = false;
         };
 
-        // Event listener untuk network error
         xhr.onerror = function () {
             messageDiv.textContent = 'Error: Terjadi kesalahan jaringan.';
             messageDiv.className = 'error';
@@ -1985,157 +1947,159 @@ function attachConverterListener() {
     });
 }
 
+// [MODIFIKASI FINAL DENGAN PENGECEKAN FABRIC.JS]
 function attachImageMergerListener() {
     const wrapper = document.getElementById('image-merger-wrapper');
     if (!wrapper) return;
 
-    const fileInput = document.getElementById('image-files-input');
-    const pageEditorContainer = document.getElementById('page-editor-container');
-    const pageCanvasArea = document.getElementById('page-canvas-area');
-    const addPageBtn = document.getElementById('add-page-btn');
-    const generatePdfBtn = document.getElementById('generate-pdf-btn');
-    const messageDiv = document.getElementById('image-merger-message');
+    const initializeImageMerger = () => {
+        const fileInput = document.getElementById('image-files-input');
+        const pageEditorContainer = document.getElementById('page-editor-container');
+        const pageCanvasArea = document.getElementById('page-canvas-area');
+        const addPageBtn = document.getElementById('add-page-btn');
+        const generatePdfBtn = document.getElementById('generate-pdf-btn');
+        const messageDiv = document.getElementById('image-merger-message');
 
-    let pageCanvases = []; // [MODIFIKASI] Kita sekarang menggunakan array untuk banyak kanvas
+        let pageCanvases = [];
 
-    // [BARU] Fungsi untuk membuat halaman baru
-    const addPage = () => {
-        const pageIndex = pageCanvases.length;
-        const pageId = `page-canvas-${pageIndex}`;
+        const addPage = () => {
+            const pageIndex = pageCanvases.length;
+            const pageId = `page-canvas-${pageIndex}`;
 
-        // Buat wrapper untuk kanvas dan tombol hapus
-        const pageWrapper = document.createElement('div');
-        pageWrapper.className = 'editor-page-wrapper';
-        pageWrapper.id = `page-wrapper-${pageIndex}`;
+            const pageWrapper = document.createElement('div');
+            pageWrapper.className = 'editor-page-wrapper';
+            pageWrapper.id = `page-wrapper-${pageIndex}`;
 
-        // Buat elemen kanvas
-        const canvasElement = document.createElement('canvas');
-        canvasElement.id = pageId;
-        canvasElement.className = 'editor-page';
+            const canvasElement = document.createElement('canvas');
+            canvasElement.id = pageId;
+            canvasElement.className = 'editor-page';
 
-        // Buat tombol hapus
-        const deleteBtn = document.createElement('button');
-        deleteBtn.innerHTML = '&times;';
-        deleteBtn.className = 'delete-page-btn';
-        deleteBtn.title = 'Hapus halaman ini';
-        deleteBtn.onclick = () => {
-            if (pageCanvases.filter(c => c !== null).length <= 1) {
-                alert("Tidak bisa menghapus satu-satunya halaman.");
-                return;
-            }
-            // Hapus dari DOM dan array
-            document.getElementById(`page-wrapper-${pageIndex}`).remove();
-            // Tandai sebagai null agar tidak ikut di-render, lebih mudah daripada splice
-            pageCanvases[pageIndex] = null;
+            const deleteBtn = document.createElement('button');
+            deleteBtn.innerHTML = '&times;';
+            deleteBtn.className = 'delete-page-btn';
+            deleteBtn.title = 'Hapus halaman ini';
+            deleteBtn.onclick = () => {
+                if (pageCanvases.filter(c => c !== null).length <= 1) {
+                    alert("Tidak bisa menghapus satu-satunya halaman.");
+                    return;
+                }
+                document.getElementById(`page-wrapper-${pageIndex}`).remove();
+                pageCanvases[pageIndex] = null;
+            };
+
+            pageWrapper.appendChild(canvasElement);
+            pageWrapper.appendChild(deleteBtn);
+            pageCanvasArea.appendChild(pageWrapper);
+            
+            const fabricCanvas = new fabric.Canvas(pageId, {
+                backgroundColor: '#ffffff',
+                width: 595,
+                height: 842,
+            });
+            
+            pageCanvases.push(fabricCanvas);
+            pageWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
 
-        pageWrapper.appendChild(canvasElement);
-        pageWrapper.appendChild(deleteBtn);
-        pageCanvasArea.appendChild(pageWrapper);
-        
-        // Inisialisasi Fabric.js pada kanvas baru
-        const fabricCanvas = new fabric.Canvas(pageId, {
-            backgroundColor: '#ffffff',
-            width: 595,
-            height: 842,
-        });
-        
-        pageCanvases.push(fabricCanvas);
-        pageWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    };
+        addPageBtn.addEventListener('click', addPage);
 
-    // [BARU] Event listener untuk tombol tambah halaman
-    addPageBtn.addEventListener('click', addPage);
+        fileInput.addEventListener('change', (event) => {
+            const files = event.target.files;
+            if (files.length === 0) return;
 
-    // [MODIFIKASI] Logika saat file gambar dipilih
-    fileInput.addEventListener('change', (event) => {
-        const files = event.target.files;
-        if (files.length === 0) return;
-
-        // Tampilkan UI editor jika belum terlihat
-        pageEditorContainer.classList.remove('hidden');
-        generatePdfBtn.classList.remove('hidden');
-        
-        // Jika belum ada halaman, buat satu
-        if (pageCanvases.filter(c => c !== null).length === 0) {
-            pageCanvasArea.innerHTML = ''; // Bersihkan jika sebelumnya ada halaman yg dihapus
-            pageCanvases = [];
-            addPage();
-        }
-        
-        // Tambahkan gambar ke halaman terakhir yang aktif
-        const targetCanvas = pageCanvases[pageCanvases.length - 1];
-
-        Array.from(files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (f) => {
-                fabric.Image.fromURL(f.target.result, (img) => {
-                    img.scaleToWidth(targetCanvas.width / 2); // Sesuaikan ukuran awal
-                    targetCanvas.add(img);
-                    targetCanvas.centerObject(img);
-                    targetCanvas.renderAll(); // [PERBAIKAN] Panggil renderAll() untuk menampilkan gambar di kanvas
-                });
-            };
-            reader.readAsDataURL(file);
-        });
-    });
-
-    // [MODIFIKASI] Logika untuk generate PDF
-    generatePdfBtn.addEventListener('click', async () => {
-        const activeCanvases = pageCanvases.filter(canvas => canvas !== null);
-        if (activeCanvases.length === 0) {
-            alert("Tidak ada halaman untuk dijadikan PDF.");
-            return;
-        }
-
-        messageDiv.textContent = 'Mempersiapkan halaman...';
-        messageDiv.className = '';
-        generatePdfBtn.disabled = true;
-
-        try {
-            const imageDataUrls = [];
-            for (const canvas of activeCanvases) {
-                const dataUrl = canvas.toDataURL({
-                    format: 'jpeg',
-                    quality: 0.85
-                });
-                imageDataUrls.push(dataUrl);
+            pageEditorContainer.classList.remove('hidden');
+            generatePdfBtn.classList.remove('hidden');
+            
+            if (pageCanvases.filter(c => c !== null).length === 0) {
+                pageCanvasArea.innerHTML = '';
+                pageCanvases = [];
+                addPage();
             }
             
-            messageDiv.textContent = `Mengirim ${imageDataUrls.length} halaman ke server...`;
+            const targetCanvas = pageCanvases[pageCanvases.length - 1];
 
-            // Kirim ARRAY data URL ke backend
-            const response = await fetch(`${API_BASE_URL}/api/generate-pdf-from-canvas`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ imageDataUrls }) // [MODIFIKASI] Kirim sebagai array
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (f) => {
+                    fabric.Image.fromURL(f.target.result, (img) => {
+                        img.scaleToWidth(targetCanvas.width / 2);
+                        targetCanvas.add(img);
+                        targetCanvas.centerObject(img);
+                        targetCanvas.renderAll();
+                    });
+                };
+                reader.readAsDataURL(file);
             });
+        });
 
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error || 'Gagal membuat PDF di server.');
+        generatePdfBtn.addEventListener('click', async () => {
+            const activeCanvases = pageCanvases.filter(canvas => canvas !== null);
+            if (activeCanvases.length === 0) {
+                alert("Tidak ada halaman untuk dijadikan PDF.");
+                return;
             }
 
-            messageDiv.textContent = 'Berhasil! PDF sedang diunduh.';
-            messageDiv.className = 'success';
+            messageDiv.textContent = 'Mempersiapkan halaman...';
+            messageDiv.className = '';
+            generatePdfBtn.disabled = true;
 
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `hamdirizal_merged_pdf_${Date.now()}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
+            try {
+                const imageDataUrls = [];
+                for (const canvas of activeCanvases) {
+                    const dataUrl = canvas.toDataURL({
+                        format: 'jpeg',
+                        quality: 0.85
+                    });
+                    imageDataUrls.push(dataUrl);
+                }
+                
+                messageDiv.textContent = `Mengirim ${imageDataUrls.length} halaman ke server...`;
 
-        } catch (error) {
-            messageDiv.textContent = `Error: ${error.message}`;
-            messageDiv.className = 'error';
-        } finally {
-            generatePdfBtn.disabled = false;
+                const response = await fetch(`${API_BASE_URL}/api/generate-pdf-from-canvas`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imageDataUrls })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'Gagal membuat PDF di server.');
+                }
+
+                messageDiv.textContent = 'Berhasil! PDF sedang diunduh.';
+                messageDiv.className = 'success';
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `hamdirizal_merged_pdf_${Date.now()}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+
+            } catch (error) {
+                messageDiv.textContent = `Error: ${error.message}`;
+                messageDiv.className = 'error';
+            } finally {
+                generatePdfBtn.disabled = false;
+            }
+        });
+    }
+
+    // Pengecekan untuk memastikan fabric.js sudah siap
+    const checkFabric = () => {
+        if (typeof fabric !== 'undefined') {
+            console.log('Fabric.js is ready. Initializing Image to PDF tool.');
+            initializeImageMerger();
+        } else {
+            console.log('Waiting for Fabric.js to load...');
+            setTimeout(checkFabric, 100); // Coba lagi setelah 100ms
         }
-    });
+    };
+
+    checkFabric();
 }
 
 
@@ -2355,7 +2319,6 @@ async function handleDeleteUserLink(event) {
         console.error('Error deleting user link:', error);
     }
 }
-// Ganti fungsi setupAuthPage yang lama dengan yang ini
 function setupAuthPage() {
     const loginSection = document.getElementById('login-section');
     const registerSection = document.getElementById('register-section');
@@ -2366,31 +2329,26 @@ function setupAuthPage() {
     const authMessage = document.getElementById('auth-message');
     const authTitle = document.getElementById('auth-title');
     const googleLoginBtn = document.getElementById('google-login-btn');
-    const googleRegisterBtn = document.getElementById('google-register-btn'); // <-- Baris baru ditambahkan
+    const googleRegisterBtn = document.getElementById('google-register-btn');
 
-    // Fungsi yang akan dijalankan oleh kedua tombol Google
     const startGoogleAuth = () => {
         window.location.href = `${API_BASE_URL}/api/auth/google`;
     };
 
-    // Event listener untuk tombol Google Login
     if (googleLoginBtn) {
         googleLoginBtn.addEventListener('click', startGoogleAuth);
     }
 
-    // [BARU] Event listener untuk tombol Google Register
     if (googleRegisterBtn) {
         googleRegisterBtn.addEventListener('click', startGoogleAuth);
     }
 
-    // Cek jika ada error dari callback Google di URL
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('error')) {
         authMessage.textContent = 'Error: Gagal login dengan Google. Silakan coba lagi.';
         authMessage.className = 'error';
     }
 
-    // Event listener untuk link "Registrasi di sini"
     if (showRegisterLink) {
         showRegisterLink.addEventListener('click', (e) => {
             e.preventDefault();
@@ -2402,7 +2360,6 @@ function setupAuthPage() {
         });
     }
 
-    // Event listener untuk link "Login di sini"
     if (showLoginLink) {
         showLoginLink.addEventListener('click', (e) => {
             e.preventDefault();
@@ -2414,7 +2371,6 @@ function setupAuthPage() {
         });
     }
 
-    // Event listener untuk form registrasi
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -2435,7 +2391,6 @@ function setupAuthPage() {
         });
     }
 
-    // Event listener untuk form login
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
