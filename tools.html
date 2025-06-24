@@ -166,14 +166,17 @@
                     </div>
                 </div>
                 
-                <div id="pdf-canvas-container" class="hidden" style="margin-top: 1.5rem;">
-                    <p style="text-align:center; color: var(--text-muted-color); margin-bottom: 1rem;">
-                        Atur posisi dan ukuran gambar. Klik gambar untuk mengaktifkan kontrol.
-                    </p>
-                    <canvas id="pdf-canvas"></canvas>
+                <div id="page-editor-container" class="hidden" style="margin-top: 1.5rem;">
+                    <div class="page-controls">
+                        <button type="button" id="add-page-btn" class="button-pintu button-secondary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                            Tambah Halaman
+                        </button>
+                    </div>
+                    <div id="page-canvas-area">
+                        </div>
                 </div>
-
-                <button type="button" id="generate-pdf-btn" class="button-pintu hidden" style="margin-top: 1.5rem; width: 100%;">Generate PDF from Layout</button>
+                <button type="button" id="generate-pdf-btn" class="button-pintu hidden" style="margin-top: 1.5rem; width: 100%;">Generate PDF from All Pages</button>
             </form>
 
             <div id="image-merger-message" style="margin-top: 1rem;"></div>

@@ -1988,140 +1988,159 @@ function attachConverterListener() {
     });
 }
 
-// ============================================
-// == INI ADALAH FUNGSI YANG SUDAH DIPERBAIKI ==
-// ============================================
 function attachImageMergerListener() {
     const wrapper = document.getElementById('image-merger-wrapper');
     if (!wrapper) return;
 
-    const form = document.getElementById('image-merger-form');
-    if (!form) return;
-
     const fileInput = document.getElementById('image-files-input');
-    const messageDiv = document.getElementById('image-merger-message');
-    const canvasContainer = document.getElementById('pdf-canvas-container');
+    const pageEditorContainer = document.getElementById('page-editor-container');
+    const pageCanvasArea = document.getElementById('page-canvas-area');
+    const addPageBtn = document.getElementById('add-page-btn');
     const generatePdfBtn = document.getElementById('generate-pdf-btn');
-    const progressWrapper = document.getElementById('merger-progress-wrapper');
-    const progressBar = document.getElementById('merger-progress-bar');
-    const progressText = progressWrapper.querySelector('.progress-bar-text');
+    const messageDiv = document.getElementById('image-merger-message');
 
-    let fabricCanvas = null;
+    let pageCanvases = []; // [MODIFIKASI] Kita sekarang menggunakan array untuk banyak kanvas
 
+    // [BARU] Fungsi untuk membuat halaman baru
+    const addPage = () => {
+        const pageIndex = pageCanvases.length;
+        const pageId = `page-canvas-${pageIndex}`;
+
+        // Buat wrapper untuk kanvas dan tombol hapus
+        const pageWrapper = document.createElement('div');
+        pageWrapper.className = 'editor-page-wrapper';
+        pageWrapper.id = `page-wrapper-${pageIndex}`;
+
+        // Buat elemen kanvas
+        const canvasElement = document.createElement('canvas');
+        canvasElement.id = pageId;
+        canvasElement.className = 'editor-page';
+
+        // Buat tombol hapus
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '&times;';
+        deleteBtn.className = 'delete-page-btn';
+        deleteBtn.title = 'Hapus halaman ini';
+        deleteBtn.onclick = () => {
+            if (pageCanvases.filter(c => c !== null).length <= 1) {
+                alert("Tidak bisa menghapus satu-satunya halaman.");
+                return;
+            }
+            // Hapus dari DOM dan array
+            document.getElementById(`page-wrapper-${pageIndex}`).remove();
+            // Tandai sebagai null agar tidak ikut di-render, lebih mudah daripada splice
+            pageCanvases[pageIndex] = null;
+        };
+
+        pageWrapper.appendChild(canvasElement);
+        pageWrapper.appendChild(deleteBtn);
+        pageCanvasArea.appendChild(pageWrapper);
+        
+        // Inisialisasi Fabric.js pada kanvas baru
+        const fabricCanvas = new fabric.Canvas(pageId, {
+            backgroundColor: '#ffffff',
+            width: 595,
+            height: 842,
+        });
+        
+        pageCanvases.push(fabricCanvas);
+        pageWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+    // [BARU] Event listener untuk tombol tambah halaman
+    addPageBtn.addEventListener('click', addPage);
+
+    // [MODIFIKASI] Logika saat file gambar dipilih
     fileInput.addEventListener('change', (event) => {
         const files = event.target.files;
-        if (files.length === 0) {
-            return;
-        }
+        if (files.length === 0) return;
 
-        // 1. Tampilkan elemen UI terlebih dahulu
-        canvasContainer.classList.remove('hidden');
+        // Tampilkan UI editor jika belum terlihat
+        pageEditorContainer.classList.remove('hidden');
         generatePdfBtn.classList.remove('hidden');
-        wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        // 2. Beri jeda singkat agar browser sempat menggambar elemen
-        setTimeout(() => {
-            // 3. Inisialisasi atau bersihkan kanvas setelah elemen terlihat
-            if (!fabricCanvas) {
-                const canvasEl = document.getElementById('pdf-canvas');
-                // Ambil ukuran dari kontainer yang SEKARANG SUDAH TERLIHAT
-                const containerWidth = canvasContainer.clientWidth;
-                
-                canvasEl.width = containerWidth;
-                canvasEl.height = canvasContainer.clientHeight;
-                
-                fabricCanvas = new fabric.Canvas('pdf-canvas', {
-                    backgroundColor: '#ffffff',
-                    width: containerWidth,
-                    height: canvasContainer.clientHeight
-                });
-            }
-            
-            fabricCanvas.clear();
-
-            Array.from(files).forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = (f) => {
-                    const dataURL = f.target.result;
-                    fabric.Image.fromURL(dataURL, (img) => {
-                        img.scaleToWidth(fabricCanvas.width / 2.5);
-                        img.set({
-                            left: (index % 2) * (fabricCanvas.width / 2) + 30,
-                            top: Math.floor(index / 2) * 150 + 30,
-                            borderColor: 'var(--accent-color)',
-                            cornerColor: 'var(--accent-color)',
-                            cornerSize: 12,
-                            cornerStyle: 'circle',
-                            transparentCorners: false,
-                            borderScaleFactor: 2
-                        });
-                        fabricCanvas.add(img);
-                    });
-                };
-                reader.readAsDataURL(file);
-            });
-        }, 100); // Penundaan 100ms sudah lebih dari cukup
-    });
-
-    generatePdfBtn.addEventListener('click', () => {
-        if (!fabricCanvas || fabricCanvas.getObjects().length === 0) {
-            messageDiv.textContent = 'Error: Tidak ada gambar di kanvas.';
-            messageDiv.className = 'error';
-            return;
+        
+        // Jika belum ada halaman, buat satu
+        if (pageCanvases.filter(c => c !== null).length === 0) {
+            pageCanvasArea.innerHTML = ''; // Bersihkan jika sebelumnya ada halaman yg dihapus
+            pageCanvases = [];
+            addPage();
         }
         
-        const imageDataUrl = fabricCanvas.toDataURL({
-            format: 'jpeg',
-            quality: 0.85
-        });
+        // Tambahkan gambar ke halaman terakhir yang aktif
+        const targetCanvas = pageCanvases[pageCanvases.length - 1];
 
-        messageDiv.textContent = '';
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (f) => {
+                fabric.Image.fromURL(f.target.result, (img) => {
+                    img.scaleToWidth(targetCanvas.width / 2); // Sesuaikan ukuran awal
+                    targetCanvas.add(img);
+                    targetCanvas.centerObject(img);
+                    targetCanvas.renderAll();
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    // [MODIFIKASI] Logika untuk generate PDF
+    generatePdfBtn.addEventListener('click', async () => {
+        const activeCanvases = pageCanvases.filter(canvas => canvas !== null);
+        if (activeCanvases.length === 0) {
+            alert("Tidak ada halaman untuk dijadikan PDF.");
+            return;
+        }
+
+        messageDiv.textContent = 'Mempersiapkan halaman...';
         messageDiv.className = '';
-        progressWrapper.classList.remove('hidden');
-        progressBar.style.width = '0%';
-        progressText.textContent = 'Mempersiapkan file...';
         generatePdfBtn.disabled = true;
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${API_BASE_URL}/api/generate-pdf-from-canvas`, true); 
-        xhr.responseType = 'blob';
-        
-        xhr.upload.onprogress = () => {
-            progressBar.style.width = '50%';
-            progressText.textContent = 'Mengirim tata letak ke server...';
-        };
-
-        xhr.onload = function () {
-            if (this.status === 200) {
-                progressBar.style.width = '100%';
-                progressText.textContent = 'Berhasil! PDF Anda sedang diunduh.';
-                
-                const blob = this.response;
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none'; a.href = url; a.download = `layout-to-pdf-${Date.now()}.pdf`;
-                document.body.appendChild(a); a.click();
-                window.URL.revokeObjectURL(url); a.remove();
-            } else {
-                messageDiv.textContent = 'Error: Gagal membuat PDF di server.';
-                messageDiv.className = 'error';
+        try {
+            const imageDataUrls = [];
+            for (const canvas of activeCanvases) {
+                const dataUrl = canvas.toDataURL({
+                    format: 'jpeg',
+                    quality: 0.85
+                });
+                imageDataUrls.push(dataUrl);
             }
             
-            setTimeout(() => progressWrapper.classList.add('hidden'), 2000);
-            generatePdfBtn.disabled = false;
-        };
+            messageDiv.textContent = `Mengirim ${imageDataUrls.length} halaman ke server...`;
 
-        xhr.onerror = function () {
-            messageDiv.textContent = 'Error: Terjadi kesalahan jaringan.';
+            // Kirim ARRAY data URL ke backend
+            const response = await fetch(`${API_BASE_URL}/api/generate-pdf-from-canvas`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ imageDataUrls }) // [MODIFIKASI] Kirim sebagai array
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Gagal membuat PDF di server.');
+            }
+
+            messageDiv.textContent = 'Berhasil! PDF sedang diunduh.';
+            messageDiv.className = 'success';
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `hamdirizal_merged_pdf_${Date.now()}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+
+        } catch (error) {
+            messageDiv.textContent = `Error: ${error.message}`;
             messageDiv.className = 'error';
-            progressWrapper.classList.add('hidden');
+        } finally {
             generatePdfBtn.disabled = false;
-        };
-        
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify({ imageDataUrl: imageDataUrl }));
+        }
     });
 }
+
 
 function attachQrCodeGeneratorListener() {
     const form = document.getElementById('qr-generator-form');
