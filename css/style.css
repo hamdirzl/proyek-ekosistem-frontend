@@ -1,18 +1,14 @@
-/* =================================================================== */
-/* ==   V12: FINAL STYLE - LIGHT, PROFESSIONAL, MINIMALIST THEME  == */
-/* =================================================================== */
-
 /* === PENGATURAN GLOBAL: DESIGN SYSTEM === */
 :root {
     /* Palet Warna - TEMA TERANG BARU */
-    --background-color: #f8f9fa; /* Abu-abu sangat terang */
-    --card-bg-color: #ffffff;      /* Putih bersih untuk kartu */
-    --text-color: #212529;         /* Hitam pekat untuk teks */
-    --text-muted-color: #6c757d;   /* Abu-abu untuk teks sekunder */
-    --border-color: #dee2e6;       /* Abu-abu terang untuk border */
-    --accent-color: #007bff;       /* Biru profesional sebagai aksen */
-    --accent-hover: #0056b3;       /* Biru lebih gelap untuk hover */
-    --border-hover-color: #adb5bd; /* Abu-abu lebih gelap untuk hover border */
+    --background-color: #f8f9fa; 
+    --card-bg-color: #ffffff;      
+    --text-color: #212529;       
+    --text-muted-color: #6c757d;   
+    --border-color: #dee2e6;       
+    --accent-color: #007bff;       
+    --accent-hover: #0056b3;       
+    --border-hover-color: #adb5bd; 
 
     /* Font (tetap sama, sudah bagus) */
     --font-heading: 'Poppins', sans-serif;
@@ -26,17 +22,15 @@
     --space-xl: 4rem;     /* 64px */
     --space-xxl: 6rem;    /* 96px */
 
-    /* Ukuran font responsif (tetap sama) */
     --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
     --font-size-h1:   clamp(2.2rem, 1.5rem + 3.5vw, 3.5rem);
     --font-size-h2:   clamp(1.8rem, 1.25rem + 2.5vw, 2.5rem);
     --font-size-h3:   clamp(1.25rem, 1.1rem + 1.5vw, 1.75rem);
     
-    /* Bayangan (disesuaikan untuk latar belakang terang) */
+ 
     --soft-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
     --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
-
 
 /* Global reset and foundational styles */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -50,7 +44,7 @@ body {
     font-size: var(--font-size-base);
     -webkit-font-smoothing: antialiased; 
     -moz-osx-font-smoothing: grayscale;
-    /* background-image dihapus untuk tampilan minimalis */
+   
 }
 
 html, body {
@@ -69,10 +63,10 @@ html, body {
     top: 0; 
     z-index: 1000; 
     transition: background-color 0.3s ease;
-    background-color: rgba(255, 255, 255, 0.5); /* Latar belakang putih transparan */
+    background-color: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-color); /* Menggunakan variabel border baru */
+    border-bottom: 1px solid var(--border-color); 
 }
 
 .logo a { 
@@ -80,7 +74,7 @@ html, body {
     font-size: 1.5rem; 
     font-weight: 700; 
     text-decoration: none; 
-    color: var(--text-color); /* Menggunakan variabel teks utama */
+    color: var(--text-color); 
     transition: color 0.3s ease; 
 }
 .logo a:hover { color: var(--accent-color); }
@@ -111,7 +105,7 @@ html, body {
 .button-pintu { 
     display: inline-block; 
     background: var(--accent-color); 
-    color: #ffffff; /* Warna teks diubah menjadi putih agar kontras dengan biru */
+    color: #ffffff; 
     padding: 0.7rem 1.6rem; 
     border: 2px solid var(--accent-color); 
     border-radius: 8px;
@@ -123,7 +117,7 @@ html, body {
     cursor: pointer;
 }
 .login-button { 
-    color: #ffffff !important; /* Warna teks diubah menjadi putih */
+    color: #ffffff !important; 
     padding: 0.6rem 1.2rem !important;
     background-color: var(--accent-color) !important;
 }
@@ -413,7 +407,7 @@ input:focus, textarea:focus, select:focus {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    margin-bottom: var(--space-md); /* Consistent with form-group margin */
+    margin-bottom: var(--space-md); 
 }
 
 .custom-file-input-wrapper input[type="file"] {
@@ -424,13 +418,13 @@ input:focus, textarea:focus, select:focus {
     height: 100%;
     opacity: 0;
     cursor: pointer;
-    z-index: 10; /* Ensure it's clickable */
+    z-index: 10; 
 }
 
 .custom-file-button {
-    display: inline-flex; /* Use flex to align icon and text */
+    display: inline-flex; 
     align-items: center;
-    justify-content: center; /* Center content horizontally */
+    justify-content: center;
     background-color: var(--card-bg-color);
     color: var(--text-color);
     padding: 0.7rem 1.2rem;
@@ -438,8 +432,8 @@ input:focus, textarea:focus, select:focus {
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    flex-shrink: 0; /* Prevent button from shrinking */
-    gap: 8px; /* Space between icon and text */
+    flex-shrink: 0; 
+    gap: 8px; 
     font-weight: 500;
 }
 
@@ -455,12 +449,12 @@ input:focus, textarea:focus, select:focus {
 }
 
 .custom-file-label {
-    flex-grow: 1; /* Allow label to take remaining space */
+    flex-grow: 1; 
     color: var(--text-muted-color);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 0.7rem 0; /* Align vertically with button */
+    padding: 0.7rem 0; 
     font-size: var(--font-size-base);
 }
 
@@ -578,7 +572,7 @@ input:focus, textarea:focus, select:focus {
 
 .navbar nav {
     order: -1;
-    width: 50px; /* Beri lebar tetap untuk simetri */
+    width: 50px; 
     display: flex;
     justify-content: center;
 }
@@ -586,7 +580,7 @@ input:focus, textarea:focus, select:focus {
 .navbar::after {
     content: '';
     display: block;
-    width: 50px; /* Lebarnya HARUS SAMA dengan elemen <nav> di atas */
+    width: 50px; 
 }
 
 .hamburger {
@@ -609,18 +603,18 @@ input:focus, textarea:focus, select:focus {
         bottom: 0; 
         width: 85%;
         max-width: 320px; 
-        height: 100vh; /* Pastikan tinggi penuh */
+        height: 100vh;
         background-color: rgba(248, 249, 250, 0.98); 
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        padding: var(--space-xl) 0; /* Ubah padding vertikal */
+        padding: var(--space-xl) 0; 
         transform: translateX(-100%); 
         transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-        display: flex; /* Aktifkan flexbox */
-        flex-direction: column; /* Atur item secara vertikal */
+        display: flex; 
+        flex-direction: column; 
         align-items: flex-start;
         justify-content: flex-start;
-        gap: 0; /* Hapus gap utama, atur di item */
+        gap: 0; 
         box-shadow: 5px 0 25px rgba(0,0,0,0.1); 
         z-index: 1000; 
     }
@@ -653,9 +647,9 @@ input:focus, textarea:focus, select:focus {
 
     /* Ganti gaya untuk link dan tombol di menu */
     .nav-links a, .nav-links .nav-button { 
-        display: flex; /* Gunakan flex untuk ikon dan teks */
+        display: flex; 
         align-items: center;
-        gap: var(--space-md); /* Jarak antara ikon dan teks */
+        gap: var(--space-md); 
         padding: var(--space-sm) var(--space-lg);
         width: 100%; 
         border-radius: 0; 
@@ -672,11 +666,10 @@ input:focus, textarea:focus, select:focus {
 
     .nav-links a::after { display: none; }
     
-    /* Atur ikon di dalam link */
     .nav-links a svg, .nav-links .nav-button svg {
         width: 20px;
         height: 20px;
-        flex-shrink: 0; /* Mencegah ikon menyusut */
+        flex-shrink: 0;
         color: var(--text-muted-color);
         transition: color 0.3s ease;
     }
@@ -690,12 +683,12 @@ input:focus, textarea:focus, select:focus {
         margin: var(--space-md) var(--space-lg);
         width: calc(100% - (var(--space-lg) * 2));
         text-align: center;
-        display: block; /* Kembalikan ke block karena tidak ada ikon */
+        display: block; 
     }
     
     /* CSS BARU UNTUK TOMBOL LOGOUT */
     .nav-logout-item {
-        margin-top: auto; /* INI KUNCINYA: Mendorong item ini ke bawah */
+        margin-top: auto;
         padding: var(--space-md) var(--space-lg);
     }
     
@@ -713,7 +706,6 @@ input:focus, textarea:focus, select:focus {
     .mood-item-header strong { margin-right: 0; } 
 }
 
-/* Penyesuaian form URL shortener di mobile */
 @media (max-width: 550px) {
     #shortener-form {
         grid-template-columns: 1fr;
@@ -1027,9 +1019,8 @@ input:focus, textarea:focus, select:focus {
     text-decoration: underline;
 }
 
-/* === Perbaikan untuk Teks Panjang (Overflow) di Panel Admin === */
 .mood-item-header > span {
-    min-width: 0; /* Memungkinkan item flex untuk menyusut */
+    min-width: 0;
     overflow-wrap: break-word;
     word-wrap: break-word;
     word-break: break-word;
@@ -1038,20 +1029,14 @@ input:focus, textarea:focus, select:focus {
 /* ================================================= */
 /* == BLOK FINAL HEADER (DESKTOP & MOBILE) - V3   == */
 /* ================================================= */
-
-/* [GLOBAL] Mengatur logo menjadi dua baris */
 .logo a {
     line-height: 1.2;
     display: inline-block;
     text-align: center;
 }
-
-/* [GLOBAL] Menghapus efek garis bawah nav-link lama */
 .nav-links a::after {
     display: none;
 }
-
-/* [UMUM] Aturan dasar untuk semua elemen interaktif di navigasi */
 .nav-links li > a,
 .nav-links li > .nav-button {
     display: flex;
@@ -1060,9 +1045,7 @@ input:focus, textarea:focus, select:focus {
     text-decoration: none;
 }
 
-/* [DESKTOP] Aturan untuk header di layar lebar (769px ke atas) */
 @media (min-width: 769px) {
-    /* Mengatur item nav menjadi vertikal (ikon di atas, teks di bawah) */
     .nav-links li > a,
     .nav-links li > .nav-button {
         flex-direction: column;
@@ -1087,7 +1070,6 @@ input:focus, textarea:focus, select:focus {
         font-weight: 500;
     }
 
-    /* Pengaturan tombol logout di desktop */
     #nav-logout .button-pintu {
         flex-direction: row;
         gap: 8px;
@@ -1097,10 +1079,7 @@ input:focus, textarea:focus, select:focus {
     }
 }
 
-
-/* [MOBILE] Aturan untuk menu hamburger (768px ke bawah) */
 @media (max-width: 768px) {
-    /* Mengatur item nav menjadi horizontal (ikon di samping teks) di dalam sidebar */
     .nav-links li > a,
     .nav-links li > .nav-button {
         flex-direction: row;
@@ -1111,34 +1090,24 @@ input:focus, textarea:focus, select:focus {
 /* ================================================= */
 /* == BLOK FINAL V6 UNTUK LOGO (DESKTOP & MOBILE) == */
 /* ================================================= */
-
-/* Aturan untuk menyembunyikan logo mobile di layar besar (DESKTOP) */
 .logo-mobile {
     display: none !important;
 }
-
-/* Aturan untuk menampilkan logo desktop di layar besar (DESKTOP) */
 .logo-desktop {
     display: inline-block !important;
     line-height: 1.2;
     text-align: center;
 }
 
-/* Aturan untuk layar kecil (MOBILE) */
 @media (max-width: 768px) {
-    /* Tampilkan logo mobile dan atur gayanya */
     .logo-mobile {
         display: inline-block !important;
         font-size: 1.5rem;
     }
-
-    /* SEMBUNYIKAN logo desktop */
     .logo-desktop {
         display: none !important;
     }
 }
-
-/* Penyesuaian Footer untuk Mobile */
 @media (max-width: 768px) {
     .footer-container {
         flex-direction: column;
@@ -1178,7 +1147,7 @@ input:focus, textarea:focus, select:focus {
 
 .dashboard-nav {
     display: flex;
-    flex-wrap: wrap; /* Agar tombol turun ke bawah di mobile */
+    flex-wrap: wrap;
     gap: var(--space-xs);
     border-bottom: 2px solid var(--border-color);
     margin-bottom: var(--space-lg);
@@ -1195,7 +1164,7 @@ input:focus, textarea:focus, select:focus {
     border-bottom: 3px solid transparent;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-bottom: -2px; /* Agar border bawah menimpa border container */
+    margin-bottom: -2px;
 }
 
 .dashboard-tab-button:hover {
@@ -1209,15 +1178,14 @@ input:focus, textarea:focus, select:focus {
 }
 
 .dashboard-panel {
-    display: none; /* Semua panel disembunyikan secara default */
+    display: none;
     animation: fadeIn 0.5s ease-in-out;
 }
 
 .dashboard-panel.active {
-    display: block; /* Hanya panel aktif yang ditampilkan */
+    display: block;
 }
 
-/* Animasi fade-in sederhana untuk panel */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -1229,7 +1197,6 @@ input:focus, textarea:focus, select:focus {
     }
 }
 
-/* Hilangkan styling berlebih dari section lama di dalam tab */
 .dashboard-panel .history-section,
 .dashboard-panel #user-dashboard-section,
 .dashboard-panel #account-management-section,
@@ -1249,20 +1216,20 @@ input:focus, textarea:focus, select:focus {
 @media (max-width: 600px) {
     .dashboard-nav {
         display: grid;
-        grid-template-columns: 1fr 1fr; /* Paksa menjadi 2 kolom sama lebar */
-        gap: var(--space-sm); /* Beri sedikit jarak antar tombol */
-        border-bottom: none; /* Hapus garis bawah dari container */
+        grid-template-columns: 1fr 1fr; 
+        gap: var(--space-sm); 
+        border-bottom: none; 
     }
 
     .dashboard-tab-button {
-        text-align: center; /* Ini akan membuat teks di dalam tombol menjadi rata tengah */
-        border-bottom: 3px solid var(--border-color); /* Pindahkan garis ke masing-masing tombol */
+        text-align: center;
+        border-bottom: 3px solid var(--border-color);
         margin-bottom: 0;
-        padding: var(--space-sm) var(--space-xs); /* Sedikit mengurangi padding horizontal untuk teks panjang */
+        padding: var(--space-sm) var(--space-xs);
     }
 
     .dashboard-tab-button.active {
-        border-bottom-color: var(--accent-color); /* Garis bawah aktif */
+        border-bottom-color: var(--accent-color);
     }
 }
 
@@ -1386,10 +1353,6 @@ input:focus, textarea:focus, select:focus {
 /* ============================================= */
 /* == [BARU] PENYESUAIAN TEMA UNTUK TINYMCE   == */
 /* ============================================= */
-/* Dikosongkan agar menggunakan tema default (terang) dari TinyMCE */
-
-
-/* KODE UNTUK MEMBUAT HEADER MELAYANG DI HALAMAN UTAMA */
 .is-homepage .navbar {
     position: absolute;
     width: 100%;
@@ -1403,24 +1366,20 @@ input:focus, textarea:focus, select:focus {
 /* ==   PERBAIKAN WARNA HEADER DI HOMEPAGE      == */
 /* ================================================= */
 .is-homepage .navbar {
-    background-color: rgba(0, 0, 0, 0.3); /* Latar belakang gelap transparan */
+    background-color: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Garis batas tipis */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 .is-homepage .logo a,
 .is-homepage .nav-links li > a,
 .is-homepage .nav-links li > .nav-button {
-    color: #ffffff; /* Warna teks putih */
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5); /* Bayangan agar mudah terbaca */
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
-
-/* Mengubah warna ikon SVG di navigasi menjadi putih */
 .is-homepage .nav-links li svg {
     color: #ffffff;
 }
-
-/* Mengembalikan warna tombol Login agar tetap menonjol */
 .is-homepage .login-button {
     background-color: var(--accent-color) !important;
     border-color: var(--accent-color) !important;
@@ -1430,100 +1389,78 @@ input:focus, textarea:focus, select:focus {
     background-color: var(--accent-hover) !important;
     border-color: var(--accent-hover) !important;
 }
-
-/* Menghilangkan efek latar belakang saat hover di menu desktop (khusus homepage) */
 @media (min-width: 769px) {
     .is-homepage .nav-links li > a:hover,
     .is-homepage .nav-links li > .nav-button:hover {
         background-color: transparent;
-        color: #f0f0f0; /* Sedikit redup saat hover untuk feedback */
+        color: #f0f0f0;
     }
 }
-/* Penambahan: Mengubah warna ikon hamburger di homepage menjadi putih */
 .is-homepage .hamburger span {
     background-color: #ffffff;
 }
-
-/* PERBAIKAN: Mengubah warna ikon 'X' di menu mobile homepage agar terlihat */
 .is-homepage .hamburger.active span {
     background-color: var(--text-color);
 }
-
-/* PERBAIKAN BARU: Mengubah warna ikon menu di sidebar homepage agar terlihat */
 .is-homepage .nav-links.active li svg {
     color: var(--text-muted-color);
 }
-
-/* 1. Mengubah warna ikon 'X' hamburger saat menu aktif */
 .is-homepage .hamburger.active span {
     background-color: var(--text-color);
 }
-
-/* 2. Mengubah warna ikon dan tulisan di dalam sidebar saat menu aktif */
 .is-homepage .nav-links.active li > a,
 .is-homepage .nav-links.active li > .nav-button {
-    color: var(--text-muted-color); /* Mengembalikan warna tulisan menjadi abu-abu */
-    text-shadow: none; /* Menghapus bayangan teks */
+    color: var(--text-muted-color);
+    text-shadow: none;
 }
-
 .is-homepage .nav-links.active li svg {
-    color: var(--text-muted-color); /* Mengembalikan warna ikon menjadi abu-abu */
+    color: var(--text-muted-color);
 }
-
-/* 3. (Opsional) Efek hover agar konsisten dengan halaman lain */
 .is-homepage .nav-links.active li > a:hover,
 .is-homepage .nav-links.active li > .nav-button:hover {
-    color: var(--text-color); /* Membuat tulisan menjadi hitam saat disentuh */
+    color: var(--text-color);
 }
 .is-homepage .nav-links.active li a:hover svg,
 .is-homepage .nav-links.active li .nav-button:hover svg {
-    color: var(--text-color); /* Membuat ikon menjadi hitam saat disentuh */
+    color: var(--text-color);
 }
 
 /* ============================================= */
 /* ==         GAYA UNTUK QUILL.JS             == */
 /* ============================================= */
 
-/* Atur warna border dan background untuk toolbar dan container */
 .ql-toolbar.ql-snow,
 .ql-container.ql-snow {
     border: 1px solid var(--border-color);
-    background-color: #ffffff; /* Latar belakang putih */
+    background-color: #ffffff;
     color: var(--text-color);
 }
 
-/* Bulatkan sudut toolbar (atas) */
 .ql-toolbar.ql-snow {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
 }
 
-/* Bulatkan sudut container editor (bawah) */
 .ql-container.ql-snow {
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
 }
 
-/* Atur font di dalam editor agar konsisten */
 .ql-editor {
     font-family: var(--font-body);
     font-size: var(--font-size-base);
     line-height: 1.7;
 }
 
-/* Beri tinggi minimal berbeda untuk setiap editor jika perlu */
 #quill-editor { min-height: 300px; }
 #quill-portfolio-editor { min-height: 150px; }
 
-
-/* Atur warna placeholder */
 .ql-editor.ql-blank::before {
     color: var(--text-muted-color);
     font-style: normal;
     opacity: 0.7;
 }
 
-/* Atur warna ikon di toolbar */
 .ql-snow .ql-stroke {
     stroke: var(--text-color);
 }
@@ -1531,7 +1468,6 @@ input:focus, textarea:focus, select:focus {
     fill: var(--text-color);
 }
 
-/* Warna ikon saat aktif atau di-hover */
 .ql-snow .ql-picker-label:hover,
 .ql-snow .ql-picker-label.ql-active,
 .ql-snow .ql-picker-item:hover,
@@ -1550,10 +1486,9 @@ input:focus, textarea:focus, select:focus {
     stroke: var(--accent-color);
 }
 
-/* Fokus pada editor */
 .ql-container.ql-snow:focus-within {
-    border-color: var(--accent-color); 
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); 
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
 }
 
 
@@ -1762,27 +1697,24 @@ input:focus, textarea:focus, select:focus {
 /* ============================================= */
 
 @media (max-width: 768px) {
-    /* 1. Perkecil balon chat dan posisikan lebih dekat ke tepi */
     .chat-bubble-container {
         width: 50px;
         height: 50px;
-        bottom: var(--space-md); /* Jarak dari bawah: 1.5rem */
-        right: var(--space-md);  /* Jarak dari kanan: 1.5rem */
+        bottom: var(--space-md);
+        right: var(--space-md);
     }
 
-    /* Perkecil ikon di dalam balon chat agar proporsional */
     .chat-bubble-container svg {
         width: 28px;
         height: 28px;
     }
 
-    /* 2. Atur ulang posisi dan ukuran jendela chat agar simetris */
     .chat-window-container {
-        width: auto; /* Biarkan lebar diatur oleh properti left & right */
-        left: var(--space-sm);  /* Jarak dari kiri layar: 1rem */
-        right: var(--space-sm); /* Jarak dari kanan layar: 1rem */
-        bottom: calc(var(--space-md) + 50px + var(--space-xs)); /* Posisikan di atas balon baru */
-        max-height: 80vh; /* Izinkan jendela chat mengambil lebih banyak ruang vertikal di mobile */
+        width: auto;
+        left: var(--space-sm);
+        right: var(--space-sm);
+        bottom: calc(var(--space-md) + 50px + var(--space-xs));
+        max-height: 80vh;
     }
 }
 
@@ -1804,7 +1736,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 .chat-tool-btn.is-recording {
-    color: #dc3545; /* Merah saat merekam */
+    color: #dc3545;
 }
 
 /* === [BARU] GAYA UNTUK KONTEN PESAN MEDIA === */
