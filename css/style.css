@@ -1759,3 +1759,152 @@ input:focus, textarea:focus, select:focus {
     background-color: var(--accent-hover);
 }
 
+/* === [IMPROVEMENT] Custom Form Elements === */
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: var(--text-muted-color);
+    margin-bottom: var(--space-sm);
+}
+
+/* Custom File Upload */
+.custom-file-upload {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--card-bg-color);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.custom-file-upload:hover {
+    border-color: var(--border-hover-color);
+}
+
+.custom-file-upload input[type="file"] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.file-upload-button {
+    flex-shrink: 0;
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--background-color);
+    border-right: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.custom-file-upload:hover .file-upload-button {
+    background-color: var(--accent-color);
+    color: #ffffff;
+}
+
+.file-upload-label {
+    flex-grow: 1;
+    padding: var(--space-sm) var(--space-md);
+    color: var(--text-muted-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Custom Select Dropdown */
+.custom-select-wrapper {
+    position: relative;
+}
+
+.custom-select-wrapper select {
+    display: none; /* Sembunyikan select asli */
+}
+
+.select-trigger {
+    width: 100%;
+    padding: var(--space-sm);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--card-bg-color);
+    color: var(--text-color);
+    font-size: var(--font-size-base);
+    font-family: var(--font-body);
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.select-trigger:focus, .custom-select-wrapper.active .select-trigger {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+.select-trigger::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid var(--text-muted-color);
+    transition: transform 0.3s ease;
+}
+
+.custom-select-wrapper.active .select-trigger::after {
+    transform: rotate(180deg);
+}
+
+.select-options {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--soft-shadow);
+    z-index: 10;
+    list-style: none;
+    max-height: 200px;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+}
+
+.custom-select-wrapper.active .select-options {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.select-options li {
+    padding: var(--space-sm);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.select-options li:hover {
+    background-color: var(--background-color);
+}
+
+.select-options li.selected {
+    background-color: var(--accent-color);
+    color: #ffffff;
+    font-weight: 500;
+}
