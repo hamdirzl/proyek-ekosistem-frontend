@@ -1678,42 +1678,57 @@ function setupToolsPage() {
     ];
     const toolSelectionSection = document.querySelector('.tool-selection');
 
-    // Sembunyikan semua wrapper tool pada awalnya
     wrappers.forEach(el => el && el.classList.add('hidden'));
 
-    // Selalu tampilkan pilihan tools untuk semua pengunjung
     if (toolSelectionSection) toolSelectionSection.classList.remove('hidden');
 
-    // Pasang semua event listener untuk tombol-tombol tools
     document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper'));
     document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper'));
     document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper'));
     document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper'));
     document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper'));
 
-    // Pasang semua event listener untuk logika form tools
     attachShortenerListener();
     attachConverterListener();
     attachImageMergerListener();
     attachQrCodeGeneratorListener();
     attachImageCompressorListener();
 
-    // Logika untuk file input di media converter tetap di sini jika ada
+    // === LOGIKA BARU UNTUK DROPDOWN DINAMIS ===
     const fileInput = document.getElementById('file-input');
     const outputFormatSelect = document.getElementById('output-format');
+
+    const conversionOptions = {
+        'default': [
+            { value: 'pdf', text: 'PDF' },
+            { value: 'docx', text: 'DOCX (Word Document)' },
+        ],
+        'pdf': [
+            { value: 'docx', text: 'DOCX (Word - Kualitas Terbaik)' },
+            { value: 'txt', text: 'TXT (Teks Polos)' },
+            { value: 'jpg', text: 'JPG (Setiap halaman jadi gambar)' }
+        ],
+        'docx': [{ value: 'pdf', text: 'PDF' }, { value: 'txt', text: 'TXT' }],
+        'pptx': [{ value: 'pdf', text: 'PDF' }],
+        'jpg': [{ value: 'png', text: 'PNG' }, { value: 'pdf', text: 'PDF' }],
+        'png': [{ value: 'jpg', text: 'JPG' }, { value: 'pdf', text: 'PDF' }]
+    };
+
     if (fileInput && outputFormatSelect) {
         fileInput.addEventListener('change', () => {
             if (!fileInput.files || fileInput.files.length === 0) return;
             const fileName = fileInput.files[0].name.toLowerCase();
-            const docxOption = outputFormatSelect.querySelector('option[value="docx"]');
-            if (fileName.endsWith('.pdf')) {
-                if (docxOption) {
-                    docxOption.disabled = true;
-                    if (outputFormatSelect.value === 'docx') outputFormatSelect.value = 'pdf';
-                }
-            } else {
-                if (docxOption) docxOption.disabled = false;
-            }
+            const extension = fileName.split('.').pop();
+            
+            const options = conversionOptions[extension] || conversionOptions['default'];
+            
+            outputFormatSelect.innerHTML = '';
+            options.forEach(opt => {
+                const optionElement = document.createElement('option');
+                optionElement.value = opt.value;
+                optionElement.textContent = opt.text;
+                outputFormatSelect.appendChild(optionElement);
+            });
         });
     }
 }
