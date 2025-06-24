@@ -1947,7 +1947,6 @@ function attachConverterListener() {
     });
 }
 
-// [MODIFIKASI FINAL DENGAN PENGECEKAN FABRIC.JS]
 function attachImageMergerListener() {
     const wrapper = document.getElementById('image-merger-wrapper');
     if (!wrapper) return;
@@ -1992,10 +1991,10 @@ function attachImageMergerListener() {
             pageCanvasArea.appendChild(pageWrapper);
             
             const fabricCanvas = new fabric.Canvas(canvasElement, {
-            backgroundColor: '#ffffff',
-            width: 595,
-            height: 842,
-        });
+                backgroundColor: '#ffffff',
+                width: 595,
+                height: 842,
+            });
             
             pageCanvases.push(fabricCanvas);
             pageWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2004,70 +2003,69 @@ function attachImageMergerListener() {
         addPageBtn.addEventListener('click', addPage);
 
         fileInput.addEventListener('change', (event) => {
-    const files = event.target.files;
-    if (files.length === 0) return;
+            const files = event.target.files;
+            if (files.length === 0) return;
 
-    // Tampilkan UI editor dan beri feedback ke pengguna
-    pageEditorContainer.classList.remove('hidden');
-    generatePdfBtn.classList.remove('hidden');
-    messageDiv.textContent = `Memproses ${files.length} gambar...`;
-    messageDiv.className = '';
+            pageEditorContainer.classList.remove('hidden');
+            generatePdfBtn.classList.remove('hidden');
+            messageDiv.textContent = `Memproses ${files.length} gambar...`;
+            messageDiv.className = '';
 
-    // Jika ini unggahan pertama, bersihkan area kerja
-    const allCanvasesAreEmpty = pageCanvases.every(c => c === null || c.getObjects().length === 0);
-    if (allCanvasesAreEmpty) {
-        pageCanvasArea.innerHTML = '';
-        pageCanvases = [];
-    }
+            const allCanvasesAreEmpty = pageCanvases.every(c => c === null || c.getObjects().length === 0);
+            if (allCanvasesAreEmpty) {
+                pageCanvasArea.innerHTML = '';
+                pageCanvases = [];
+            }
 
-    Array.from(files).forEach((file, index) => {
-        const reader = new FileReader();
+            Array.from(files).forEach((file, index) => {
+                const reader = new FileReader();
 
-        reader.onload = (f) => {
-            const dataURL = f.target.result;
-            console.log(`[DEBUG] File ${file.name} berhasil dibaca. Mencoba memuat ke Fabric.js...`);
+                reader.onload = (f) => {
+                    const dataURL = f.target.result;
+                    console.log(`[DEBUG] File ${file.name} berhasil dibaca. Mencoba memuat ke Fabric.js...`);
 
-            // Buat halaman baru untuk setiap gambar
-            addPage();
-            // Dapatkan kanvas yang baru saja dibuat
-            const newCanvas = pageCanvases[pageCanvases.length - 1];
+                    addPage();
+                    const newCanvas = pageCanvases[pageCanvases.length - 1];
 
-            // Muat gambar dari data URL
-            fabric.Image.fromURL(dataURL, (img) => {
-                console.log(`[DEBUG] Gambar ${file.name} berhasil diproses oleh Fabric.js.`);
+                    // --- BLOK YANG DIPERBAIKI DIMULAI DI SINI ---
+                    fabric.Image.fromURL(dataURL, (img, isError) => {
+                        if (isError) {
+                            console.error(`[ERROR] Fabric.js gagal memuat gambar: ${file.name}`, img);
+                            messageDiv.textContent = `Error: Gagal memuat file '${file.name}'. File mungkin rusak atau formatnya tidak didukung.`;
+                            messageDiv.className = 'error';
+                            const pageWrapperToRemove = document.getElementById(`page-wrapper-${pageCanvases.indexOf(newCanvas)}`);
+                            if (pageWrapperToRemove) pageWrapperToRemove.remove();
+                            pageCanvases[pageCanvases.indexOf(newCanvas)] = null;
+                            return;
+                        }
+                        
+                        console.log(`[DEBUG] Gambar ${file.name} berhasil diproses oleh Fabric.js.`);
+                        
+                        img.scaleToWidth(newCanvas.width * 0.9);
+
+                        newCanvas.add(img);
+                        newCanvas.centerObject(img);
+                        newCanvas.renderAll();
+                        console.log(`[DEBUG] Gambar ${file.name} telah ditambahkan dan dirender di kanvas.`);
+                        
+                        if (index === files.length - 1) {
+                            messageDiv.textContent = `${files.length} gambar berhasil ditambahkan.`;
+                            messageDiv.className = 'success';
+                        }
+
+                    }, { crossOrigin: 'anonymous' });
+                    // --- BLOK YANG DIPERBAIKI SELESAI DI SINI ---
+                };
                 
-                // Skalakan gambar agar pas dengan lebar halaman
-                img.scaleToWidth(newCanvas.width * 0.9);
+                reader.onerror = () => {
+                     console.error(`[ERROR] FileReader gagal membaca file: ${file.name}`);
+                     messageDiv.textContent = `Error: Gagal membaca file '${file.name}'.`;
+                     messageDiv.className = 'error';
+                };
 
-                newCanvas.add(img);
-                newCanvas.centerObject(img);
-                newCanvas.renderAll();
-                console.log(`[DEBUG] Gambar ${file.name} telah ditambahkan dan dirender di kanvas.`);
-                
-                if (index === files.length - 1) {
-                    messageDiv.textContent = `${files.length} gambar berhasil ditambahkan.`;
-                    messageDiv.className = 'success';
-                }
-
-            }, { // Obyek Opsi dengan Penanganan Error
-                crossOrigin: 'anonymous',
-                onError: (error) => {
-                    console.error(`[ERROR] Fabric.js gagal memuat gambar: ${file.name}`, error);
-                    messageDiv.textContent = `Error: Gagal memuat file '${file.name}'. File mungkin rusak atau formatnya tidak didukung.`;
-                    messageDiv.className = 'error';
-                }
+                reader.readAsDataURL(file);
             });
-        };
-        
-        reader.onerror = () => {
-             console.error(`[ERROR] FileReader gagal membaca file: ${file.name}`);
-             messageDiv.textContent = `Error: Gagal membaca file '${file.name}'.`;
-             messageDiv.className = 'error';
-        };
-
-        reader.readAsDataURL(file);
-    });
-});
+        });
 
         generatePdfBtn.addEventListener('click', async () => {
             const activeCanvases = pageCanvases.filter(canvas => canvas !== null);
@@ -2125,14 +2123,13 @@ function attachImageMergerListener() {
         });
     }
 
-    // Pengecekan untuk memastikan fabric.js sudah siap
     const checkFabric = () => {
         if (typeof fabric !== 'undefined') {
             console.log('Fabric.js is ready. Initializing Image to PDF tool.');
             initializeImageMerger();
         } else {
             console.log('Waiting for Fabric.js to load...');
-            setTimeout(checkFabric, 100); // Coba lagi setelah 100ms
+            setTimeout(checkFabric, 100);
         }
     };
 
