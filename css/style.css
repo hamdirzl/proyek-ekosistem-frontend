@@ -1759,26 +1759,3 @@ input:focus, textarea:focus, select:focus {
     background-color: var(--accent-hover);
 }
 
-/* [BARU] Pengaturan untuk baris tombol login/registrasi */
-.form-action-row {
-  display: flex;
-  gap: 1rem; /* Jarak antara tombol utama dan tombol google */
-  align-items: stretch;
-}
-
-/* Tombol utama (Login/Registrasi) akan mengisi sisa ruang */
-.form-action-row .button-pintu[type="submit"] {
-  flex-grow: 1;
-}
-
-/* Tombol ikon Google */
-.google-icon-btn {
-  width: 54px; /* Lebar tombol ikon */
-  height: auto; /* Tinggi otomatis menyesuaikan padding */
-  padding-left: 12px;
-  padding-right: 12px;
-  flex-shrink: 0; /* Mencegah tombol mengecil */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
