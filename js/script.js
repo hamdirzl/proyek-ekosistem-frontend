@@ -1988,10 +1988,15 @@ function attachConverterListener() {
     });
 }
 // Ganti fungsi attachImageMergerListener yang lama dengan ini
-// Ganti fungsi attachImageMergerListener yang lama dengan kode ini
+// Ganti fungsi yang lama dengan yang ini di script.js
+
 function attachImageMergerListener() {
     const wrapper = document.getElementById('image-merger-wrapper');
     if (!wrapper) return;
+
+    // DAPATKAN FORM DI SINI
+    const form = document.getElementById('image-merger-form'); 
+    if (!form) return;
 
     const fileInput = document.getElementById('image-files-input');
     const messageDiv = document.getElementById('image-merger-message');
@@ -2001,7 +2006,7 @@ function attachImageMergerListener() {
     const progressBar = document.getElementById('merger-progress-bar');
     const progressText = progressWrapper.querySelector('.progress-bar-text');
 
-    let fabricCanvas = null; // Variabel untuk menyimpan objek kanvas
+    let fabricCanvas = null;
 
     fileInput.addEventListener('change', (event) => {
         const files = event.target.files;
@@ -2009,19 +2014,14 @@ function attachImageMergerListener() {
             return;
         }
 
-        // Tampilkan container kanvas dan tombol generate
         canvasContainer.classList.remove('hidden');
         generatePdfBtn.classList.remove('hidden');
         wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-
-        // Inisialisasi kanvas Fabric.js jika belum ada
         if (!fabricCanvas) {
             const canvasEl = document.getElementById('pdf-canvas');
             const containerWidth = canvasContainer.clientWidth;
             
-            // Set ukuran kanvas agar sesuai dengan kontainernya
-            // Ini penting untuk menjaga aspek rasio A4
             canvasEl.width = containerWidth;
             canvasEl.height = canvasContainer.clientHeight;
             
@@ -2032,18 +2032,14 @@ function attachImageMergerListener() {
             });
         }
         
-        fabricCanvas.clear(); // Bersihkan kanvas setiap kali file baru dipilih
+        fabricCanvas.clear();
 
-        // Loop setiap file yang dipilih dan tambahkan ke kanvas
         Array.from(files).forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = (f) => {
                 const dataURL = f.target.result;
                 fabric.Image.fromURL(dataURL, (img) => {
-                    // Skalakan gambar agar muat di kanvas
                     img.scaleToWidth(fabricCanvas.width / 2.5);
-
-                    // Posisikan gambar dengan sedikit acak agar tidak menumpuk
                     img.set({
                         left: (index % 2) * (fabricCanvas.width / 2) + 30,
                         top: Math.floor(index / 2) * 150 + 30,
@@ -2060,7 +2056,7 @@ function attachImageMergerListener() {
             reader.readAsDataURL(file);
         });
         
-        // Update label file input
+        // GUNAKAN VARIABEL 'form' YANG SUDAH DIDEFINISIKAN
         const fileLabel = form.querySelector('.file-upload-label');
         if (fileLabel) fileLabel.textContent = `${files.length} file dipilih`;
     });
@@ -2072,16 +2068,11 @@ function attachImageMergerListener() {
             return;
         }
         
-        // Ekspor kanvas sebagai gambar JPEG Data URL
         const imageDataUrl = fabricCanvas.toDataURL({
             format: 'jpeg',
-            quality: 0.85 // Kualitas 85% untuk keseimbangan ukuran dan kualitas
+            quality: 0.85
         });
 
-        const formData = new FormData();
-        formData.append('imageDataUrl', imageDataUrl);
-
-        // Reset UI dan tampilkan progress bar
         messageDiv.textContent = '';
         messageDiv.className = '';
         progressWrapper.classList.remove('hidden');
@@ -2090,10 +2081,10 @@ function attachImageMergerListener() {
         generatePdfBtn.disabled = true;
 
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${API_BASE_URL}/api/generate-pdf-from-canvas`, true);
+        // KIRIM KE ENDPOINT BARU YANG AKAN KITA BUAT
+        xhr.open('POST', `${API_BASE_URL}/api/generate-pdf-from-canvas`, true); 
         xhr.responseType = 'blob';
-        // Karena kita mengirim dataURL (teks), progres upload mungkin tidak akurat,
-        // jadi kita hanya tampilkan status "mengirim"
+        
         xhr.upload.onprogress = () => {
             progressBar.style.width = '50%';
             progressText.textContent = 'Mengirim tata letak ke server...';
@@ -2126,7 +2117,6 @@ function attachImageMergerListener() {
             generatePdfBtn.disabled = false;
         };
         
-        // Kirim dataURL sebagai JSON
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.send(JSON.stringify({ imageDataUrl: imageDataUrl }));
     });
