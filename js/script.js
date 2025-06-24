@@ -1902,6 +1902,7 @@ function attachShortenerListener() {
         });
     }
 }
+// Ganti fungsi attachConverterListener yang lama dengan ini
 function attachConverterListener() {
     const form = document.getElementById('converter-form');
     if (!form) return;
@@ -1911,55 +1912,92 @@ function attachConverterListener() {
         const formData = new FormData(form);
         const submitButton = form.querySelector('button');
         const messageDiv = document.getElementById('converter-message');
-        messageDiv.textContent = 'Mengunggah dan mengonversi file, harap tunggu...';
+        const progressWrapper = document.getElementById('converter-progress-wrapper');
+        const progressBar = document.getElementById('converter-progress-bar');
+        const progressText = progressWrapper.querySelector('.progress-bar-text');
+
+        // Reset UI
+        messageDiv.textContent = '';
         messageDiv.className = '';
+        progressWrapper.classList.remove('hidden');
+        progressBar.style.width = '0%';
+        progressText.textContent = 'Uploading: 0%';
         submitButton.disabled = true;
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/convert`, {
-                method: 'POST', body: formData
-            });
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${API_BASE_URL}/api/convert`, true);
+        xhr.responseType = 'blob'; // Penting agar bisa diunduh
 
-            if (!response.ok) {
-                let errorData = await response.json().catch(() => ({ error: response.statusText }));
-                throw new Error(errorData.error || 'Gagal memproses file.');
+        // Event listener untuk progres unggahan
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percentComplete = Math.round((e.loaded / e.total) * 100);
+                progressBar.style.width = percentComplete + '%';
+                progressText.textContent = `Uploading: ${percentComplete}%`;
+            }
+        });
+
+        // Event listener untuk saat request selesai
+        xhr.onload = function () {
+            if (this.status === 200) {
+                progressText.textContent = 'Konversi berhasil! File sedang diunduh.';
+                const contentDisposition = xhr.getResponseHeader('content-disposition');
+                let fileName = contentDisposition?.match(/filename="(.+)"/)?.[1] || 'converted-file';
+
+                const blob = this.response;
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none'; a.href = url; a.download = fileName;
+                document.body.appendChild(a); a.click();
+                window.URL.revokeObjectURL(url); a.remove();
+
+                form.reset();
+                const fileLabel = form.querySelector('.file-upload-label');
+                if (fileLabel) fileLabel.textContent = 'Tidak ada file yang dipilih';
+
+            } else {
+                // Coba parse error dari respons JSON
+                try {
+                    const reader = new FileReader();
+                    reader.onload = function() {
+                       const errorResult = JSON.parse(this.result);
+                       messageDiv.textContent = `Error: ${errorResult.error || 'Gagal memproses file.'}`;
+                       messageDiv.className = 'error';
+                    }
+                    reader.readAsText(this.response);
+                } catch (e) {
+                     messageDiv.textContent = `Error: Terjadi kesalahan pada server (Status: ${this.status}).`;
+                     messageDiv.className = 'error';
+                }
             }
 
-            const blob = await response.blob();
-            const contentDisposition = response.headers.get('content-disposition');
-            let fileName = contentDisposition?.match(/filename="(.+)"/)?.[1] || 'converted-file';
-
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none'; a.href = url; a.download = fileName;
-            document.body.appendChild(a); a.click();
-            window.URL.revokeObjectURL(url); a.remove();
-
-            messageDiv.textContent = 'Konversi berhasil! File sedang diunduh.';
-            messageDiv.className = 'success';
-            form.reset();
-            
-            // Reset custom file input label
-            const fileLabel = form.querySelector('.file-upload-label');
-            if(fileLabel) fileLabel.textContent = 'Tidak ada file yang dipilih';
-
-        } catch (error) {
-            messageDiv.textContent = `Error: ${error.message}`;
-            messageDiv.className = 'error';
-        } finally {
+            // Sembunyikan progress bar setelah selesai
+            setTimeout(() => progressWrapper.classList.add('hidden'), 2000);
             submitButton.disabled = false;
-        }
+        };
+
+        // Event listener untuk network error
+        xhr.onerror = function () {
+            messageDiv.textContent = 'Error: Terjadi kesalahan jaringan.';
+            messageDiv.className = 'error';
+            progressWrapper.classList.add('hidden');
+            submitButton.disabled = false;
+        };
+
+        xhr.send(formData);
     });
 }
+// Ganti fungsi attachImageMergerListener yang lama dengan ini
 function attachImageMergerListener() {
     const form = document.getElementById('image-merger-form');
     if (!form) return;
 
-    const messageDiv = document.getElementById('image-merger-message');
-    const fileInput = document.getElementById('image-files-input');
-
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
+        const fileInput = document.getElementById('image-files-input');
+        const messageDiv = document.getElementById('image-merger-message');
+        const submitButton = form.querySelector('button');
+
         if (fileInput.files.length === 0) {
             messageDiv.textContent = 'Error: Silakan pilih setidaknya satu gambar.';
             messageDiv.className = 'error';
@@ -1967,40 +2005,72 @@ function attachImageMergerListener() {
         }
 
         const formData = new FormData(form);
-        const submitButton = form.querySelector('button');
-        messageDiv.textContent = 'Mengunggah dan menggabungkan gambar...';
+        const progressWrapper = document.getElementById('merger-progress-wrapper');
+        const progressBar = document.getElementById('merger-progress-bar');
+        const progressText = progressWrapper.querySelector('.progress-bar-text');
+
+        // Reset UI
+        messageDiv.textContent = '';
         messageDiv.className = '';
+        progressWrapper.classList.remove('hidden');
+        progressBar.style.width = '0%';
+        progressText.textContent = 'Uploading: 0%';
         submitButton.disabled = true;
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/convert/images-to-pdf`, {
-                method: 'POST', body: formData
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Gagal memproses file.');
+        const xhr = new XMLHttpRequest();
+        // Gunakan endpoint yang sudah kita perbaiki sebelumnya
+        xhr.open('POST', `${API_BASE_URL}/api/convert/images-to-pdf`, true); 
+        xhr.responseType = 'blob';
+
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percentComplete = Math.round((e.loaded / e.total) * 100);
+                progressBar.style.width = percentComplete + '%';
+                progressText.textContent = `Uploading: ${percentComplete}%`;
             }
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none'; a.href = url; a.download = 'hasil-gabungan.pdf';
-            document.body.appendChild(a); a.click();
-            window.URL.revokeObjectURL(url); a.remove();
+        });
 
-            messageDiv.textContent = 'Berhasil! PDF Anda sedang diunduh.';
-            messageDiv.className = 'success';
-            form.reset();
+        xhr.onload = function () {
+            if (this.status === 200) {
+                progressText.textContent = 'Berhasil! PDF Anda sedang diunduh.';
+                const blob = this.response;
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none'; a.href = url; a.download = 'hasil-gabungan.pdf';
+                document.body.appendChild(a); a.click();
+                window.URL.revokeObjectURL(url); a.remove();
 
-            // Reset custom file input label
-            const fileLabel = form.querySelector('.file-upload-label');
-            if(fileLabel) fileLabel.textContent = 'Tidak ada gambar yang dipilih';
+                form.reset();
+                const fileLabel = form.querySelector('.file-upload-label');
+                if(fileLabel) fileLabel.textContent = 'Tidak ada gambar yang dipilih';
 
-        } catch (error) {
-            messageDiv.textContent = `Error: ${error.message}`;
-            messageDiv.className = 'error';
-        } finally {
+            } else {
+                try {
+                    const reader = new FileReader();
+                    reader.onload = function() {
+                       const errorResult = JSON.parse(this.result);
+                       messageDiv.textContent = `Error: ${errorResult.error || 'Gagal memproses file.'}`;
+                       messageDiv.className = 'error';
+                    }
+                    reader.readAsText(this.response);
+                } catch (e) {
+                     messageDiv.textContent = `Error: Terjadi kesalahan pada server (Status: ${this.status}).`;
+                     messageDiv.className = 'error';
+                }
+            }
+
+            setTimeout(() => progressWrapper.classList.add('hidden'), 2000);
             submitButton.disabled = false;
-        }
+        };
+
+        xhr.onerror = function () {
+            messageDiv.textContent = 'Error: Terjadi kesalahan jaringan.';
+            messageDiv.className = 'error';
+            progressWrapper.classList.add('hidden');
+            submitButton.disabled = false;
+        };
+
+        xhr.send(formData);
     });
 }
 function attachQrCodeGeneratorListener() {
