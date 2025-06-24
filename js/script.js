@@ -1775,7 +1775,7 @@ function setupToolsPage() {
 
     attachShortenerListener();
     attachConverterListener();
-    attachImageMergerListener();
+    attachImageMergerListener(); // Memanggil fungsi yang sudah diperbaiki
     attachQrCodeGeneratorListener();
     attachImageCompressorListener();
 
@@ -1987,15 +1987,15 @@ function attachConverterListener() {
         xhr.send(formData);
     });
 }
-// Ganti fungsi attachImageMergerListener yang lama dengan ini
-// Ganti fungsi yang lama dengan yang ini di script.js
 
+// ============================================
+// == INI ADALAH FUNGSI YANG SUDAH DIPERBAIKI ==
+// ============================================
 function attachImageMergerListener() {
     const wrapper = document.getElementById('image-merger-wrapper');
     if (!wrapper) return;
 
-    // DAPATKAN FORM DI SINI
-    const form = document.getElementById('image-merger-form'); 
+    const form = document.getElementById('image-merger-form');
     if (!form) return;
 
     const fileInput = document.getElementById('image-files-input');
@@ -2014,51 +2014,53 @@ function attachImageMergerListener() {
             return;
         }
 
+        // 1. Tampilkan elemen UI terlebih dahulu
         canvasContainer.classList.remove('hidden');
         generatePdfBtn.classList.remove('hidden');
         wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-        if (!fabricCanvas) {
-            const canvasEl = document.getElementById('pdf-canvas');
-            const containerWidth = canvasContainer.clientWidth;
-            
-            canvasEl.width = containerWidth;
-            canvasEl.height = canvasContainer.clientHeight;
-            
-            fabricCanvas = new fabric.Canvas('pdf-canvas', {
-                backgroundColor: '#ffffff',
-                width: containerWidth,
-                height: canvasContainer.clientHeight
-            });
-        }
-        
-        fabricCanvas.clear();
-
-        Array.from(files).forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = (f) => {
-                const dataURL = f.target.result;
-                fabric.Image.fromURL(dataURL, (img) => {
-                    img.scaleToWidth(fabricCanvas.width / 2.5);
-                    img.set({
-                        left: (index % 2) * (fabricCanvas.width / 2) + 30,
-                        top: Math.floor(index / 2) * 150 + 30,
-                        borderColor: 'var(--accent-color)',
-                        cornerColor: 'var(--accent-color)',
-                        cornerSize: 12,
-                        cornerStyle: 'circle',
-                        transparentCorners: false,
-                        borderScaleFactor: 2
-                    });
-                    fabricCanvas.add(img);
+        // 2. Beri jeda singkat agar browser sempat menggambar elemen
+        setTimeout(() => {
+            // 3. Inisialisasi atau bersihkan kanvas setelah elemen terlihat
+            if (!fabricCanvas) {
+                const canvasEl = document.getElementById('pdf-canvas');
+                // Ambil ukuran dari kontainer yang SEKARANG SUDAH TERLIHAT
+                const containerWidth = canvasContainer.clientWidth;
+                
+                canvasEl.width = containerWidth;
+                canvasEl.height = canvasContainer.clientHeight;
+                
+                fabricCanvas = new fabric.Canvas('pdf-canvas', {
+                    backgroundColor: '#ffffff',
+                    width: containerWidth,
+                    height: canvasContainer.clientHeight
                 });
-            };
-            reader.readAsDataURL(file);
-        });
-        
-        // GUNAKAN VARIABEL 'form' YANG SUDAH DIDEFINISIKAN
-        const fileLabel = form.querySelector('.file-upload-label');
-        if (fileLabel) fileLabel.textContent = `${files.length} file dipilih`;
+            }
+            
+            fabricCanvas.clear();
+
+            Array.from(files).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (f) => {
+                    const dataURL = f.target.result;
+                    fabric.Image.fromURL(dataURL, (img) => {
+                        img.scaleToWidth(fabricCanvas.width / 2.5);
+                        img.set({
+                            left: (index % 2) * (fabricCanvas.width / 2) + 30,
+                            top: Math.floor(index / 2) * 150 + 30,
+                            borderColor: 'var(--accent-color)',
+                            cornerColor: 'var(--accent-color)',
+                            cornerSize: 12,
+                            cornerStyle: 'circle',
+                            transparentCorners: false,
+                            borderScaleFactor: 2
+                        });
+                        fabricCanvas.add(img);
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+        }, 100); // Penundaan 100ms sudah lebih dari cukup
     });
 
     generatePdfBtn.addEventListener('click', () => {
@@ -2081,7 +2083,6 @@ function attachImageMergerListener() {
         generatePdfBtn.disabled = true;
 
         const xhr = new XMLHttpRequest();
-        // KIRIM KE ENDPOINT BARU YANG AKAN KITA BUAT
         xhr.open('POST', `${API_BASE_URL}/api/generate-pdf-from-canvas`, true); 
         xhr.responseType = 'blob';
         
@@ -2121,6 +2122,7 @@ function attachImageMergerListener() {
         xhr.send(JSON.stringify({ imageDataUrl: imageDataUrl }));
     });
 }
+
 function attachQrCodeGeneratorListener() {
     const form = document.getElementById('qr-generator-form');
     if (!form) return;
