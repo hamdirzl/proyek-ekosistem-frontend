@@ -2110,13 +2110,22 @@ function setupAuthPage() {
     const showLoginLink = document.getElementById('show-login');
     const authMessage = document.getElementById('auth-message');
     const authTitle = document.getElementById('auth-title');
-    const googleLoginBtn = document.getElementById('google-login-btn'); // Pindahkan ke sini
+    const googleLoginBtn = document.getElementById('google-login-btn');
+    const googleRegisterBtn = document.getElementById('google-register-btn'); // <-- Baris baru ditambahkan
+
+    // Fungsi yang akan dijalankan oleh kedua tombol Google
+    const startGoogleAuth = () => {
+        window.location.href = `${API_BASE_URL}/api/auth/google`;
+    };
 
     // Event listener untuk tombol Google Login
     if (googleLoginBtn) {
-        googleLoginBtn.addEventListener('click', () => {
-            window.location.href = `${API_BASE_URL}/api/auth/google`;
-        });
+        googleLoginBtn.addEventListener('click', startGoogleAuth);
+    }
+
+    // [BARU] Event listener untuk tombol Google Register
+    if (googleRegisterBtn) {
+        googleRegisterBtn.addEventListener('click', startGoogleAuth);
     }
 
     // Cek jika ada error dari callback Google di URL
