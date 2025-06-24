@@ -1988,89 +1988,147 @@ function attachConverterListener() {
     });
 }
 // Ganti fungsi attachImageMergerListener yang lama dengan ini
+// Ganti fungsi attachImageMergerListener yang lama dengan kode ini
 function attachImageMergerListener() {
-    const form = document.getElementById('image-merger-form');
-    if (!form) return;
+    const wrapper = document.getElementById('image-merger-wrapper');
+    if (!wrapper) return;
 
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const fileInput = document.getElementById('image-files-input');
-        const messageDiv = document.getElementById('image-merger-message');
-        const submitButton = form.querySelector('button');
+    const fileInput = document.getElementById('image-files-input');
+    const messageDiv = document.getElementById('image-merger-message');
+    const canvasContainer = document.getElementById('pdf-canvas-container');
+    const generatePdfBtn = document.getElementById('generate-pdf-btn');
+    const progressWrapper = document.getElementById('merger-progress-wrapper');
+    const progressBar = document.getElementById('merger-progress-bar');
+    const progressText = progressWrapper.querySelector('.progress-bar-text');
 
-        if (fileInput.files.length === 0) {
-            messageDiv.textContent = 'Error: Silakan pilih setidaknya satu gambar.';
-            messageDiv.className = 'error';
+    let fabricCanvas = null; // Variabel untuk menyimpan objek kanvas
+
+    fileInput.addEventListener('change', (event) => {
+        const files = event.target.files;
+        if (files.length === 0) {
             return;
         }
 
-        const formData = new FormData(form);
-        const progressWrapper = document.getElementById('merger-progress-wrapper');
-        const progressBar = document.getElementById('merger-progress-bar');
-        const progressText = progressWrapper.querySelector('.progress-bar-text');
+        // Tampilkan container kanvas dan tombol generate
+        canvasContainer.classList.remove('hidden');
+        generatePdfBtn.classList.remove('hidden');
+        wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-        // Reset UI
+
+        // Inisialisasi kanvas Fabric.js jika belum ada
+        if (!fabricCanvas) {
+            const canvasEl = document.getElementById('pdf-canvas');
+            const containerWidth = canvasContainer.clientWidth;
+            
+            // Set ukuran kanvas agar sesuai dengan kontainernya
+            // Ini penting untuk menjaga aspek rasio A4
+            canvasEl.width = containerWidth;
+            canvasEl.height = canvasContainer.clientHeight;
+            
+            fabricCanvas = new fabric.Canvas('pdf-canvas', {
+                backgroundColor: '#ffffff',
+                width: containerWidth,
+                height: canvasContainer.clientHeight
+            });
+        }
+        
+        fabricCanvas.clear(); // Bersihkan kanvas setiap kali file baru dipilih
+
+        // Loop setiap file yang dipilih dan tambahkan ke kanvas
+        Array.from(files).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = (f) => {
+                const dataURL = f.target.result;
+                fabric.Image.fromURL(dataURL, (img) => {
+                    // Skalakan gambar agar muat di kanvas
+                    img.scaleToWidth(fabricCanvas.width / 2.5);
+
+                    // Posisikan gambar dengan sedikit acak agar tidak menumpuk
+                    img.set({
+                        left: (index % 2) * (fabricCanvas.width / 2) + 30,
+                        top: Math.floor(index / 2) * 150 + 30,
+                        borderColor: 'var(--accent-color)',
+                        cornerColor: 'var(--accent-color)',
+                        cornerSize: 12,
+                        cornerStyle: 'circle',
+                        transparentCorners: false,
+                        borderScaleFactor: 2
+                    });
+                    fabricCanvas.add(img);
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        // Update label file input
+        const fileLabel = form.querySelector('.file-upload-label');
+        if (fileLabel) fileLabel.textContent = `${files.length} file dipilih`;
+    });
+
+    generatePdfBtn.addEventListener('click', () => {
+        if (!fabricCanvas || fabricCanvas.getObjects().length === 0) {
+            messageDiv.textContent = 'Error: Tidak ada gambar di kanvas.';
+            messageDiv.className = 'error';
+            return;
+        }
+        
+        // Ekspor kanvas sebagai gambar JPEG Data URL
+        const imageDataUrl = fabricCanvas.toDataURL({
+            format: 'jpeg',
+            quality: 0.85 // Kualitas 85% untuk keseimbangan ukuran dan kualitas
+        });
+
+        const formData = new FormData();
+        formData.append('imageDataUrl', imageDataUrl);
+
+        // Reset UI dan tampilkan progress bar
         messageDiv.textContent = '';
         messageDiv.className = '';
         progressWrapper.classList.remove('hidden');
         progressBar.style.width = '0%';
-        progressText.textContent = 'Uploading: 0%';
-        submitButton.disabled = true;
+        progressText.textContent = 'Mempersiapkan file...';
+        generatePdfBtn.disabled = true;
 
         const xhr = new XMLHttpRequest();
-        // Gunakan endpoint yang sudah kita perbaiki sebelumnya
-        xhr.open('POST', `${API_BASE_URL}/api/convert/images-to-pdf`, true); 
+        xhr.open('POST', `${API_BASE_URL}/api/generate-pdf-from-canvas`, true);
         xhr.responseType = 'blob';
-
-        xhr.upload.addEventListener('progress', (e) => {
-            if (e.lengthComputable) {
-                const percentComplete = Math.round((e.loaded / e.total) * 100);
-                progressBar.style.width = percentComplete + '%';
-                progressText.textContent = `Uploading: ${percentComplete}%`;
-            }
-        });
+        // Karena kita mengirim dataURL (teks), progres upload mungkin tidak akurat,
+        // jadi kita hanya tampilkan status "mengirim"
+        xhr.upload.onprogress = () => {
+            progressBar.style.width = '50%';
+            progressText.textContent = 'Mengirim tata letak ke server...';
+        };
 
         xhr.onload = function () {
             if (this.status === 200) {
+                progressBar.style.width = '100%';
                 progressText.textContent = 'Berhasil! PDF Anda sedang diunduh.';
+                
                 const blob = this.response;
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.style.display = 'none'; a.href = url; a.download = 'hasil-gabungan.pdf';
+                a.style.display = 'none'; a.href = url; a.download = `layout-to-pdf-${Date.now()}.pdf`;
                 document.body.appendChild(a); a.click();
                 window.URL.revokeObjectURL(url); a.remove();
-
-                form.reset();
-                const fileLabel = form.querySelector('.file-upload-label');
-                if(fileLabel) fileLabel.textContent = 'Tidak ada gambar yang dipilih';
-
             } else {
-                try {
-                    const reader = new FileReader();
-                    reader.onload = function() {
-                       const errorResult = JSON.parse(this.result);
-                       messageDiv.textContent = `Error: ${errorResult.error || 'Gagal memproses file.'}`;
-                       messageDiv.className = 'error';
-                    }
-                    reader.readAsText(this.response);
-                } catch (e) {
-                     messageDiv.textContent = `Error: Terjadi kesalahan pada server (Status: ${this.status}).`;
-                     messageDiv.className = 'error';
-                }
+                messageDiv.textContent = 'Error: Gagal membuat PDF di server.';
+                messageDiv.className = 'error';
             }
-
+            
             setTimeout(() => progressWrapper.classList.add('hidden'), 2000);
-            submitButton.disabled = false;
+            generatePdfBtn.disabled = false;
         };
 
         xhr.onerror = function () {
             messageDiv.textContent = 'Error: Terjadi kesalahan jaringan.';
             messageDiv.className = 'error';
             progressWrapper.classList.add('hidden');
-            submitButton.disabled = false;
+            generatePdfBtn.disabled = false;
         };
-
-        xhr.send(formData);
+        
+        // Kirim dataURL sebagai JSON
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({ imageDataUrl: imageDataUrl }));
     });
 }
 function attachQrCodeGeneratorListener() {
