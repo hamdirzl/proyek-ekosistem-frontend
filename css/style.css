@@ -1,6 +1,5 @@
 /* === PENGATURAN GLOBAL: DESIGN SYSTEM === */
 :root {
-    /* Palet Warna - TEMA TERANG BARU */
     --background-color: #f8f9fa; 
     --card-bg-color: #ffffff;      
     --text-color: #212529;       
@@ -10,17 +9,15 @@
     --accent-hover: #0056b3;       
     --border-hover-color: #adb5bd; 
 
-    /* Font (tetap sama, sudah bagus) */
     --font-heading: 'Poppins', sans-serif;
     --font-body: 'Inter', sans-serif;
 
-    /* Skala Spasi (tetap sama) */
-    --space-xs: 0.5rem;   /* 8px */
-    --space-sm: 1rem;     /* 16px */
-    --space-md: 1.5rem;   /* 24px */
-    --space-lg: 2.5rem;   /* 40px */
-    --space-xl: 4rem;     /* 64px */
-    --space-xxl: 6rem;    /* 96px */
+    --space-xs: 0.5rem;  
+    --space-sm: 1rem;     
+    --space-md: 1.5rem;  
+    --space-lg: 2.5rem; 
+    --space-xl: 4rem;     
+    --space-xxl: 6rem;   
 
     --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
     --font-size-h1:   clamp(2.2rem, 1.5rem + 3.5vw, 3.5rem);
