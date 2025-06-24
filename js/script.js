@@ -1669,42 +1669,38 @@ function setupJurnalDetailPage() {
     fetchJurnalDetails();
 }
 
-// === LOGIKA HALAMAN TOOLS ===
+// === LOGIKA HALAMAN TOOLS (VERSI BARU UNTUK AKSES PUBLIK) ===
 function setupToolsPage() {
     const wrappers = [
         document.getElementById('shortener-wrapper'), document.getElementById('history-section'),
         document.getElementById('converter-wrapper'), document.getElementById('image-merger-wrapper'),
         document.getElementById('qr-generator-wrapper'), document.getElementById('image-compressor-wrapper')
     ];
-    const loginPrompt = document.getElementById('login-prompt');
     const toolSelectionSection = document.querySelector('.tool-selection');
 
+    // Sembunyikan semua wrapper tool pada awalnya
     wrappers.forEach(el => el && el.classList.add('hidden'));
 
-    if (localStorage.getItem('jwt_refresh_token')) {
-        if (loginPrompt) loginPrompt.classList.add('hidden');
-        if (toolSelectionSection) toolSelectionSection.classList.remove('hidden');
+    // Selalu tampilkan pilihan tools untuk semua pengunjung
+    if (toolSelectionSection) toolSelectionSection.classList.remove('hidden');
 
-        document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper'));
-        document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper'));
-        document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper'));
-        document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper'));
-        document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper'));
+    // Pasang semua event listener untuk tombol-tombol tools
+    document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper'));
+    document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper'));
+    document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper'));
+    document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper'));
+    document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper'));
 
-        attachShortenerListener();
-        attachConverterListener();
-        attachImageMergerListener();
-        attachQrCodeGeneratorListener();
-        attachImageCompressorListener();
+    // Pasang semua event listener untuk logika form tools
+    attachShortenerListener();
+    attachConverterListener();
+    attachImageMergerListener();
+    attachQrCodeGeneratorListener();
+    attachImageCompressorListener();
 
-    } else {
-        if (loginPrompt) loginPrompt.classList.remove('hidden');
-        if (toolSelectionSection) toolSelectionSection.classList.add('hidden');
-    }
-
+    // Logika untuk file input di media converter tetap di sini jika ada
     const fileInput = document.getElementById('file-input');
     const outputFormatSelect = document.getElementById('output-format');
-
     if (fileInput && outputFormatSelect) {
         fileInput.addEventListener('change', () => {
             if (!fileInput.files || fileInput.files.length === 0) return;
@@ -1721,6 +1717,7 @@ function setupToolsPage() {
         });
     }
 }
+
 function showToolSection(sectionIdToShow) {
     const allToolSections = [
         document.getElementById('shortener-wrapper'), document.getElementById('converter-wrapper'),
@@ -1735,7 +1732,8 @@ function showToolSection(sectionIdToShow) {
     });
 
     if (historySection) {
-        if (sectionIdToShow === 'shortener-wrapper') {
+        // Cek jika tool yang dipilih adalah shortener DAN pengguna sudah login
+        if (sectionIdToShow === 'shortener-wrapper' && localStorage.getItem('jwt_refresh_token')) {
             historySection.classList.remove('hidden');
             fetchUserLinkHistory();
         } else {
@@ -1746,6 +1744,7 @@ function showToolSection(sectionIdToShow) {
     const targetSection = document.getElementById(sectionIdToShow);
     if (targetSection) targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
 function attachShortenerListener() {
     const form = document.getElementById('shortener-form');
     if (!form) return;
@@ -1765,8 +1764,10 @@ function attachShortenerListener() {
         copyButton.style.display = 'none';
 
         try {
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/shorten`, {
+            // Menggunakan fetch biasa karena endpointnya sudah publik
+            const response = await fetch(`${API_BASE_URL}/api/shorten`, {
                 method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ original_url: longUrlInput.value, custom_slug: customSlugInput.value }),
             });
             const data = await response.json();
@@ -1777,7 +1778,11 @@ function attachShortenerListener() {
             resultText.textContent = data.short_url;
             longUrlInput.value = '';
             customSlugInput.value = '';
-            fetchUserLinkHistory();
+
+            // Jika pengguna login, refresh riwayatnya
+            if (localStorage.getItem('jwt_refresh_token')) {
+                fetchUserLinkHistory();
+            }
 
         } catch (error) {
             resultText.textContent = 'Gagal: ' + error.message;
@@ -1808,7 +1813,7 @@ function attachConverterListener() {
         submitButton.disabled = true;
 
         try {
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/convert`, {
+            const response = await fetch(`${API_BASE_URL}/api/convert`, {
                 method: 'POST', body: formData
             });
 
@@ -1860,7 +1865,7 @@ function attachImageMergerListener() {
         submitButton.disabled = true;
 
         try {
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/convert/images-to-pdf`, {
+            const response = await fetch(`${API_BASE_URL}/api/convert/images-to-pdf`, {
                 method: 'POST', body: formData
             });
             if (!response.ok) {
@@ -1905,8 +1910,9 @@ function attachQrCodeGeneratorListener() {
         downloadQrButton.style.display = 'none';
 
         try {
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/generate-qr`, {
+            const response = await fetch(`${API_BASE_URL}/api/generate-qr`, {
                 method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     text: qrText.value,
                     level: qrErrorLevel.value,
@@ -1979,7 +1985,7 @@ function attachImageCompressorListener() {
         formData.append('format', formatSelect.value);
 
         try {
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/compress-image`, {
+            const response = await fetch(`${API_BASE_URL}/api/compress-image`, {
                 method: 'POST',
                 body: formData
             });
