@@ -1669,6 +1669,91 @@ function setupJurnalDetailPage() {
     fetchJurnalDetails();
 }
 
+// === [FUNGSI BARU] Logika untuk Input dan Dropdown Kustom ===
+function setupCustomFileInputs() {
+    document.querySelectorAll('.custom-file-upload input[type="file"]').forEach(inputElement => {
+        const container = inputElement.closest('.custom-file-upload');
+        if (!container) return;
+        
+        const label = container.querySelector('.file-upload-label');
+        if (!label) return;
+        
+        const defaultLabelText = label.textContent;
+
+        inputElement.addEventListener('change', () => {
+            if (inputElement.files.length > 0) {
+                if (inputElement.files.length === 1) {
+                    label.textContent = inputElement.files[0].name;
+                } else {
+                    label.textContent = `${inputElement.files.length} file dipilih`;
+                }
+            } else {
+                label.textContent = defaultLabelText;
+            }
+        });
+    });
+}
+
+function setupCustomDropdowns() {
+    document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
+        const select = wrapper.querySelector('select');
+        if (!select) return;
+
+        // Hapus elemen custom yang mungkin sudah ada agar tidak duplikat
+        wrapper.querySelector('.select-trigger')?.remove();
+        wrapper.querySelector('.select-options')?.remove();
+
+        const trigger = document.createElement('div');
+        trigger.className = 'select-trigger';
+        
+        const optionsList = document.createElement('ul');
+        optionsList.className = 'select-options';
+
+        [...select.options].forEach(option => {
+            const listItem = document.createElement('li');
+            listItem.textContent = option.textContent;
+            listItem.dataset.value = option.value;
+            if (option.selected) {
+                trigger.textContent = option.textContent;
+                listItem.classList.add('selected');
+            }
+            optionsList.appendChild(listItem);
+
+            listItem.addEventListener('click', (e) => {
+                e.stopPropagation();
+                optionsList.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+                listItem.classList.add('selected');
+                
+                trigger.textContent = listItem.textContent;
+                select.value = listItem.dataset.value;
+                wrapper.classList.remove('active');
+                
+                select.dispatchEvent(new Event('change'));
+            });
+        });
+
+        wrapper.appendChild(trigger);
+        wrapper.appendChild(optionsList);
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.custom-select-wrapper.active').forEach(openWrapper => {
+                if (openWrapper !== wrapper) {
+                    openWrapper.classList.remove('active');
+                }
+            });
+            wrapper.classList.toggle('active');
+        });
+    });
+
+    window.addEventListener('click', () => {
+        document.querySelectorAll('.custom-select-wrapper.active').forEach(wrapper => {
+            wrapper.classList.remove('active');
+        });
+    });
+}
+
+
 // === LOGIKA HALAMAN TOOLS (VERSI BARU UNTUK AKSES PUBLIK) ===
 function setupToolsPage() {
     const wrappers = [
@@ -1694,7 +1779,6 @@ function setupToolsPage() {
     attachQrCodeGeneratorListener();
     attachImageCompressorListener();
 
-    // === LOGIKA BARU UNTUK DROPDOWN DINAMIS ===
     const fileInput = document.getElementById('file-input');
     const outputFormatSelect = document.getElementById('output-format');
 
@@ -1729,8 +1813,15 @@ function setupToolsPage() {
                 optionElement.textContent = opt.text;
                 outputFormatSelect.appendChild(optionElement);
             });
+            
+            // Panggil setupCustomDropdowns lagi untuk meregenerasi tampilan dropdown kustom
+            setupCustomDropdowns();
         });
     }
+
+    // Panggil fungsi setup untuk elemen kustom
+    setupCustomFileInputs();
+    setupCustomDropdowns();
 }
 
 function showToolSection(sectionIdToShow) {
@@ -1747,7 +1838,6 @@ function showToolSection(sectionIdToShow) {
     });
 
     if (historySection) {
-        // Cek jika tool yang dipilih adalah shortener DAN pengguna sudah login
         if (sectionIdToShow === 'shortener-wrapper' && localStorage.getItem('jwt_refresh_token')) {
             historySection.classList.remove('hidden');
             fetchUserLinkHistory();
@@ -1779,7 +1869,6 @@ function attachShortenerListener() {
         copyButton.style.display = 'none';
 
         try {
-            // Menggunakan fetch biasa karena endpointnya sudah publik
             const response = await fetch(`${API_BASE_URL}/api/shorten`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1794,7 +1883,6 @@ function attachShortenerListener() {
             longUrlInput.value = '';
             customSlugInput.value = '';
 
-            // Jika pengguna login, refresh riwayatnya
             if (localStorage.getItem('jwt_refresh_token')) {
                 fetchUserLinkHistory();
             }
@@ -1850,6 +1938,11 @@ function attachConverterListener() {
             messageDiv.textContent = 'Konversi berhasil! File sedang diunduh.';
             messageDiv.className = 'success';
             form.reset();
+            
+            // Reset custom file input label
+            const fileLabel = form.querySelector('.file-upload-label');
+            if(fileLabel) fileLabel.textContent = 'Tidak ada file yang dipilih';
+
         } catch (error) {
             messageDiv.textContent = `Error: ${error.message}`;
             messageDiv.className = 'error';
@@ -1897,6 +1990,11 @@ function attachImageMergerListener() {
             messageDiv.textContent = 'Berhasil! PDF Anda sedang diunduh.';
             messageDiv.className = 'success';
             form.reset();
+
+            // Reset custom file input label
+            const fileLabel = form.querySelector('.file-upload-label');
+            if(fileLabel) fileLabel.textContent = 'Tidak ada gambar yang dipilih';
+
         } catch (error) {
             messageDiv.textContent = `Error: ${error.message}`;
             messageDiv.className = 'error';

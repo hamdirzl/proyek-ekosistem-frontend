@@ -117,8 +117,26 @@
         <section id="converter-wrapper" class="tool-section hidden" data-aos="fade-up">
             <h2 class="section-title">Tool: Media Converter</h2>
             <form id="converter-form" enctype="multipart/form-data">
-                <div class="form-group"><label for="file-input" style="display: block; margin-bottom: 0.5rem;">Select File</label><input type="file" id="file-input" name="file" required style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; background-color: #2a2a2a; color: var(--text-color);"></div>
-                <div class="form-group" style="margin-top: 1rem;"><label for="output-format" style="display: block; margin-bottom: 0.5rem;">Convert To:</label><select id="output-format" name="outputFormat" required style="width: 100%; padding: var(--space-sm); border: 1px solid var(--border-color); border-radius: 8px; font-size: var(--font-size-base); font-family: var(--font-body); background-color: #2a2a2a; color: var(--text-color);"><option value="pdf">PDF</option><option value="docx">DOCX (Word Document)</option><option value="pptx">PPTX (PowerPoint)</option><option value="odt">ODT (OpenDocument Text)</option><option value="jpg">JPG</option><option value="png">PNG</option></select></div>
+                <div class="form-group">
+                    <label for="file-input">Select File</label>
+                    <div class="custom-file-upload">
+                        <input type="file" id="file-input" name="file" required>
+                        <span class="file-upload-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            Pilih File
+                        </span>
+                        <span class="file-upload-label">Tidak ada file yang dipilih</span>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label for="output-format">Convert To:</label>
+                    <div class="custom-select-wrapper">
+                        <select id="output-format" name="outputFormat" required>
+                            <option value="pdf">PDF</option>
+                            <option value="docx">DOCX (Word Document)</option>
+                        </select>
+                    </div>
+                </div>
                 <button type="submit" class="button-pintu" style="margin-top: 1.5rem; width: 100%;">Convert!</button>
             </form>
             <div id="converter-message" style="margin-top: 1rem;"></div>
@@ -127,7 +145,17 @@
         <section id="image-merger-wrapper" class="tool-section hidden" data-aos="fade-up">
             <h2 class="section-title">Tool: Merge Images to PDF</h2>
             <form id="image-merger-form" enctype="multipart/form-data">
-                <div class="form-group"><label for="image-files-input" style="display: block; margin-bottom: 0.5rem;">Select Images (JPG/PNG, multiple allowed)</label><input type="file" id="image-files-input" name="files" required multiple accept="image/png, image/jpeg" style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; width: 100%; background-color: #2a2a2a; color: var(--text-color);"></div>
+                <div class="form-group">
+                    <label for="image-files-input">Select Images (JPG/PNG, multiple allowed)</label>
+                    <div class="custom-file-upload">
+                         <input type="file" id="image-files-input" name="files" required multiple accept="image/png, image/jpeg">
+                         <span class="file-upload-button">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            Pilih Gambar
+                        </span>
+                        <span class="file-upload-label">Tidak ada gambar yang dipilih</span>
+                    </div>
+                </div>
                 <button type="submit" class="button-pintu" style="margin-top: 1.5rem; width: 100%;">Merge to PDF!</button>
             </form>
             <div id="image-merger-message" style="margin-top: 1rem;"></div>
