@@ -1758,3 +1758,26 @@ input:focus, textarea:focus, select:focus {
 .message.user audio::-webkit-media-controls-panel {
     background-color: var(--accent-hover);
 }
+
+/* Penyesuaian Tombol Google di Versi Mobile */
+@media (max-width: 480px) {
+    #google-login-btn,
+    #google-register-btn {
+        width: 52px;
+        height: 52px;
+        padding: 0;
+        border-radius: 50%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #google-login-btn span,
+    #google-register-btn span {
+        display: none;
+    }
+
+    #google-login-btn svg,
+    #google-register-btn svg {
+        margin: 0;
+    }
+}
