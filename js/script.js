@@ -46,7 +46,7 @@ async function uploadChatFile(file, type) {
 function forceLogout() {
     localStorage.removeItem('jwt_refresh_token');
     sessionStorage.removeItem('jwt_access_token');
-    localStorage.removeItem('chatSession'); 
+    localStorage.removeItem('chatSession');
     if (!window.location.pathname.endsWith('auth.html')) {
         alert('Sesi Anda telah berakhir. Silakan login kembali.');
         window.location.href = 'auth.html';
@@ -56,7 +56,7 @@ function forceLogout() {
 async function fetchWithAuth(url, options = {}) {
     let accessToken = sessionStorage.getItem('jwt_access_token');
 
-    options.headers = { ...options.headers }; 
+    options.headers = { ...options.headers };
     if (accessToken) {
         options.headers['Authorization'] = `Bearer ${accessToken}`;
     }
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (navLogin) navLogin.style.display = 'list-item';
         if (navLogout) navLogout.style.display = 'none';
     }
-    
+
     if (refreshToken && !sessionStorage.getItem('jwt_access_token')) {
         console.log("Sesi baru, mencoba mendapatkan access token...");
         try {
@@ -179,6 +179,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupToolsPage();
     } else if (document.getElementById('login-form')) {
         setupAuthPage();
+    } else if (document.title.includes("Logging In...")) {
+        setupAuthCallbackPage();
     }
 
     setupAboutModal();
@@ -216,11 +218,11 @@ function setupChatBubble() {
     let isRecording = false;
 
     if (window.location.pathname.includes('dashboard.html')) {
-        if(chatBubble) chatBubble.style.display = 'none';
-        if(chatWindow) chatWindow.style.display = 'none';
-        return; 
+        if (chatBubble) chatBubble.style.display = 'none';
+        if (chatWindow) chatWindow.style.display = 'none';
+        return;
     }
-    
+
     if (!chatBubble || !chatWindow) return;
 
     let ws = null;
@@ -276,13 +278,13 @@ function setupChatBubble() {
             messageDiv.style.color = 'var(--text-muted-color)';
             messageDiv.textContent = content;
         }
-        
+
         chatMessages.appendChild(messageDiv);
         if (messageType !== 'image') { // scroll langsung jika bukan gambar
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     };
-    
+
     const updateStatus = (status) => {
         if (!chatStatus) return;
         if (status === 'terhubung') {
@@ -292,8 +294,8 @@ function setupChatBubble() {
             chatStatus.textContent = 'Sedang menghubungi admin...';
             chatStatus.style.color = 'var(--text-muted-color)';
         } else {
-             chatStatus.textContent = 'Koneksi terputus';
-             chatStatus.style.color = '#dc3545';
+            chatStatus.textContent = 'Koneksi terputus';
+            chatStatus.style.color = '#dc3545';
         }
     };
 
@@ -304,14 +306,14 @@ function setupChatBubble() {
             const response = await fetch(`${API_BASE_URL}/api/chat/history/${userId}`);
             if (!response.ok) throw new Error('Gagal memuat riwayat');
             const history = await response.json();
-            
-            chatMessages.innerHTML = ''; 
+
+            chatMessages.innerHTML = '';
             if (history.length > 0) {
-                 appendMessage('Ini adalah riwayat percakapan Anda sebelumnya.', 'server-info');
+                appendMessage('Ini adalah riwayat percakapan Anda sebelumnya.', 'server-info');
             } else {
-                 const session = JSON.parse(localStorage.getItem('chatSession'));
-                 const welcomeName = session ? session.userName : 'Pengunjung';
-                 appendMessage(`Halo ${welcomeName}! Ada yang bisa kami bantu?`, 'admin');
+                const session = JSON.parse(localStorage.getItem('chatSession'));
+                const welcomeName = session ? session.userName : 'Pengunjung';
+                appendMessage(`Halo ${welcomeName}! Ada yang bisa kami bantu?`, 'admin');
             }
 
             history.forEach(msg => {
@@ -322,7 +324,7 @@ function setupChatBubble() {
             appendMessage('Gagal memuat riwayat percakapan.', 'server-info');
         }
     };
-    
+
     const connect = () => {
         const session = JSON.parse(localStorage.getItem('chatSession'));
         if (isConnecting || (ws && ws.readyState === WebSocket.OPEN) || !session) {
@@ -370,7 +372,7 @@ function setupChatBubble() {
         ws.onerror = (error) => {
             isConnecting = false;
             console.error('WebSocket error:', error);
-            if(ws) ws.close();
+            if (ws) ws.close();
         };
     };
 
@@ -394,7 +396,7 @@ function setupChatBubble() {
     closeChatBtn.addEventListener('click', () => {
         chatWindow.classList.add('hidden');
     });
-    
+
     if (chatStartForm) {
         chatStartForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -411,7 +413,7 @@ function setupChatBubble() {
             chatStartForm.style.display = 'none';
             chatMain.classList.remove('hidden');
             chatMain.style.display = 'flex';
-            await loadChatHistory(newSession.userId); 
+            await loadChatHistory(newSession.userId);
             connect();
         });
     }
@@ -489,7 +491,7 @@ function setupChatBubble() {
                                 appendMessage(result.url, 'user', 'audio');
                             }
                         } else {
-                             appendMessage(`Gagal: ${result.message}`, 'server-info', 'info-upload');
+                            appendMessage(`Gagal: ${result.message}`, 'server-info', 'info-upload');
                         }
                         // Matikan track audio untuk mematikan ikon rekam di browser
                         stream.getTracks().forEach(track => track.stop());
@@ -509,8 +511,8 @@ function setupChatBubble() {
 
     const existingSession = JSON.parse(localStorage.getItem('chatSession'));
     if (existingSession && existingSession.userId) {
-        if(chatStartForm) chatStartForm.style.display = 'none';
-        if(chatMain) {
+        if (chatStartForm) chatStartForm.style.display = 'none';
+        if (chatMain) {
             chatMain.classList.remove('hidden');
             chatMain.style.display = 'flex';
         }
@@ -529,14 +531,14 @@ async function setupAdminChatUI() {
     adminChatForm = document.getElementById('admin-chat-form');
     adminChatInput = document.getElementById('admin-chat-input');
 
-    if (!userChatList) return; 
+    if (!userChatList) return;
 
     const accessToken = sessionStorage.getItem('jwt_access_token');
     if (!accessToken) return;
 
     const backendWsUrl = `wss://server-pribadi-hamdi-docker.onrender.com?token=${accessToken}`;
     adminWebSocket = new WebSocket(backendWsUrl);
-    
+
     adminWebSocket.onopen = () => console.log("Koneksi WebSocket Admin berhasil dibuka.");
     adminWebSocket.onclose = () => console.log("Koneksi WebSocket Admin ditutup.");
     adminWebSocket.onerror = (error) => console.error("Error pada WebSocket Admin:", error);
@@ -580,7 +582,7 @@ async function setupAdminChatUI() {
             }
         }
     };
-    
+
     // === [MODIFIKASI] appendAdminMessage menjadi lebih canggih ===
     function appendAdminMessage(content, type, messageType = 'text') {
         if (!activeChatMessages) return;
@@ -612,13 +614,13 @@ async function setupAdminChatUI() {
 
     adminWebSocket.onmessage = async (event) => {
         const data = JSON.parse(event.data);
-        
+
         if (data.type === 'chat') {
             const userId = data.sender;
             const userName = data.userName || `Pengunjung ${userId.substring(0, 6)}`;
-            
+
             if (!allChatHistories[userId]) allChatHistories[userId] = [];
-            
+
             allChatHistories[userId].push({ sender: 'user', content: data.content, message_type: data.messageType });
             updateUserEntryTypingStatus(userId, false);
 
@@ -629,7 +631,7 @@ async function setupAdminChatUI() {
                 userEntry.className = 'chat-user-entry';
                 userEntry.innerHTML = `<span><span>${userName}</span></span><span class="unread-dot hidden"></span>`;
                 userChatList.prepend(userEntry);
-                
+
                 userEntry.addEventListener('click', async () => {
                     document.querySelectorAll('.chat-user-entry.active').forEach(el => el.classList.remove('active'));
                     userEntry.classList.add('active');
@@ -647,24 +649,24 @@ async function setupAdminChatUI() {
                             const type = (msg.sender_type === 'admin' || msg.sender === 'admin') ? 'admin' : 'user';
                             appendAdminMessage(msg.content, type, msg.message_type);
                         });
-                    } catch(e) { 
-                        console.error("Gagal fetch riwayat chat:", e); 
+                    } catch (e) {
+                        console.error("Gagal fetch riwayat chat:", e);
                         activeChatMessages.innerHTML = '<p style="color: red;">Gagal memuat riwayat.</p>';
                     }
                 });
             } else {
                 userEntry.querySelector('span > span').textContent = userName;
             }
-            
+
             if (currentAdminChatTarget !== userId) {
-                 userEntry.querySelector('.unread-dot').classList.remove('hidden');
+                userEntry.querySelector('.unread-dot').classList.remove('hidden');
             } else {
                 appendAdminMessage(data.content, 'user', data.messageType);
             }
         } else if (data.type === 'user_disconnected') {
-             const userEntry = document.getElementById(`chat-user-${data.userId}`);
-             if (userEntry) userEntry.style.opacity = '0.5';
-             updateUserEntryTypingStatus(data.userId, false);
+            const userEntry = document.getElementById(`chat-user-${data.userId}`);
+            if (userEntry) userEntry.style.opacity = '0.5';
+            updateUserEntryTypingStatus(data.userId, false);
         } else if (data.type === 'typing') {
             updateUserEntryTypingStatus(data.userId, data.isTyping);
         }
@@ -679,17 +681,17 @@ async function setupAdminChatUI() {
             }
             const message = adminChatInput.value.trim();
             if (message && currentAdminChatTarget && adminWebSocket.readyState === WebSocket.OPEN) {
-                 adminWebSocket.send(JSON.stringify({
-                     type: 'admin_message',
-                     content: message,
-                     targetUserId: currentAdminChatTarget,
-                     messageType: 'text' // Admin untuk saat ini hanya mengirim teks
-                 }));
-                 appendAdminMessage(message, 'admin', 'text');
-                 if (allChatHistories[currentAdminChatTarget]) {
+                adminWebSocket.send(JSON.stringify({
+                    type: 'admin_message',
+                    content: message,
+                    targetUserId: currentAdminChatTarget,
+                    messageType: 'text' // Admin untuk saat ini hanya mengirim teks
+                }));
+                appendAdminMessage(message, 'admin', 'text');
+                if (allChatHistories[currentAdminChatTarget]) {
                     allChatHistories[currentAdminChatTarget].push({ sender: 'admin', content: message, message_type: 'text' });
-                 }
-                 adminChatInput.value = '';
+                }
+                adminChatInput.value = '';
             }
         });
     }
@@ -775,7 +777,7 @@ async function uploadCroppedImageForEditor(blob, successCallback, failureCallbac
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Gagal mengunggah gambar');
-        
+
         successCallback(data.location);
 
     } catch (error) {
@@ -793,17 +795,17 @@ async function setupDashboardPage() {
         window.location.href = 'auth.html';
         return;
     }
-    
+
     const accessToken = sessionStorage.getItem('jwt_access_token');
     if (!accessToken) {
         console.log("Menunggu access token dari proses refresh...");
-        return; 
+        return;
     }
 
     const decodedToken = decodeJwt(accessToken);
     populateUserInfo(decodedToken);
-    populateUserDashboard(); 
-    
+    populateUserDashboard();
+
     if (decodedToken && decodedToken.role === 'admin') {
         setupAdminPanels();
         await setupAdminChatUI(); // Panggil UI Admin Chat
@@ -827,9 +829,9 @@ async function populateUserDashboard() {
     try {
         const statsResponse = await fetchWithAuth(`${API_BASE_URL}/api/user/dashboard-stats`);
         if (!statsResponse.ok) throw new Error('Gagal memuat data statistik.');
-        
+
         const stats = await statsResponse.json();
-        
+
         statsLinkCountEl.textContent = stats.linkCount;
         if (stats.lastLogin) {
             statsLastLoginEl.innerHTML = `${stats.lastLogin.time}<br><small style="font-weight: 400; color: var(--text-muted-color);">${stats.lastLogin.ip}</small>`;
@@ -845,14 +847,14 @@ async function populateUserDashboard() {
     const historyList = document.getElementById('user-links-list');
     const loadingMessage = document.getElementById('loading-user-links');
     if (!historyList || !loadingMessage) return;
-    
+
     loadingMessage.textContent = 'Memuat riwayat tautan...';
     try {
         const linksResponse = await fetchWithAuth(`${API_BASE_URL}/api/user/links`);
         if (!linksResponse.ok) throw new Error('Gagal memuat riwayat tautan.');
 
         const links = await linksResponse.json();
-        
+
         historyList.innerHTML = '';
         if (links.length === 0) {
             loadingMessage.textContent = 'Anda belum pernah membuat tautan pendek.';
@@ -873,10 +875,10 @@ function setupAdminPanels() {
     document.getElementById('admin-jurnal-tab')?.classList.remove('hidden');
     document.getElementById('admin-links-tab')?.classList.remove('hidden');
     document.getElementById('admin-users-tab')?.classList.remove('hidden');
-    
+
     setupAdminPortfolioPanel();
     setupAdminJurnalPanel();
-    
+
     const adminSection = document.getElementById('admin-section');
     if (adminSection) {
         const linkSearchInput = document.getElementById('link-search-input');
@@ -920,7 +922,7 @@ function setupAdminPortfolioPanel() {
     const toolbarOptions = [
         [{ 'header': [1, 2, 3, false] }],
         ['bold', 'italic', 'underline'],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
         ['link', 'image', 'video'],
         ['clean']
     ];
@@ -977,11 +979,11 @@ function setupAdminPortfolioPanel() {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const id = hiddenId.value;
         const title = titleInput.value;
         const description = portfolioQuill.root.innerHTML;
-        
+
         if (!title || portfolioQuill.getLength() <= 1) {
             messageDiv.className = 'error';
             messageDiv.textContent = 'Error: Judul dan deskripsi tidak boleh kosong.';
@@ -995,8 +997,8 @@ function setupAdminPortfolioPanel() {
         const method = id ? 'PUT' : 'POST';
 
         try {
-            const response = await fetchWithAuth(url, { 
-                method, 
+            const response = await fetchWithAuth(url, {
+                method,
                 body: JSON.stringify({ title, description })
             });
             const result = await response.json();
@@ -1004,7 +1006,7 @@ function setupAdminPortfolioPanel() {
 
             messageDiv.className = 'success';
             messageDiv.textContent = id ? 'Proyek berhasil diperbarui!' : 'Proyek berhasil ditambahkan!';
-            
+
             resetPortfolioForm();
             fetchAndDisplayPortfolioAdmin();
         } catch (error) {
@@ -1034,7 +1036,7 @@ function setupAdminJurnalPanel() {
     const toolbarOptions = [
         [{ 'header': [1, 2, 3, false] }],
         ['bold', 'italic', 'underline'],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
         ['link', 'image', 'video'],
         ['clean']
     ];
@@ -1094,17 +1096,17 @@ function setupAdminJurnalPanel() {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const id = hiddenId.value;
         const title = titleInput.value;
         const content = quill.root.innerHTML;
-        
+
         if (!title || quill.getLength() <= 1) {
             messageDiv.className = 'error';
             messageDiv.textContent = 'Error: Judul dan konten tidak boleh kosong.';
             return;
         }
-        
+
         messageDiv.className = '';
         messageDiv.textContent = "Menyimpan postingan...";
 
@@ -1112,8 +1114,8 @@ function setupAdminJurnalPanel() {
         const method = id ? 'PUT' : 'POST';
 
         try {
-            const response = await fetchWithAuth(url, { 
-                method, 
+            const response = await fetchWithAuth(url, {
+                method,
                 body: JSON.stringify({ title, content })
             });
             const result = await response.json();
@@ -1121,7 +1123,7 @@ function setupAdminJurnalPanel() {
 
             messageDiv.className = 'success';
             messageDiv.textContent = id ? 'Postingan berhasil diperbarui!' : 'Postingan berhasil ditambahkan!';
-            
+
             resetJurnalForm();
             fetchAndDisplayJurnalAdmin();
         } catch (error) {
@@ -1129,7 +1131,7 @@ function setupAdminJurnalPanel() {
             messageDiv.textContent = `Error: ${error.message}`;
         }
     });
-    
+
     fetchAndDisplayJurnalAdmin();
 }
 
@@ -1141,12 +1143,12 @@ async function fetchAndDisplayPortfolioAdmin() {
 
     loadingMessage.style.display = 'block';
     listContainer.innerHTML = '';
-    
+
     try {
         const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio`);
         const projects = await response.json();
         if (!response.ok) throw new Error(projects.error || 'Gagal memuat proyek.');
-        
+
         loadingMessage.style.display = 'none';
 
         if (projects.length === 0) {
@@ -1189,7 +1191,7 @@ function renderAdminPortfolioItem(project, container) {
         document.getElementById('portfolio-form-title').textContent = 'Edit Proyek';
         document.getElementById('portfolio-id').value = project.id;
         document.getElementById('portfolio-title').value = project.title;
-        
+
         const editorDiv = document.getElementById('quill-portfolio-editor');
         if (editorDiv && editorDiv.__quill) {
             editorDiv.__quill.root.innerHTML = project.description;
@@ -1200,12 +1202,12 @@ function renderAdminPortfolioItem(project, container) {
 
     listItem.querySelector('.delete-portfolio-btn').addEventListener('click', async () => {
         if (!confirm(`Yakin ingin menghapus proyek "${project.title}"?`)) return;
-        
+
         try {
             const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio/${project.id}`, { method: 'DELETE' });
             const result = await response.json();
             if (!response.ok) throw new Error(result.error);
-            
+
             alert('Proyek berhasil dihapus.');
             fetchAndDisplayPortfolioAdmin();
         } catch (error) {
@@ -1221,12 +1223,12 @@ async function fetchAndDisplayJurnalAdmin() {
 
     loadingMessage.style.display = 'block';
     listContainer.innerHTML = '';
-    
+
     try {
         const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal`);
         const posts = await response.json();
         if (!response.ok) throw new Error(posts.error || 'Gagal memuat postingan.');
-        
+
         loadingMessage.style.display = 'none';
 
         if (posts.length === 0) {
@@ -1245,7 +1247,7 @@ function renderAdminJurnalItem(post, container) {
     listItem.className = 'mood-item';
     listItem.id = `jurnal-item-${post.id}`;
     const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
-    const strippedContent = post.content.replace(/<[^>]+>/g, ' '); 
+    const strippedContent = post.content.replace(/<[^>]+>/g, ' ');
 
     listItem.innerHTML = `
         <div class="mood-item-header">
@@ -1268,23 +1270,23 @@ function renderAdminJurnalItem(post, container) {
         document.getElementById('jurnal-form-title').textContent = 'Edit Postingan';
         document.getElementById('jurnal-id').value = post.id;
         document.getElementById('jurnal-title').value = post.title;
-        
+
         const editorDiv = document.getElementById('quill-editor');
         if (editorDiv && editorDiv.__quill) {
             editorDiv.__quill.root.innerHTML = post.content;
         }
-        
+
         document.getElementById('jurnal-form').scrollIntoView({ behavior: 'smooth' });
     });
 
     listItem.querySelector('.delete-jurnal-btn').addEventListener('click', async () => {
         if (!confirm(`Yakin ingin menghapus postingan "${post.title}"?`)) return;
-        
+
         try {
             const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/${post.id}`, { method: 'DELETE' });
             const result = await response.json();
             if (!response.ok) throw new Error(result.error);
-            
+
             alert('Postingan berhasil dihapus.');
             fetchAndDisplayJurnalAdmin();
         } catch (error) {
@@ -1320,7 +1322,6 @@ async function fetchAndDisplayLinks(searchQuery = '') {
             const listItem = document.createElement('li');
             listItem.className = 'mood-item';
             listItem.id = `link-${link.slug}`;
-            // [FIX] Hapus backslash `\` sebelum backtick
             listItem.innerHTML = `
                 <div class="mood-item-header">
                     <span><strong>Slug:</strong> ${link.slug}</span>
@@ -1473,7 +1474,7 @@ function setupPortfolioPage() {
             if (!response.ok) throw new Error('Gagal memuat data portofolio.');
 
             const projects = await response.json();
-            portfolioGrid.innerHTML = ''; 
+            portfolioGrid.innerHTML = '';
 
             if (projects.length === 0) {
                 portfolioGrid.innerHTML = '<p style="text-align: center; color: var(--text-muted-color);">Belum ada proyek portofolio untuk ditampilkan.</p>';
@@ -1481,13 +1482,13 @@ function setupPortfolioPage() {
             }
 
             projects.forEach(project => {
-                const projectCard = document.createElement('a'); 
+                const projectCard = document.createElement('a');
                 projectCard.className = 'portfolio-card portfolio-link-card';
                 projectCard.href = `project-detail.html?id=${project.id}`;
                 projectCard.setAttribute('data-aos', 'fade-up');
 
-                const projectImage = project.image_url || 'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=500&q=80'; 
-                
+                const projectImage = project.image_url || 'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=500&q=80';
+
                 const projectLinkButton = `<span class="button-pintu">Lihat Detail</span>`;
 
                 projectCard.innerHTML = `
@@ -1544,9 +1545,9 @@ function setupProjectDetailPage() {
                 imageElement.alt = `Gambar utama untuk ${project.title}`;
                 imageElement.style.display = 'block';
             } else {
-                 imageElement.style.display = 'none';
+                imageElement.style.display = 'none';
             }
-            
+
             contentElement.innerHTML = project.description;
 
             if (project.project_link) {
@@ -1588,10 +1589,10 @@ function setupJurnalPage() {
                 const postCard = document.createElement('article');
                 postCard.className = 'jurnal-card';
                 postCard.setAttribute('data-aos', 'fade-up');
-                
+
                 const firstImageMatch = post.content.match(/<img[^>]+src="([^">]+)"/);
                 const postImage = post.image_url || (firstImageMatch ? firstImageMatch[1] : 'https://images.unsplash.com/photo-1489549132488-d00b7d8818e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80');
-                
+
                 const strippedContent = post.content.replace(/<[^>]+>/g, ' ');
                 const excerpt = strippedContent.substring(0, 150).trim() + (strippedContent.length > 150 ? '...' : '');
 
@@ -1643,10 +1644,10 @@ function setupJurnalDetailPage() {
             document.title = `${post.title} - Detail Jurnal`;
             titleElement.textContent = post.title;
             metaElement.textContent = `Dipublikasikan pada ${new Date(post.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
-            
+
             const firstImageMatch = post.content.match(/<img[^>]+src="([^">]+)"/);
             const mainImage = post.image_url || (firstImageMatch ? firstImageMatch[1] : null);
-            
+
             if (mainImage) {
                 imageElement.src = mainImage;
                 imageElement.alt = `Gambar untuk ${post.title}`;
@@ -1654,7 +1655,7 @@ function setupJurnalDetailPage() {
             } else {
                 imageElement.style.display = 'none';
             }
-            
+
             contentElement.innerHTML = post.content;
 
             loadingIndicator.style.display = 'none';
@@ -2099,6 +2100,7 @@ async function handleDeleteUserLink(event) {
         console.error('Error deleting user link:', error);
     }
 }
+// Ganti fungsi setupAuthPage yang lama dengan yang ini
 function setupAuthPage() {
     const loginSection = document.getElementById('login-section');
     const registerSection = document.getElementById('register-section');
@@ -2108,25 +2110,47 @@ function setupAuthPage() {
     const showLoginLink = document.getElementById('show-login');
     const authMessage = document.getElementById('auth-message');
     const authTitle = document.getElementById('auth-title');
+    const googleLoginBtn = document.getElementById('google-login-btn'); // Pindahkan ke sini
 
+    // Event listener untuk tombol Google Login
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', () => {
+            window.location.href = `${API_BASE_URL}/api/auth/google`;
+        });
+    }
+
+    // Cek jika ada error dari callback Google di URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('error')) {
+        authMessage.textContent = 'Error: Gagal login dengan Google. Silakan coba lagi.';
+        authMessage.className = 'error';
+    }
+
+    // Event listener untuk link "Registrasi di sini"
     if (showRegisterLink) {
         showRegisterLink.addEventListener('click', (e) => {
             e.preventDefault();
             loginSection.classList.add('hidden');
             registerSection.classList.remove('hidden');
             if (authTitle) authTitle.textContent = 'Registrasi';
-            authMessage.textContent = ''; authMessage.className = '';
+            authMessage.textContent = '';
+            authMessage.className = '';
         });
     }
+
+    // Event listener untuk link "Login di sini"
     if (showLoginLink) {
         showLoginLink.addEventListener('click', (e) => {
             e.preventDefault();
             registerSection.classList.add('hidden');
             loginSection.classList.remove('hidden');
             if (authTitle) authTitle.textContent = 'Login';
-            authMessage.textContent = ''; authMessage.className = '';
+            authMessage.textContent = '';
+            authMessage.className = '';
         });
     }
+
+    // Event listener untuk form registrasi
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -2146,6 +2170,8 @@ function setupAuthPage() {
             }
         });
     }
+
+    // Event listener untuk form login
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -2170,6 +2196,7 @@ function setupAuthPage() {
         });
     }
 }
+
 const forgotForm = document.getElementById('forgot-form');
 if (forgotForm) {
     forgotForm.addEventListener('submit', async (e) => {
@@ -2301,9 +2328,9 @@ function setupMobileMenu() {
     const menuOverlay = document.getElementById('menu-overlay');
 
     const toggleMenu = () => {
-        if(hamburger) hamburger.classList.toggle('active');
-        if(navLinks) navLinks.classList.toggle('active');
-        if(menuOverlay) menuOverlay.classList.toggle('active');
+        if (hamburger) hamburger.classList.toggle('active');
+        if (navLinks) navLinks.classList.toggle('active');
+        if (menuOverlay) menuOverlay.classList.toggle('active');
         document.body.classList.toggle('menu-open');
         document.documentElement.classList.toggle('menu-open');
     };
@@ -2338,8 +2365,26 @@ function setupAllPasswordToggles() {
             });
         }
     };
+
     setupPasswordToggle('toggle-login-password', 'login-password');
     setupPasswordToggle('toggle-register-password', 'register-password');
     setupPasswordToggle('toggle-reset-password', 'reset-password');
     setupPasswordToggle('toggle-confirm-password', 'confirm-password');
+}
+
+function setupAuthCallbackPage() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const accessToken = urlParams.get('accessToken');
+    const refreshToken = urlParams.get('refreshToken');
+
+    if (accessToken && refreshToken) {
+        sessionStorage.setItem('jwt_access_token', accessToken);
+        localStorage.setItem('jwt_refresh_token', refreshToken);
+
+        // Arahkan ke halaman utama setelah berhasil
+        window.location.href = 'index.html';
+    } else {
+        // Jika gagal, arahkan kembali ke halaman login dengan pesan error
+        window.location.href = 'auth.html?error=token-missing';
+    }
 }
