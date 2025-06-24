@@ -2007,35 +2007,64 @@ function attachImageMergerListener() {
     const files = event.target.files;
     if (files.length === 0) return;
 
+    // Tampilkan UI editor dan beri feedback ke pengguna
     pageEditorContainer.classList.remove('hidden');
     generatePdfBtn.classList.remove('hidden');
+    messageDiv.textContent = `Memproses ${files.length} gambar...`;
+    messageDiv.className = '';
 
-    // Jika ini adalah unggahan pertama atau kanvas yang ada masih kosong, bersihkan semuanya.
+    // Jika ini unggahan pertama, bersihkan area kerja
     const allCanvasesAreEmpty = pageCanvases.every(c => c === null || c.getObjects().length === 0);
     if (allCanvasesAreEmpty) {
         pageCanvasArea.innerHTML = '';
         pageCanvases = [];
     }
 
-    Array.from(files).forEach(file => {
+    Array.from(files).forEach((file, index) => {
         const reader = new FileReader();
+
         reader.onload = (f) => {
-            // Panggil fungsi addPage() untuk membuat halaman baru UNTUK SETIAP GAMBAR
+            const dataURL = f.target.result;
+            console.log(`[DEBUG] File ${file.name} berhasil dibaca. Mencoba memuat ke Fabric.js...`);
+
+            // Buat halaman baru untuk setiap gambar
             addPage();
-            // Ambil kanvas yang baru saja dibuat
+            // Dapatkan kanvas yang baru saja dibuat
             const newCanvas = pageCanvases[pageCanvases.length - 1];
 
-            fabric.Image.fromURL(f.target.result, (img) => {
+            // Muat gambar dari data URL
+            fabric.Image.fromURL(dataURL, (img) => {
+                console.log(`[DEBUG] Gambar ${file.name} berhasil diproses oleh Fabric.js.`);
+                
                 // Skalakan gambar agar pas dengan lebar halaman
-                const scale = (newCanvas.width * 0.9) / img.width;
-                img.scale(scale);
+                img.scaleToWidth(newCanvas.width * 0.9);
 
-                // Tambahkan gambar ke kanvas baru dan pusatkan
                 newCanvas.add(img);
                 newCanvas.centerObject(img);
                 newCanvas.renderAll();
+                console.log(`[DEBUG] Gambar ${file.name} telah ditambahkan dan dirender di kanvas.`);
+                
+                if (index === files.length - 1) {
+                    messageDiv.textContent = `${files.length} gambar berhasil ditambahkan.`;
+                    messageDiv.className = 'success';
+                }
+
+            }, { // Obyek Opsi dengan Penanganan Error
+                crossOrigin: 'anonymous',
+                onError: (error) => {
+                    console.error(`[ERROR] Fabric.js gagal memuat gambar: ${file.name}`, error);
+                    messageDiv.textContent = `Error: Gagal memuat file '${file.name}'. File mungkin rusak atau formatnya tidak didukung.`;
+                    messageDiv.className = 'error';
+                }
             });
         };
+        
+        reader.onerror = () => {
+             console.error(`[ERROR] FileReader gagal membaca file: ${file.name}`);
+             messageDiv.textContent = `Error: Gagal membaca file '${file.name}'.`;
+             messageDiv.className = 'error';
+        };
+
         reader.readAsDataURL(file);
     });
 });
