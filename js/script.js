@@ -1991,11 +1991,11 @@ function attachImageMergerListener() {
             pageWrapper.appendChild(deleteBtn);
             pageCanvasArea.appendChild(pageWrapper);
             
-            const fabricCanvas = new fabric.Canvas(pageId, {
-                backgroundColor: '#ffffff',
-                width: 595,
-                height: 842,
-            });
+            const fabricCanvas = new fabric.Canvas(canvasElement, {
+            backgroundColor: '#ffffff',
+            width: 595,
+            height: 842,
+        });
             
             pageCanvases.push(fabricCanvas);
             pageWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
