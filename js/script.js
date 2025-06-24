@@ -697,9 +697,6 @@ async function setupAdminChatUI() {
     }
 }
 
-
-// Sisa kode dari sini ke bawah tetap sama, tidak perlu diubah.
-// ... (seluruh fungsi lainnya dari setupDashboardPage sampai akhir)
 // ===================================
 // FUNGSI-FUNGSI UNTUK CROPPING GAMBAR
 // ===================================
@@ -2076,7 +2073,7 @@ function attachImageMergerListener() {
                     img.scaleToWidth(targetCanvas.width / 2); // Sesuaikan ukuran awal
                     targetCanvas.add(img);
                     targetCanvas.centerObject(img);
-                    targetCanvas.renderAll();
+                    targetCanvas.renderAll(); // [PERBAIKAN] Panggil renderAll() untuk menampilkan gambar di kanvas
                 });
             };
             reader.readAsDataURL(file);
