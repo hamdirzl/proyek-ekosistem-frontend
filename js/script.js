@@ -2004,33 +2004,41 @@ function attachImageMergerListener() {
         addPageBtn.addEventListener('click', addPage);
 
         fileInput.addEventListener('change', (event) => {
-            const files = event.target.files;
-            if (files.length === 0) return;
+    const files = event.target.files;
+    if (files.length === 0) return;
 
-            pageEditorContainer.classList.remove('hidden');
-            generatePdfBtn.classList.remove('hidden');
-            
-            if (pageCanvases.filter(c => c !== null).length === 0) {
-                pageCanvasArea.innerHTML = '';
-                pageCanvases = [];
-                addPage();
-            }
-            
-            const targetCanvas = pageCanvases[pageCanvases.length - 1];
+    pageEditorContainer.classList.remove('hidden');
+    generatePdfBtn.classList.remove('hidden');
 
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (f) => {
-                    fabric.Image.fromURL(f.target.result, (img) => {
-                        img.scaleToWidth(targetCanvas.width / 2);
-                        targetCanvas.add(img);
-                        targetCanvas.centerObject(img);
-                        targetCanvas.renderAll();
-                    });
-                };
-                reader.readAsDataURL(file);
+    // Jika ini adalah unggahan pertama atau kanvas yang ada masih kosong, bersihkan semuanya.
+    const allCanvasesAreEmpty = pageCanvases.every(c => c === null || c.getObjects().length === 0);
+    if (allCanvasesAreEmpty) {
+        pageCanvasArea.innerHTML = '';
+        pageCanvases = [];
+    }
+
+    Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (f) => {
+            // Panggil fungsi addPage() untuk membuat halaman baru UNTUK SETIAP GAMBAR
+            addPage();
+            // Ambil kanvas yang baru saja dibuat
+            const newCanvas = pageCanvases[pageCanvases.length - 1];
+
+            fabric.Image.fromURL(f.target.result, (img) => {
+                // Skalakan gambar agar pas dengan lebar halaman
+                const scale = (newCanvas.width * 0.9) / img.width;
+                img.scale(scale);
+
+                // Tambahkan gambar ke kanvas baru dan pusatkan
+                newCanvas.add(img);
+                newCanvas.centerObject(img);
+                newCanvas.renderAll();
             });
-        });
+        };
+        reader.readAsDataURL(file);
+    });
+});
 
         generatePdfBtn.addEventListener('click', async () => {
             const activeCanvases = pageCanvases.filter(canvas => canvas !== null);
