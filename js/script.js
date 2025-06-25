@@ -1971,6 +1971,8 @@ function attachImageMergerListener() {
 
             const canvasElement = document.createElement('canvas');
             canvasElement.id = pageId;
+            canvasElement.width = 595;
+            canvasElement.height = 842;
             canvasElement.className = 'editor-page';
 
             const deleteBtn = document.createElement('button');
@@ -1991,9 +1993,7 @@ function attachImageMergerListener() {
             pageCanvasArea.appendChild(pageWrapper);
             
             const fabricCanvas = new fabric.Canvas(canvasElement, {
-                backgroundColor: '#ffffff',
-                width: 595,
-                height: 842,
+                backgroundColor: '#ffffff'
             });
             
             pageCanvases.push(fabricCanvas);
@@ -2027,7 +2027,6 @@ function attachImageMergerListener() {
                     addPage();
                     const newCanvas = pageCanvases[pageCanvases.length - 1];
 
-                    // --- BLOK YANG DIPERBAIKI DIMULAI DI SINI ---
                     fabric.Image.fromURL(dataURL, (img, isError) => {
                         if (isError) {
                             console.error(`[ERROR] Fabric.js gagal memuat gambar: ${file.name}`, img);
@@ -2054,7 +2053,6 @@ function attachImageMergerListener() {
                         }
 
                     }, { crossOrigin: 'anonymous' });
-                    // --- BLOK YANG DIPERBAIKI SELESAI DI SINI ---
                 };
                 
                 reader.onerror = () => {
