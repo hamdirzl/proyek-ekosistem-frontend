@@ -2044,7 +2044,12 @@ function attachImageMergerListener() {
 
                         newCanvas.add(img);
                         newCanvas.centerObject(img);
-                        newCanvas.renderAll();
+                        
+                        newCanvas.calcOffset();
+                        setTimeout(function() {
+                            newCanvas.renderAll();
+                        }, 10);
+
                         console.log(`[DEBUG] Gambar ${file.name} telah ditambahkan dan dirender di kanvas.`);
                         
                         if (index === files.length - 1) {
