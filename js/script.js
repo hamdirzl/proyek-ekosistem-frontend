@@ -1947,10 +1947,12 @@ function attachConverterListener() {
     });
 }
 
+// GANTI SELURUH FUNGSI attachImageMergerListener DENGAN YANG INI
 function attachImageMergerListener() {
     const wrapper = document.getElementById('image-merger-wrapper');
     if (!wrapper) return;
 
+    // Pastikan Fabric.js sudah dimuat sebelum menginisialisasi
     const initializeImageMerger = () => {
         const fileInput = document.getElementById('image-files-input');
         const pageEditorContainer = document.getElementById('page-editor-container');
@@ -1961,7 +1963,12 @@ function attachImageMergerListener() {
 
         let pageCanvases = [];
 
-        const addPage = () => {
+        /**
+         * FUNGSI addPage YANG SUDAH DIMODIFIKASI
+         * Sekarang bisa menerima objek gambar dari Fabric.js sebagai argumen.
+         * Jika tidak ada gambar, ia akan membuat halaman kosong.
+         */
+        const addPage = (imageObject = null) => {
             const pageIndex = pageCanvases.length;
             const pageId = `page-canvas-${pageIndex}`;
 
@@ -1971,21 +1978,22 @@ function attachImageMergerListener() {
 
             const canvasElement = document.createElement('canvas');
             canvasElement.id = pageId;
-            canvasElement.width = 595;
-            canvasElement.height = 842;
+            canvasElement.width = 595;  // Ukuran A4 dalam piksel (lebar)
+            canvasElement.height = 842; // Ukuran A4 dalam piksel (tinggi)
             canvasElement.className = 'editor-page';
 
             const deleteBtn = document.createElement('button');
             deleteBtn.innerHTML = '&times;';
             deleteBtn.className = 'delete-page-btn';
             deleteBtn.title = 'Hapus halaman ini';
+            deleteBtn.type = 'button'; // Pastikan tidak submit form
             deleteBtn.onclick = () => {
                 if (pageCanvases.filter(c => c !== null).length <= 1) {
                     alert("Tidak bisa menghapus satu-satunya halaman.");
                     return;
                 }
                 document.getElementById(`page-wrapper-${pageIndex}`).remove();
-                pageCanvases[pageIndex] = null;
+                pageCanvases[pageIndex] = null; // Tandai kanvas sebagai null
             };
 
             pageWrapper.appendChild(canvasElement);
@@ -1995,13 +2003,23 @@ function attachImageMergerListener() {
             const fabricCanvas = new fabric.Canvas(canvasElement, {
                 backgroundColor: '#ffffff'
             });
+
+            // BARU: Jika ada objek gambar, tambahkan ke kanvas
+            if (imageObject) {
+                imageObject.scaleToWidth(fabricCanvas.width * 0.9); // Skalakan agar pas
+                fabricCanvas.add(imageObject);
+                fabricCanvas.centerObject(imageObject);
+                fabricCanvas.renderAll();
+            }
             
             pageCanvases.push(fabricCanvas);
             pageWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
 
-        addPageBtn.addEventListener('click', addPage);
+        // Event listener untuk tombol 'Tambah Halaman' (membuat halaman kosong)
+        addPageBtn.addEventListener('click', () => addPage(null));
 
+        // Event listener untuk input file gambar
         fileInput.addEventListener('change', (event) => {
             const files = event.target.files;
             if (files.length === 0) return;
@@ -2011,49 +2029,34 @@ function attachImageMergerListener() {
             messageDiv.textContent = `Memproses ${files.length} gambar...`;
             messageDiv.className = '';
 
+            // Cek apakah semua kanvas kosong, jika ya, reset.
             const allCanvasesAreEmpty = pageCanvases.every(c => c === null || c.getObjects().length === 0);
             if (allCanvasesAreEmpty) {
                 pageCanvasArea.innerHTML = '';
                 pageCanvases = [];
             }
 
+            // Proses setiap file
             Array.from(files).forEach((file, index) => {
                 const reader = new FileReader();
 
                 reader.onload = (f) => {
                     const dataURL = f.target.result;
-                    console.log(`[DEBUG] File ${file.name} berhasil dibaca. Mencoba memuat ke Fabric.js...`);
 
-                    addPage();
-                    const newCanvas = pageCanvases[pageCanvases.length - 1];
-
+                    // Buat objek gambar Fabric DULU
                     fabric.Image.fromURL(dataURL, (img, isError) => {
                         if (isError) {
-                            console.error(`[ERROR] Fabric.js gagal memuat gambar: ${file.name}`, img);
-                            messageDiv.textContent = `Error: Gagal memuat file '${file.name}'. File mungkin rusak atau formatnya tidak didukung.`;
+                            messageDiv.textContent = `Error: Gagal memuat file '${file.name}'.`;
                             messageDiv.className = 'error';
-                            const pageWrapperToRemove = document.getElementById(`page-wrapper-${pageCanvases.indexOf(newCanvas)}`);
-                            if (pageWrapperToRemove) pageWrapperToRemove.remove();
-                            pageCanvases[pageCanvases.indexOf(newCanvas)] = null;
                             return;
                         }
                         
-                        console.log(`[DEBUG] Gambar ${file.name} berhasil diproses oleh Fabric.js.`);
+                        // BARU: Panggil addPage SETELAH gambar berhasil dibuat, dan kirim objek gambar
+                        addPage(img);
                         
-                        img.scaleToWidth(newCanvas.width * 0.9);
-
-                        newCanvas.add(img);
-                        newCanvas.centerObject(img);
-                        
-                        newCanvas.calcOffset();
-                        setTimeout(function() {
-                            newCanvas.renderAll();
-                        }, 10);
-
-                        console.log(`[DEBUG] Gambar ${file.name} telah ditambahkan dan dirender di kanvas.`);
-                        
+                        // Update status setelah gambar terakhir diproses
                         if (index === files.length - 1) {
-                            messageDiv.textContent = `${files.length} gambar berhasil ditambahkan.`;
+                            messageDiv.textContent = `${files.length} gambar berhasil ditambahkan. Atur tata letak jika perlu.`;
                             messageDiv.className = 'success';
                         }
 
@@ -2061,15 +2064,17 @@ function attachImageMergerListener() {
                 };
                 
                 reader.onerror = () => {
-                     console.error(`[ERROR] FileReader gagal membaca file: ${file.name}`);
                      messageDiv.textContent = `Error: Gagal membaca file '${file.name}'.`;
                      messageDiv.className = 'error';
                 };
 
                 reader.readAsDataURL(file);
             });
+            // Reset input file agar bisa memilih file yang sama lagi
+            fileInput.value = '';
         });
 
+        // Event listener untuk tombol 'Generate PDF'
         generatePdfBtn.addEventListener('click', async () => {
             const activeCanvases = pageCanvases.filter(canvas => canvas !== null);
             if (activeCanvases.length === 0) {
@@ -2086,7 +2091,7 @@ function attachImageMergerListener() {
                 for (const canvas of activeCanvases) {
                     const dataUrl = canvas.toDataURL({
                         format: 'jpeg',
-                        quality: 0.85
+                        quality: 0.85 // Kualitas kompresi JPEG
                     });
                     imageDataUrls.push(dataUrl);
                 }
@@ -2126,6 +2131,7 @@ function attachImageMergerListener() {
         });
     }
 
+    // Pengecekan untuk memastikan Fabric.js sudah dimuat
     const checkFabric = () => {
         if (typeof fabric !== 'undefined') {
             console.log('Fabric.js is ready. Initializing Image to PDF tool.');
