@@ -2006,10 +2006,12 @@ function attachImageMergerListener() {
 
             // BARU: Jika ada objek gambar, tambahkan ke kanvas
             if (imageObject) {
-                imageObject.scaleToWidth(fabricCanvas.width * 0.9); // Skalakan agar pas
-                fabricCanvas.add(imageObject);
-                fabricCanvas.centerObject(imageObject);
-                fabricCanvas.renderAll();
+                setTimeout(() => {
+                    imageObject.scaleToWidth(fabricCanvas.width * 0.9); // Skalakan agar pas
+                    fabricCanvas.add(imageObject);
+                    fabricCanvas.centerObject(imageObject);
+                    fabricCanvas.renderAll();
+                }, 0); // Jeda 0 milidetik sudah cukup
             }
             
             pageCanvases.push(fabricCanvas);
