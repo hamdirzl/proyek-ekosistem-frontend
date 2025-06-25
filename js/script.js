@@ -2004,14 +2004,21 @@ function attachImageMergerListener() {
                 backgroundColor: '#ffffff'
             });
 
-            // BARU: Jika ada objek gambar, tambahkan ke kanvas
-            if (imageObject) {
-                setTimeout(() => {
-                    imageObject.scaleToWidth(fabricCanvas.width * 0.9); // Skalakan agar pas
-                    fabricCanvas.add(imageObject);
-                    fabricCanvas.centerObject(imageObject);
-                    fabricCanvas.renderAll();
-                }, 0); // Jeda 0 milidetik sudah cukup
+             if (imageObject) {
+                // Skalakan gambar terlebih dahulu
+                imageObject.scaleToWidth(fabricCanvas.width * 0.9);
+                
+                // Tambahkan gambar ke kanvas
+                fabricCanvas.add(imageObject);
+
+                // Pusatkan objek di kanvas
+                fabricCanvas.centerObject(imageObject);
+                
+                // KUNCI PERBAIKAN: Memaksa Fabric untuk menghitung ulang posisinya
+                fabricCanvas.calcOffset();
+
+                // Lakukan rendering final
+                fabricCanvas.renderAll();
             }
             
             pageCanvases.push(fabricCanvas);
