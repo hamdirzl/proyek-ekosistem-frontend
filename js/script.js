@@ -1792,15 +1792,16 @@ function setupToolsPage() {
 }
 
 // PASTE KODE BARU INI SEBAGAI PENGGANTI
-// GANTI LAGI SELURUH FUNGSI INI DENGAN VERSI TERBARU
+// GANTI FUNGSI LAMA DENGAN KESELURUHAN KODE DI BAWAH INI
+
 function attachImagesToPdfListener() {
     const form = document.getElementById('images-to-pdf-form');
     if (!form) return;
 
-    // [BARU] Ambil elemen tombol yang baru dibuat
+    // --- Mengambil semua elemen yang dibutuhkan ---
     const toggleOptionsBtn = document.getElementById('toggle-pdf-options-btn');
     const backToPreviewsBtn = document.getElementById('back-to-previews-btn');
-
+    const optionsOverlay = form.querySelector('.pdf-options-overlay');
     const imageInput = document.getElementById('images-to-pdf-input');
     const fileUploadLabel = form.querySelector('.file-upload-label');
     const previewsContainer = document.getElementById('image-previews-container');
@@ -1811,21 +1812,21 @@ function attachImagesToPdfListener() {
     
     let selectedFiles = [];
 
-    // [BARU] Event listener untuk tombol setting (roda gigi)
+    // --- Logika untuk membuka & menutup panel opsi di mobile ---
+    const closeOptions = () => form.classList.remove('options-active');
+    const openOptions = () => form.classList.add('options-active');
+
     if(toggleOptionsBtn) {
-        toggleOptionsBtn.addEventListener('click', () => {
-            form.classList.add('options-active');
-        });
+        toggleOptionsBtn.addEventListener('click', openOptions);
     }
-
-    // [BARU] Event listener untuk tombol kembali
     if(backToPreviewsBtn) {
-        backToPreviewsBtn.addEventListener('click', () => {
-            form.classList.remove('options-active');
-        });
+        backToPreviewsBtn.addEventListener('click', closeOptions);
+    }
+    if(optionsOverlay) {
+        optionsOverlay.addEventListener('click', closeOptions);
     }
 
-    // Sisa kode di dalam fungsi ini tetap sama seperti sebelumnya...
+    // --- Fungsi untuk memperbarui semua pratinjau saat opsi diubah ---
     const updateAllPreviewsLayout = () => {
         const orientation = form.querySelector('input[name="orientation"]:checked').value;
         const marginChoice = form.querySelector('input[name="margin"]:checked').value;
@@ -1844,6 +1845,7 @@ function attachImagesToPdfListener() {
     form.querySelectorAll('input[name="orientation"], input[name="margin"]').forEach(radio => radio.addEventListener('change', updateAllPreviewsLayout));
     if (pageSizeSelect) pageSizeSelect.addEventListener('change', updateAllPreviewsLayout);
 
+    // --- Fungsi untuk membuat & memperbarui daftar pratinjau gambar ---
     const updatePreviews = () => {
         previewsContainer.innerHTML = ''; 
         if (selectedFiles.length > 0) {
@@ -1892,6 +1894,7 @@ function attachImagesToPdfListener() {
         updatePreviews();
     });
     
+    // --- Logika saat form di-submit (menggunakan XHR) ---
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (selectedFiles.length === 0) {

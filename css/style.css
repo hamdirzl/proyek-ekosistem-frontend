@@ -2339,76 +2339,68 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* === [BARU] GAYA UNTUK PDF TOOL MOBILE (iLovePDF Style) === */
+/* GANTI BLOK MEDIA QUERY 768px YANG LAMA DENGAN YANG INI */
+
+/* === [FINAL] GAYA UNTUK PDF TOOL MOBILE (Slide-in Panel) === */
 @media (max-width: 768px) {
-    /* Sembunyikan panel opsi secara default di mobile */
+    /* 1. Panel Opsi (yang akan bergeser) */
     .pdf-tool-layout .pdf-tool-options {
-        display: none;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 90%; /* Tidak full screen */
+        max-width: 350px; /* Lebar maksimal */
+        height: 100%;
+        background-color: var(--card-bg-color);
+        z-index: 1101; /* Di atas overlay */
+        padding: var(--space-md);
+        box-shadow: -5px 0 20px rgba(0,0,0,0.15);
+
+        /* Sembunyikan di luar layar sebelah kanan secara default */
+        transform: translateX(100%);
+        visibility: hidden;
+        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility 0.4s;
+    }
+
+    /* 2. Latar Belakang Gelap (Overlay) */
+    .pdf-options-overlay {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: var(--background-color);
+        background-color: rgba(0, 0, 0, 0.5);
         z-index: 1100;
-        overflow-y: auto;
-        padding: var(--space-md);
-    }
-    
-    /* Atur agar layout pratinjau memenuhi layar */
-    .pdf-tool-layout {
-        display: block;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.4s ease, visibility 0.4s;
     }
 
-    /* Saat opsi aktif, tampilkan panel opsi dan sembunyikan pratinjau */
+    /* 3. Aturan Saat Panel Aktif (diganti oleh JavaScript) */
     #images-to-pdf-form.options-active .pdf-tool-options {
-        display: flex;
-        flex-direction: column;
+        transform: translateX(0); /* Panel bergeser ke dalam layar */
+        visibility: visible;
     }
-    #images-to-pdf-form.options-active .pdf-tool-previews {
-        display: none;
-    }
-    #images-to-pdf-form.options-active .fab-container {
-        display: none; /* Sembunyikan tombol setting saat panel opsi terbuka */
+    #images-to-pdf-form.options-active .pdf-options-overlay {
+        opacity: 1; /* Overlay muncul */
+        visibility: visible;
     }
 
-    /* Gaya untuk header di panel opsi */
-    .options-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: var(--space-md);
-        margin-bottom: var(--space-lg);
-    }
-    .options-header h3 {
-        margin: 0;
-        font-size: 1.2rem;
-    }
-    .back-btn {
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-    }
-    .back-btn svg {
-        color: var(--text-color);
-    }
-
-    /* Gaya untuk tombol melayang (Floating Action Button) */
+    /* 4. Tombol Roda Gigi (FAB) */
     .fab-container {
-    position: fixed;
-    /* Posisikan 150px dari bawah, di atas tombol chat */
-    bottom: 300px; 
-    /* Sejajarkan di kanan dengan tombol chat */
-    right: var(--space-md); 
-    z-index: 1050;
-}
+        position: fixed;
+        bottom: 150px; 
+        right: var(--space-md);
+        z-index: 1050;
+    }
     .fab {
+        width: 48px;
+        height: 48px;
         background-color: var(--accent-color);
         color: white;
         border: none;
-        width: 45px;
-        height: 45px;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -2420,4 +2412,17 @@ input:focus, textarea:focus, select:focus {
     .fab:hover {
         transform: scale(1.1);
     }
+
+    /* 5. Header di dalam panel opsi */
+    .options-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: var(--space-md);
+        margin-bottom: var(--space-lg);
+    }
+    .options-header h3 { margin: 0; font-size: 1.2rem; }
+    .back-btn { background: none; border: none; padding: 0; cursor: pointer; }
+    .back-btn svg { color: var(--text-color); }
 }
