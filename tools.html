@@ -115,83 +115,55 @@
         <h2 class="section-title">Tool: Images to PDF</h2>
         
         <form id="images-to-pdf-form" class="pdf-tool-layout">
-            
-            <div class="pdf-tool-previews">
-                <div class="form-group">
-                    <div class="custom-file-upload">
-                        <input type="file" id="images-to-pdf-input" name="images" multiple accept="image/jpeg, image/png">
-                        <span class="file-upload-button">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.19 16.62a1 1 0 0 1-1.13 1.38l-4.34-1.38a1 1 0 0 1-.6-1.56l1.39-2.78a1 1 0 0 1 1.56-.6l4.34 1.38a1 1 0 0 1 .78 2.56z"></path><path d="M11.62 1.19a1 1 0 0 1 1.38 1.13l-1.38 4.34a1 1 0 0 1-1.56-.6l-1.38-2.78a1 1 0 0 1 .6-1.56z"></path><path d="M10 10.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"></path><path d="m4.93 5.93 2.12 2.12"></path><path d="M14.83 1.17 17 3.34"></path><path d="m4.93 18.07 2.12-2.12"></path><path d="m14.83 22.83 2.12-2.12"></path><circle cx="12" cy="12" r="10"></circle></svg>
-                            Pilih Gambar
-                        </span>
-                        <span class="file-upload-label">Belum ada gambar yang dipilih</span>
-                    </div>
-                </div>
-                <div id="image-previews-container">
-                    </div>
+    
+    <div class="pdf-tool-previews">
+        <div class="form-group">
+            <div class="custom-file-upload">
+                <input type="file" id="images-to-pdf-input" name="images" multiple accept="image/jpeg, image/png">
+                <span class="file-upload-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.19 16.62a1 1 0 0 1-1.13 1.38l-4.34-1.38a1 1 0 0 1-.6-1.56l1.39-2.78a1 1 0 0 1 1.56-.6l4.34 1.38a1 1 0 0 1 .78 2.56z"></path><path d="M11.62 1.19a1 1 0 0 1 1.38 1.13l-1.38 4.34a1 1 0 0 1-1.56-.6l-1.38-2.78a1 1 0 0 1 .6-1.56z"></path><path d="M10 10.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"></path><path d="m4.93 5.93 2.12 2.12"></path><path d="M14.83 1.17 17 3.34"></path><path d="m4.93 18.07 2.12-2.12"></path><path d="m14.83 22.83 2.12-2.12"></path><circle cx="12" cy="12" r="10"></circle></svg>
+                    Pilih Gambar
+                </span>
+                <span class="file-upload-label">Belum ada gambar yang dipilih</span>
             </div>
-
-            <div class="pdf-tool-options">
-                <h3 class="options-title">Image to PDF options</h3>
-                
-                <div class="form-group">
-                    <label>Page orientation</label>
-                    <div class="radio-card-group">
-                        <label class="radio-card">
-                            <input type="radio" name="orientation" value="portrait" checked>
-                            <div class="radio-card-content">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="1"></rect></svg>
-                                <span>Portrait</span>
-                            </div>
-                        </label>
-                        <label class="radio-card">
-                            <input type="radio" name="orientation" value="landscape">
-                            <div class="radio-card-content">
-                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="1"></rect></svg>
-                                <span>Landscape</span>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="page-size">Page size</label>
-                    <select id="page-size" name="pageSize">
-                        <option value="A4" selected>A4 (210x297mm)</option>
-                        <option value="Letter">Letter (216x279mm)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Margin</label>
-                     <div class="radio-card-group">
-                        <label class="radio-card">
-                            <input type="radio" name="margin" value="no_margin" checked>
-                            <div class="radio-card-content">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>
-                                <span>No margin</span>
-                            </div>
-                        </label>
-                        <label class="radio-card">
-                            <input type="radio" name="margin" value="small">
-                            <div class="radio-card-content">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"></rect><path d="M8 3v18"></path><path d="M16 3v18"></path><path d="M3 8h18"></path><path d="M3 16h18"></path></svg>
-                                <span>Small</span>
-                            </div>
-                        </label>
-                         <label class="radio-card">
-                            <input type="radio" name="margin" value="big">
-                            <div class="radio-card-content">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="1"/><path d="M3 10h18M3 14h18M10 3v18M14 3v18"/></svg>
-                                <span>Big</span>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <button type="submit" class="button-pintu">Convert to PDF</button>
+        </div>
+        <div id="image-previews-container">
             </div>
-        </form>
+    </div>
+
+    <div class="pdf-tool-options">
+        <div class="options-header">
+            <button type="button" id="back-to-previews-btn" class="back-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </button>
+            <h3>Image to PDF options</h3>
+            <span></span> </div>
+        
+        <div class="form-group">
+            <label>Page orientation</label>
+            <div class="radio-card-group">
+                <label class="radio-card"><input type="radio" name="orientation" value="portrait" checked><div class="radio-card-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="1"></rect></svg><span>Portrait</span></div></label>
+                <label class="radio-card"><input type="radio" name="orientation" value="landscape"><div class="radio-card-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="1"></rect></svg><span>Landscape</span></div></label>
+            </div>
+        </div>
+        <div class="form-group"><label for="page-size">Page size</label><select id="page-size" name="pageSize"><option value="A4" selected>A4 (210x297mm)</option><option value="Letter">Letter (216x279mm)</option></select></div>
+        <div class="form-group">
+            <label>Margin</label>
+            <div class="radio-card-group">
+                <label class="radio-card"><input type="radio" name="margin" value="no_margin" checked><div class="radio-card-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg><span>No margin</span></div></label>
+                <label class="radio-card"><input type="radio" name="margin" value="small"><div class="radio-card-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"></rect><path d="M8 3v18"></path><path d="M16 3v18"></path><path d="M3 8h18"></path><path d="M3 16h18"></path></svg><span>Small</span></div></label>
+                <label class="radio-card"><input type="radio" name="margin" value="big"><div class="radio-card-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="1"/><path d="M3 10h18M3 14h18M10 3v18M14 3v18"/></svg><span>Big</span></div></label>
+            </div>
+        </div>
+        <button type="submit" class="button-pintu">Convert to PDF</button>
+    </div>
+
+    <div class="fab-container">
+        <button type="button" id="toggle-pdf-options-btn" class="fab" title="Image to PDF options">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+    </div>
+</form>
          
         <div id="images-to-pdf-message" style="margin-top: 1rem;"></div>
         <div id="images-to-pdf-progress-wrapper" class="progress-wrapper hidden">

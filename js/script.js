@@ -1792,9 +1792,14 @@ function setupToolsPage() {
 }
 
 // PASTE KODE BARU INI SEBAGAI PENGGANTI
+// GANTI LAGI SELURUH FUNGSI INI DENGAN VERSI TERBARU
 function attachImagesToPdfListener() {
     const form = document.getElementById('images-to-pdf-form');
     if (!form) return;
+
+    // [BARU] Ambil elemen tombol yang baru dibuat
+    const toggleOptionsBtn = document.getElementById('toggle-pdf-options-btn');
+    const backToPreviewsBtn = document.getElementById('back-to-previews-btn');
 
     const imageInput = document.getElementById('images-to-pdf-input');
     const fileUploadLabel = form.querySelector('.file-upload-label');
@@ -1803,13 +1808,28 @@ function attachImagesToPdfListener() {
     const progressWrapper = document.getElementById('images-to-pdf-progress-wrapper');
     const submitButton = form.querySelector('button[type="submit"]');
     const pageSizeSelect = document.getElementById('page-size');
-
+    
     let selectedFiles = [];
 
+    // [BARU] Event listener untuk tombol setting (roda gigi)
+    if(toggleOptionsBtn) {
+        toggleOptionsBtn.addEventListener('click', () => {
+            form.classList.add('options-active');
+        });
+    }
+
+    // [BARU] Event listener untuk tombol kembali
+    if(backToPreviewsBtn) {
+        backToPreviewsBtn.addEventListener('click', () => {
+            form.classList.remove('options-active');
+        });
+    }
+
+    // Sisa kode di dalam fungsi ini tetap sama seperti sebelumnya...
     const updateAllPreviewsLayout = () => {
         const orientation = form.querySelector('input[name="orientation"]:checked').value;
         const marginChoice = form.querySelector('input[name="margin"]:checked').value;
-
+        
         document.querySelectorAll('.preview-page').forEach(page => {
             page.classList.remove('portrait', 'landscape', 'margin-small', 'margin-big');
             page.classList.add(orientation);
@@ -1831,10 +1851,10 @@ function attachImagesToPdfListener() {
         } else {
             fileUploadLabel.textContent = 'Belum ada gambar yang dipilih';
         }
-
+    
         const currentOrientation = form.querySelector('input[name="orientation"]:checked').value;
         const currentMargin = form.querySelector('input[name="margin"]:checked').value;
-
+        
         let pageClasses = 'preview-page';
         pageClasses += currentOrientation === 'portrait' ? ' portrait' : ' landscape';
         if (currentMargin === 'small') {
@@ -1842,13 +1862,13 @@ function attachImagesToPdfListener() {
         } else if (currentMargin === 'big') {
             pageClasses += ' margin-big';
         }
-
+        
         selectedFiles.forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const previewCard = document.createElement('div');
                 previewCard.className = 'image-preview-card';
-
+                
                 previewCard.innerHTML = `
                     <div class="${pageClasses}">
                         <img src="${e.target.result}" alt="${file.name}">
@@ -1856,7 +1876,7 @@ function attachImagesToPdfListener() {
                     <button type="button" class="remove-btn" data-index="${index}" title="Hapus gambar">&times;</button>
                 `;
                 previewsContainer.appendChild(previewCard);
-
+    
                 previewCard.querySelector('.remove-btn').addEventListener('click', (event) => {
                     const idxToRemove = parseInt(event.target.dataset.index, 10);
                     selectedFiles.splice(idxToRemove, 1);
@@ -1871,7 +1891,7 @@ function attachImagesToPdfListener() {
         selectedFiles.push(...Array.from(imageInput.files));
         updatePreviews();
     });
-
+    
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (selectedFiles.length === 0) {
@@ -1879,38 +1899,38 @@ function attachImagesToPdfListener() {
             messageDiv.textContent = 'Silakan pilih setidaknya satu gambar.';
             return;
         }
-
+    
         const formData = new FormData();
         selectedFiles.forEach(file => {
             formData.append('images', file);
         });
-
+    
         formData.append('pageSize', pageSizeSelect.value);
         formData.append('orientation', form.querySelector('input[name="orientation"]:checked').value);
         formData.append('marginChoice', form.querySelector('input[name="margin"]:checked').value);
-
+    
         submitButton.disabled = true;
         messageDiv.textContent = '';
         messageDiv.className = '';
         progressWrapper.classList.remove('hidden');
-
+    
         const progressBarContainer = progressWrapper.querySelector('.progress-bar');
         const progressText = progressWrapper.querySelector('.progress-bar-text');
-
+    
         progressBarContainer.classList.add('indeterminate');
         progressText.textContent = 'Mengonversi gambar ke PDF, harap tunggu...';
-
+    
         const xhr = new XMLHttpRequest();
         xhr.open('POST', `${API_BASE_URL}/api/images-to-pdf`, true);
         xhr.responseType = 'blob';
-
+    
         xhr.onload = function() {
             progressBarContainer.classList.remove('indeterminate');
-
+    
             if (this.status === 200) {
                 messageDiv.className = 'success';
                 progressText.textContent = 'Konversi berhasil! Mengunduh file...';
-
+    
                 const header = this.getResponseHeader('Content-Disposition');
                 const parts = header.split(';');
                 let filename = 'converted.pdf';
@@ -1919,7 +1939,7 @@ function attachImagesToPdfListener() {
                         filename = part.split('=')[1].replace(/"/g, '');
                     }
                 });
-
+    
                 const url = window.URL.createObjectURL(this.response);
                 const a = document.createElement('a');
                 a.style.display = 'none';
@@ -1929,7 +1949,7 @@ function attachImagesToPdfListener() {
                 a.click();
                 window.URL.revokeObjectURL(url);
                 a.remove();
-
+    
                 selectedFiles = [];
                 updatePreviews();
                 form.reset();
@@ -1938,14 +1958,14 @@ function attachImagesToPdfListener() {
                 messageDiv.className = 'error';
                 messageDiv.textContent = 'Error: Gagal membuat PDF.';
             }
-
+    
             setTimeout(() => {
                 progressWrapper.classList.add('hidden');
                 messageDiv.textContent = '';
             }, 4000);
             submitButton.disabled = false;
         };
-
+    
         xhr.onerror = function() {
             progressBarContainer.classList.remove('indeterminate');
             messageDiv.className = 'error';
@@ -1953,7 +1973,7 @@ function attachImagesToPdfListener() {
             progressWrapper.classList.add('hidden');
             submitButton.disabled = false;
         };
-
+    
         xhr.send(formData);
     });
 }

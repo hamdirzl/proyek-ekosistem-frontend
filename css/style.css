@@ -2337,3 +2337,85 @@ input:focus, textarea:focus, select:focus {
   from { background-position: 40px 0; }
   to { background-position: 0 0; }
 }
+
+/* === [BARU] GAYA UNTUK PDF TOOL MOBILE (iLovePDF Style) === */
+@media (max-width: 768px) {
+    /* Sembunyikan panel opsi secara default di mobile */
+    .pdf-tool-layout .pdf-tool-options {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--background-color);
+        z-index: 1100;
+        overflow-y: auto;
+        padding: var(--space-md);
+    }
+    
+    /* Atur agar layout pratinjau memenuhi layar */
+    .pdf-tool-layout {
+        display: block;
+    }
+
+    /* Saat opsi aktif, tampilkan panel opsi dan sembunyikan pratinjau */
+    #images-to-pdf-form.options-active .pdf-tool-options {
+        display: flex;
+        flex-direction: column;
+    }
+    #images-to-pdf-form.options-active .pdf-tool-previews {
+        display: none;
+    }
+    #images-to-pdf-form.options-active .fab-container {
+        display: none; /* Sembunyikan tombol setting saat panel opsi terbuka */
+    }
+
+    /* Gaya untuk header di panel opsi */
+    .options-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: var(--space-md);
+        margin-bottom: var(--space-lg);
+    }
+    .options-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+    .back-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+    }
+    .back-btn svg {
+        color: var(--text-color);
+    }
+
+    /* Gaya untuk tombol melayang (Floating Action Button) */
+    .fab-container {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 1050;
+    }
+    .fab {
+        background-color: var(--accent-color);
+        color: white;
+        border: none;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+    .fab:hover {
+        transform: scale(1.1);
+    }
+}
