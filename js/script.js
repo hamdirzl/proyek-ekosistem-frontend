@@ -177,6 +177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupJurnalPage();
     } else if (document.title.includes("Tools")) {
         setupToolsPage();
+        setupCropModal(); // Cropper juga dibutuhkan di halaman tools
     } else if (document.getElementById('login-form')) {
         setupAuthPage();
     } else if (document.title.includes("Logging In...")) {
@@ -1790,12 +1791,10 @@ function setupToolsPage() {
     setupCustomDropdowns();
 }
 
-// FUNGSI BARU UNTUK IMAGE TO PDF
 function attachImageToPdfListener() {
     const wrapper = document.getElementById('image-to-pdf-wrapper');
     if (!wrapper) return;
 
-    // --- Referensi Elemen UI ---
     const initialInput = document.getElementById('pdf-image-input');
     const addMoreInput = document.getElementById('add-more-images-input');
     const uploadArea = document.getElementById('pdf-upload-area');
@@ -1806,9 +1805,10 @@ function attachImageToPdfListener() {
     const convertBtn = document.getElementById('convert-to-pdf-btn');
     const messageDiv = document.getElementById('image-to-pdf-message');
 
-    // --- State Management ---
-    let imageLibrary = []; // Berisi { file, name, previewUrl }
-    let documentPages = []; // Berisi { id, images: [ {instanceId, fileName, x, y, width, height, crop} ] }
+    let imageLibrary = [];
+    let documentPages = [];
+    let activePageIndex = -1;
+    let selectedImageInstanceId = null;
 
     const handleFiles = (files) => {
         for (const file of files) {
@@ -1822,29 +1822,26 @@ function attachImageToPdfListener() {
                 previewUrl: URL.createObjectURL(file),
             });
         }
+        if (documentPages.length === 0) addPage();
         renderUI();
     };
     
     const renderUI = () => {
-        // Tampilkan/sembunyikan editor
         if (imageLibrary.length > 0) {
             uploadArea.classList.add('hidden');
             editorLayout.classList.remove('hidden');
             editorLayout.style.display = 'flex';
         }
 
-        // Render Image Library
         libraryList.innerHTML = '';
         imageLibrary.forEach(img => {
             const imgElement = document.createElement('img');
             imgElement.src = img.previewUrl;
             imgElement.className = 'library-image';
             imgElement.dataset.fileName = img.name;
-            imgElement.setAttribute('draggable', 'true');
             libraryList.appendChild(imgElement);
         });
 
-        // Render Halaman PDF
         pageCanvasArea.innerHTML = '';
         documentPages.forEach((page, pageIndex) => {
             const pageElement = document.createElement('div');
@@ -1856,67 +1853,192 @@ function attachImageToPdfListener() {
                 if (!libraryImage) return;
 
                 const placedImgWrapper = document.createElement('div');
-                placedImgWrapper.className = 'placed-image';
+                placedImgWrapper.className = `placed-image ${imgInstance.instanceId === selectedImageInstanceId ? 'selected' : ''}`;
                 placedImgWrapper.style.left = `${imgInstance.x}px`;
                 placedImgWrapper.style.top = `${imgInstance.y}px`;
                 placedImgWrapper.style.width = `${imgInstance.width}px`;
                 placedImgWrapper.style.height = `${imgInstance.height}px`;
+                placedImgWrapper.dataset.instanceId = imgInstance.instanceId;
+
+                const imgTag = document.createElement('img');
+                imgTag.src = imgInstance.croppedUrl || libraryImage.previewUrl;
                 
-                const placedImg = document.createElement('img');
-                placedImg.src = libraryImage.previewUrl;
-                // Di sini Anda perlu menambahkan logika untuk crop, resize, dan drag
-                placedImgWrapper.appendChild(placedImg);
+                placedImgWrapper.appendChild(imgTag);
+
+                if (imgInstance.instanceId === selectedImageInstanceId) {
+                    placedImgWrapper.innerHTML += `
+                        <div class="placed-image-actions">
+                            <button class="crop-placed-btn" title="Crop Image">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
+                            </button>
+                            <button class="delete-placed-btn" title="Delete Image">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                        <div class="resize-handle nw"></div><div class="resize-handle ne"></div>
+                        <div class="resize-handle sw"></div><div class="resize-handle se"></div>
+                    `;
+                }
                 pageElement.appendChild(placedImgWrapper);
             });
             pageCanvasArea.appendChild(pageElement);
         });
         
-        attachDragListeners();
+        attachInteractiveListeners();
     };
 
     const addPage = () => {
-        documentPages.push({
-            id: `page-${Date.now()}`,
-            width: 595, // A4 Potrait
-            height: 842,
-            images: []
+        documentPages.push({ id: `page-${Date.now()}`, width: 595, height: 842, images: [] });
+        activePageIndex = documentPages.length - 1;
+        renderUI();
+    };
+
+    const addImageToPage = (fileName) => {
+        if (documentPages.length === 0) addPage();
+        const targetPageIndex = (activePageIndex === -1) ? 0 : activePageIndex;
+        
+        documentPages[targetPageIndex].images.push({
+            instanceId: `inst-${Date.now()}`,
+            fileName: fileName,
+            x: 50, y: 50, width: 200, height: 150,
+            crop: null, croppedUrl: null
         });
         renderUI();
     };
 
-    // --- Logika Drag and Drop (Sederhana) ---
-    function attachDragListeners() {
-        // Drag dari library ke halaman
+    function attachInteractiveListeners() {
         libraryList.querySelectorAll('.library-image').forEach(img => {
-            img.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', e.target.dataset.fileName);
-            });
+            img.addEventListener('click', () => addImageToPage(img.dataset.fileName));
         });
 
-        pageCanvasArea.querySelectorAll('.editor-page').forEach(page => {
-            page.addEventListener('dragover', (e) => e.preventDefault());
-
-            page.addEventListener('drop', (e) => {
-                e.preventDefault();
-                const fileName = e.dataTransfer.getData('text/plain');
-                if (!fileName) return;
-
-                const pageIndex = parseInt(page.dataset.pageIndex, 10);
-                const rect = page.getBoundingClientRect();
-                
-                // Tambahkan gambar baru ke state halaman
-                documentPages[pageIndex].images.push({
-                    instanceId: `inst-${Date.now()}`,
-                    fileName: fileName,
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top,
-                    width: 150, // Ukuran default
-                    height: 100,
-                    crop: null
-                });
-                renderUI();
-            });
+        document.querySelectorAll('.placed-image').forEach(el => {
+            el.addEventListener('mousedown', onSelectAndStartMove);
         });
+
+        document.querySelectorAll('.resize-handle').forEach(handle => {
+            handle.addEventListener('mousedown', onStartResize);
+        });
+        
+        document.querySelectorAll('.delete-placed-btn').forEach(btn => {
+            btn.addEventListener('click', onDeletePlacedImage);
+        });
+
+        document.querySelectorAll('.crop-placed-btn').forEach(btn => {
+            btn.addEventListener('click', onCropPlacedImage);
+        });
+    }
+    
+    function onSelectAndStartMove(e) {
+        if (e.target.classList.contains('resize-handle')) return;
+        
+        const element = e.currentTarget;
+        selectedImageInstanceId = element.dataset.instanceId;
+        renderUI(); 
+
+        const pageIndex = parseInt(element.closest('.editor-page').dataset.pageIndex, 10);
+        const imgInstance = documentPages[pageIndex].images.find(i => i.instanceId === selectedImageInstanceId);
+        
+        let initialX = e.clientX;
+        let initialY = e.clientY;
+        let startX = imgInstance.x;
+        let startY = imgInstance.y;
+
+        function onMouseMove(moveEvent) {
+            const dx = moveEvent.clientX - initialX;
+            const dy = moveEvent.clientY - initialY;
+            element.style.left = `${startX + dx}px`;
+            element.style.top = `${startY + dy}px`;
+        }
+        function onMouseUp() {
+            const finalLeft = parseFloat(element.style.left);
+            const finalTop = parseFloat(element.style.top);
+            imgInstance.x = finalLeft;
+            imgInstance.y = finalTop;
+
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    }
+    
+    function onStartResize(e) {
+        e.stopPropagation(); 
+        const element = e.currentTarget.closest('.placed-image');
+        const handle = e.currentTarget;
+
+        const pageIndex = parseInt(element.closest('.editor-page').dataset.pageIndex, 10);
+        const imgInstance = documentPages[pageIndex].images.find(i => i.instanceId === element.dataset.instanceId);
+
+        let initialX = e.clientX;
+        let initialY = e.clientY;
+        let startW = imgInstance.width;
+        let startH = imgInstance.height;
+        let startLeft = imgInstance.x;
+        let startTop = imgInstance.y;
+
+        function onMouseMoveResize(moveEvent) {
+            const dx = moveEvent.clientX - initialX;
+            const dy = moveEvent.clientY - initialY;
+
+            if (handle.classList.contains('se')) {
+                element.style.width = `${startW + dx}px`;
+                element.style.height = `${startH + dy}px`;
+            } else if (handle.classList.contains('sw')) {
+                element.style.width = `${startW - dx}px`;
+                element.style.height = `${startH + dy}px`;
+                element.style.left = `${startLeft + dx}px`;
+            } else if (handle.classList.contains('ne')) {
+                element.style.width = `${startW + dx}px`;
+                element.style.height = `${startH - dy}px`;
+                element.style.top = `${startTop + dy}px`;
+            } else if (handle.classList.contains('nw')) {
+                element.style.width = `${startW - dx}px`;
+                element.style.height = `${startH - dy}px`;
+                element.style.left = `${startLeft + dx}px`;
+                element.style.top = `${startTop + dy}px`;
+            }
+        }
+        function onMouseUpResize() {
+            imgInstance.width = parseFloat(element.style.width);
+            imgInstance.height = parseFloat(element.style.height);
+            imgInstance.x = parseFloat(element.style.left);
+            imgInstance.y = parseFloat(element.style.top);
+            
+            document.removeEventListener('mousemove', onMouseMoveResize);
+            document.removeEventListener('mouseup', onMouseUpResize);
+        }
+        document.addEventListener('mousemove', onMouseMoveResize);
+        document.addEventListener('mouseup', onMouseUpResize);
+    }
+
+    function onDeletePlacedImage(e) {
+        e.stopPropagation();
+        const element = e.currentTarget.closest('.placed-image');
+        const pageIndex = parseInt(element.closest('.editor-page').dataset.pageIndex, 10);
+        const instanceId = element.dataset.instanceId;
+
+        documentPages[pageIndex].images = documentPages[pageIndex].images.filter(img => img.instanceId !== instanceId);
+        selectedImageInstanceId = null;
+        renderUI();
+    }
+    
+    function onCropPlacedImage(e) {
+        e.stopPropagation();
+        const element = e.currentTarget.closest('.placed-image');
+        const pageIndex = parseInt(element.closest('.editor-page').dataset.pageIndex, 10);
+        const instanceId = element.dataset.instanceId;
+        const imgInstance = documentPages[pageIndex].images.find(i => i.instanceId === instanceId);
+        const libraryFile = imageLibrary.find(lib => lib.name === imgInstance.fileName);
+
+        if (!libraryFile) return;
+
+        handleImageSelectionForCropping(libraryFile.file, (blob) => {
+            const cropData = cropper.getData(true);
+            imgInstance.crop = cropData; // Simpan data crop
+            imgInstance.croppedUrl = URL.createObjectURL(blob);
+            renderUI(); // Render ulang untuk menampilkan gambar yang di-crop
+        }, NaN); // Aspect ratio bebas
     }
 
     // --- Event Listeners Utama ---
@@ -1930,20 +2052,23 @@ function attachImageToPdfListener() {
         convertBtn.disabled = true;
 
         const formData = new FormData();
+        const filesToSend = new Set(); // Hanya kirim setiap file sekali
+        
         const config = {
             pages: documentPages.map(page => ({
                 width: page.width,
                 height: page.height,
                 images: page.images.map(img => {
-                    // Pastikan file untuk gambar ini ditambahkan ke formData
-                    const libraryFile = imageLibrary.find(libFile => libFile.name === img.fileName);
-                    if(libraryFile) {
-                        formData.append('images', libraryFile.file, libraryFile.name);
-                    }
-                    return img; // Mengembalikan seluruh objek instance gambar
+                    filesToSend.add(img.fileName);
+                    return img; 
                 })
             }))
         };
+
+        filesToSend.forEach(fileName => {
+             const libraryFile = imageLibrary.find(libFile => libFile.name === fileName);
+             if (libraryFile) formData.append('images', libraryFile.file, libraryFile.name);
+        });
         
         formData.append('documentConfig', JSON.stringify(config));
 
@@ -1979,7 +2104,6 @@ function attachImageToPdfListener() {
             convertBtn.disabled = false;
         }
     });
-
 }
     
 function showToolSection(sectionIdToShow) {
