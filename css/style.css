@@ -2045,6 +2045,8 @@ input:focus, textarea:focus, select:focus {
 
 /* === [GANTI DENGAN INI] GAYA UNTUK SLIDER PRATINJAU GAMBAR === */
 
+/* === [VERSI FINAL] GAYA UNTUK SLIDER PRATINJAU GAMBAR === */
+
 .preview-slider-wrapper {
     position: relative;
     width: 100%;
@@ -2054,32 +2056,37 @@ input:focus, textarea:focus, select:focus {
 }
 
 .preview-slider-container {
-    overflow-x: auto; /* Izinkan scroll horizontal */
+    overflow-x: auto;
     overflow-y: hidden;
-    scroll-behavior: smooth; /* Buat animasi scroll saat tombol diklik */
+    scroll-behavior: smooth;
+    
+    /* [PERBAIKAN] Tambahkan padding untuk memberi ruang pada shadow dan tombol 'X' */
+    padding: 15px 20px; 
+    
+    /* [PERBAIKAN] Mengatasi masalah clipping pada Safari/Chrome dengan margin negatif */
+    margin: -15px -20px;
 
-    /* Kode untuk menyembunyikan scrollbar di semua browser */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE & Edge (legacy) */
+    /* Sembunyikan scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
-/* Kode untuk menyembunyikan scrollbar di Chrome, Safari, dan Edge baru */
 .preview-slider-container::-webkit-scrollbar {
     display: none;
 }
 
 #image-previews-container {
-    display: flex; /* Ubah dari grid ke flexbox */
-    flex-wrap: nowrap; /* Pastikan gambar tidak pindah ke baris baru */
+    display: flex;
+    flex-wrap: nowrap;
     gap: var(--space-lg);
-    padding-bottom: 10px; /* Beri sedikit ruang bawah */
-    transition: transform 0.4s ease-in-out; /* Animasi geser yang mulus */
+    /* [PERBAIKAN] Padding ini sekarang berada di parent-nya */
+    padding: 0; 
 }
 
 .image-preview-card {
     position: relative;
-    flex: 0 0 calc(50% - 12px); /* Setiap kartu lebarnya 50% dikurangi setengah gap */
-    max-width: calc(50% - 12px); /* var(--space-lg) adalah 24px, setengahnya 12px */
+    flex: 0 0 calc(50% - 12px);
+    max-width: calc(50% - 12px);
 }
 
 .slider-nav-btn {
@@ -2097,7 +2104,7 @@ input:focus, textarea:focus, select:focus {
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     transition: all 0.2s ease;
-    display: none; /* Sembunyikan secara default, tampilkan di desktop */
+    display: none;
 }
 
 .slider-nav-btn:hover {
@@ -2111,12 +2118,48 @@ input:focus, textarea:focus, select:focus {
     cursor: not-allowed;
 }
 
+/* [PERBAIKAN] Pindahkan tombol navigasi agar tidak terpotong */
 #prev-preview-btn {
-    left: -20px;
+    left: 10px;
 }
 
 #next-preview-btn {
-    right: -20px;
+    right: 10px;
+}
+
+/* Aturan untuk Desktop (lebar lebih dari 768px) */
+@media (min-width: 769px) {
+    .slider-nav-btn {
+        display: block;
+    }
+}
+
+/* Aturan untuk Mobile (lebar 768px atau kurang) */
+@media (max-width: 768px) {
+    .preview-slider-wrapper {
+        border-top: none;
+        padding-top: 0;
+    }
+    /* [PERBAIKAN] Hapus padding pada container di mobile */
+    .preview-slider-container {
+        padding: 0;
+        margin: 0;
+    }
+    #image-previews-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-md);
+    }
+    .preview-slider-container {
+        max-height: 400px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 5px;
+    }
+    .image-preview-card {
+        max-width: 100%;
+        flex-basis: auto;
+    }
 }
 
 /* Aturan untuk Desktop (lebar lebih dari 768px) */
