@@ -2183,73 +2183,76 @@ input:focus, textarea:focus, select:focus {
     }
 }
 
-/* Untuk layar ponsel (lebar maks 768px) - KODE PERBAIKAN UTAMA DI SINI */
+/* BLOK PENGGANTI UNTUK TAMPILAN MOBILE */
 @media (max-width: 768px) {
-
-    /* Memastikan container utama tidak pernah meluber ke kanan */
     .page-container {
-        width: 100%;
-        overflow-x: hidden; /* Mencegah scroll horizontal paksa */
+        padding-left: var(--space-sm);
+        padding-right: var(--space-sm);
     }
 
-    /* Mengganti layout grid menjadi flexbox kolom untuk kepastian */
-    .pdf-tool-layout {
-        display: flex;
-        flex-direction: column; /* Paksa jadi satu kolom */
-        width: 100%;
+    .tool-section,
+    .dashboard-container,
+    .pdf-tool-options,
+    .pdf-tool-previews {
+        padding: var(--space-md);
+    }
+
+    #image-previews-container {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         gap: var(--space-md);
     }
+    
+    /* --- PERBAIKAN UTAMA UNTUK OPSI PDF (SESUAI SARAN ANDA) --- */
 
-    /* Memastikan setiap bagian di dalamnya tidak meluber */
-    .pdf-tool-previews, .pdf-tool-options {
-        width: 100%;
-        max-width: 100%; /* Menjamin tidak akan lebih lebar dari parent */
-        min-width: 0; /* Mengizinkan elemen untuk mengecil */
-    }
-
-    /* Aturan untuk radio card group agar tetap rapi */
+    /* 1. Ubah grup menjadi daftar vertikal yang rapi */
     .radio-card-group {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-        gap: var(--space-sm);
-    }
-
-    /* Perbaikan untuk Image Compressor agar tidak meluber juga */
-    #image-compressor-form {
         display: flex;
         flex-direction: column;
-        gap: var(--space-md);
-        width: 100%;
+        gap: var(--space-md); /* Jarak antar setiap pilihan */
+        align-items: flex-start; /* Ratakan semua pilihan ke kiri */
     }
 
-    /* 1. Paksa grup kartu menjadi 2 kolom yang rapi */
-.radio-card-group {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Selalu buat 2 kolom berdampingan */
-    gap: var(--space-sm);
-}
+    /* 2. Hilangkan semua gaya 'kartu' pada setiap pilihan */
+    .radio-card {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: auto; /* Biarkan lebarnya sesuai konten */
+    }
+    .radio-card:hover {
+         background-color: transparent !important;
+    }
 
-/* 2. Atur ulang konten di dalam setiap kartu agar lebih ringkas */
-.radio-card-content {
-    flex-direction: column; /* Susun ikon di ATAS teks, bukan di samping */
-    gap: 6px;               /* Beri sedikit jarak antara ikon dan teks */
-    padding: var(--space-sm) var(--space-xs); /* Atur ulang padding (tinggi, lebar) */
-    text-align: center;
-    height: 100%; /* Pastikan semua kartu sama tinggi */
-    justify-content: center;
-}
+    /* 3. Atur ulang konten di dalamnya (radio & teks) */
+    .radio-card-content {
+        flex-direction: row; /* Susun item di dalamnya secara horizontal */
+        align-items: center;
+        gap: 0.75rem; /* Jarak antara radio button dan teks */
+        padding: 0;
+    }
 
-/* 3. Sedikit perkecil ukuran ikon di dalam kartu */
-.radio-card-content svg {
-    width: 28px;
-    height: 28px;
-    margin: 0 auto; /* Pastikan ikon berada di tengah */
-}
+    /* 4. Tampilkan radio button asli dari browser */
+    .radio-card input[type="radio"] {
+        display: inline-block; 
+        width: 1.2em;
+        height: 1.2em;
+        margin: 0;
+        -webkit-appearance: radio;
+        appearance: radio;
+    }
 
-/* 4. Sedikit perkecil ukuran teks di dalam kartu */
-.radio-card-content span {
-    font-size: 0.85rem;
-}
+    /* 5. Sembunyikan ikon-ikon SVG kustom yang memakan tempat */
+    .radio-card-content svg {
+        display: none;
+    }
+
+    /* 6. Beri tanda visual pada teks yang terpilih */
+    .radio-card input:checked + .radio-card-content span {
+        color: var(--accent-color);
+        font-weight: 600;
+    }
 }
 
 /* Untuk layar ponsel yang sangat kecil (lebar maks 480px) */
