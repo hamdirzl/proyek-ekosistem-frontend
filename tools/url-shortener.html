@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener - Tools Hamdi</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <a href="../index.html" class="logo-desktop">HAMDI<br>RIZAL</a>
+            <a href="../index.html" class="logo-mobile">HAMDI RIZAL</a>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li id="nav-dasbor" style="display: none;">
+                    <a href="../dashboard.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        <span>Dasbor</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../portfolio.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        <span>Portofolio</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../jurnal.html">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                        <span>Jurnal</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../arena.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                        <span>Arena Game</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../tools.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                        <span>Tools Hamdi</span>
+                    </a>
+                </li>
+                <li>
+                    <button id="about-button" class="nav-button">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <span>Tentang Saya</span>
+                    </button>
+                </li>
+                <li id="nav-login" style="display: list-item;">
+                    <a href="../auth.html" class="login-button">Login</a>
+                </li>
+                <li id="nav-logout" class="nav-logout-item" style="display: none;">
+                    <button id="logout-button-nav" class="button-pintu">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        <span>Logout</span>
+                    </button>
+                </li>
+            </ul>
+            <button class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <main class="page-container">
+        <section class="tool-section" data-aos="fade-up">
+            <h1 class="page-title">URL Shortener</h1>
+            <p class="page-subtitle">Perpendek tautan panjang Anda menjadi lebih ringkas dan mudah dibagikan.</p>
+            <form id="shortener-form">
+                <input type="url" id="long-url" placeholder="Enter your long URL here..." required>
+                <input type="text" id="custom-slug" placeholder="Custom name (optional)..." pattern="[a-zA-Z0-9-]+" title="Only letters, numbers, and hyphens allowed">
+                <button type="submit" class="button-pintu">Shorten!</button>
+            </form>
+            <div class="result-box" id="result">
+                <span id="short-url-text"></span> 
+                <button id="copy-button" aria-label="Copy Link">
+                    <svg id="copy-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    <svg id="check-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check" style="display: none;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </button>
+            </div>
+        </section>
+
+        <section id="history-section" class="history-section hidden" data-aos="fade-up">
+            <h2 class="section-title">Your Link History</h2>
+            <p id="loading-history">Loading history...</p>
+            <ul id="link-history-list" class="mood-history-list"></ul>
+        </section>
+    </main>
+
+    <div id="about-modal" class="modal-overlay hidden">
+        <div class="modal-content" data-aos="zoom-in" data-aos-duration="400">
+            <button class="modal-close" aria-label="Tutup Modal">×</button>
+            <h2 class="section-title">Tentang Saya</h2>
+            <h3 class="about-greeting">Hai, saya Hamdi</h3>
+            <p>Saya suka musik, alam, dan hal-hal spontan. Kadang main alat musik, kadang jalan-jalan tanpa rencana.</p>
+            <p>Di website ini, saya cuma pengen ngumpulin semua hal yang saya suka—biar bisa dilihat lagi nanti, atau siapa tahu ada yang relate.</p>
+            <p>Kalau kamu nemu sesuatu yang menarik, itu bonus. Terima kasih udah mampir.</p>
+        </div>
+    </div>
+
+    <div id="menu-overlay" class="menu-overlay"></div>
+        
+    <footer>
+        <div class="footer-container">
+            <div class="footer-logo">
+                 <a href="../index.html" class="logo-desktop">HAMDI<br>RIZAL</a>
+            </div>
+            <div class="footer-links">
+                <h4>Navigasi</h4>
+                <ul>
+                    <li><a href="../portfolio.html">Portofolio</a></li>
+                    <li><a href="../jurnal.html">Jurnal</a></li>
+                    <li><a href="../arena.html">Arena</a></li>
+                    <li><a href="../tools.html">Tools</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <h4>Terhubung</h4>
+                <div class="social-icons">
+                    <a href="https://www.instagram.com/hamdirzl/" target="_blank" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-instagram"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                    <a href="https://github.com/hamdirzl" target="_blank" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a>
+                    <a href="https://www.linkedin.com/in/hamdi-rizal-926942190/" target="_blank" aria-label="LinkedIn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
+                    <a href="mailto:hamdirizall1@gmail.com" aria-label="Email"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mail"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 HAMDI RIZAL. Hak Cipta Dilindungi.</p>
+        </div>
+    </footer>
+
+    <script src="../js/script.js" defer></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>AOS.init({duration: 800, once: true});</script>
+</body>
+</html>

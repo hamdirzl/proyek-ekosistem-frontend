@@ -1,4 +1,4 @@
-// VERSI FINAL (PERBAIKAN) - DENGAN RICH TEXT EDITOR, CROPPING, & FITUR CHAT GAMBAR/SUARA
+// VERSI FINAL (PERBAIKAN) - DENGAN ARSITEKTUR MULTI-HALAMAN UNTUK TOOLS
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
@@ -175,7 +175,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupJurnalDetailPage();
     } else if (document.title.includes("Jurnal - HAMDI RIZAL")) {
         setupJurnalPage();
-    } else if (document.title.includes("Tools")) {
+    } else if (document.title.includes("Tools - HAMDI RIZAL") || document.title.includes("Tools Hamdi")) {
+        // Logika baru untuk halaman tools
         setupToolsPage();
     } else if (document.getElementById('login-form')) {
         setupAuthPage();
@@ -1722,32 +1723,42 @@ function setupCustomDropdowns() {
     });
 }
 
+// ===================================================================
+// == PERUBAHAN UTAMA: Logika untuk menangani halaman tools terpisah ==
+// ===================================================================
 function setupToolsPage() {
-    const wrappers = [
-        document.getElementById('shortener-wrapper'), document.getElementById('history-section'),
-        document.getElementById('converter-wrapper'),
-        document.getElementById('qr-generator-wrapper'), document.getElementById('image-compressor-wrapper'),
-        document.getElementById('images-to-pdf-wrapper')
-        
-    ];
-    const toolSelectionSection = document.querySelector('.tool-selection');
+    // Cek di halaman tools mana kita berada, dan jalankan setup yang sesuai
+    if (window.location.pathname.includes('url-shortener.html')) {
+        setupUrlShortenerPage();
+    } else if (window.location.pathname.includes('media-converter.html')) {
+        setupMediaConverterPage();
+    } else if (window.location.pathname.includes('qr-code-generator.html')) {
+        attachQrCodeGeneratorListener();
+    } else if (window.location.pathname.includes('image-compressor.html')) {
+        attachImageCompressorListener();
+    } else if (window.location.pathname.includes('images-to-pdf.html')) {
+        attachImagesToPdfListener();
+    }
+    
+    // Fungsi ini tetap dipanggil karena ada di beberapa halaman tools
+    setupCustomFileInputs(); 
+    setupCustomDropdowns();
+}
 
-    wrappers.forEach(el => el && el.classList.add('hidden'));
-
-    if (toolSelectionSection) toolSelectionSection.classList.remove('hidden');
-
-    document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper'));
-    document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper'));
-    document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper'));
-    document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper'));
-    document.getElementById('show-images-to-pdf')?.addEventListener('click', () => showToolSection('images-to-pdf-wrapper'));
-
+function setupUrlShortenerPage() {
     attachShortenerListener();
-    attachConverterListener();
-    attachQrCodeGeneratorListener();
-    attachImageCompressorListener();
-    attachImagesToPdfListener();
+    // Tampilkan riwayat hanya jika pengguna login
+    if (localStorage.getItem('jwt_refresh_token')) {
+        const historySection = document.getElementById('history-section');
+        if (historySection) {
+            historySection.classList.remove('hidden');
+            fetchUserLinkHistory();
+        }
+    }
+}
 
+function setupMediaConverterPage() {
+    attachConverterListener();
     const fileInput = document.getElementById('file-input');
     const outputFormatSelect = document.getElementById('output-format');
 
@@ -1775,24 +1786,21 @@ function setupToolsPage() {
             
             const options = conversionOptions[extension] || conversionOptions['default'];
             
-            outputFormatSelect.innerHTML = '';
+            const selectElement = outputFormatSelect.querySelector('select') || outputFormatSelect;
+            selectElement.innerHTML = ''; // Hapus opsi lama
             options.forEach(opt => {
                 const optionElement = document.createElement('option');
                 optionElement.value = opt.value;
                 optionElement.textContent = opt.text;
-                outputFormatSelect.appendChild(optionElement);
+                selectElement.appendChild(optionElement);
             });
             
+            // Perbarui tampilan dropdown kustom setelah mengubah opsi
             setupCustomDropdowns();
         });
     }
-
-    setupCustomFileInputs();
-    setupCustomDropdowns();
 }
 
-// PASTE KODE BARU INI SEBAGAI PENGGANTI
-// GANTI FUNGSI LAMA DENGAN KESELURUHAN KODE DI BAWAH INI
 
 function attachImagesToPdfListener() {
     const form = document.getElementById('images-to-pdf-form');
@@ -1981,32 +1989,6 @@ function attachImagesToPdfListener() {
     });
 }
 
-function showToolSection(sectionIdToShow) {
-    const allToolSections = [
-        document.getElementById('shortener-wrapper'), document.getElementById('converter-wrapper'),
-        document.getElementById('qr-generator-wrapper'),
-        document.getElementById('image-compressor-wrapper'),
-        document.getElementById('images-to-pdf-wrapper')
-    ];
-    const historySection = document.getElementById('history-section');
-
-    allToolSections.forEach(section => {
-        if (section && section.id === sectionIdToShow) section.classList.remove('hidden');
-        else section?.classList.add('hidden');
-    });
-
-    if (historySection) {
-        if (sectionIdToShow === 'shortener-wrapper' && localStorage.getItem('jwt_refresh_token')) {
-            historySection.classList.remove('hidden');
-            fetchUserLinkHistory();
-        } else {
-            historySection.classList.add('hidden');
-        }
-    }
-
-    const targetSection = document.getElementById(sectionIdToShow);
-    if (targetSection) targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
 
 function attachShortenerListener() {
     const form = document.getElementById('shortener-form');
@@ -2061,7 +2043,6 @@ function attachShortenerListener() {
     }
 }
 
-// MENJADI SEPERTI INI
 function attachConverterListener() {
     const form = document.getElementById('converter-form');
     if (!form) return;
@@ -2072,7 +2053,6 @@ function attachConverterListener() {
         const submitButton = form.querySelector('button');
         const messageDiv = document.getElementById('converter-message');
         const progressWrapper = document.getElementById('converter-progress-wrapper');
-        // [MODIFIKASI] Kita targetkan kontainer progress bar, bukan hanya bagian dalamnya
         const progressBarContainer = document.getElementById('converter-progress-wrapper').querySelector('.progress-bar');
         const progressText = progressWrapper.querySelector('.progress-bar-text');
 
@@ -2081,7 +2061,6 @@ function attachConverterListener() {
         progressWrapper.classList.remove('hidden');
         submitButton.disabled = true;
 
-        // [BARU] Mengaktifkan animasi indeterminate
         progressBarContainer.classList.add('indeterminate');
         progressText.textContent = 'Uploading file, please wait...';
 
@@ -2089,19 +2068,7 @@ function attachConverterListener() {
         xhr.open('POST', `${API_BASE_URL}/api/convert`, true);
         xhr.responseType = 'blob';
 
-        // [DIHAPUS] Event listener untuk progress akurat tidak lagi diperlukan
-        /*
-        xhr.upload.addEventListener('progress', (e) => {
-            if (e.lengthComputable) {
-                const percentComplete = Math.round((e.loaded / e.total) * 100);
-                progressBar.style.width = percentComplete + '%';
-                progressText.textContent = `Uploading: ${percentComplete}%`;
-            }
-        });
-        */
-
         xhr.onload = function () {
-            // [BARU] Matikan animasi setelah selesai
             progressBarContainer.classList.remove('indeterminate');
 
             if (this.status === 200) {
@@ -2140,7 +2107,6 @@ function attachConverterListener() {
         };
 
         xhr.onerror = function () {
-            // [BARU] Matikan animasi jika terjadi error
             progressBarContainer.classList.remove('indeterminate');
             messageDiv.textContent = 'Error: Terjadi kesalahan jaringan.';
             messageDiv.className = 'error';
