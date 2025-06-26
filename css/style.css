@@ -2014,3 +2014,73 @@ input:focus, textarea:focus, select:focus {
 .delete-page-btn:hover {
     background-color: #c82333;
 }
+
+/* style.css (tambahkan di akhir file) */
+
+#pdf-editor-area {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1.5rem;
+    background-color: var(--background-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px dashed var(--border-color);
+    min-height: 200px;
+}
+
+.editor-image-preview {
+    position: relative;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: grab;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.editor-image-preview:active {
+    cursor: grabbing;
+    transform: scale(1.05);
+    box-shadow: var(--soft-shadow);
+}
+
+.editor-image-preview.dragging {
+    opacity: 0.5;
+}
+
+.editor-image-preview img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+}
+
+.image-overlay-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 8px;
+}
+
+.image-overlay-actions button {
+    background-color: rgba(0,0,0,0.6);
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.image-overlay-actions button:hover {
+    background-color: var(--accent-color);
+}
+
+.image-overlay-actions svg {
+    width: 16px;
+    height: 16px;
+}
