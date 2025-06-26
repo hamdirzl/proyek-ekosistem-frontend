@@ -2225,7 +2225,8 @@ input:focus, textarea:focus, select:focus {
     /* 1. Paksa grup kartu menjadi 2 kolom yang rapi */
 .radio-card-group {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Selalu buat 2 kolom berdampingan */
+    /* Gunakan auto-fit agar kolom menyesuaikan secara otomatis */
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
     gap: var(--space-sm);
 }
 
@@ -2250,6 +2251,20 @@ input:focus, textarea:focus, select:focus {
 .radio-card-content span {
     font-size: 0.85rem;
 }
+/* Tambahkan ini di dalam @media (max-width: 768px) */
+.pdf-tool-previews, .pdf-tool-options {
+    border: none;
+    background-color: transparent;
+    padding: 0;
+    box-shadow: none;
+}
+
+.pdf-tool-previews {
+    /* Tambahkan garis pemisah agar tetap jelas */
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--space-lg);
+}
+
 }
 
 /* Untuk layar ponsel yang sangat kecil (lebar maks 480px) */
