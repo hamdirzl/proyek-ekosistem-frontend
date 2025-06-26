@@ -1,4 +1,4 @@
-// VERSI FINAL (PERBAIKAN) - DENGAN ARSITEKTUR MULTI-HALAMAN UNTUK TOOLS
+// VERSI FINAL (PERBAIKAN 2) - Logika Pemuatan Halaman Diperbaiki
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
 console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
@@ -20,7 +20,7 @@ let adminChatForm = null;
 let adminChatInput = null;
 const allChatHistories = {}; // Objek untuk menyimpan riwayat chat per user
 
-// === [BARU] FUNGSI HELPER UPLOAD FILE CHAT ===
+// === FUNGSI HELPER UPLOAD FILE CHAT ===
 async function uploadChatFile(file, type) {
     const formData = new FormData();
     formData.append('file', file);
@@ -47,9 +47,10 @@ function forceLogout() {
     localStorage.removeItem('jwt_refresh_token');
     sessionStorage.removeItem('jwt_access_token');
     localStorage.removeItem('chatSession');
+    const authPath = window.location.href.includes('github.io') ? '/hrportof/auth.html' : '/auth.html';
     if (!window.location.pathname.endsWith('auth.html')) {
         alert('Sesi Anda telah berakhir. Silakan login kembali.');
-        window.location.href = 'auth.html';
+        window.location.href = authPath;
     }
 }
 
@@ -127,7 +128,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.error("Gagal logout di server, tapi tetap lanjut logout di client.", e);
                 } finally {
                     forceLogout();
-                    window.location.href = 'index.html';
+                    const indexPath = window.location.href.includes('github.io') ? '/hrportof/' : '/';
+                    window.location.href = indexPath;
                 }
             });
         }
@@ -163,31 +165,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Panggil fungsi setup berdasarkan halaman
+    // =================================================================
+    // == [PERBAIKAN UTAMA] Logika Pemuatan Halaman yang Lebih Spesifik ==
+    // =================================================================
+    const pageTitle = document.title;
+    
     if (document.body.contains(document.getElementById('dashboard-main'))) {
         await setupDashboardPage();
         setupCropModal();
-    } else if (document.title.includes("Portofolio - HAMDI RIZAL")) {
+    } else if (pageTitle.includes("Portofolio - HAMDI RIZAL")) {
         setupPortfolioPage();
-    } else if (document.title.includes("Detail Proyek")) {
+    } else if (pageTitle.includes("Detail Proyek")) {
         setupProjectDetailPage();
-    } else if (document.title.includes("Detail Jurnal")) {
+    } else if (pageTitle.includes("Detail Jurnal")) {
         setupJurnalDetailPage();
-    } else if (document.title.includes("Jurnal - HAMDI RIZAL")) {
+    } else if (pageTitle.includes("Jurnal - HAMDI RIZAL")) {
         setupJurnalPage();
-    } else if (document.title.includes("Tools - HAMDI RIZAL") || document.title.includes("Tools Hamdi")) {
-        // Logika baru untuk halaman tools
-        setupToolsPage();
+    } else if (pageTitle.includes("URL Shortener")) {
+        setupUrlShortenerPage();
+    } else if (pageTitle.includes("Media Converter")) {
+        setupMediaConverterPage();
+    } else if (pageTitle.includes("QR Code Generator")) {
+        attachQrCodeGeneratorListener();
+    } else if (pageTitle.includes("Image Compressor")) {
+        setupImageCompressorPage();
+    } else if (pageTitle.includes("Images to PDF")) {
+        setupImagesToPdfPage();
     } else if (document.getElementById('login-form')) {
         setupAuthPage();
-    } else if (document.title.includes("Logging In...")) {
+    } else if (pageTitle.includes("Logging In...")) {
         setupAuthCallbackPage();
     }
+    // Halaman "Tools" utama tidak memerlukan setup JS spesifik lagi.
 
     setupAboutModal();
     setupMobileMenu();
     setupAllPasswordToggles();
-    setupChatBubble(); // Panggil fungsi live chat
+    setupChatBubble();
     setupAccountManagement();
     setupDashboardTabs();
 });
@@ -200,9 +214,10 @@ function decodeJwt(token) {
 function setupChatBubble() {
     const chatBubble = document.getElementById('chat-bubble');
     const chatWindow = document.getElementById('chat-window');
+    if (!chatBubble || !chatWindow) return;
+
     const closeChatBtn = document.getElementById('close-chat-btn');
     const chatStatus = document.getElementById('chat-status');
-
     const chatStartForm = document.getElementById('chat-start-form');
     const chatUserNameInput = document.getElementById('chat-user-name');
     const chatMain = document.getElementById('chat-main');
@@ -210,7 +225,6 @@ function setupChatBubble() {
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
     const typingIndicator = document.getElementById('typing-indicator');
-
     const imageInput = document.getElementById('chat-image-input');
     const micBtn = document.getElementById('chat-mic-btn');
     let mediaRecorder;
@@ -218,18 +232,16 @@ function setupChatBubble() {
     let isRecording = false;
 
     if (window.location.pathname.includes('dashboard.html')) {
-        if (chatBubble) chatBubble.style.display = 'none';
-        if (chatWindow) chatWindow.style.display = 'none';
+        chatBubble.style.display = 'none';
+        chatWindow.style.display = 'none';
         return;
     }
-
-    if (!chatBubble || !chatWindow) return;
 
     let ws = null;
     let isConnecting = false;
     const backendWsUrl = 'wss://server-pribadi-hamdi-docker.onrender.com';
-
     let typingTimeout;
+
     const showTypingIndicator = (show) => {
         if (typingIndicator) {
             typingIndicator.textContent = show ? 'Admin sedang mengetik...' : '';
@@ -261,9 +273,7 @@ function setupChatBubble() {
             const img = document.createElement('img');
             img.src = content;
             img.alt = 'Gambar terkirim';
-            img.onload = () => {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            };
+            img.onload = () => { chatMessages.scrollTop = chatMessages.scrollHeight; };
             messageDiv.appendChild(img);
         } else if (messageType === 'audio') {
             const audio = document.createElement('audio');
@@ -271,7 +281,7 @@ function setupChatBubble() {
             audio.src = content;
             messageDiv.appendChild(audio);
         } else if (messageType === 'info-upload') {
-            messageDiv.className = 'message server-info'
+            messageDiv.className = 'message server-info';
             messageDiv.style.fontStyle = 'italic';
             messageDiv.style.color = 'var(--text-muted-color)';
             messageDiv.textContent = content;
@@ -304,7 +314,6 @@ function setupChatBubble() {
             const response = await fetch(`${API_BASE_URL}/api/chat/history/${userId}`);
             if (!response.ok) throw new Error('Gagal memuat riwayat');
             const history = await response.json();
-
             chatMessages.innerHTML = '';
             if (history.length > 0) {
                 appendMessage('Ini adalah riwayat percakapan Anda sebelumnya.', 'server-info');
@@ -313,7 +322,6 @@ function setupChatBubble() {
                 const welcomeName = session ? session.userName : 'Pengunjung';
                 appendMessage(`Halo ${welcomeName}! Ada yang bisa kami bantu?`, 'admin');
             }
-
             history.forEach(msg => {
                 appendMessage(msg.content, msg.sender_type, msg.message_type);
             });
@@ -325,21 +333,15 @@ function setupChatBubble() {
 
     const connect = () => {
         const session = JSON.parse(localStorage.getItem('chatSession'));
-        if (isConnecting || (ws && ws.readyState === WebSocket.OPEN) || !session) {
-            return;
-        }
-
+        if (isConnecting || (ws && ws.readyState === WebSocket.OPEN) || !session) return;
         isConnecting = true;
         updateStatus('menghubungi');
-
         ws = new WebSocket(backendWsUrl);
-
         ws.onopen = () => {
             isConnecting = false;
             console.log('Terhubung ke WebSocket. Mengidentifikasi sesi...');
             ws.send(JSON.stringify({ type: 'identify', session: session }));
         };
-
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             switch (data.type) {
@@ -358,7 +360,6 @@ function setupChatBubble() {
                     break;
             }
         };
-
         ws.onclose = () => {
             isConnecting = false;
             console.log('Koneksi WebSocket terputus.');
@@ -366,7 +367,6 @@ function setupChatBubble() {
             ws = null;
             setTimeout(connect, 3000);
         };
-
         ws.onerror = (error) => {
             isConnecting = false;
             console.error('WebSocket error:', error);
@@ -377,14 +377,11 @@ function setupChatBubble() {
     chatBubble.addEventListener('click', () => {
         chatWindow.classList.remove('hidden');
         const session = JSON.parse(localStorage.getItem('chatSession'));
-
         if (session && session.userId && session.userName) {
             chatStartForm.style.display = 'none';
             chatMain.classList.remove('hidden');
             chatMain.style.display = 'flex';
-            if (!ws || ws.readyState !== WebSocket.OPEN) {
-                connect();
-            }
+            if (!ws || ws.readyState !== WebSocket.OPEN) connect();
         } else {
             chatStartForm.style.display = 'flex';
             chatMain.classList.add('hidden');
@@ -399,14 +396,8 @@ function setupChatBubble() {
         chatStartForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const userName = chatUserNameInput.value.trim();
-            if (!userName) {
-                alert('Nama tidak boleh kosong.');
-                return;
-            }
-            const newSession = {
-                userId: crypto.randomUUID(),
-                userName: userName
-            };
+            if (!userName) return alert('Nama tidak boleh kosong.');
+            const newSession = { userId: crypto.randomUUID(), userName: userName };
             localStorage.setItem('chatSession', JSON.stringify(newSession));
             chatStartForm.style.display = 'none';
             chatMain.classList.remove('hidden');
@@ -439,10 +430,8 @@ function setupChatBubble() {
         imageInput.addEventListener('change', async () => {
             const file = imageInput.files[0];
             if (!file) return;
-
             appendMessage('Mengunggah gambar...', 'server-info', 'info-upload');
             const result = await uploadChatFile(file, 'gambar');
-
             if (result.success) {
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify({ type: 'user_message', content: result.url, messageType: 'image' }));
@@ -466,9 +455,7 @@ function setupChatBubble() {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     mediaRecorder = new MediaRecorder(stream);
                     audioChunks = [];
-                    mediaRecorder.addEventListener("dataavailable", event => {
-                        audioChunks.push(event.data);
-                    });
+                    mediaRecorder.addEventListener("dataavailable", event => { audioChunks.push(event.data); });
                     mediaRecorder.addEventListener("stop", async () => {
                         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                         const audioFile = new File([audioBlob], `pesan_suara_${Date.now()}.webm`, { type: 'audio/webm' });
@@ -767,8 +754,9 @@ async function uploadCroppedImageForEditor(blob, successCallback, failureCallbac
 
 async function setupDashboardPage() {
     const refreshToken = localStorage.getItem('jwt_refresh_token');
+    const authPath = window.location.href.includes('github.io') ? '/hrportof/auth.html' : '/auth.html';
     if (!refreshToken) {
-        window.location.href = 'auth.html';
+        window.location.href = authPath;
         return;
     }
 
@@ -993,6 +981,86 @@ function setupAdminPortfolioPanel() {
     fetchAndDisplayPortfolioAdmin();
 }
 
+async function fetchAndDisplayPortfolioAdmin() {
+    const listContainer = document.getElementById('portfolio-list-admin');
+    const loadingMessage = document.getElementById('loading-portfolio-admin');
+    if (!listContainer || !loadingMessage) return;
+
+    loadingMessage.style.display = 'block';
+    listContainer.innerHTML = '';
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio`);
+        const projects = await response.json();
+        if (!response.ok) throw new Error(projects.error || 'Gagal memuat proyek.');
+
+        loadingMessage.style.display = 'none';
+
+        if (projects.length === 0) {
+            listContainer.innerHTML = '<li><p>Belum ada proyek ditambahkan.</p></li>';
+            return;
+        }
+
+        projects.forEach(project => renderAdminPortfolioItem(project, listContainer));
+    } catch (error) {
+        loadingMessage.textContent = `Error: ${error.message}`;
+    }
+}
+
+function renderAdminPortfolioItem(project, container) {
+    const listItem = document.createElement('li');
+    listItem.className = 'mood-item';
+    listItem.id = `portfolio-item-${project.id}`;
+    const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+
+    const strippedDescription = project.description.replace(/<[^>]+>/g, ' ');
+
+    listItem.innerHTML = `
+        <div class="mood-item-header">
+            <span><strong>${project.title}</strong></span>
+            <div class="mood-item-actions">
+                <button class="mood-icon-button edit-portfolio-btn" data-id="${project.id}" aria-label="Edit Proyek">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                </button>
+                <button class="mood-icon-button delete-portfolio-btn delete-button" data-id="${project.id}" aria-label="Hapus Proyek">
+                    ${trashIconSvg}
+                </button>
+            </div>
+        </div>
+        <p class="mood-notes">${strippedDescription.substring(0, 100)}...</p>
+        <small class="mood-date">Dibuat: ${new Date(project.created_at).toLocaleString('id-ID')}</small>
+    `;
+    container.appendChild(listItem);
+
+    listItem.querySelector('.edit-portfolio-btn').addEventListener('click', async () => {
+        document.getElementById('portfolio-form-title').textContent = 'Edit Proyek';
+        document.getElementById('portfolio-id').value = project.id;
+        document.getElementById('portfolio-title').value = project.title;
+
+        const editorDiv = document.getElementById('quill-portfolio-editor');
+        if (editorDiv && editorDiv.__quill) {
+            editorDiv.__quill.root.innerHTML = project.description;
+        }
+
+        document.getElementById('portfolio-form').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    listItem.querySelector('.delete-portfolio-btn').addEventListener('click', async () => {
+        if (!confirm(`Yakin ingin menghapus proyek "${project.title}"?`)) return;
+
+        try {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio/${project.id}`, { method: 'DELETE' });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error);
+
+            alert('Proyek berhasil dihapus.');
+            fetchAndDisplayPortfolioAdmin();
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        }
+    });
+}
+
 function setupAdminJurnalPanel() {
     const form = document.getElementById('jurnal-form');
     if (!form) return;
@@ -1106,87 +1174,6 @@ function setupAdminJurnalPanel() {
     });
 
     fetchAndDisplayJurnalAdmin();
-}
-
-
-async function fetchAndDisplayPortfolioAdmin() {
-    const listContainer = document.getElementById('portfolio-list-admin');
-    const loadingMessage = document.getElementById('loading-portfolio-admin');
-    if (!listContainer || !loadingMessage) return;
-
-    loadingMessage.style.display = 'block';
-    listContainer.innerHTML = '';
-
-    try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio`);
-        const projects = await response.json();
-        if (!response.ok) throw new Error(projects.error || 'Gagal memuat proyek.');
-
-        loadingMessage.style.display = 'none';
-
-        if (projects.length === 0) {
-            listContainer.innerHTML = '<li><p>Belum ada proyek ditambahkan.</p></li>';
-            return;
-        }
-
-        projects.forEach(project => renderAdminPortfolioItem(project, listContainer));
-    } catch (error) {
-        loadingMessage.textContent = `Error: ${error.message}`;
-    }
-}
-
-function renderAdminPortfolioItem(project, container) {
-    const listItem = document.createElement('li');
-    listItem.className = 'mood-item';
-    listItem.id = `portfolio-item-${project.id}`;
-    const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
-
-    const strippedDescription = project.description.replace(/<[^>]+>/g, ' ');
-
-    listItem.innerHTML = `
-        <div class="mood-item-header">
-            <span><strong>${project.title}</strong></span>
-            <div class="mood-item-actions">
-                <button class="mood-icon-button edit-portfolio-btn" data-id="${project.id}" aria-label="Edit Proyek">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                </button>
-                <button class="mood-icon-button delete-portfolio-btn delete-button" data-id="${project.id}" aria-label="Hapus Proyek">
-                    ${trashIconSvg}
-                </button>
-            </div>
-        </div>
-        <p class="mood-notes">${strippedDescription.substring(0, 100)}...</p>
-        <small class="mood-date">Dibuat: ${new Date(project.created_at).toLocaleString('id-ID')}</small>
-    `;
-    container.appendChild(listItem);
-
-    listItem.querySelector('.edit-portfolio-btn').addEventListener('click', async () => {
-        document.getElementById('portfolio-form-title').textContent = 'Edit Proyek';
-        document.getElementById('portfolio-id').value = project.id;
-        document.getElementById('portfolio-title').value = project.title;
-
-        const editorDiv = document.getElementById('quill-portfolio-editor');
-        if (editorDiv && editorDiv.__quill) {
-            editorDiv.__quill.root.innerHTML = project.description;
-        }
-
-        document.getElementById('portfolio-form').scrollIntoView({ behavior: 'smooth' });
-    });
-
-    listItem.querySelector('.delete-portfolio-btn').addEventListener('click', async () => {
-        if (!confirm(`Yakin ingin menghapus proyek "${project.title}"?`)) return;
-
-        try {
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio/${project.id}`, { method: 'DELETE' });
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error);
-
-            alert('Proyek berhasil dihapus.');
-            fetchAndDisplayPortfolioAdmin();
-        } catch (error) {
-            alert(`Error: ${error.message}`);
-        }
-    });
 }
 
 async function fetchAndDisplayJurnalAdmin() {
@@ -1723,31 +1710,8 @@ function setupCustomDropdowns() {
     });
 }
 
-// ===================================================================
-// == PERUBAHAN UTAMA: Logika untuk menangani halaman tools terpisah ==
-// ===================================================================
-function setupToolsPage() {
-    // Cek di halaman tools mana kita berada, dan jalankan setup yang sesuai
-    if (window.location.pathname.includes('url-shortener.html')) {
-        setupUrlShortenerPage();
-    } else if (window.location.pathname.includes('media-converter.html')) {
-        setupMediaConverterPage();
-    } else if (window.location.pathname.includes('qr-code-generator.html')) {
-        attachQrCodeGeneratorListener();
-    } else if (window.location.pathname.includes('image-compressor.html')) {
-        attachImageCompressorListener();
-    } else if (window.location.pathname.includes('images-to-pdf.html')) {
-        attachImagesToPdfListener();
-    }
-    
-    // Fungsi ini tetap dipanggil karena ada di beberapa halaman tools
-    setupCustomFileInputs(); 
-    setupCustomDropdowns();
-}
-
 function setupUrlShortenerPage() {
     attachShortenerListener();
-    // Tampilkan riwayat hanya jika pengguna login
     if (localStorage.getItem('jwt_refresh_token')) {
         const historySection = document.getElementById('history-section');
         if (historySection) {
@@ -1759,6 +1723,9 @@ function setupUrlShortenerPage() {
 
 function setupMediaConverterPage() {
     attachConverterListener();
+    setupCustomFileInputs();
+    setupCustomDropdowns();
+    
     const fileInput = document.getElementById('file-input');
     const outputFormatSelect = document.getElementById('output-format');
 
@@ -1783,30 +1750,37 @@ function setupMediaConverterPage() {
             if (!fileInput.files || fileInput.files.length === 0) return;
             const fileName = fileInput.files[0].name.toLowerCase();
             const extension = fileName.split('.').pop();
-            
             const options = conversionOptions[extension] || conversionOptions['default'];
             
-            const selectElement = outputFormatSelect.querySelector('select') || outputFormatSelect;
-            selectElement.innerHTML = ''; // Hapus opsi lama
+            outputFormatSelect.innerHTML = '';
             options.forEach(opt => {
                 const optionElement = document.createElement('option');
                 optionElement.value = opt.value;
                 optionElement.textContent = opt.text;
-                selectElement.appendChild(optionElement);
+                outputFormatSelect.appendChild(optionElement);
             });
             
-            // Perbarui tampilan dropdown kustom setelah mengubah opsi
             setupCustomDropdowns();
         });
     }
 }
 
+function setupImageCompressorPage() {
+    attachImageCompressorListener();
+    setupCustomFileInputs();
+    setupCustomDropdowns();
+}
+
+function setupImagesToPdfPage() {
+    attachImagesToPdfListener();
+    setupCustomFileInputs();
+    setupCustomDropdowns();
+}
 
 function attachImagesToPdfListener() {
     const form = document.getElementById('images-to-pdf-form');
     if (!form) return;
-
-    // --- Mengambil semua elemen yang dibutuhkan ---
+    
     const toggleOptionsBtn = document.getElementById('toggle-pdf-options-btn');
     const backToPreviewsBtn = document.getElementById('back-to-previews-btn');
     const optionsOverlay = form.querySelector('.pdf-options-overlay');
@@ -1820,21 +1794,13 @@ function attachImagesToPdfListener() {
     
     let selectedFiles = [];
 
-    // --- Logika untuk membuka & menutup panel opsi di mobile ---
     const closeOptions = () => form.classList.remove('options-active');
     const openOptions = () => form.classList.add('options-active');
 
-    if(toggleOptionsBtn) {
-        toggleOptionsBtn.addEventListener('click', openOptions);
-    }
-    if(backToPreviewsBtn) {
-        backToPreviewsBtn.addEventListener('click', closeOptions);
-    }
-    if(optionsOverlay) {
-        optionsOverlay.addEventListener('click', closeOptions);
-    }
+    if(toggleOptionsBtn) toggleOptionsBtn.addEventListener('click', openOptions);
+    if(backToPreviewsBtn) backToPreviewsBtn.addEventListener('click', closeOptions);
+    if(optionsOverlay) optionsOverlay.addEventListener('click', closeOptions);
 
-    // --- Fungsi untuk memperbarui semua pratinjau saat opsi diubah ---
     const updateAllPreviewsLayout = () => {
         const orientation = form.querySelector('input[name="orientation"]:checked').value;
         const marginChoice = form.querySelector('input[name="margin"]:checked').value;
@@ -1853,32 +1819,22 @@ function attachImagesToPdfListener() {
     form.querySelectorAll('input[name="orientation"], input[name="margin"]').forEach(radio => radio.addEventListener('change', updateAllPreviewsLayout));
     if (pageSizeSelect) pageSizeSelect.addEventListener('change', updateAllPreviewsLayout);
 
-    // --- Fungsi untuk membuat & memperbarui daftar pratinjau gambar ---
     const updatePreviews = () => {
         previewsContainer.innerHTML = ''; 
-        if (selectedFiles.length > 0) {
-            fileUploadLabel.textContent = `${selectedFiles.length} gambar dipilih`;
-        } else {
-            fileUploadLabel.textContent = 'Belum ada gambar yang dipilih';
-        }
+        fileUploadLabel.textContent = selectedFiles.length > 0 ? `${selectedFiles.length} gambar dipilih` : 'Belum ada gambar yang dipilih';
     
         const currentOrientation = form.querySelector('input[name="orientation"]:checked').value;
         const currentMargin = form.querySelector('input[name="margin"]:checked').value;
         
-        let pageClasses = 'preview-page';
-        pageClasses += currentOrientation === 'portrait' ? ' portrait' : ' landscape';
-        if (currentMargin === 'small') {
-            pageClasses += ' margin-small';
-        } else if (currentMargin === 'big') {
-            pageClasses += ' margin-big';
-        }
+        let pageClasses = `preview-page ${currentOrientation}`;
+        if (currentMargin === 'small') pageClasses += ' margin-small';
+        else if (currentMargin === 'big') pageClasses += ' margin-big';
         
         selectedFiles.forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const previewCard = document.createElement('div');
                 previewCard.className = 'image-preview-card';
-                
                 previewCard.innerHTML = `
                     <div class="${pageClasses}">
                         <img src="${e.target.result}" alt="${file.name}">
@@ -1886,7 +1842,6 @@ function attachImagesToPdfListener() {
                     <button type="button" class="remove-btn" data-index="${index}" title="Hapus gambar">&times;</button>
                 `;
                 previewsContainer.appendChild(previewCard);
-    
                 previewCard.querySelector('.remove-btn').addEventListener('click', (event) => {
                     const idxToRemove = parseInt(event.target.dataset.index, 10);
                     selectedFiles.splice(idxToRemove, 1);
@@ -1902,7 +1857,6 @@ function attachImagesToPdfListener() {
         updatePreviews();
     });
     
-    // --- Logika saat form di-submit (menggunakan XHR) ---
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (selectedFiles.length === 0) {
@@ -1912,10 +1866,7 @@ function attachImagesToPdfListener() {
         }
     
         const formData = new FormData();
-        selectedFiles.forEach(file => {
-            formData.append('images', file);
-        });
-    
+        selectedFiles.forEach(file => formData.append('images', file));
         formData.append('pageSize', pageSizeSelect.value);
         formData.append('orientation', form.querySelector('input[name="orientation"]:checked').value);
         formData.append('marginChoice', form.querySelector('input[name="margin"]:checked').value);
@@ -1937,20 +1888,19 @@ function attachImagesToPdfListener() {
     
         xhr.onload = function() {
             progressBarContainer.classList.remove('indeterminate');
-    
             if (this.status === 200) {
                 messageDiv.className = 'success';
                 progressText.textContent = 'Konversi berhasil! Mengunduh file...';
-    
                 const header = this.getResponseHeader('Content-Disposition');
-                const parts = header.split(';');
                 let filename = 'converted.pdf';
-                parts.forEach(part => {
-                    if (part.trim().startsWith('filename=')) {
-                        filename = part.split('=')[1].replace(/"/g, '');
-                    }
-                });
-    
+                if(header) {
+                    const parts = header.split(';');
+                    parts.forEach(part => {
+                        if (part.trim().startsWith('filename=')) {
+                            filename = part.split('=')[1].replace(/"/g, '');
+                        }
+                    });
+                }
                 const url = window.URL.createObjectURL(this.response);
                 const a = document.createElement('a');
                 a.style.display = 'none';
@@ -1960,7 +1910,6 @@ function attachImagesToPdfListener() {
                 a.click();
                 window.URL.revokeObjectURL(url);
                 a.remove();
-    
                 selectedFiles = [];
                 updatePreviews();
                 form.reset();
@@ -1969,7 +1918,6 @@ function attachImagesToPdfListener() {
                 messageDiv.className = 'error';
                 messageDiv.textContent = 'Error: Gagal membuat PDF.';
             }
-    
             setTimeout(() => {
                 progressWrapper.classList.add('hidden');
                 messageDiv.textContent = '';
@@ -1984,16 +1932,14 @@ function attachImagesToPdfListener() {
             progressWrapper.classList.add('hidden');
             submitButton.disabled = false;
         };
-    
         xhr.send(formData);
     });
 }
 
-
 function attachShortenerListener() {
     const form = document.getElementById('shortener-form');
     if (!form) return;
-
+    
     const longUrlInput = document.getElementById('long-url');
     const customSlugInput = document.getElementById('custom-slug');
     const resultBox = document.getElementById('result');
@@ -2120,7 +2066,7 @@ function attachConverterListener() {
 function attachQrCodeGeneratorListener() {
     const form = document.getElementById('qr-generator-form');
     if (!form) return;
-
+    
     const qrText = document.getElementById('qr-text');
     const qrErrorLevel = document.getElementById('qr-error-level');
     const qrColorDark = document.getElementById('qr-color-dark');
@@ -2175,7 +2121,7 @@ function attachQrCodeGeneratorListener() {
 function attachImageCompressorListener() {
     const form = document.getElementById('image-compressor-form');
     if (!form) return;
-
+    
     const imageInput = document.getElementById('image-compress-input');
     const qualityInput = document.getElementById('compress-quality');
     const qualityValueSpan = document.getElementById('compress-quality-value');
@@ -2609,15 +2555,15 @@ function setupAuthCallbackPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const accessToken = urlParams.get('accessToken');
     const refreshToken = urlParams.get('refreshToken');
+    const indexPath = window.location.href.includes('github.io') ? '/hrportof/' : '/';
+    const authPath = window.location.href.includes('github.io') ? '/hrportof/auth.html?error=token-missing' : '/auth.html?error=token-missing';
+
 
     if (accessToken && refreshToken) {
         sessionStorage.setItem('jwt_access_token', accessToken);
         localStorage.setItem('jwt_refresh_token', refreshToken);
-
-        // Arahkan ke halaman utama setelah berhasil
-        window.location.href = 'index.html';
+        window.location.href = indexPath;
     } else {
-        // Jika gagal, arahkan kembali ke halaman login dengan pesan error
-        window.location.href = 'auth.html?error=token-missing';
+        window.location.href = authPath;
     }
 }
