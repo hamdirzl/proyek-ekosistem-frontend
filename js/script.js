@@ -1916,7 +1916,8 @@ function showToolSection(sectionIdToShow) {
     const allToolSections = [
         document.getElementById('shortener-wrapper'), document.getElementById('converter-wrapper'),
         document.getElementById('qr-generator-wrapper'),
-        document.getElementById('image-compressor-wrapper')
+        document.getElementById('image-compressor-wrapper'),
+        document.getElementById('images-to-pdf-wrapper')
     ];
     const historySection = document.getElementById('history-section');
 
