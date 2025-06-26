@@ -2183,13 +2183,14 @@ input:focus, textarea:focus, select:focus {
     }
 }
 
-/* BLOK PENGGANTI UNTUK TAMPILAN MOBILE */
+/* Untuk layar ponsel (lebar maks 768px) - KODE PERBAIKAN UTAMA DI SINI */
 @media (max-width: 768px) {
     .page-container {
         padding-left: var(--space-sm);
         padding-right: var(--space-sm);
     }
 
+    /* Mengurangi padding pada semua tool agar tidak sempit di mobile */
     .tool-section,
     .dashboard-container,
     .pdf-tool-options,
@@ -2197,64 +2198,27 @@ input:focus, textarea:focus, select:focus {
         padding: var(--space-md);
     }
 
+    /* * PERBAIKAN #1:
+     * Mengatur ulang grid pratinjau gambar.
+     * Menggunakan 'auto-fit' dan 'minmax' dengan nilai lebih kecil (120px)
+     * memastikan kolom dapat beradaptasi pada layar sempit.
+    */
     #image-previews-container {
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         gap: var(--space-md);
     }
     
-    /* --- PERBAIKAN UTAMA UNTUK OPSI PDF (SESUAI SARAN ANDA) --- */
-
-    /* 1. Ubah grup menjadi daftar vertikal yang rapi */
+    /* * PERBAIKAN #2:
+     * Mengatur ulang grup radio button agar rapi.
+     * Ini akan membuat pilihan seperti 'Portrait' & 'Landscape' atau 'No margin' & 'Small' 
+     * secara otomatis turun ke bawah jika tidak cukup ruang.
+    */
     .radio-card-group {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-md); /* Jarak antar setiap pilihan */
-        align-items: flex-start; /* Ratakan semua pilihan ke kiri */
-    }
-
-    /* 2. Hilangkan semua gaya 'kartu' pada setiap pilihan */
-    .radio-card {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        width: auto; /* Biarkan lebarnya sesuai konten */
-    }
-    .radio-card:hover {
-         background-color: transparent !important;
-    }
-
-    /* 3. Atur ulang konten di dalamnya (radio & teks) */
-    .radio-card-content {
-        flex-direction: row; /* Susun item di dalamnya secara horizontal */
-        align-items: center;
-        gap: 0.75rem; /* Jarak antara radio button dan teks */
-        padding: 0;
-    }
-
-    /* 4. Tampilkan radio button asli dari browser */
-    .radio-card input[type="radio"] {
-        display: inline-block; 
-        width: 1.2em;
-        height: 1.2em;
-        margin: 0;
-        -webkit-appearance: radio;
-        appearance: radio;
-    }
-
-    /* 5. Sembunyikan ikon-ikon SVG kustom yang memakan tempat */
-    .radio-card-content svg {
-        display: none;
-    }
-
-    /* 6. Beri tanda visual pada teks yang terpilih */
-    .radio-card input:checked + .radio-card-content span {
-        color: var(--accent-color);
-        font-weight: 600;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: var(--space-sm);
     }
 }
-
 /* Untuk layar ponsel yang sangat kecil (lebar maks 480px) */
 @media (max-width: 480px) {
     /* Tombol pilihan tool menjadi satu kolom penuh */
