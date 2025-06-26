@@ -2211,6 +2211,16 @@ input:focus, textarea:focus, select:focus {
     }
 }
 
+@media (max-width: 768px) {
+    /* [FIX] Gunakan Grid untuk Opsi agar tidak terpotong */
+    .radio-card-group {
+        display: grid;
+        /* Secara otomatis membuat kolom dengan lebar minimal 110px */
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+        gap: var(--space-sm);
+    }
+}
+
 /* Untuk layar ponsel yang sangat kecil (lebar maks 480px) */
 @media (max-width: 480px) {
     /* [TAMBAHAN] Tombol pilihan tool menjadi satu kolom penuh agar rapi */
