@@ -80,17 +80,13 @@
             <h1 class="page-title">Media Converter</h1>
             <p class="page-subtitle">Konversi berbagai format file media dengan mudah.</p>
             <form id="converter-form" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="file-input">Select File</label>
-                    <div class="custom-file-upload">
-                        <input type="file" id="file-input" name="file" required>
-                        <span class="file-upload-button">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                            Pilih File
-                        </span>
-                        <span class="file-upload-label">Tidak ada file yang dipilih</span>
-                    </div>
-                </div>
+                <div class="form-group" style="text-align: center;">
+    <label for="file-input" class="button-pintu file-select-button">
+        Pilih File
+    </label>
+    <input type="file" id="file-input" name="file" required class="hidden">
+    <p id="file-count-label" class="file-count-info"></p>
+</div>
                 <div class="form-group" style="margin-top: 1.5rem;">
                     <label for="output-format">Convert To:</label>
                     <div class="custom-select-wrapper">

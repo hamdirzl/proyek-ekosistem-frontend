@@ -1629,28 +1629,33 @@ function setupJurnalDetailPage() {
 }
 
 function setupCustomFileInputs() {
-    document.querySelectorAll('.custom-file-upload input[type="file"]').forEach(inputElement => {
-        const container = inputElement.closest('.custom-file-upload');
-        if (!container) return;
-        
-        const label = container.querySelector('.file-upload-label');
-        if (!label) return;
-        
-        const defaultLabelText = label.textContent;
-
-        inputElement.addEventListener('change', () => {
-            if (inputElement.files.length > 0) {
-                if (inputElement.files.length === 1) {
-                    label.textContent = inputElement.files[0].name;
-                } else {
-                    label.textContent = `${inputElement.files.length} file dipilih`;
-                }
+    // Media Converter
+    const converterInput = document.getElementById('file-input');
+    const converterLabel = document.getElementById('file-count-label');
+    if (converterInput && converterLabel) {
+        converterInput.addEventListener('change', () => {
+            if (converterInput.files.length > 0) {
+                converterLabel.textContent = `${converterInput.files[0].name} dipilih.`;
             } else {
-                label.textContent = defaultLabelText;
+                converterLabel.textContent = '';
             }
         });
-    });
+    }
+
+    // Image Compressor
+    const compressorInput = document.getElementById('image-compress-input');
+    const compressorLabel = document.getElementById('compress-file-count-label');
+    if (compressorInput && compressorLabel) {
+        compressorInput.addEventListener('change', () => {
+            if (compressorInput.files.length > 0) {
+                compressorLabel.textContent = `${compressorInput.files[0].name} dipilih.`;
+            } else {
+                compressorLabel.textContent = '';
+            }
+        });
+    }
 }
+
 
 function setupCustomDropdowns() {
     document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
@@ -1723,7 +1728,7 @@ function setupUrlShortenerPage() {
 
 function setupMediaConverterPage() {
     attachConverterListener();
-    setupCustomFileInputs();
+    setupCustomFileInputs(); // Cukup panggil ini
     setupCustomDropdowns();
     
     const fileInput = document.getElementById('file-input');
@@ -1760,6 +1765,7 @@ function setupMediaConverterPage() {
                 outputFormatSelect.appendChild(optionElement);
             });
             
+            // Re-initialize custom dropdown setelah opsi diubah
             setupCustomDropdowns();
         });
     }
@@ -1767,7 +1773,7 @@ function setupMediaConverterPage() {
 
 function setupImageCompressorPage() {
     attachImageCompressorListener();
-    setupCustomFileInputs();
+    setupCustomFileInputs(); // Cukup panggil ini
     setupCustomDropdowns();
 }
 

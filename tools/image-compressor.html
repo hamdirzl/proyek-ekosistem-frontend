@@ -80,14 +80,13 @@
             <h1 class="page-title">Image Compressor</h1>
             <p class="page-subtitle">Perkecil ukuran file gambar JPG atau PNG tanpa mengurangi kualitas secara signifikan.</p>
             <form id="image-compressor-form" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="image-compress-input">Select Image (JPG or PNG)</label>
-                    <div class="custom-file-upload">
-                        <input type="file" id="image-compress-input" name="image" required accept="image/jpeg, image/png">
-                        <span class="file-upload-button">Pilih Gambar</span>
-                        <span class="file-upload-label">Tidak ada gambar yang dipilih</span>
-                    </div>
-                </div>
+                <div class="form-group" style="text-align: center;">
+    <label for="image-compress-input" class="button-pintu file-select-button">
+        Pilih Gambar
+    </label>
+    <input type="file" id="image-compress-input" name="image" required accept="image/jpeg, image/png" class="hidden">
+    <p id="compress-file-count-label" class="file-count-info"></p>
+</div>
                 <div class="form-group">
                     <label for="compress-quality">Quality (0-100%)</label>
                     <input type="range" id="compress-quality" min="0" max="100" value="80">
