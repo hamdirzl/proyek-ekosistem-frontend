@@ -2221,6 +2221,35 @@ input:focus, textarea:focus, select:focus {
         gap: var(--space-md);
         width: 100%;
     }
+
+    /* 1. Paksa grup kartu menjadi 2 kolom yang rapi */
+.radio-card-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Selalu buat 2 kolom berdampingan */
+    gap: var(--space-sm);
+}
+
+/* 2. Atur ulang konten di dalam setiap kartu agar lebih ringkas */
+.radio-card-content {
+    flex-direction: column; /* Susun ikon di ATAS teks, bukan di samping */
+    gap: 6px;               /* Beri sedikit jarak antara ikon dan teks */
+    padding: var(--space-sm) var(--space-xs); /* Atur ulang padding (tinggi, lebar) */
+    text-align: center;
+    height: 100%; /* Pastikan semua kartu sama tinggi */
+    justify-content: center;
+}
+
+/* 3. Sedikit perkecil ukuran ikon di dalam kartu */
+.radio-card-content svg {
+    width: 28px;
+    height: 28px;
+    margin: 0 auto; /* Pastikan ikon berada di tengah */
+}
+
+/* 4. Sedikit perkecil ukuran teks di dalam kartu */
+.radio-card-content span {
+    font-size: 0.85rem;
+}
 }
 
 /* Untuk layar ponsel yang sangat kecil (lebar maks 480px) */
