@@ -2415,13 +2415,6 @@ input:focus, textarea:focus, select:focus {
         z-index: 1050;
     }
 
-    @media (min-width: 769px) {
-.back-button,
-.fab-container {
-display: none !important;
-}
-}
-
     .fab {
         width: 48px;
         height: 48px;
@@ -2452,4 +2445,27 @@ display: none !important;
     .options-header h3 { margin: 0; font-size: 1.2rem; }
     .back-btn { background: none; border: none; padding: 0; cursor: pointer; }
     .back-btn svg { color: var(--text-color); }
+}
+
+/* ===================================================== */
+/* == PERBAIKAN TAMPILAN DESKTOP PDF TOOL           == */
+/* ===================================================== */
+
+/* Aturan ini hanya berlaku untuk layar besar (desktop) */
+@media (min-width: 769px) {
+
+    /* Sembunyikan tombol roda gigi dan tombol kembali 
+      karena tidak digunakan di desktop.
+    */
+    #toggle-pdf-options-btn,
+    #back-to-previews-btn {
+        display: none !important;
+    }
+
+    /* Sembunyikan juga overlay gelap yang hanya untuk 
+      panel mobile.
+    */
+    .pdf-options-overlay {
+        display: none;
+    }
 }
