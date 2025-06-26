@@ -1783,7 +1783,6 @@ function attachImagesToPdfListener() {
     const form = document.getElementById('images-to-pdf-form');
     if (!form) return;
 
-    // [MODIFIKASI] Ambil elemen baru untuk slider
     const previewsContainer = document.getElementById('image-previews-container');
     const prevBtn = document.getElementById('prev-preview-btn');
     const nextBtn = document.getElementById('next-preview-btn');
@@ -1797,10 +1796,9 @@ function attachImagesToPdfListener() {
     const pageSizeSelect = document.getElementById('page-size');
 
     let selectedFiles = [];
-    let currentSlideIndex = 0; // [BARU] State untuk melacak posisi slider
+    let currentSlideIndex = 0;
 
     const updateAllPreviewsLayout = () => {
-        // ... (fungsi ini tidak berubah)
         const orientation = form.querySelector('input[name="orientation"]:checked').value;
         const marginChoice = form.querySelector('input[name="margin"]:checked').value;
         document.querySelectorAll('.preview-page').forEach(page => {
@@ -1814,9 +1812,9 @@ function attachImagesToPdfListener() {
     form.querySelectorAll('input[name="orientation"], input[name="margin"]').forEach(radio => radio.addEventListener('change', updateAllPreviewsLayout));
     if (pageSizeSelect) pageSizeSelect.addEventListener('change', updateAllPreviewsLayout);
     
-    // [BARU] Fungsi untuk mengatur visibilitas dan status tombol navigasi
+    // [MODIFIKASI] Logika update tombol sekarang lebih sederhana
     const updateNavButtons = () => {
-        if (selectedFiles.length <= 2) {
+        if (selectedFiles.length <= 2 || window.innerWidth <= 768) {
             prevBtn.classList.add('hidden');
             nextBtn.classList.add('hidden');
             return;
@@ -1826,15 +1824,21 @@ function attachImagesToPdfListener() {
         nextBtn.classList.remove('hidden');
 
         prevBtn.disabled = currentSlideIndex === 0;
-        // Tombol next dinonaktifkan jika 2 gambar terakhir sudah terlihat
         nextBtn.disabled = currentSlideIndex >= selectedFiles.length - 2;
     };
 
-    // [BARU] Fungsi untuk menggeser kontainer pratinjau
+    // [GANTI] Logika goToSlide menggunakan scrollLeft, bukan transform
     const goToSlide = (index) => {
-        // Lebar satu kartu adalah 50%
-        const slideWidthPercentage = 50; 
-        previewsContainer.style.transform = `translateX(-${index * slideWidthPercentage}%)`;
+        if (!previewsContainer.firstChild) return;
+
+        const firstCard = previewsContainer.querySelector('.image-preview-card');
+        const gapStyle = window.getComputedStyle(previewsContainer).getPropertyValue('gap');
+        const gap = parseFloat(gapStyle) || 24; // 24px adalah fallback dari var(--space-lg)
+
+        // Lebar scroll adalah lebar kartu ditambah gap
+        const slideWidth = firstCard.offsetWidth + gap;
+        
+        sliderContainer.scrollLeft = index * slideWidth;
         currentSlideIndex = index;
         updateNavButtons();
     };
@@ -1864,23 +1868,29 @@ function attachImagesToPdfListener() {
                 previewCard.querySelector('.remove-btn').addEventListener('click', (event) => {
                     const idxToRemove = parseInt(event.target.dataset.index, 10);
                     selectedFiles.splice(idxToRemove, 1);
-                    updatePreviews(); // Panggil lagi untuk render ulang
+                    updatePreviews();
                 });
+                
+                // [MODIFIKASI] Setelah gambar terakhir dimuat, perbarui posisi slider
+                if (index === selectedFiles.length - 1) {
+                    goToSlide(0); 
+                }
             };
             reader.readAsDataURL(file);
         });
 
-        // [MODIFIKASI] Reset dan perbarui slider setiap kali pratinjau diubah
-        goToSlide(0); 
+        // Jika tidak ada file, tetap update tombol
+        if (selectedFiles.length === 0) {
+            goToSlide(0);
+        }
     };
 
     imageInput.addEventListener('change', () => {
         selectedFiles.push(...Array.from(imageInput.files));
-        imageInput.value = ''; // Reset input agar bisa memilih file yang sama lagi
+        imageInput.value = '';
         updatePreviews();
     });
 
-    // [BARU] Event listener untuk tombol navigasi slider
     nextBtn.addEventListener('click', () => {
         if (currentSlideIndex < selectedFiles.length - 2) {
             goToSlide(currentSlideIndex + 1);
@@ -1893,8 +1903,8 @@ function attachImagesToPdfListener() {
         }
     });
 
+    // Event listener untuk submit form tidak berubah
     form.addEventListener('submit', async (event) => {
-        // ... (Logika submit form tidak berubah)
         event.preventDefault();
         if (selectedFiles.length === 0) {
             messageDiv.className = 'error';
@@ -1972,7 +1982,7 @@ function attachImagesToPdfListener() {
         xhr.send(formData);
     });
     
-    // Sembunyikan panel opsi di mobile secara default
+    // Logika untuk panel mobile tidak berubah
     const optionsPanel = form.querySelector('.pdf-tool-options');
     const fabButton = document.getElementById('toggle-pdf-options-btn');
     const backButton = document.getElementById('back-to-previews-btn');
