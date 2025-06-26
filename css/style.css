@@ -792,6 +792,34 @@ input:focus, textarea:focus, select:focus {
 }
 .tool-selector-button { min-width: 180px; padding: 1rem 1.5rem; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
 
+/* === [BARU] Tata Letak Opsi PDF untuk Desktop === */
+
+/* Mengatur grup pilihan "Page Orientation" menjadi 2 kolom */
+.pdf-tool-options .form-group:has(input[name="orientation"]) .radio-card-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+}
+
+/* Mengatur grup pilihan "Margin" menjadi 3 kolom */
+.pdf-tool-options .form-group:has(input[name="margin"]) .radio-card-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-sm);
+}
+
+/* Memastikan konten di dalam kartu pilihan tetap rapi */
+.radio-card-content {
+    display: flex;
+    /* Ubah dari column ke row untuk desktop */
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start; /* Rata kiri */
+    text-align: left;
+    gap: 12px;
+    padding: var(--space-sm);
+}
+
 /* === QR CODE GENERATOR LAYOUT & SYMMETRY === */
 #qr-generator-wrapper .tool-section {
     max-width: 600px;
@@ -2095,7 +2123,8 @@ input:focus, textarea:focus, select:focus {
 /* [BARU] GAYA UNTUK TATA LETAK 2 KOLOM PDF TOOL */
 .pdf-tool-layout {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* Kolom kiri lebih besar */
+    /* Kolom kiri (preview) 1.5 bagian, kolom kanan (opsi) 2 bagian */
+    grid-template-columns: 1.5fr 2fr;
     gap: var(--space-lg);
     align-items: flex-start;
 }
@@ -2105,7 +2134,7 @@ input:focus, textarea:focus, select:focus {
     border: 1px dashed var(--border-color);
     border-radius: 12px;
     padding: var(--space-md);
-    min-height: 450px; /* Beri tinggi minimal */
+    min-height: 420px; /* Beri tinggi minimal */
 }
 
 .pdf-tool-options {
