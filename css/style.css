@@ -2414,6 +2414,14 @@ input:focus, textarea:focus, select:focus {
         right: var(--space-md);
         z-index: 1050;
     }
+
+    @media (min-width: 769px) {
+.back-button,
+.fab-container {
+display: none !important;
+}
+}
+
     .fab {
         width: 48px;
         height: 48px;
