@@ -1791,6 +1791,7 @@ function setupToolsPage() {
     setupCustomDropdowns();
 }
 
+// PASTE KODE BARU INI SEBAGAI PENGGANTI
 function attachImagesToPdfListener() {
     const form = document.getElementById('images-to-pdf-form');
     if (!form) return;
@@ -1801,29 +1802,17 @@ function attachImagesToPdfListener() {
     const messageDiv = document.getElementById('images-to-pdf-message');
     const progressWrapper = document.getElementById('images-to-pdf-progress-wrapper');
     const submitButton = form.querySelector('button[type="submit"]');
-
-    // Ambil elemen-elemen untuk opsi
-    const orientationRadios = form.querySelectorAll('input[name="orientation"]');
     const pageSizeSelect = document.getElementById('page-size');
-    const marginRadios = form.querySelectorAll('input[name="margin"]');
 
     let selectedFiles = [];
 
-    // [BARU] Fungsi untuk memperbarui layout semua pratinjau
     const updateAllPreviewsLayout = () => {
         const orientation = form.querySelector('input[name="orientation"]:checked').value;
-        const pageSize = pageSizeSelect.value;
         const marginChoice = form.querySelector('input[name="margin"]:checked').value;
-        
+
         document.querySelectorAll('.preview-page').forEach(page => {
-            // Hapus kelas lama
             page.classList.remove('portrait', 'landscape', 'margin-small', 'margin-big');
-            // Tambah kelas orientasi
             page.classList.add(orientation);
-            // Tambah kelas ukuran halaman (opsional, jika Anda menambah ukuran lain)
-            // page.classList.add(`size-${pageSize}`); 
-            
-            // Tambah kelas margin
             if (marginChoice === 'small') {
                 page.classList.add('margin-small');
             } else if (marginChoice === 'big') {
@@ -1832,67 +1821,57 @@ function attachImagesToPdfListener() {
         });
     };
 
-    // [MODIFIKASI] Event listener untuk opsi layout
-    orientationRadios.forEach(radio => radio.addEventListener('change', updateAllPreviewsLayout));
-    pageSizeSelect.addEventListener('change', updateAllPreviewsLayout);
-    marginRadios.forEach(radio => radio.addEventListener('change', updateAllPreviewsLayout));
+    form.querySelectorAll('input[name="orientation"], input[name="margin"]').forEach(radio => radio.addEventListener('change', updateAllPreviewsLayout));
+    if (pageSizeSelect) pageSizeSelect.addEventListener('change', updateAllPreviewsLayout);
 
-    // MENJADI SEPERTI INI
-const updatePreviews = () => {
-    previewsContainer.innerHTML = ''; // Hapus semua pratinjau yang ada
-    if (selectedFiles.length > 0) {
-        fileUploadLabel.textContent = `${selectedFiles.length} gambar dipilih`;
-    } else {
-        fileUploadLabel.textContent = 'Belum ada gambar yang dipilih';
-    }
+    const updatePreviews = () => {
+        previewsContainer.innerHTML = ''; 
+        if (selectedFiles.length > 0) {
+            fileUploadLabel.textContent = `${selectedFiles.length} gambar dipilih`;
+        } else {
+            fileUploadLabel.textContent = 'Belum ada gambar yang dipilih';
+        }
 
-    // [BARU] Ambil pengaturan default saat ini SEBELUM membuat pratinjau
-    const currentOrientation = form.querySelector('input[name="orientation"]:checked').value;
-    const currentMargin = form.querySelector('input[name="margin"]:checked').value;
-    
-    // [BARU] Tentukan kelas CSS berdasarkan pengaturan
-    let pageClasses = 'preview-page';
-    pageClasses += currentOrientation === 'portrait' ? ' portrait' : ' landscape';
-    if (currentMargin === 'small') {
-        pageClasses += ' margin-small';
-    } else if (currentMargin === 'big') {
-        pageClasses += ' margin-big';
-    }
-    
-    selectedFiles.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const previewCard = document.createElement('div');
-            previewCard.className = 'image-preview-card';
-            
-            // [MODIFIKASI] Langsung terapkan kelas yang sudah ditentukan
-            previewCard.innerHTML = `
-                <div class="${pageClasses}">
-                    <img src="${e.target.result}" alt="${file.name}">
-                </div>
-                <button type="button" class="remove-btn" data-index="${index}" title="Hapus gambar">&times;</button>
-            `;
-            previewsContainer.appendChild(previewCard);
+        const currentOrientation = form.querySelector('input[name="orientation"]:checked').value;
+        const currentMargin = form.querySelector('input[name="margin"]:checked').value;
 
-            previewCard.querySelector('.remove-btn').addEventListener('click', (event) => {
-                const idxToRemove = parseInt(event.target.dataset.index, 10);
-                selectedFiles.splice(idxToRemove, 1);
-                updatePreviews(); // Panggil lagi untuk render ulang
-            });
-        };
-        reader.readAsDataURL(file);
-    });
-    
-    // [DIHAPUS] Panggilan ke setTimeout tidak diperlukan lagi untuk render awal
-    // setTimeout(updateAllPreviewsLayout, 0); // Hapus atau beri komentar pada baris ini
-};
+        let pageClasses = 'preview-page';
+        pageClasses += currentOrientation === 'portrait' ? ' portrait' : ' landscape';
+        if (currentMargin === 'small') {
+            pageClasses += ' margin-small';
+        } else if (currentMargin === 'big') {
+            pageClasses += ' margin-big';
+        }
+
+        selectedFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const previewCard = document.createElement('div');
+                previewCard.className = 'image-preview-card';
+
+                previewCard.innerHTML = `
+                    <div class="${pageClasses}">
+                        <img src="${e.target.result}" alt="${file.name}">
+                    </div>
+                    <button type="button" class="remove-btn" data-index="${index}" title="Hapus gambar">&times;</button>
+                `;
+                previewsContainer.appendChild(previewCard);
+
+                previewCard.querySelector('.remove-btn').addEventListener('click', (event) => {
+                    const idxToRemove = parseInt(event.target.dataset.index, 10);
+                    selectedFiles.splice(idxToRemove, 1);
+                    updatePreviews();
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+    };
 
     imageInput.addEventListener('change', () => {
         selectedFiles.push(...Array.from(imageInput.files));
         updatePreviews();
     });
-    
-    // Logika form submit (TIDAK BERUBAH)
+
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (selectedFiles.length === 0) {
@@ -1911,56 +1890,71 @@ const updatePreviews = () => {
         formData.append('marginChoice', form.querySelector('input[name="margin"]:checked').value);
 
         submitButton.disabled = true;
-        messageDiv.textContent = 'Mengonversi gambar ke PDF...';
+        messageDiv.textContent = '';
         messageDiv.className = '';
         progressWrapper.classList.remove('hidden');
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/images-to-pdf`, {
-                method: 'POST',
-                body: formData,
-            });
+        const progressBarContainer = progressWrapper.querySelector('.progress-bar');
+        const progressText = progressWrapper.querySelector('.progress-bar-text');
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `Terjadi kesalahan di server (Status: ${response.status})`);
+        progressBarContainer.classList.add('indeterminate');
+        progressText.textContent = 'Mengonversi gambar ke PDF, harap tunggu...';
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${API_BASE_URL}/api/images-to-pdf`, true);
+        xhr.responseType = 'blob';
+
+        xhr.onload = function() {
+            progressBarContainer.classList.remove('indeterminate');
+
+            if (this.status === 200) {
+                messageDiv.className = 'success';
+                progressText.textContent = 'Konversi berhasil! Mengunduh file...';
+
+                const header = this.getResponseHeader('Content-Disposition');
+                const parts = header.split(';');
+                let filename = 'converted.pdf';
+                parts.forEach(part => {
+                    if (part.trim().startsWith('filename=')) {
+                        filename = part.split('=')[1].replace(/"/g, '');
+                    }
+                });
+
+                const url = window.URL.createObjectURL(this.response);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+
+                selectedFiles = [];
+                updatePreviews();
+                form.reset();
+                updateAllPreviewsLayout();
+            } else {
+                messageDiv.className = 'error';
+                messageDiv.textContent = 'Error: Gagal membuat PDF.';
             }
 
-            messageDiv.className = 'success';
-            messageDiv.textContent = 'Konversi berhasil! Mengunduh file...';
-
-            const blob = await response.blob();
-            const header = response.headers.get('Content-Disposition');
-            const parts = header.split(';');
-            let filename = 'converted.pdf';
-            parts.forEach(part => {
-                if (part.trim().startsWith('filename=')) {
-                    filename = part.split('=')[1].replace(/"/g, '');
-                }
-            });
-
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            a.remove();
-
-            selectedFiles = [];
-            updatePreviews();
-            form.reset();
-            updateAllPreviewsLayout();
-
-        } catch (error) {
-            messageDiv.className = 'error';
-            messageDiv.textContent = `Error: ${error.message}`;
-        } finally {
+            setTimeout(() => {
+                progressWrapper.classList.add('hidden');
+                messageDiv.textContent = '';
+            }, 4000);
             submitButton.disabled = false;
+        };
+
+        xhr.onerror = function() {
+            progressBarContainer.classList.remove('indeterminate');
+            messageDiv.className = 'error';
+            messageDiv.textContent = 'Error: Terjadi kesalahan jaringan.';
             progressWrapper.classList.add('hidden');
-        }
+            submitButton.disabled = false;
+        };
+
+        xhr.send(formData);
     });
 }
 
