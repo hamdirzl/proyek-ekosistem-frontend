@@ -1929,15 +1929,26 @@ function attachImageToPdfListener() {
     }
     
     function onSelectAndStartMove(e) {
-        if (e.target.classList.contains('resize-handle')) return;
+        // Mencegah tindakan default browser, seperti memulai drag-and-drop gambar
+        e.preventDefault();
         
         const element = e.currentTarget;
-        selectedImageInstanceId = element.dataset.instanceId;
-        renderUI(); 
+        const instanceId = element.dataset.instanceId;
 
+        // Jika gambar yang diklik BELUM terpilih, maka kita hanya akan memilihnya
+        // dan menggambar ulang UI untuk menampilkan handle resize.
+        // Kita tidak akan memulai proses drag di sini.
+        if (selectedImageInstanceId !== instanceId) {
+            selectedImageInstanceId = instanceId;
+            renderUI(); // Gambar ulang UI untuk menampilkan status 'selected'
+            return; // Hentikan fungsi di sini, aksi selesai.
+        }
+
+        // Jika gambar yang diklik SUDAH terpilih, barulah kita jalankan logika untuk menggeser.
+        // Jangan panggil renderUI() di sini agar elemen tidak hancur saat digeser.
         const pageIndex = parseInt(element.closest('.editor-page').dataset.pageIndex, 10);
         const imgInstance = documentPages[pageIndex].images.find(i => i.instanceId === selectedImageInstanceId);
-        
+
         let initialX = e.clientX;
         let initialY = e.clientY;
         let startX = imgInstance.x;
@@ -1946,70 +1957,27 @@ function attachImageToPdfListener() {
         function onMouseMove(moveEvent) {
             const dx = moveEvent.clientX - initialX;
             const dy = moveEvent.clientY - initialY;
+            
+            // Perbarui posisi elemen secara visual saat digeser
             element.style.left = `${startX + dx}px`;
             element.style.top = `${startY + dy}px`;
         }
+
         function onMouseUp() {
+            // Setelah selesai digeser, baru update data posisi di dalam state kita
             const finalLeft = parseFloat(element.style.left);
             const finalTop = parseFloat(element.style.top);
             imgInstance.x = finalLeft;
             imgInstance.y = finalTop;
 
+            // Hapus event listener dari document
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
         }
+
+        // Tambahkan event listener ke document untuk menangani pergerakan mouse
         document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-    }
-    
-    function onStartResize(e) {
-        e.stopPropagation(); 
-        const element = e.currentTarget.closest('.placed-image');
-        const handle = e.currentTarget;
-
-        const pageIndex = parseInt(element.closest('.editor-page').dataset.pageIndex, 10);
-        const imgInstance = documentPages[pageIndex].images.find(i => i.instanceId === element.dataset.instanceId);
-
-        let initialX = e.clientX;
-        let initialY = e.clientY;
-        let startW = imgInstance.width;
-        let startH = imgInstance.height;
-        let startLeft = imgInstance.x;
-        let startTop = imgInstance.y;
-
-        function onMouseMoveResize(moveEvent) {
-            const dx = moveEvent.clientX - initialX;
-            const dy = moveEvent.clientY - initialY;
-
-            if (handle.classList.contains('se')) {
-                element.style.width = `${startW + dx}px`;
-                element.style.height = `${startH + dy}px`;
-            } else if (handle.classList.contains('sw')) {
-                element.style.width = `${startW - dx}px`;
-                element.style.height = `${startH + dy}px`;
-                element.style.left = `${startLeft + dx}px`;
-            } else if (handle.classList.contains('ne')) {
-                element.style.width = `${startW + dx}px`;
-                element.style.height = `${startH - dy}px`;
-                element.style.top = `${startTop + dy}px`;
-            } else if (handle.classList.contains('nw')) {
-                element.style.width = `${startW - dx}px`;
-                element.style.height = `${startH - dy}px`;
-                element.style.left = `${startLeft + dx}px`;
-                element.style.top = `${startTop + dy}px`;
-            }
-        }
-        function onMouseUpResize() {
-            imgInstance.width = parseFloat(element.style.width);
-            imgInstance.height = parseFloat(element.style.height);
-            imgInstance.x = parseFloat(element.style.left);
-            imgInstance.y = parseFloat(element.style.top);
-            
-            document.removeEventListener('mousemove', onMouseMoveResize);
-            document.removeEventListener('mouseup', onMouseUpResize);
-        }
-        document.addEventListener('mousemove', onMouseMoveResize);
-        document.addEventListener('mouseup', onMouseUpResize);
+        document.addEventListener('mouseup', onMouseUp, { once: true }); // 'once: true' akan otomatis menghapus listener setelah selesai
     }
 
     function onDeletePlacedImage(e) {
