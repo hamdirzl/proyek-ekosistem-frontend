@@ -2044,6 +2044,7 @@ function attachShortenerListener() {
     }
 }
 
+// MENJADI SEPERTI INI
 function attachConverterListener() {
     const form = document.getElementById('converter-form');
     if (!form) return;
@@ -2054,20 +2055,25 @@ function attachConverterListener() {
         const submitButton = form.querySelector('button');
         const messageDiv = document.getElementById('converter-message');
         const progressWrapper = document.getElementById('converter-progress-wrapper');
-        const progressBar = document.getElementById('converter-progress-bar');
+        // [MODIFIKASI] Kita targetkan kontainer progress bar, bukan hanya bagian dalamnya
+        const progressBarContainer = document.getElementById('converter-progress-wrapper').querySelector('.progress-bar');
         const progressText = progressWrapper.querySelector('.progress-bar-text');
 
         messageDiv.textContent = '';
         messageDiv.className = '';
         progressWrapper.classList.remove('hidden');
-        progressBar.style.width = '0%';
-        progressText.textContent = 'Uploading: 0%';
         submitButton.disabled = true;
+
+        // [BARU] Mengaktifkan animasi indeterminate
+        progressBarContainer.classList.add('indeterminate');
+        progressText.textContent = 'Uploading file, please wait...';
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', `${API_BASE_URL}/api/convert`, true);
         xhr.responseType = 'blob';
 
+        // [DIHAPUS] Event listener untuk progress akurat tidak lagi diperlukan
+        /*
         xhr.upload.addEventListener('progress', (e) => {
             if (e.lengthComputable) {
                 const percentComplete = Math.round((e.loaded / e.total) * 100);
@@ -2075,8 +2081,12 @@ function attachConverterListener() {
                 progressText.textContent = `Uploading: ${percentComplete}%`;
             }
         });
+        */
 
         xhr.onload = function () {
+            // [BARU] Matikan animasi setelah selesai
+            progressBarContainer.classList.remove('indeterminate');
+
             if (this.status === 200) {
                 progressText.textContent = 'Konversi berhasil! File sedang diunduh.';
                 const contentDisposition = xhr.getResponseHeader('content-disposition');
@@ -2108,11 +2118,13 @@ function attachConverterListener() {
                 }
             }
 
-            setTimeout(() => progressWrapper.classList.add('hidden'), 2000);
+            setTimeout(() => progressWrapper.classList.add('hidden'), 3000);
             submitButton.disabled = false;
         };
 
         xhr.onerror = function () {
+            // [BARU] Matikan animasi jika terjadi error
+            progressBarContainer.classList.remove('indeterminate');
             messageDiv.textContent = 'Error: Terjadi kesalahan jaringan.';
             messageDiv.className = 'error';
             progressWrapper.classList.add('hidden');
@@ -2122,7 +2134,6 @@ function attachConverterListener() {
         xhr.send(formData);
     });
 }
-
 function attachQrCodeGeneratorListener() {
     const form = document.getElementById('qr-generator-form');
     if (!form) return;

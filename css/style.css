@@ -2310,3 +2310,30 @@ input:focus, textarea:focus, select:focus {
         gap: var(--space-sm);
     }
 }
+
+/* === [BARU] GAYA UNTUK PROGRESS BAR INDETERMINATE === */
+.progress-bar.indeterminate > .progress-bar-inner {
+    /* Gunakan seluruh lebar untuk animasi */
+    width: 100% !important; 
+    
+    /* Efek garis-garis (barber pole) */
+    background-image: linear-gradient(
+        45deg, 
+        rgba(255,255,255,.15) 25%, 
+        transparent 25%, 
+        transparent 50%, 
+        rgba(255,255,255,.15) 50%, 
+        rgba(255,255,255,.15) 75%, 
+        transparent 75%, 
+        transparent
+    );
+    background-size: 40px 40px;
+    
+    /* Animasi pergerakan garis-garis */
+    animation: progress-bar-stripes 1s linear infinite;
+}
+
+@keyframes progress-bar-stripes {
+  from { background-position: 40px 0; }
+  to { background-position: 0 0; }
+}
