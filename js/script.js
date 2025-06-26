@@ -1725,7 +1725,7 @@ function setupCustomDropdowns() {
 function setupToolsPage() {
     const wrappers = [
         document.getElementById('shortener-wrapper'), document.getElementById('history-section'),
-        document.getElementById('converter-wrapper'), document.getElementById('image-merger-wrapper'),
+        document.getElementById('converter-wrapper'),
         document.getElementById('qr-generator-wrapper'), document.getElementById('image-compressor-wrapper')
     ];
     const toolSelectionSection = document.querySelector('.tool-selection');
@@ -1736,13 +1736,11 @@ function setupToolsPage() {
 
     document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper'));
     document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper'));
-    document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper'));
     document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper'));
     document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper'));
 
     attachShortenerListener();
     attachConverterListener();
-    attachImageMergerListener();
     attachQrCodeGeneratorListener();
     attachImageCompressorListener();
 
@@ -1792,7 +1790,7 @@ function setupToolsPage() {
 function showToolSection(sectionIdToShow) {
     const allToolSections = [
         document.getElementById('shortener-wrapper'), document.getElementById('converter-wrapper'),
-        document.getElementById('image-merger-wrapper'), document.getElementById('qr-generator-wrapper'),
+        document.getElementById('qr-generator-wrapper'),
         document.getElementById('image-compressor-wrapper')
     ];
     const historySection = document.getElementById('history-section');
@@ -1946,214 +1944,6 @@ function attachConverterListener() {
         xhr.send(formData);
     });
 }
-
-// GANTI SELURUH FUNGSI attachImageMergerListener DENGAN YANG INI
-function attachImageMergerListener() {
-    const wrapper = document.getElementById('image-merger-wrapper');
-    if (!wrapper) return;
-
-    // Pastikan Fabric.js sudah dimuat sebelum menginisialisasi
-    const initializeImageMerger = () => {
-        const fileInput = document.getElementById('image-files-input');
-        const pageEditorContainer = document.getElementById('page-editor-container');
-        const pageCanvasArea = document.getElementById('page-canvas-area');
-        const addPageBtn = document.getElementById('add-page-btn');
-        const generatePdfBtn = document.getElementById('generate-pdf-btn');
-        const messageDiv = document.getElementById('image-merger-message');
-
-        let pageCanvases = [];
-
-        /**
-         * FUNGSI addPage YANG SUDAH DIMODIFIKASI
-         * Sekarang bisa menerima objek gambar dari Fabric.js sebagai argumen.
-         * Jika tidak ada gambar, ia akan membuat halaman kosong.
-         */
-        const addPage = (imageObject = null) => {
-            const pageIndex = pageCanvases.length;
-            const pageId = `page-canvas-${pageIndex}`;
-
-            const pageWrapper = document.createElement('div');
-            pageWrapper.className = 'editor-page-wrapper';
-            pageWrapper.id = `page-wrapper-${pageIndex}`;
-
-            const canvasElement = document.createElement('canvas');
-            canvasElement.id = pageId;
-            canvasElement.width = 595;  // Ukuran A4 dalam piksel (lebar)
-            canvasElement.height = 842; // Ukuran A4 dalam piksel (tinggi)
-            canvasElement.className = 'editor-page';
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.innerHTML = '&times;';
-            deleteBtn.className = 'delete-page-btn';
-            deleteBtn.title = 'Hapus halaman ini';
-            deleteBtn.type = 'button'; // Pastikan tidak submit form
-            deleteBtn.onclick = () => {
-                if (pageCanvases.filter(c => c !== null).length <= 1) {
-                    alert("Tidak bisa menghapus satu-satunya halaman.");
-                    return;
-                }
-                document.getElementById(`page-wrapper-${pageIndex}`).remove();
-                pageCanvases[pageIndex] = null; // Tandai kanvas sebagai null
-            };
-
-            pageWrapper.appendChild(canvasElement);
-            pageWrapper.appendChild(deleteBtn);
-            pageCanvasArea.appendChild(pageWrapper);
-            
-            const fabricCanvas = new fabric.Canvas(canvasElement, {
-                backgroundColor: '#ffffff'
-            });
-
-             if (imageObject) {
-                // Skalakan gambar terlebih dahulu
-                imageObject.scaleToWidth(fabricCanvas.width * 0.9);
-                
-                // Tambahkan gambar ke kanvas
-                fabricCanvas.add(imageObject);
-
-                // Pusatkan objek di kanvas
-                fabricCanvas.centerObject(imageObject);
-                
-                // KUNCI PERBAIKAN: Memaksa Fabric untuk menghitung ulang posisinya
-                fabricCanvas.calcOffset();
-
-                // Lakukan rendering final
-                fabricCanvas.renderAll();
-            }
-            
-            pageCanvases.push(fabricCanvas);
-            pageWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        };
-
-        // Event listener untuk tombol 'Tambah Halaman' (membuat halaman kosong)
-        addPageBtn.addEventListener('click', () => addPage(null));
-
-        // Event listener untuk input file gambar
-        fileInput.addEventListener('change', (event) => {
-            const files = event.target.files;
-            if (files.length === 0) return;
-
-            pageEditorContainer.classList.remove('hidden');
-            generatePdfBtn.classList.remove('hidden');
-            messageDiv.textContent = `Memproses ${files.length} gambar...`;
-            messageDiv.className = '';
-
-            // Cek apakah semua kanvas kosong, jika ya, reset.
-            const allCanvasesAreEmpty = pageCanvases.every(c => c === null || c.getObjects().length === 0);
-            if (allCanvasesAreEmpty) {
-                pageCanvasArea.innerHTML = '';
-                pageCanvases = [];
-            }
-
-            // Proses setiap file
-            Array.from(files).forEach((file, index) => {
-                const reader = new FileReader();
-
-                reader.onload = (f) => {
-                    const dataURL = f.target.result;
-
-                    // Buat objek gambar Fabric DULU
-                    fabric.Image.fromURL(dataURL, (img, isError) => {
-                        if (isError) {
-                            messageDiv.textContent = `Error: Gagal memuat file '${file.name}'.`;
-                            messageDiv.className = 'error';
-                            return;
-                        }
-                        
-                        // BARU: Panggil addPage SETELAH gambar berhasil dibuat, dan kirim objek gambar
-                        addPage(img);
-                        
-                        // Update status setelah gambar terakhir diproses
-                        if (index === files.length - 1) {
-                            messageDiv.textContent = `${files.length} gambar berhasil ditambahkan. Atur tata letak jika perlu.`;
-                            messageDiv.className = 'success';
-                        }
-
-                    }, { crossOrigin: 'anonymous' });
-                };
-                
-                reader.onerror = () => {
-                     messageDiv.textContent = `Error: Gagal membaca file '${file.name}'.`;
-                     messageDiv.className = 'error';
-                };
-
-                reader.readAsDataURL(file);
-            });
-            // Reset input file agar bisa memilih file yang sama lagi
-            fileInput.value = '';
-        });
-
-        // Event listener untuk tombol 'Generate PDF'
-        generatePdfBtn.addEventListener('click', async () => {
-            const activeCanvases = pageCanvases.filter(canvas => canvas !== null);
-            if (activeCanvases.length === 0) {
-                alert("Tidak ada halaman untuk dijadikan PDF.");
-                return;
-            }
-
-            messageDiv.textContent = 'Mempersiapkan halaman...';
-            messageDiv.className = '';
-            generatePdfBtn.disabled = true;
-
-            try {
-                const imageDataUrls = [];
-                for (const canvas of activeCanvases) {
-                    const dataUrl = canvas.toDataURL({
-                        format: 'jpeg',
-                        quality: 0.85 // Kualitas kompresi JPEG
-                    });
-                    imageDataUrls.push(dataUrl);
-                }
-                
-                messageDiv.textContent = `Mengirim ${imageDataUrls.length} halaman ke server...`;
-
-                const response = await fetch(`${API_BASE_URL}/api/generate-pdf-from-canvas`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ imageDataUrls })
-                });
-
-                if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.error || 'Gagal membuat PDF di server.');
-                }
-
-                messageDiv.textContent = 'Berhasil! PDF sedang diunduh.';
-                messageDiv.className = 'success';
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `hamdirizal_merged_pdf_${Date.now()}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-
-            } catch (error) {
-                messageDiv.textContent = `Error: ${error.message}`;
-                messageDiv.className = 'error';
-            } finally {
-                generatePdfBtn.disabled = false;
-            }
-        });
-    }
-
-    // Pengecekan untuk memastikan Fabric.js sudah dimuat
-    const checkFabric = () => {
-        if (typeof fabric !== 'undefined') {
-            console.log('Fabric.js is ready. Initializing Image to PDF tool.');
-            initializeImageMerger();
-        } else {
-            console.log('Waiting for Fabric.js to load...');
-            setTimeout(checkFabric, 100);
-        }
-    };
-
-    checkFabric();
-}
-
 
 function attachQrCodeGeneratorListener() {
     const form = document.getElementById('qr-generator-form');
