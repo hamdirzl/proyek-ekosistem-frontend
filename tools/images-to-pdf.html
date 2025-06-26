@@ -83,16 +83,14 @@
             <form id="images-to-pdf-form" class="pdf-tool-layout">
 
                 <div class="pdf-tool-previews">
-                    <div class="form-group">
-                        <div class="custom-file-upload">
-                            <input type="file" id="images-to-pdf-input" name="images" multiple accept="image/jpeg, image/png">
-                            <span class="file-upload-button">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.19 16.62a1 1 0 0 1-1.13 1.38l-4.34-1.38a1 1 0 0 1-.6-1.56l1.39-2.78a1 1 0 0 1 1.56-.6l4.34 1.38a1 1 0 0 1 .78 2.56z"></path><path d="M11.62 1.19a1 1 0 0 1 1.38 1.13l-1.38 4.34a1 1 0 0 1-1.56-.6l-1.38-2.78a1 1 0 0 1 .6-1.56z"></path><path d="M10 10.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"></path><path d="m4.93 5.93 2.12 2.12"></path><path d="M14.83 1.17 17 3.34"></path><path d="m4.93 18.07 2.12-2.12"></path><path d="m14.83 22.83 2.12-2.12"></path><circle cx="12" cy="12" r="10"></circle></svg>
-                                Pilih Gambar
-                            </span>
-                            <span class="file-upload-label">Belum ada gambar yang dipilih</span>
-                        </div>
-                    </div>
+                    <div class="form-group" style="text-align: center;">
+    <label for="images-to-pdf-input" class="button-pintu file-select-button">
+        Pilih Gambar
+    </label>
+    <input type="file" id="images-to-pdf-input" name="images" multiple accept="image/jpeg, image/png" class="hidden">
+    
+    <p id="file-count-label" class="file-count-info"></p>
+</div>
                     
                     <div class="preview-slider-wrapper">
                         <button type="button" id="prev-preview-btn" class="slider-nav-btn hidden">&lt;</button>

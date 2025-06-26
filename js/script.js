@@ -1777,8 +1777,6 @@ function setupImagesToPdfPage() {
     setupCustomDropdowns();
 }
 
-// js/script.js
-
 function attachImagesToPdfListener() {
     const form = document.getElementById('images-to-pdf-form');
     if (!form) return;
@@ -1787,10 +1785,10 @@ function attachImagesToPdfListener() {
     const prevBtn = document.getElementById('prev-preview-btn');
     const nextBtn = document.getElementById('next-preview-btn');
     const sliderContainer = document.querySelector('.preview-slider-container');
-    const fabButton = document.getElementById('toggle-pdf-options-btn'); // [BARU] Ambil referensi tombol FAB
+    const fabButton = document.getElementById('toggle-pdf-options-btn');
 
     const imageInput = document.getElementById('images-to-pdf-input');
-    const fileUploadLabel = form.querySelector('.file-upload-label');
+    const fileCountLabel = document.getElementById('file-count-label'); // [MODIFIKASI] Menggunakan ID baru
     const messageDiv = document.getElementById('images-to-pdf-message');
     const progressWrapper = document.getElementById('images-to-pdf-progress-wrapper');
     const submitButton = form.querySelector('button[type="submit"]');
@@ -1799,7 +1797,6 @@ function attachImagesToPdfListener() {
     let selectedFiles = [];
     let currentSlideIndex = 0;
 
-    // [BARU] Sembunyikan tombol FAB saat halaman pertama kali dimuat
     if (fabButton) {
         fabButton.classList.add('hidden');
     }
@@ -1849,9 +1846,16 @@ function attachImagesToPdfListener() {
 
     const updatePreviews = () => {
         previewsContainer.innerHTML = '';
-        fileUploadLabel.textContent = selectedFiles.length > 0 ? `${selectedFiles.length} gambar dipilih` : 'Belum ada gambar yang dipilih';
         
-        // [MODIFIKASI] Logika untuk menampilkan/menyembunyikan tombol FAB
+        // [MODIFIKASI] Logika untuk menampilkan jumlah file di elemen <p>
+        if (fileCountLabel) {
+            if (selectedFiles.length > 0) {
+                fileCountLabel.textContent = `${selectedFiles.length} gambar telah dipilih.`;
+            } else {
+                fileCountLabel.textContent = ''; // Kosongkan jika tidak ada file
+            }
+        }
+        
         if (fabButton) {
             if (selectedFiles.length > 0) {
                 fabButton.classList.remove('hidden');
@@ -1892,7 +1896,6 @@ function attachImagesToPdfListener() {
                 
                 loadedImages++;
                 if (loadedImages === selectedFiles.length) {
-                    // Hanya reset slider setelah semua gambar dimuat ke DOM
                     goToSlide(0);
                 }
             };
@@ -1919,6 +1922,7 @@ function attachImagesToPdfListener() {
     });
 
     form.addEventListener('submit', async (event) => {
+        // ... Logika submit form (tidak ada perubahan di sini)
         event.preventDefault();
         if (selectedFiles.length === 0) {
             messageDiv.className = 'error';
