@@ -2015,11 +2015,11 @@ input:focus, textarea:focus, select:focus {
     background-color: #c82333;
 }
 
-/* [BARU] GAYA UNTUK ALAT IMAGES TO PDF */
+/* [GANTI] GAYA UNTUK KARTU PRATINJAU GAMBAR */
 #image-previews-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: var(--space-md);
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Sedikit lebih besar */
+    gap: var(--space-lg);
     margin-top: var(--space-lg);
     border-top: 1px solid var(--border-color);
     padding-top: var(--space-lg);
@@ -2027,100 +2027,67 @@ input:focus, textarea:focus, select:focus {
 
 .image-preview-card {
     position: relative;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    overflow: hidden;
-    aspect-ratio: 1 / 1;
+    /* Hapus aspect-ratio dari sini */
 }
 
-.image-preview-card img {
+/* [BARU] Gaya untuk halaman virtual di dalam kartu */
+.preview-page {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 0; /* Margin akan diatur oleh kelas modifier */
+}
+
+/* [BARU] Atur gambar di dalam halaman virtual */
+.preview-page img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain; /* PENTING: agar gambar pas tanpa terpotong */
 }
 
 .image-preview-card .remove-btn {
     position: absolute;
-    top: 4px;
-    right: 4px;
-    background-color: rgba(0, 0, 0, 0.6);
+    top: -8px; /* Posisikan di luar sedikit */
+    right: -8px;
+    z-index: 10;
+    background-color: #343a40;
     color: white;
-    border: none;
+    border: 2px solid white;
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-size: 16px;
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
     line-height: 24px;
     text-align: center;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, transform 0.2s;
 }
 
 .image-preview-card .remove-btn:hover {
     background-color: #dc3545;
+    transform: scale(1.1);
 }
 
-.pdf-options-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-lg);
-    margin-top: var(--space-lg);
-    border-top: 1px solid var(--border-color);
-    padding-top: var(--space-lg);
+/* [BARU] Kelas modifier untuk layout halaman */
+.preview-page.portrait {
+    aspect-ratio: 210 / 297; /* A4 Portrait */
 }
-
-@media (min-width: 768px) {
-    .pdf-options-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .pdf-options-grid > div:last-child:nth-child(odd) {
-        grid-column: span 2;
-    }
+.preview-page.landscape {
+    aspect-ratio: 297 / 210; /* A4 Landscape */
 }
+/* Anda bisa menambahkan ukuran lain di sini, contoh: */
+.preview-page.size-Letter.portrait { aspect-ratio: 8.5 / 11; }
+.preview-page.size-Letter.landscape { aspect-ratio: 11 / 8.5; }
 
-.radio-card-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm);
+
+/* [BARU] Kelas modifier untuk margin */
+.preview-page.margin-small {
+    padding: 5%; /* Simulasi margin kecil */
 }
-
-.radio-card {
-    flex: 1;
-    min-width: 100px;
-}
-
-.radio-card input[type="radio"] {
-    display: none;
-}
-
-.radio-card-content {
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    padding: var(--space-sm);
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-xs);
-    color: var(--text-muted-color);
-}
-
-.radio-card input[type="radio"]:checked + .radio-card-content {
-    border-color: var(--accent-color);
-    background-color: #e9f2ff;
-    color: var(--accent-color);
-    box-shadow: 0 0 0 2px var(--accent-color);
-}
-
-.radio-card-content svg {
-    width: 32px;
-    height: 32px;
-    margin-bottom: var(--space-xs);
-    transition: color 0.2s;
-}
-
-.radio-card input[type="radio"]:checked + .radio-card-content svg {
-    color: var(--accent-color);
+.preview-page.margin-big {
+    padding: 10%; /* Simulasi margin besar */
 }
