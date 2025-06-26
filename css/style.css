@@ -2185,40 +2185,44 @@ input:focus, textarea:focus, select:focus {
 
 /* Untuk layar ponsel (lebar maks 768px) - KODE PERBAIKAN UTAMA DI SINI */
 @media (max-width: 768px) {
+
+    /* Memastikan container utama tidak pernah meluber ke kanan */
     .page-container {
-        padding-left: var(--space-sm);
-        padding-right: var(--space-sm);
+        width: 100%;
+        overflow-x: hidden; /* Mencegah scroll horizontal paksa */
     }
 
-    /* Mengurangi padding pada semua tool agar tidak sempit di mobile */
-    .tool-section,
-    .dashboard-container,
-    .pdf-tool-options,
-    .pdf-tool-previews {
-        padding: var(--space-md);
-    }
-
-    /* * PERBAIKAN #1:
-     * Mengatur ulang grid pratinjau gambar.
-     * Menggunakan 'auto-fit' dan 'minmax' dengan nilai lebih kecil (120px)
-     * memastikan kolom dapat beradaptasi pada layar sempit.
-    */
-    #image-previews-container {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    /* Mengganti layout grid menjadi flexbox kolom untuk kepastian */
+    .pdf-tool-layout {
+        display: flex;
+        flex-direction: column; /* Paksa jadi satu kolom */
+        width: 100%;
         gap: var(--space-md);
     }
-    
-    /* * PERBAIKAN #2:
-     * Mengatur ulang grup radio button agar rapi.
-     * Ini akan membuat pilihan seperti 'Portrait' & 'Landscape' atau 'No margin' & 'Small' 
-     * secara otomatis turun ke bawah jika tidak cukup ruang.
-    */
+
+    /* Memastikan setiap bagian di dalamnya tidak meluber */
+    .pdf-tool-previews, .pdf-tool-options {
+        width: 100%;
+        max-width: 100%; /* Menjamin tidak akan lebih lebar dari parent */
+        min-width: 0; /* Mengizinkan elemen untuk mengecil */
+    }
+
+    /* Aturan untuk radio card group agar tetap rapi */
     .radio-card-group {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
         gap: var(--space-sm);
     }
+
+    /* Perbaikan untuk Image Compressor agar tidak meluber juga */
+    #image-compressor-form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+        width: 100%;
+    }
 }
+
 /* Untuk layar ponsel yang sangat kecil (lebar maks 480px) */
 @media (max-width: 480px) {
     /* Tombol pilihan tool menjadi satu kolom penuh */
