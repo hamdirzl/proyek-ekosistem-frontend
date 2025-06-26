@@ -2547,7 +2547,7 @@ input:focus, textarea:focus, select:focus {
     .fab-container {
         display: block;
         position: fixed;
-        bottom: 180px; /* [DIUBAH] Dinaikkan dari 150px menjadi 180px */
+        bottom: 400px; /* [DIUBAH] Dinaikkan dari 150px menjadi 180px */
         right: var(--space-md);
         z-index: 1050;
     }
