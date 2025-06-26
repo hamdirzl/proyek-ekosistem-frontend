@@ -2396,11 +2396,13 @@ input:focus, textarea:focus, select:focus {
 
     /* Gaya untuk tombol melayang (Floating Action Button) */
     .fab-container {
-        position: fixed;
-        bottom: 2rem;
-        right: 2rem;
-        z-index: 1050;
-    }
+    position: fixed;
+    /* Posisikan 150px dari bawah, di atas tombol chat */
+    bottom: 150px; 
+    /* Sejajarkan di kanan dengan tombol chat */
+    right: var(--space-md); 
+    z-index: 1050;
+}
     .fab {
         background-color: var(--accent-color);
         color: white;
