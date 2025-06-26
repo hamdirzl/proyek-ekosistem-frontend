@@ -2469,3 +2469,95 @@ input:focus, textarea:focus, select:focus {
         display: none;
     }
 }
+
+/* css/style.css */
+
+/* === [BARU] GAYA UNTUK SLIDER PRATINJAU GAMBAR === */
+
+.preview-slider-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: var(--space-lg);
+}
+
+.preview-slider-container {
+    overflow: hidden; /* Sembunyikan gambar yang di luar area pandang */
+}
+
+#image-previews-container {
+    display: flex; /* Ubah dari grid ke flexbox */
+    flex-wrap: nowrap; /* Pastikan gambar tidak pindah ke baris baru */
+    gap: var(--space-lg);
+    padding-bottom: 10px; /* Beri sedikit ruang bawah */
+    transition: transform 0.4s ease-in-out; /* Animasi geser yang mulus */
+}
+
+.image-preview-card {
+    flex: 0 0 calc(50% - (var(--space-lg) / 2)); /* Setiap kartu lebarnya 50% dikurangi setengah gap */
+    max-width: calc(50% - (var(--space-lg) / 2));
+}
+
+.slider-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+    display: none; /* Sembunyikan secara default, tampilkan di desktop */
+}
+
+.slider-nav-btn:hover {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.slider-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+#prev-preview-btn {
+    left: -20px;
+}
+
+#next-preview-btn {
+    right: -20px;
+}
+
+/* Aturan untuk Desktop (lebar lebih dari 768px) */
+@media (min-width: 769px) {
+    .slider-nav-btn {
+        display: block; /* Tampilkan tombol navigasi di desktop */
+    }
+}
+
+/* Aturan untuk Mobile (lebar 768px atau kurang) */
+@media (max-width: 768px) {
+    #image-previews-container {
+        display: grid; /* Kembali ke grid di mobile */
+        grid-template-columns: 1fr 1fr; /* 2 kolom */
+        gap: var(--space-md);
+        padding: 0;
+    }
+
+    .preview-slider-container {
+        max-height: 400px; /* Tentukan tinggi maksimal area scroll */
+        overflow-y: auto; /* Aktifkan scroll vertikal */
+        overflow-x: hidden;
+        padding-right: 5px; /* Ruang untuk scrollbar */
+    }
+
+    .image-preview-card {
+        max-width: 100%; /* Lebar penuh sesuai kolom grid */
+    }
+}
