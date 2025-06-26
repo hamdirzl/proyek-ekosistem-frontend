@@ -2168,3 +2168,69 @@ input:focus, textarea:focus, select:focus {
         position: static; /* Hapus sticky position di mobile */
     }
 }
+
+/* ================================================= */
+/* ==   PENYEMPURNAAN RESPONSIVE UNTUK MOBILE   == */
+/* ================================================= */
+
+/* Untuk layar tablet dan di bawahnya (lebar maks 992px) */
+@media (max-width: 992px) {
+    /* [PERBAIKAN] Mengubah layout PDF tool menjadi 1 kolom */
+    .pdf-tool-layout {
+        grid-template-columns: 1fr; /* Hanya 1 kolom */
+        gap: var(--space-md);       /* Kurangi jarak antar bagian */
+    }
+
+    /* [PERBAIKAN] Panel opsi tidak lagi "menempel" di samping */
+    .pdf-tool-options {
+        position: static;
+        top: auto;
+    }
+
+    /* [PERBAIKAN] Pastikan area pratinjau tidak terlalu tinggi di mobile */
+    .pdf-tool-previews {
+        min-height: 300px; /* Kurangi tinggi minimal */
+    }
+}
+
+/* Untuk layar ponsel (lebar maks 768px) */
+@media (max-width: 768px) {
+    .page-container {
+        padding-left: var(--space-sm);
+        padding-right: var(--space-sm);
+    }
+
+    .tool-section,
+    .dashboard-container {
+        padding: var(--space-md); /* Kurangi padding di dalam kartu */
+    }
+
+    #image-previews-container {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: var(--space-md);
+    }
+}
+
+/* Untuk layar ponsel yang sangat kecil (lebar maks 480px) */
+@media (max-width: 480px) {
+    /* [TAMBAHAN] Tombol pilihan tool menjadi satu kolom penuh agar rapi */
+    .tool-buttons-container {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    /* [TAMBAHAN] Pratinjau gambar dibuat 2 kolom agar tidak terlalu kecil */
+    #image-previews-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm);
+    }
+    
+    /* [TAMBAHAN] Opsi margin dibuat 2 kolom agar hemat tempat */
+    .pdf-tool-options .radio-card-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    .pdf-tool-options .radio-card-group label:last-child:nth-child(odd) {
+       grid-column: span 2; /* Jika jumlahnya ganjil, item terakhir jadi full-width */
+    }
+}
