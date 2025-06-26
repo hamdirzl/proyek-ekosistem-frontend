@@ -2341,30 +2341,44 @@ input:focus, textarea:focus, select:focus {
 /* === [BARU] GAYA UNTUK PDF TOOL MOBILE (iLovePDF Style) === */
 /* GANTI BLOK MEDIA QUERY 768px YANG LAMA DENGAN YANG INI */
 
-/* === [FINAL] GAYA UNTUK PDF TOOL MOBILE (Slide-in Panel) === */
+/* === [FINAL LENGKAP] GAYA UNTUK PDF TOOL MOBILE (Slide-in Panel) === */
 @media (max-width: 768px) {
-    /* 1. Panel Opsi (yang akan bergeser) */
+    /* Mengatur panel opsi utama */
     .pdf-tool-layout .pdf-tool-options {
         display: flex;
         flex-direction: column;
         position: fixed;
         top: 0;
         right: 0;
-        width: 90%; /* Tidak full screen */
-        max-width: 350px; /* Lebar maksimal */
+        width: 90%;
+        max-width: 350px;
         height: 100%;
         background-color: var(--card-bg-color);
-        z-index: 1101; /* Di atas overlay */
+        z-index: 1101;
         padding: var(--space-md);
         box-shadow: -5px 0 20px rgba(0,0,0,0.15);
-
-        /* Sembunyikan di luar layar sebelah kanan secara default */
         transform: translateX(100%);
         visibility: hidden;
         transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility 0.4s;
+        overflow: hidden; /* Mencegah seluruh panel ter-scroll */
     }
 
-    /* 2. Latar Belakang Gelap (Overlay) */
+    /* Membuat area konten (opsi) bisa di-scroll */
+    .options-content-scrollable {
+        flex-grow: 1;
+        overflow-y: auto;
+        margin: 0 -8px;
+        padding: 0 8px;
+    }
+
+    /* Mengatur agar tombol Convert selalu di bawah */
+    .pdf-tool-options .button-pintu {
+        flex-shrink: 0;
+        margin-top: var(--space-md);
+        width: 100%;
+    }
+
+    /* Latar belakang gelap (overlay) */
     .pdf-options-overlay {
         position: fixed;
         top: 0;
@@ -2378,17 +2392,17 @@ input:focus, textarea:focus, select:focus {
         transition: opacity 0.4s ease, visibility 0.4s;
     }
 
-    /* 3. Aturan Saat Panel Aktif (diganti oleh JavaScript) */
+    /* Aturan saat panel aktif */
     #images-to-pdf-form.options-active .pdf-tool-options {
-        transform: translateX(0); /* Panel bergeser ke dalam layar */
+        transform: translateX(0);
         visibility: visible;
     }
     #images-to-pdf-form.options-active .pdf-options-overlay {
-        opacity: 1; /* Overlay muncul */
+        opacity: 1;
         visibility: visible;
     }
 
-    /* 4. Tombol Roda Gigi (FAB) */
+    /* Tombol roda gigi (FAB) */
     .fab-container {
         position: fixed;
         bottom: 150px; 
@@ -2412,8 +2426,8 @@ input:focus, textarea:focus, select:focus {
     .fab:hover {
         transform: scale(1.1);
     }
-
-    /* 5. Header di dalam panel opsi */
+    
+    /* Header di dalam panel opsi */
     .options-header {
         display: flex;
         justify-content: space-between;
