@@ -1837,41 +1837,55 @@ function attachImagesToPdfListener() {
     pageSizeSelect.addEventListener('change', updateAllPreviewsLayout);
     marginRadios.forEach(radio => radio.addEventListener('change', updateAllPreviewsLayout));
 
-    const updatePreviews = () => {
-        previewsContainer.innerHTML = ''; // Hapus semua pratinjau yang ada
-        if (selectedFiles.length > 0) {
-            fileUploadLabel.textContent = `${selectedFiles.length} gambar dipilih`;
-        } else {
-            fileUploadLabel.textContent = 'Belum ada gambar yang dipilih';
-        }
+    // MENJADI SEPERTI INI
+const updatePreviews = () => {
+    previewsContainer.innerHTML = ''; // Hapus semua pratinjau yang ada
+    if (selectedFiles.length > 0) {
+        fileUploadLabel.textContent = `${selectedFiles.length} gambar dipilih`;
+    } else {
+        fileUploadLabel.textContent = 'Belum ada gambar yang dipilih';
+    }
 
-        selectedFiles.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const previewCard = document.createElement('div');
-                previewCard.className = 'image-preview-card';
-                
-                // [MODIFIKASI] Buat struktur HTML baru untuk pratinjau
-                previewCard.innerHTML = `
-                    <div class="preview-page">
-                        <img src="${e.target.result}" alt="${file.name}">
-                    </div>
-                    <button type="button" class="remove-btn" data-index="${index}" title="Hapus gambar">&times;</button>
-                `;
-                previewsContainer.appendChild(previewCard);
+    // [BARU] Ambil pengaturan default saat ini SEBELUM membuat pratinjau
+    const currentOrientation = form.querySelector('input[name="orientation"]:checked').value;
+    const currentMargin = form.querySelector('input[name="margin"]:checked').value;
+    
+    // [BARU] Tentukan kelas CSS berdasarkan pengaturan
+    let pageClasses = 'preview-page';
+    pageClasses += currentOrientation === 'portrait' ? ' portrait' : ' landscape';
+    if (currentMargin === 'small') {
+        pageClasses += ' margin-small';
+    } else if (currentMargin === 'big') {
+        pageClasses += ' margin-big';
+    }
+    
+    selectedFiles.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const previewCard = document.createElement('div');
+            previewCard.className = 'image-preview-card';
+            
+            // [MODIFIKASI] Langsung terapkan kelas yang sudah ditentukan
+            previewCard.innerHTML = `
+                <div class="${pageClasses}">
+                    <img src="${e.target.result}" alt="${file.name}">
+                </div>
+                <button type="button" class="remove-btn" data-index="${index}" title="Hapus gambar">&times;</button>
+            `;
+            previewsContainer.appendChild(previewCard);
 
-                previewCard.querySelector('.remove-btn').addEventListener('click', (event) => {
-                    const idxToRemove = parseInt(event.target.dataset.index, 10);
-                    selectedFiles.splice(idxToRemove, 1);
-                    updatePreviews(); // Panggil lagi untuk render ulang
-                });
-            };
-            reader.readAsDataURL(file);
-        });
-        
-        // Panggil fungsi layout setelah pratinjau baru ditambahkan
-        setTimeout(updateAllPreviewsLayout, 0);
-    };
+            previewCard.querySelector('.remove-btn').addEventListener('click', (event) => {
+                const idxToRemove = parseInt(event.target.dataset.index, 10);
+                selectedFiles.splice(idxToRemove, 1);
+                updatePreviews(); // Panggil lagi untuk render ulang
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    // [DIHAPUS] Panggilan ke setTimeout tidak diperlukan lagi untuk render awal
+    // setTimeout(updateAllPreviewsLayout, 0); // Hapus atau beri komentar pada baris ini
+};
 
     imageInput.addEventListener('change', () => {
         selectedFiles.push(...Array.from(imageInput.files));
