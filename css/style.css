@@ -2398,7 +2398,7 @@ input:focus, textarea:focus, select:focus {
     .fab-container {
     position: fixed;
     /* Posisikan 150px dari bawah, di atas tombol chat */
-    bottom: 150px; 
+    bottom: 300px; 
     /* Sejajarkan di kanan dengan tombol chat */
     right: var(--space-md); 
     z-index: 1050;
