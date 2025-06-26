@@ -177,7 +177,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupJurnalPage();
     } else if (document.title.includes("Tools")) {
         setupToolsPage();
-        setupCropModal(); // Cropper juga dibutuhkan di halaman tools
     } else if (document.getElementById('login-form')) {
         setupAuthPage();
     } else if (document.title.includes("Logging In...")) {
@@ -725,7 +724,7 @@ function showCropModal(imageSrc, callback, aspectRatio = 16 / 9) {
     }
 
     cropper = new Cropper(imageToCropElement, {
-        aspectRatio: aspectRatio, // PERUBAHAN DI SINI
+        aspectRatio: NaN,
         viewMode: 1,
         background: false,
         autoCropArea: 0.9,
@@ -1727,8 +1726,7 @@ function setupToolsPage() {
     const wrappers = [
         document.getElementById('shortener-wrapper'), document.getElementById('history-section'),
         document.getElementById('converter-wrapper'),
-        document.getElementById('qr-generator-wrapper'), document.getElementById('image-compressor-wrapper'),
-        document.getElementById('image-to-pdf-wrapper') // TAMBAHKAN WRAPPER BARU
+        document.getElementById('qr-generator-wrapper'), document.getElementById('image-compressor-wrapper')
     ];
     const toolSelectionSection = document.querySelector('.tool-selection');
 
@@ -1740,13 +1738,11 @@ function setupToolsPage() {
     document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper'));
     document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper'));
     document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper'));
-    document.getElementById('show-image-to-pdf')?.addEventListener('click', () => showToolSection('image-to-pdf-wrapper')); // TAMBAHKAN EVENT LISTENER
 
     attachShortenerListener();
     attachConverterListener();
     attachQrCodeGeneratorListener();
     attachImageCompressorListener();
-    attachImageToPdfListener(); // PANGGIL FUNGSI BARU
 
     const fileInput = document.getElementById('file-input');
     const outputFormatSelect = document.getElementById('output-format');
@@ -1791,294 +1787,11 @@ function setupToolsPage() {
     setupCustomDropdowns();
 }
 
-function attachImageToPdfListener() {
-    const wrapper = document.getElementById('image-to-pdf-wrapper');
-    if (!wrapper) return;
-
-    const initialInput = document.getElementById('pdf-image-input');
-    const addMoreInput = document.getElementById('add-more-images-input');
-    const uploadArea = document.getElementById('pdf-upload-area');
-    const editorLayout = document.getElementById('pdf-layout-editor');
-    const libraryList = document.getElementById('image-library-list');
-    const pageCanvasArea = document.getElementById('page-canvas-area');
-    const addPageBtn = document.getElementById('add-page-btn');
-    const convertBtn = document.getElementById('convert-to-pdf-btn');
-    const messageDiv = document.getElementById('image-to-pdf-message');
-
-    let imageLibrary = [];
-    let documentPages = [];
-    let activePageIndex = -1;
-    let selectedImageInstanceId = null;
-
-    const handleFiles = (files) => {
-        for (const file of files) {
-            if (!file.type.startsWith('image/')) continue;
-            const alreadyExists = imageLibrary.some(img => img.name === file.name);
-            if (alreadyExists) continue;
-
-            imageLibrary.push({
-                file: file,
-                name: file.name,
-                previewUrl: URL.createObjectURL(file),
-            });
-        }
-        if (documentPages.length === 0) addPage();
-        renderUI();
-    };
-    
-    const renderUI = () => {
-        if (imageLibrary.length > 0) {
-            uploadArea.classList.add('hidden');
-            editorLayout.classList.remove('hidden');
-            editorLayout.style.display = 'flex';
-        }
-
-        libraryList.innerHTML = '';
-        imageLibrary.forEach(img => {
-            const imgElement = document.createElement('img');
-            imgElement.src = img.previewUrl;
-            imgElement.className = 'library-image';
-            imgElement.dataset.fileName = img.name;
-            libraryList.appendChild(imgElement);
-        });
-
-        pageCanvasArea.innerHTML = '';
-        documentPages.forEach((page, pageIndex) => {
-            const pageElement = document.createElement('div');
-            pageElement.className = 'editor-page';
-            pageElement.dataset.pageIndex = pageIndex;
-
-            page.images.forEach(imgInstance => {
-                const libraryImage = imageLibrary.find(libImg => libImg.name === imgInstance.fileName);
-                if (!libraryImage) return;
-
-                const placedImgWrapper = document.createElement('div');
-                placedImgWrapper.className = `placed-image ${imgInstance.instanceId === selectedImageInstanceId ? 'selected' : ''}`;
-                placedImgWrapper.style.left = `${imgInstance.x}px`;
-                placedImgWrapper.style.top = `${imgInstance.y}px`;
-                placedImgWrapper.style.width = `${imgInstance.width}px`;
-                placedImgWrapper.style.height = `${imgInstance.height}px`;
-                placedImgWrapper.dataset.instanceId = imgInstance.instanceId;
-
-                const imgTag = document.createElement('img');
-                imgTag.src = imgInstance.croppedUrl || libraryImage.previewUrl;
-                
-                placedImgWrapper.appendChild(imgTag);
-
-                if (imgInstance.instanceId === selectedImageInstanceId) {
-                    placedImgWrapper.innerHTML += `
-                        <div class="placed-image-actions">
-                            <button class="crop-placed-btn" title="Crop Image">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
-                            </button>
-                            <button class="delete-placed-btn" title="Delete Image">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                            </button>
-                        </div>
-                        <div class="resize-handle nw"></div><div class="resize-handle ne"></div>
-                        <div class="resize-handle sw"></div><div class="resize-handle se"></div>
-                    `;
-                }
-                pageElement.appendChild(placedImgWrapper);
-            });
-            pageCanvasArea.appendChild(pageElement);
-        });
-        
-        attachInteractiveListeners();
-    };
-
-    const addPage = () => {
-        documentPages.push({ id: `page-${Date.now()}`, width: 595, height: 842, images: [] });
-        activePageIndex = documentPages.length - 1;
-        renderUI();
-    };
-
-    const addImageToPage = (fileName) => {
-        if (documentPages.length === 0) addPage();
-        const targetPageIndex = (activePageIndex === -1) ? 0 : activePageIndex;
-        
-        documentPages[targetPageIndex].images.push({
-            instanceId: `inst-${Date.now()}`,
-            fileName: fileName,
-            x: 50, y: 50, width: 200, height: 150,
-            crop: null, croppedUrl: null
-        });
-        renderUI();
-    };
-
-    function attachInteractiveListeners() {
-        libraryList.querySelectorAll('.library-image').forEach(img => {
-            img.addEventListener('click', () => addImageToPage(img.dataset.fileName));
-        });
-
-        document.querySelectorAll('.placed-image').forEach(el => {
-            el.addEventListener('mousedown', onSelectAndStartMove);
-        });
-
-        document.querySelectorAll('.resize-handle').forEach(handle => {
-            handle.addEventListener('mousedown', onStartResize);
-        });
-        
-        document.querySelectorAll('.delete-placed-btn').forEach(btn => {
-            btn.addEventListener('click', onDeletePlacedImage);
-        });
-
-        document.querySelectorAll('.crop-placed-btn').forEach(btn => {
-            btn.addEventListener('click', onCropPlacedImage);
-        });
-    }
-    
-    function onSelectAndStartMove(e) {
-        // Mencegah tindakan default browser, seperti memulai drag-and-drop gambar
-        e.preventDefault();
-        
-        const element = e.currentTarget;
-        const instanceId = element.dataset.instanceId;
-
-        // Jika gambar yang diklik BELUM terpilih, maka kita hanya akan memilihnya
-        // dan menggambar ulang UI untuk menampilkan handle resize.
-        // Kita tidak akan memulai proses drag di sini.
-        if (selectedImageInstanceId !== instanceId) {
-            selectedImageInstanceId = instanceId;
-            renderUI(); // Gambar ulang UI untuk menampilkan status 'selected'
-            return; // Hentikan fungsi di sini, aksi selesai.
-        }
-
-        // Jika gambar yang diklik SUDAH terpilih, barulah kita jalankan logika untuk menggeser.
-        // Jangan panggil renderUI() di sini agar elemen tidak hancur saat digeser.
-        const pageIndex = parseInt(element.closest('.editor-page').dataset.pageIndex, 10);
-        const imgInstance = documentPages[pageIndex].images.find(i => i.instanceId === selectedImageInstanceId);
-
-        let initialX = e.clientX;
-        let initialY = e.clientY;
-        let startX = imgInstance.x;
-        let startY = imgInstance.y;
-
-        function onMouseMove(moveEvent) {
-            const dx = moveEvent.clientX - initialX;
-            const dy = moveEvent.clientY - initialY;
-            
-            // Perbarui posisi elemen secara visual saat digeser
-            element.style.left = `${startX + dx}px`;
-            element.style.top = `${startY + dy}px`;
-        }
-
-        function onMouseUp() {
-            // Setelah selesai digeser, baru update data posisi di dalam state kita
-            const finalLeft = parseFloat(element.style.left);
-            const finalTop = parseFloat(element.style.top);
-            imgInstance.x = finalLeft;
-            imgInstance.y = finalTop;
-
-            // Hapus event listener dari document
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-        }
-
-        // Tambahkan event listener ke document untuk menangani pergerakan mouse
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp, { once: true }); // 'once: true' akan otomatis menghapus listener setelah selesai
-    }
-
-    function onDeletePlacedImage(e) {
-        e.stopPropagation();
-        const element = e.currentTarget.closest('.placed-image');
-        const pageIndex = parseInt(element.closest('.editor-page').dataset.pageIndex, 10);
-        const instanceId = element.dataset.instanceId;
-
-        documentPages[pageIndex].images = documentPages[pageIndex].images.filter(img => img.instanceId !== instanceId);
-        selectedImageInstanceId = null;
-        renderUI();
-    }
-    
-    function onCropPlacedImage(e) {
-        e.stopPropagation();
-        const element = e.currentTarget.closest('.placed-image');
-        const pageIndex = parseInt(element.closest('.editor-page').dataset.pageIndex, 10);
-        const instanceId = element.dataset.instanceId;
-        const imgInstance = documentPages[pageIndex].images.find(i => i.instanceId === instanceId);
-        const libraryFile = imageLibrary.find(lib => lib.name === imgInstance.fileName);
-
-        if (!libraryFile) return;
-
-        handleImageSelectionForCropping(libraryFile.file, (blob) => {
-            const cropData = cropper.getData(true);
-            imgInstance.crop = cropData; // Simpan data crop
-            imgInstance.croppedUrl = URL.createObjectURL(blob);
-            renderUI(); // Render ulang untuk menampilkan gambar yang di-crop
-        }, NaN); // Aspect ratio bebas
-    }
-
-    // --- Event Listeners Utama ---
-    initialInput.addEventListener('change', (e) => handleFiles(e.target.files));
-    addMoreInput.addEventListener('change', (e) => handleFiles(e.target.files));
-    addPageBtn.addEventListener('click', addPage);
-    
-    convertBtn.addEventListener('click', async () => {
-        messageDiv.className = '';
-        messageDiv.textContent = 'Mempersiapkan data...';
-        convertBtn.disabled = true;
-
-        const formData = new FormData();
-        const filesToSend = new Set(); // Hanya kirim setiap file sekali
-        
-        const config = {
-            pages: documentPages.map(page => ({
-                width: page.width,
-                height: page.height,
-                images: page.images.map(img => {
-                    filesToSend.add(img.fileName);
-                    return img; 
-                })
-            }))
-        };
-
-        filesToSend.forEach(fileName => {
-             const libraryFile = imageLibrary.find(libFile => libFile.name === fileName);
-             if (libraryFile) formData.append('images', libraryFile.file, libraryFile.name);
-        });
-        
-        formData.append('documentConfig', JSON.stringify(config));
-
-        try {
-            messageDiv.textContent = 'Mengonversi... Ini bisa memakan waktu lama.';
-            const response = await fetch(`${API_BASE_URL}/api/images-to-pdf`, {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error || 'Server error');
-            }
-
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = response.headers.get('Content-Disposition').split('filename=')[1].replace(/"/g, '');
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
-            
-            messageDiv.className = 'success';
-            messageDiv.textContent = 'PDF berhasil dibuat dan diunduh!';
-
-        } catch (error) {
-            messageDiv.className = 'error';
-            messageDiv.textContent = `Error: ${error.message}`;
-        } finally {
-            convertBtn.disabled = false;
-        }
-    });
-}
-    
 function showToolSection(sectionIdToShow) {
     const allToolSections = [
         document.getElementById('shortener-wrapper'), document.getElementById('converter-wrapper'),
-        document.getElementById('qr-generator-wrapper'), document.getElementById('image-compressor-wrapper'),
-        document.getElementById('image-to-pdf-wrapper')
+        document.getElementById('qr-generator-wrapper'),
+        document.getElementById('image-compressor-wrapper')
     ];
     const historySection = document.getElementById('history-section');
 
