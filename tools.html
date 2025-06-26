@@ -224,36 +224,48 @@
         </div>
 
         <div id="image-to-pdf-wrapper" class="hidden">
-            <section class="tool-section" data-aos="fade-up">
-                <h2 class="section-title">Tool: Image to PDF Converter</h2>
-                
-                <div id="pdf-upload-area">
-                    <div class="form-group">
-                        <label for="pdf-image-input">Pilih satu atau beberapa gambar untuk memulai</label>
-                        <div class="custom-file-upload">
-                            <input type="file" id="pdf-image-input" name="images" required multiple accept="image/jpeg, image/png">
-                            <span class="file-upload-button">
-                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                Pilih Gambar
-                            </span>
-                            <span class="file-upload-label">Belum ada gambar yang dipilih</span>
-                        </div>
-                    </div>
+    <section class="tool-section" data-aos="fade-up">
+        <h2 class="section-title">Tool: PDF Layout Editor</h2>
+        
+        <div id="pdf-upload-area">
+            <div class="form-group">
+                <label for="pdf-image-input">Pilih gambar untuk ditambahkan ke Library</label>
+                <div class="custom-file-upload">
+                    <input type="file" id="pdf-image-input" name="images" required multiple accept="image/jpeg, image/png">
+                    <span class="file-upload-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        Pilih Gambar
+                    </span>
+                    <span class="file-upload-label">Belum ada gambar yang dipilih</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="pdf-layout-editor" class="hidden">
+            <div class="editor-main-area">
+                <div class="editor-controls">
+                    <button id="add-page-btn" class="button-pintu button-secondary">Tambah Halaman</button>
+                    <button id="convert-to-pdf-btn" class="button-pintu">Convert & Download PDF</button>
                 </div>
 
-                <div id="pdf-editor-controls" class="hidden" style="margin-bottom: 1.5rem; display: flex; gap: 1rem; justify-content: center;">
-                     <label for="add-more-images-input" class="button-pintu button-secondary">Tambah Gambar Lagi</label>
-                     <input type="file" id="add-more-images-input" multiple accept="image/jpeg, image/png" style="display:none;">
-                     <button id="convert-to-pdf-btn" class="button-pintu">Convert ke PDF</button>
-                </div>
-                
-                <div id="pdf-editor-area" style="margin-top: 1.5rem;">
+                <div id="page-canvas-area">
                     </div>
-    
-                <div id="image-to-pdf-message" style="margin-top: 1rem;"></div>
-    
-            </section>
+            </div>
+            
+            <div class="image-library-panel">
+                <h4>Image Library</h4>
+                <div class="library-controls">
+                     <label for="add-more-images-input" class="button-pintu button-secondary">Tambah Gambar</label>
+                     <input type="file" id="add-more-images-input" multiple accept="image/jpeg, image/png" style="display:none;">
+                </div>
+                <div id="image-library-list">
+                    </div>
+            </div>
         </div>
+        
+        <div id="image-to-pdf-message" style="margin-top: 1rem;"></div>
+    </section>
+</div>
         </main>
 
     <div id="about-modal" class="modal-overlay hidden">

@@ -1795,180 +1795,182 @@ function attachImageToPdfListener() {
     const wrapper = document.getElementById('image-to-pdf-wrapper');
     if (!wrapper) return;
 
+    // --- Referensi Elemen UI ---
     const initialInput = document.getElementById('pdf-image-input');
     const addMoreInput = document.getElementById('add-more-images-input');
     const uploadArea = document.getElementById('pdf-upload-area');
-    const editorControls = document.getElementById('pdf-editor-controls');
-    const editorArea = document.getElementById('pdf-editor-area');
+    const editorLayout = document.getElementById('pdf-layout-editor');
+    const libraryList = document.getElementById('image-library-list');
+    const pageCanvasArea = document.getElementById('page-canvas-area');
+    const addPageBtn = document.getElementById('add-page-btn');
     const convertBtn = document.getElementById('convert-to-pdf-btn');
     const messageDiv = document.getElementById('image-to-pdf-message');
 
-    let imageFilesState = []; // State untuk menyimpan file, preview, dan data crop
+    // --- State Management ---
+    let imageLibrary = []; // Berisi { file, name, previewUrl }
+    let documentPages = []; // Berisi { id, images: [ {instanceId, fileName, x, y, width, height, crop} ] }
 
     const handleFiles = (files) => {
         for (const file of files) {
             if (!file.type.startsWith('image/')) continue;
-            const fileState = {
+            const alreadyExists = imageLibrary.some(img => img.name === file.name);
+            if (alreadyExists) continue;
+
+            imageLibrary.push({
                 file: file,
                 name: file.name,
                 previewUrl: URL.createObjectURL(file),
-                crop: null // { x, y, width, height }
-            };
-            imageFilesState.push(fileState);
+            });
         }
-        renderEditor();
+        renderUI();
     };
-
-    const renderEditor = () => {
-        if (imageFilesState.length > 0) {
+    
+    const renderUI = () => {
+        // Tampilkan/sembunyikan editor
+        if (imageLibrary.length > 0) {
             uploadArea.classList.add('hidden');
-            editorControls.classList.remove('hidden');
-            editorControls.style.display = 'flex';
-        } else {
-            uploadArea.classList.remove('hidden');
-            editorControls.classList.add('hidden');
+            editorLayout.classList.remove('hidden');
+            editorLayout.style.display = 'flex';
         }
 
-        editorArea.innerHTML = '';
-        imageFilesState.forEach((state, index) => {
-            const previewWrapper = document.createElement('div');
-            previewWrapper.className = 'editor-image-preview';
-            previewWrapper.dataset.index = index;
-            previewWrapper.setAttribute('draggable', 'true');
-            
-            previewWrapper.innerHTML = `
-                <img src="${state.previewUrl}" alt="${state.name}">
-                <div class="image-overlay-actions">
-                    <button class="crop-btn" title="Crop Image">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
-                    </button>
-                    <button class="delete-btn" title="Delete Image">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                    </button>
-                </div>
-            `;
-            editorArea.appendChild(previewWrapper);
+        // Render Image Library
+        libraryList.innerHTML = '';
+        imageLibrary.forEach(img => {
+            const imgElement = document.createElement('img');
+            imgElement.src = img.previewUrl;
+            imgElement.className = 'library-image';
+            imgElement.dataset.fileName = img.name;
+            imgElement.setAttribute('draggable', 'true');
+            libraryList.appendChild(imgElement);
         });
 
-        attachActionListeners();
-        attachDragAndDropListeners();
-    };
-    
-    const attachActionListeners = () => {
-         editorArea.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.onclick = (e) => {
-                const index = e.currentTarget.closest('.editor-image-preview').dataset.index;
-                imageFilesState.splice(index, 1);
-                renderEditor();
-            };
-        });
-        
-         editorArea.querySelectorAll('.crop-btn').forEach(btn => {
-            btn.onclick = (e) => {
-                const index = e.currentTarget.closest('.editor-image-preview').dataset.index;
-                const state = imageFilesState[index];
+        // Render Halaman PDF
+        pageCanvasArea.innerHTML = '';
+        documentPages.forEach((page, pageIndex) => {
+            const pageElement = document.createElement('div');
+            pageElement.className = 'editor-page';
+            pageElement.dataset.pageIndex = pageIndex;
+
+            page.images.forEach(imgInstance => {
+                const libraryImage = imageLibrary.find(libImg => libImg.name === imgInstance.fileName);
+                if (!libraryImage) return;
+
+                const placedImgWrapper = document.createElement('div');
+                placedImgWrapper.className = 'placed-image';
+                placedImgWrapper.style.left = `${imgInstance.x}px`;
+                placedImgWrapper.style.top = `${imgInstance.y}px`;
+                placedImgWrapper.style.width = `${imgInstance.width}px`;
+                placedImgWrapper.style.height = `${imgInstance.height}px`;
                 
-                handleImageSelectionForCropping(state.file, (blob) => {
-                    const cropData = cropper.getData(true); // Dapatkan data yang sudah dibulatkan
-                    state.crop = cropData;
-                    
-                    const croppedUrl = URL.createObjectURL(blob);
-                    e.currentTarget.closest('.editor-image-preview').querySelector('img').src = croppedUrl;
-                    state.file = blob; // Ganti file asli dengan file yang sudah di-crop
-
-                    console.log(`Gambar ${state.name} di-crop:`, cropData);
-
-                }, NaN);
-            };
-        });
-    };
-
-    const attachDragAndDropListeners = () => {
-        let dragStartIndex;
-        const previews = editorArea.querySelectorAll('.editor-image-preview');
-
-        previews.forEach(preview => {
-            preview.addEventListener('dragstart', (e) => {
-                dragStartIndex = parseInt(e.currentTarget.dataset.index, 10);
-                setTimeout(() => e.currentTarget.classList.add('dragging'), 0);
+                const placedImg = document.createElement('img');
+                placedImg.src = libraryImage.previewUrl;
+                // Di sini Anda perlu menambahkan logika untuk crop, resize, dan drag
+                placedImgWrapper.appendChild(placedImg);
+                pageElement.appendChild(placedImgWrapper);
             });
-            preview.addEventListener('dragend', (e) => {
-                e.currentTarget.classList.remove('dragging');
-            });
-        });
-
-        editorArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
+            pageCanvasArea.appendChild(pageElement);
         });
         
-        editorArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const draggingElement = document.querySelector('.dragging');
-            if (!draggingElement) return;
-
-            const dropTarget = e.target.closest('.editor-image-preview');
-            if (!dropTarget || dropTarget === draggingElement) return;
-            
-            const dropIndex = parseInt(dropTarget.dataset.index, 10);
-            const draggedItem = imageFilesState.splice(dragStartIndex, 1)[0];
-            
-            imageFilesState.splice(dropIndex, 0, draggedItem);
-            
-            renderEditor();
-        });
+        attachDragListeners();
     };
-    
+
+    const addPage = () => {
+        documentPages.push({
+            id: `page-${Date.now()}`,
+            width: 595, // A4 Potrait
+            height: 842,
+            images: []
+        });
+        renderUI();
+    };
+
+    // --- Logika Drag and Drop (Sederhana) ---
+    function attachDragListeners() {
+        // Drag dari library ke halaman
+        libraryList.querySelectorAll('.library-image').forEach(img => {
+            img.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', e.target.dataset.fileName);
+            });
+        });
+
+        pageCanvasArea.querySelectorAll('.editor-page').forEach(page => {
+            page.addEventListener('dragover', (e) => e.preventDefault());
+
+            page.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const fileName = e.dataTransfer.getData('text/plain');
+                if (!fileName) return;
+
+                const pageIndex = parseInt(page.dataset.pageIndex, 10);
+                const rect = page.getBoundingClientRect();
+                
+                // Tambahkan gambar baru ke state halaman
+                documentPages[pageIndex].images.push({
+                    instanceId: `inst-${Date.now()}`,
+                    fileName: fileName,
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top,
+                    width: 150, // Ukuran default
+                    height: 100,
+                    crop: null
+                });
+                renderUI();
+            });
+        });
+    }
+
+    // --- Event Listeners Utama ---
     initialInput.addEventListener('change', (e) => handleFiles(e.target.files));
     addMoreInput.addEventListener('change', (e) => handleFiles(e.target.files));
-
+    addPageBtn.addEventListener('click', addPage);
+    
     convertBtn.addEventListener('click', async () => {
-        if (imageFilesState.length === 0) {
-            messageDiv.className = 'error';
-            messageDiv.textContent = 'Pilih setidaknya satu gambar.';
-            return;
-        }
-
         messageDiv.className = '';
-        messageDiv.textContent = 'Mempersiapkan file untuk konversi...';
+        messageDiv.textContent = 'Mempersiapkan data...';
         convertBtn.disabled = true;
-        
-        const formData = new FormData();
-        const config = imageFilesState.map(state => {
-            const finalFile = state.crop ? new File([state.file], state.name, { type: state.file.type }) : state.file;
-            formData.append('images', finalFile, state.name);
-            return {
-                name: state.name,
-                crop: state.crop // Kirim null jika tidak ada crop
-            };
-        });
 
-        formData.append('config', JSON.stringify(config));
+        const formData = new FormData();
+        const config = {
+            pages: documentPages.map(page => ({
+                width: page.width,
+                height: page.height,
+                images: page.images.map(img => {
+                    // Pastikan file untuk gambar ini ditambahkan ke formData
+                    const libraryFile = imageLibrary.find(libFile => libFile.name === img.fileName);
+                    if(libraryFile) {
+                        formData.append('images', libraryFile.file, libraryFile.name);
+                    }
+                    return img; // Mengembalikan seluruh objek instance gambar
+                })
+            }))
+        };
+        
+        formData.append('documentConfig', JSON.stringify(config));
 
         try {
-            messageDiv.textContent = 'Mengonversi... Ini mungkin memakan waktu beberapa saat.';
+            messageDiv.textContent = 'Mengonversi... Ini bisa memakan waktu lama.';
             const response = await fetch(`${API_BASE_URL}/api/images-to-pdf`, {
                 method: 'POST',
                 body: formData
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Terjadi kesalahan di server.');
+                const err = await response.json();
+                throw new Error(err.error || 'Server error');
             }
-            
+
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.style.display = 'none';
             a.href = url;
             a.download = response.headers.get('Content-Disposition').split('filename=')[1].replace(/"/g, '');
             document.body.appendChild(a);
             a.click();
-            window.URL.revokeObjectURL(url);
             a.remove();
+            window.URL.revokeObjectURL(url);
             
             messageDiv.className = 'success';
-            messageDiv.textContent = 'Konversi berhasil! File PDF telah diunduh.';
+            messageDiv.textContent = 'PDF berhasil dibuat dan diunduh!';
 
         } catch (error) {
             messageDiv.className = 'error';
@@ -1977,8 +1979,9 @@ function attachImageToPdfListener() {
             convertBtn.disabled = false;
         }
     });
-}
 
+}
+    
 function showToolSection(sectionIdToShow) {
     const allToolSections = [
         document.getElementById('shortener-wrapper'), document.getElementById('converter-wrapper'),

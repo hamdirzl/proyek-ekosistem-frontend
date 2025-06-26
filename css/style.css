@@ -2084,3 +2084,108 @@ input:focus, textarea:focus, select:focus {
     width: 16px;
     height: 16px;
 }
+
+/* style.css (tambahkan di akhir file) */
+
+#pdf-layout-editor {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.editor-main-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.editor-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#page-canvas-area {
+    flex-grow: 1;
+    background-color: var(--background-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px dashed var(--border-color);
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    overflow-y: auto;
+}
+
+.editor-page {
+    position: relative;
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 595px; /* A4 width in points */
+    height: 842px; /* A4 height in points */
+    max-width: 100%;
+    flex-shrink: 0;
+}
+
+.editor-page .placed-image {
+    position: absolute;
+    cursor: grab;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+.editor-page .placed-image:hover, .editor-page .placed-image.selected {
+    border-color: var(--accent-color);
+    z-index: 10;
+}
+.editor-page .placed-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none; /* Penting untuk drag-and-drop */
+}
+
+.image-library-panel {
+    width: 250px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--border-color);
+    padding-left: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+.image-library-panel h4 {
+    margin-bottom: 1rem;
+}
+.library-controls {
+    margin-bottom: 1rem;
+}
+.library-controls label {
+    width: 100%;
+    text-align: center;
+    display: block;
+}
+
+#image-library-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.library-image {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: grab;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.library-image:hover {
+    transform: scale(1.05);
+    box-shadow: var(--soft-shadow);
+}
