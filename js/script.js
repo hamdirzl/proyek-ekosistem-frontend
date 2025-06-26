@@ -1726,7 +1726,9 @@ function setupToolsPage() {
     const wrappers = [
         document.getElementById('shortener-wrapper'), document.getElementById('history-section'),
         document.getElementById('converter-wrapper'),
-        document.getElementById('qr-generator-wrapper'), document.getElementById('image-compressor-wrapper')
+        document.getElementById('qr-generator-wrapper'), document.getElementById('image-compressor-wrapper'),
+        document.getElementById('images-to-pdf-wrapper')
+        
     ];
     const toolSelectionSection = document.querySelector('.tool-selection');
 
@@ -1738,11 +1740,13 @@ function setupToolsPage() {
     document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper'));
     document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper'));
     document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper'));
+    document.getElementById('show-images-to-pdf')?.addEventListener('click', () => showToolSection('images-to-pdf-wrapper'));
 
     attachShortenerListener();
     attachConverterListener();
     attachQrCodeGeneratorListener();
     attachImageCompressorListener();
+    attachImagesToPdfListener();
 
     const fileInput = document.getElementById('file-input');
     const outputFormatSelect = document.getElementById('output-format');
@@ -1785,6 +1789,127 @@ function setupToolsPage() {
 
     setupCustomFileInputs();
     setupCustomDropdowns();
+}
+
+// [BARU] FUNGSI UNTUK ALAT IMAGES TO PDF
+function attachImagesToPdfListener() {
+    const form = document.getElementById('images-to-pdf-form');
+    if (!form) return;
+
+    const imageInput = document.getElementById('images-to-pdf-input');
+    const fileUploadLabel = form.querySelector('.file-upload-label');
+    const previewsContainer = document.getElementById('image-previews-container');
+    const messageDiv = document.getElementById('images-to-pdf-message');
+    const progressWrapper = document.getElementById('images-to-pdf-progress-wrapper');
+    const progressBar = document.getElementById('images-to-pdf-progress-bar');
+    const progressText = progressWrapper.querySelector('.progress-bar-text');
+
+    let selectedFiles = []; // Array untuk menyimpan objek File
+
+    imageInput.addEventListener('change', () => {
+        selectedFiles.push(...Array.from(imageInput.files));
+        updatePreviews();
+    });
+
+    function updatePreviews() {
+        previewsContainer.innerHTML = '';
+        if (selectedFiles.length > 0) {
+            fileUploadLabel.textContent = `${selectedFiles.length} gambar dipilih`;
+        } else {
+            fileUploadLabel.textContent = 'Belum ada gambar yang dipilih';
+        }
+
+        selectedFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const previewCard = document.createElement('div');
+                previewCard.className = 'image-preview-card';
+                previewCard.innerHTML = `
+                    <img src="${e.target.result}" alt="${file.name}">
+                    <button type="button" class="remove-btn" data-index="${index}" title="Hapus gambar">&times;</button>
+                `;
+                previewsContainer.appendChild(previewCard);
+
+                previewCard.querySelector('.remove-btn').addEventListener('click', (event) => {
+                    const idxToRemove = parseInt(event.target.dataset.index, 10);
+                    selectedFiles.splice(idxToRemove, 1);
+                    updatePreviews();
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (selectedFiles.length === 0) {
+            messageDiv.className = 'error';
+            messageDiv.textContent = 'Silakan pilih setidaknya satu gambar.';
+            return;
+        }
+
+        const formData = new FormData();
+        selectedFiles.forEach(file => {
+            formData.append('images', file);
+        });
+
+        formData.append('pageSize', document.getElementById('page-size').value);
+        formData.append('orientation', form.querySelector('input[name="orientation"]:checked').value);
+        formData.append('marginChoice', form.querySelector('input[name="margin"]:checked').value);
+
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        messageDiv.textContent = 'Mengonversi gambar ke PDF...';
+        messageDiv.className = '';
+        progressWrapper.classList.remove('hidden');
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/images-to-pdf`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Terjadi kesalahan di server (Status: ${response.status})`);
+            }
+
+            messageDiv.className = 'success';
+            messageDiv.textContent = 'Konversi berhasil! Mengunduh file...';
+
+            const blob = await response.blob();
+            const header = response.headers.get('Content-Disposition');
+            const parts = header.split(';');
+            let filename = 'converted.pdf';
+            parts.forEach(part => {
+                if (part.trim().startsWith('filename=')) {
+                    filename = part.split('=')[1].replace(/"/g, '');
+                }
+            });
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+
+            // Reset form
+            selectedFiles = [];
+            updatePreviews();
+            form.reset();
+
+        } catch (error) {
+            messageDiv.className = 'error';
+            messageDiv.textContent = `Error: ${error.message}`;
+        } finally {
+            submitButton.disabled = false;
+            progressWrapper.classList.add('hidden');
+        }
+    });
 }
 
 function showToolSection(sectionIdToShow) {
