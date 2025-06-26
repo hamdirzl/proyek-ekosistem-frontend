@@ -2183,7 +2183,7 @@ input:focus, textarea:focus, select:focus {
     }
 }
 
-/* Untuk layar ponsel (lebar maks 768px) */
+/* Untuk layar ponsel (lebar maks 768px) - KODE PERBAIKAN UTAMA DI SINI */
 @media (max-width: 768px) {
     .page-container {
         padding-left: var(--space-sm);
@@ -2200,11 +2200,14 @@ input:focus, textarea:focus, select:focus {
         gap: var(--space-md);
     }
     
-    /* FIX UTAMA: Panel opsi dan isinya */
     .pdf-tool-options {
         padding: var(--space-md); /* Mengurangi padding agar tidak sempit */
     }
 
+    /* * PERBAIKAN UTAMA: Mengatur ulang grup radio button agar rapi di mobile.
+     * Ini akan membuat pilihan seperti 'Portrait' & 'Landscape' atau 'No margin' & 'Small' 
+     * secara otomatis turun ke bawah jika tidak cukup ruang.
+    */
     .radio-card-group {
         display: grid;
         /* Buat kolom otomatis yang lebarnya minimal 100px */
