@@ -2014,8 +2014,12 @@ function attachImagesToPdfListener() {
 
 // [BARU] FUNGSI UNTUK HALAMAN SPLIT PDF
 function attachSplitPdfListener() {
+    // BARIS INI DITAMBAHKAN
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.102/build/pdf.worker.min.js`;
+
     const form = document.getElementById('split-pdf-form');
     if (!form) return;
+
 
     const fileInput = document.getElementById('split-pdf-input');
     const fileLabel = document.getElementById('split-pdf-file-label');
