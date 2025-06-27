@@ -731,7 +731,6 @@ async function uploadCroppedImageForEditor(blob, successCallback, failureCallbac
         successCallback(data.location);
 
     } catch (error) {
-        console.error(error);
         failureCallback(`Gagal unggah: ${error.message}`);
     }
 }
@@ -786,7 +785,6 @@ async function populateUserDashboard() {
             statsLastLoginEl.textContent = 'Belum ada data.';
         }
     } catch (error) {
-        console.error('Gagal memuat statistik dasbor:', error);
         statsLinkCountEl.textContent = 'Error';
         statsLastLoginEl.textContent = 'Gagal memuat';
     }
@@ -1286,7 +1284,6 @@ async function fetchAndDisplayLinks(searchQuery = '') {
 
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
-        console.error(error);
     }
 }
 async function fetchAndDisplayUsers(searchQuery = '') {
@@ -1339,7 +1336,6 @@ async function fetchAndDisplayUsers(searchQuery = '') {
 
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
-        console.error(error);
     }
 }
 async function handleDeleteLink(event) {
@@ -1358,7 +1354,6 @@ async function handleDeleteLink(event) {
 
     } catch (error) {
         alert(`Error: ${error.message}`);
-        console.error(error);
     }
 }
 async function toggleUserRole(event) {
@@ -1384,7 +1379,6 @@ async function toggleUserRole(event) {
         }
     } catch (error) {
         alert(`Error: ${error.message}`);
-        console.error(error);
     }
 }
 async function deleteUser(event) {
@@ -1403,7 +1397,6 @@ async function deleteUser(event) {
 
     } catch (error) {
         alert(`Error: ${error.message}`);
-        console.error(error);
     }
 }
 function setupPortfolioPage() {
@@ -1503,7 +1496,6 @@ function setupProjectDetailPage() {
             mainContent.style.display = 'block';
 
         } catch (error) {
-            console.error(error);
             loadingIndicator.innerHTML = `<p style="color: #ff4d4d;">Error: ${error.message}</p>`;
         }
     }
@@ -1604,7 +1596,6 @@ function setupJurnalDetailPage() {
             mainContent.style.display = 'block';
 
         } catch (error) {
-            console.error(error);
             loadingIndicator.innerHTML = `<p style="color: #ff4d4d;">Error: ${error.message}</p>`;
         }
     }
