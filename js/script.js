@@ -192,8 +192,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupImageCompressorPage();
     } else if (pageTitle.includes("Images to PDF")) {
         attachImagesToPdfListener();
-    } else if (document.getElementById('split-pdf-form')) { // INI ADALAH VERSI YANG BENAR
+    } else if (document.getElementById('split-pdf-form')) {
+    window.addEventListener('load', () => {
         attachSplitPdfListener();
+    });
     } else if (document.getElementById('login-form')) {
         setupAuthPage();
     } else if (pageTitle.includes("Logging In...")) {
