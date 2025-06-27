@@ -193,10 +193,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (pageTitle.includes("Images to PDF")) {
         attachImagesToPdfListener();
     } else if (document.getElementById('split-pdf-form')) {
-    window.addEventListener('load', () => {
-        attachSplitPdfListener();
-    });
-    } else if (document.getElementById('login-form')) {
+    // PENDEKATAN BARU: Tunggu & Periksa hingga pdfjsLib siap
+    const checkPdfJsLib = setInterval(() => {
+        // Cek apakah 'pdfjsLib' sudah terdefinisi di window
+        if (typeof pdfjsLib !== 'undefined') {
+            // Jika sudah, hentikan pengecekan
+            clearInterval(checkPdfJsLib);
+            // Sekarang aman untuk menjalankan fungsi setup
+            attachSplitPdfListener();
+        }
+    }, 100); // Lakukan pengecekan setiap 100 milidetik
+} else if (document.getElementById('login-form')) {
         setupAuthPage();
     } else if (pageTitle.includes("Logging In...")) {
         setupAuthCallbackPage();
