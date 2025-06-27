@@ -1,8 +1,6 @@
 // VERSI FINAL (PERBAIKAN 2) - Logika Pemuatan Halaman Diperbaiki
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
 
-console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
-
 // --- Variabel Global untuk Fitur Cropping & Editor ---
 let cropper = null;
 let imageToCropElement = null;
@@ -71,7 +69,6 @@ async function fetchWithAuth(url, options = {}) {
     let response = await fetch(url, options);
 
     if (response.status === 401 || response.status === 403) {
-        console.log("Access Token kedaluwarsa atau tidak valid, mencoba refresh...");
         const refreshToken = localStorage.getItem('jwt_refresh_token');
 
         if (!refreshToken) {
@@ -89,7 +86,6 @@ async function fetchWithAuth(url, options = {}) {
             if (refreshResponse.ok) {
                 const data = await refreshResponse.json();
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
-                console.log("Refresh berhasil, mengulangi permintaan...");
 
                 options.headers['Authorization'] = `Bearer ${data.accessToken}`;
                 response = await fetch(url, options);
@@ -97,7 +93,6 @@ async function fetchWithAuth(url, options = {}) {
                 forceLogout();
             }
         } catch (error) {
-            console.error("Error saat proses refresh token:", error);
             forceLogout();
         }
     }
@@ -142,7 +137,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (refreshToken && !sessionStorage.getItem('jwt_access_token')) {
-        console.log("Sesi baru, mencoba mendapatkan access token...");
         try {
             const refreshResponse = await fetch(`${API_BASE_URL}/api/refresh-token`, {
                 method: 'POST',
@@ -153,7 +147,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (refreshResponse.ok) {
                 const data = await refreshResponse.json();
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
-                console.log("Access token berhasil didapatkan untuk sesi ini.");
                 if (document.body.contains(document.getElementById('dashboard-main'))) {
                     await setupDashboardPage();
                 }
@@ -161,7 +154,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 forceLogout();
             }
         } catch (error) {
-            console.error("Gagal mendapatkan access token saat load:", error);
             forceLogout();
         }
     }
@@ -338,7 +330,6 @@ function setupChatBubble() {
         ws = new WebSocket(backendWsUrl);
         ws.onopen = () => {
             isConnecting = false;
-            console.log('Terhubung ke WebSocket. Mengidentifikasi sesi...');
             ws.send(JSON.stringify({ type: 'identify', session: session }));
         };
         ws.onmessage = (event) => {
@@ -361,14 +352,12 @@ function setupChatBubble() {
         };
         ws.onclose = () => {
             isConnecting = false;
-            console.log('Koneksi WebSocket terputus.');
             updateStatus('offline');
             ws = null;
             setTimeout(connect, 3000);
         };
         ws.onerror = (error) => {
             isConnecting = false;
-            console.error('WebSocket error:', error);
             if (ws) ws.close();
         };
     };
@@ -474,7 +463,6 @@ function setupChatBubble() {
                     isRecording = true;
                     micBtn.classList.add('is-recording');
                 } catch (err) {
-                    console.error("Error accessing microphone:", err);
                     alert("Tidak dapat mengakses mikrofon. Pastikan Anda telah memberikan izin.");
                 }
             }
@@ -511,8 +499,6 @@ async function setupAdminChatUI() {
     const backendWsUrl = `wss://server-pribadi-hamdi-docker.onrender.com?token=${accessToken}`;
     adminWebSocket = new WebSocket(backendWsUrl);
 
-    adminWebSocket.onopen = () => console.log("Koneksi WebSocket Admin berhasil dibuka.");
-    adminWebSocket.onclose = () => console.log("Koneksi WebSocket Admin ditutup.");
     adminWebSocket.onerror = (error) => console.error("Error pada WebSocket Admin:", error);
 
     let adminTypingTimeout;
@@ -621,7 +607,6 @@ async function setupAdminChatUI() {
                             appendAdminMessage(msg.content, type, msg.message_type);
                         });
                     } catch (e) {
-                        console.error("Gagal fetch riwayat chat:", e);
                         activeChatMessages.innerHTML = '<p style="color: red;">Gagal memuat riwayat.</p>';
                     }
                 });
@@ -761,7 +746,6 @@ async function setupDashboardPage() {
 
     const accessToken = sessionStorage.getItem('jwt_access_token');
     if (!accessToken) {
-        console.log("Menunggu access token dari proses refresh...");
         return;
     }
 
