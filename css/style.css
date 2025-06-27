@@ -1096,6 +1096,20 @@ input:focus, textarea:focus, select:focus {
         font-weight: 500;
     }
 
+    /* === [TAMBAHKAN INI] GAYA KHUSUS UNTUK TOMBOL LOGOUT PIL === */
+#nav-logout .button-pintu {
+    flex-direction: row;
+    gap: 8px;
+    border-radius: 50px; /* Membuat bentuk pil */
+    padding: 10px 20px;
+    background-color: var(--accent-color) !important;
+    color: #ffffff !important;
+}
+
+#nav-logout .button-pintu:hover {
+    background-color: var(--accent-hover) !important;
+}
+
     #nav-logout .button-pintu {
         flex-direction: row;
         gap: 8px;
