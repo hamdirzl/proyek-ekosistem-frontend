@@ -2946,3 +2946,54 @@ input:focus, textarea:focus, select:focus {
         display: flex;
     }
 }
+
+/* ======================================================= */
+/* ==   [PERBAIKAN] TAMPILAN CHAT LAYAR PENUH DI MOBILE   == */
+/* ======================================================= */
+@media (max-width: 768px) {
+    /* * Mengubah jendela chat agar menutupi seluruh layar di mobile.
+     * Kita atur semua sisi (top, left, right, bottom) ke 0.
+     */
+    .chat-window-container {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 0; /* Hapus sudut melengkung agar terlihat penuh */
+        
+        /* Mengubah titik asal animasi agar muncul dari bawah */
+        transform-origin: bottom center; 
+    }
+
+    /* * Sedikit penyesuaian posisi bubble di mobile agar konsisten.
+     */
+    .chat-bubble-container {
+        width: 50px;
+        height: 50px;
+        bottom: var(--space-md);
+        right: var(--space-md);
+    }
+
+    .chat-bubble-container svg {
+        width: 28px;
+        height: 28px;
+    }
+    
+    /* * Memastikan header chat tidak terlalu besar di layar kecil.
+     */
+    .chat-header h3 {
+        font-size: 1rem;
+    }
+
+    /*
+     * Memberi sedikit ruang di bawah pesan terakhir agar tidak
+     * tertutup oleh area input teks.
+     */
+    .chat-window-container .chat-messages {
+        padding-bottom: var(--space-lg);
+    }
+}
