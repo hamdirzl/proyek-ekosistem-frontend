@@ -529,7 +529,6 @@ async function setupAdminChatUI() {
     const adminChatTab = document.getElementById('admin-chat-tab');
     if (adminChatTab) adminChatTab.classList.remove('hidden');
 
-    // === Deklarasi Elemen DOM ===
     const adminChatContainer = document.getElementById('admin-chat-container');
     const userChatListItems = document.getElementById('user-chat-list-items');
     const activeChatMessages = document.getElementById('active-chat-messages');
@@ -541,10 +540,10 @@ async function setupAdminChatUI() {
     const activeChatAvatar = document.getElementById('active-chat-avatar');
     const activeChatUsername = document.getElementById('active-chat-username');
     const activeChatStatus = document.getElementById('active-chat-status');
+    const noChatsMessage = document.getElementById('no-active-chats');
 
     if (!userChatListItems || !adminChatContainer) return;
 
-    // === Event Listeners UI ===
     if (backToListBtn) {
         backToListBtn.addEventListener('click', () => {
             adminChatContainer.classList.remove('chat-active');
@@ -552,72 +551,48 @@ async function setupAdminChatUI() {
         });
     }
 
-    // === Logika WebSocket ===
-    const accessToken = sessionStorage.getItem('jwt_access_token');
-    if (!accessToken) return;
-
-    const backendWsUrl = `wss://server-pribadi-hamdi-docker.onrender.com?token=${accessToken}`;
-    adminWebSocket = new WebSocket(backendWsUrl);
-    adminWebSocket.onerror = (error) => console.error("Error pada WebSocket Admin:", error);
-
-    let adminTypingTimeout;
-    if (adminChatInput) {
-        adminChatInput.addEventListener('input', () => {
-            if (!currentAdminChatTarget) return;
-            clearTimeout(adminTypingTimeout);
-            if (adminWebSocket && adminWebSocket.readyState === WebSocket.OPEN) {
-                adminWebSocket.send(JSON.stringify({ type: 'typing', isTyping: true, targetUserId: currentAdminChatTarget }));
-            }
-            adminTypingTimeout = setTimeout(() => {
-                if (adminWebSocket && adminWebSocket.readyState === WebSocket.OPEN) {
-                    adminWebSocket.send(JSON.stringify({ type: 'typing', isTyping: false, targetUserId: currentAdminChatTarget }));
-                }
-            }, 2000);
-        });
-    }
-
-    // === Fungsi Helper Internal ===
-    const updateUserEntry = (data) => {
-        const { userId, userName, content, messageType, timestamp } = data;
-        let userEntry = document.getElementById(`chat-user-${userId}`);
-        const noChatsMessage = document.getElementById('no-active-chats');
+    // Fungsi untuk merender satu entri percakapan
+    const renderConversationEntry = (convo) => {
+        let userEntry = document.getElementById(`chat-user-${convo.conversation_id}`);
         if (noChatsMessage) noChatsMessage.style.display = 'none';
 
-        const lastMessageContent = messageType === 'image' ? '🖼️ Gambar' : (messageType === 'audio' ? '🎤 Pesan Suara' : content);
-        const timeString = new Date(timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        const lastMessageContent = convo.last_message_type === 'image' ? '🖼️ Gambar' : (convo.last_message_type === 'audio' ? '🎤 Pesan Suara' : convo.last_message);
+        const timeString = convo.last_message_time ? new Date(convo.last_message_time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+        const statusClass = convo.is_online ? 'online' : 'offline';
+        const statusText = convo.is_online ? 'Online' : 'Offline';
 
         if (!userEntry) {
             userEntry = document.createElement('div');
-            userEntry.id = `chat-user-${userId}`;
+            userEntry.id = `chat-user-${convo.conversation_id}`;
             userEntry.className = 'chat-user-entry';
-            userChatListItems.prepend(userEntry);
+            userChatListItems.appendChild(userEntry);
 
             userEntry.addEventListener('click', async () => {
                 document.querySelectorAll('.chat-user-entry.active').forEach(el => el.classList.remove('active'));
                 userEntry.classList.add('active');
-                currentAdminChatTarget = userId;
+                currentAdminChatTarget = convo.conversation_id;
 
-                chatPlaceholder.classList.add('hidden');
+                chatPlaceholder.style.display = 'none';
                 activeChatContent.classList.remove('hidden');
                 adminChatContainer.classList.add('chat-active');
                 
-                const avatarInitial = userName.charAt(0).toUpperCase();
-                activeChatAvatar.textContent = avatarInitial;
-                activeChatUsername.textContent = userName;
-                activeChatStatus.textContent = 'Online';
-                activeChatStatus.className = '';
+                activeChatAvatar.textContent = convo.user_name.charAt(0).toUpperCase();
+                activeChatUsername.textContent = convo.user_name;
+                activeChatStatus.textContent = statusText;
+                activeChatStatus.className = statusClass;
 
                 activeChatMessages.innerHTML = '<p class="message server-info">Memuat riwayat...</p>';
-                userEntry.querySelector('.unread-dot').classList.add('hidden');
+                const unreadDot = userEntry.querySelector('.unread-dot');
+                if(unreadDot) unreadDot.classList.add('hidden');
 
                 try {
-                    const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/chat/history/${userId}`);
+                    const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/chat/history/${convo.conversation_id}`);
                     if (!res.ok) throw new Error('Gagal mengambil riwayat');
                     const history = await res.json();
                     activeChatMessages.innerHTML = '';
                     history.forEach(msg => {
-                        const type = (msg.sender_type === 'admin' || msg.sender === 'admin') ? 'admin' : 'user';
-                        appendAdminMessage(userId, msg.content, type, msg.message_type, msg.created_at);
+                        const type = (msg.sender_type === 'admin') ? 'admin' : 'user';
+                        appendAdminMessage(convo.conversation_id, msg.content, type, msg.message_type, msg.created_at);
                     });
                 } catch (e) {
                     activeChatMessages.innerHTML = '<p class="message server-info" style="color: red;">Gagal memuat riwayat.</p>';
@@ -626,82 +601,84 @@ async function setupAdminChatUI() {
         }
         
         userEntry.innerHTML = `
-            <div class="chat-avatar">${userName.charAt(0).toUpperCase()}</div>
+            <div class="chat-avatar">${convo.user_name.charAt(0).toUpperCase()}</div>
             <div class="chat-user-info">
-                <span class="username">${userName}</span>
-                <span class="message-preview">${lastMessageContent}</span>
+                <span class="username">${convo.user_name}</span>
+                <span class="message-preview">${lastMessageContent || 'Belum ada pesan'}</span>
             </div>
             <div class="chat-user-meta">
                 <span class="timestamp">${timeString}</span>
-                <div class="unread-dot ${currentAdminChatTarget === userId || !data.isNew ? 'hidden' : ''}"></div>
-            </div>`;
+                <div class="unread-dot hidden"></div>
+            </div>
+        `;
 
         if (userChatListItems.firstChild !== userEntry) {
             userChatListItems.prepend(userEntry);
         }
     };
     
-    const updateUserEntryTypingStatus = (userId, isTyping) => {
-        const userEntry = document.getElementById(`chat-user-${userId}`);
-        if (!userEntry) return;
-
-        let previewSpan = userEntry.querySelector('.message-preview');
-        if (!previewSpan) return;
-
-        // Simpan teks asli jika belum disimpan
-        if (!previewSpan.dataset.originalText) {
-            previewSpan.dataset.originalText = previewSpan.textContent;
-        }
-
-        if (isTyping) {
-            previewSpan.innerHTML = '<span class="typing-status">mengetik...</span>';
-        } else {
-            previewSpan.textContent = previewSpan.dataset.originalText || '';
-            previewSpan.removeAttribute('data-original-text');
+    // Fungsi untuk mengambil dan merender semua percakapan saat dasbor dimuat
+    const fetchAndRenderConversations = async () => {
+        try {
+            const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/chat/conversations`);
+            if (!res.ok) throw new Error('Gagal memuat daftar percakapan');
+            const conversations = await res.json();
+            
+            if (conversations.length > 0) {
+                userChatListItems.innerHTML = ''; 
+                conversations.forEach(renderConversationEntry);
+            } else {
+                if (noChatsMessage) noChatsMessage.style.display = 'block';
+            }
+        } catch (error) {
+            console.error(error);
+            if (noChatsMessage) noChatsMessage.textContent = 'Gagal memuat percakapan.';
         }
     };
+    
+    await fetchAndRenderConversations();
+    
+    // Logika WebSocket
+    const accessToken = sessionStorage.getItem('jwt_access_token');
+    if (!accessToken) return;
+    const backendWsUrl = `wss://server-pribadi-hamdi-docker.onrender.com?token=${accessToken}`;
+    adminWebSocket = new WebSocket(backendWsUrl);
 
-    // === Menangani Pesan dari WebSocket ===
     adminWebSocket.onmessage = async (event) => {
         const data = JSON.parse(event.data);
 
         if (data.type === 'chat') {
-            const userId = data.sender;
-            updateUserEntry({
-                userId: userId,
-                userName: data.userName || `Pengunjung ${userId.substring(0, 6)}`,
-                content: data.content,
-                messageType: data.messageType,
-                timestamp: new Date(),
-                isNew: true
+             renderConversationEntry({
+                conversation_id: data.sender,
+                user_name: data.userName,
+                last_message: data.content,
+                last_message_type: data.messageType,
+                last_message_time: new Date(),
+                is_online: true
             });
 
-            if (currentAdminChatTarget === userId) {
-                appendAdminMessage(userId, data.content, 'user', data.messageType, new Date());
+            if (currentAdminChatTarget === data.sender) {
+                appendAdminMessage(data.sender, data.content, 'user', data.messageType, new Date());
+            } else {
+                const userEntry = document.getElementById(`chat-user-${data.sender}`);
+                if (userEntry) {
+                    const unreadDot = userEntry.querySelector('.unread-dot');
+                    if(unreadDot) unreadDot.classList.remove('hidden');
+                }
             }
-
         } else if (data.type === 'user_disconnected') {
             const userEntry = document.getElementById(`chat-user-${data.userId}`);
-            if (userEntry) userEntry.style.opacity = '0.7';
+            if (userEntry) userEntry.style.opacity = '0.7'; 
             if(currentAdminChatTarget === data.userId) {
                 activeChatStatus.textContent = 'Offline';
                 activeChatStatus.className = 'offline';
             }
-            updateUserEntryTypingStatus(data.userId, false);
-
-        } else if (data.type === 'typing') {
-            updateUserEntryTypingStatus(data.userId, data.isTyping);
         }
     };
 
-    // === Event Listener Form Submit ===
     if (adminChatForm) {
         adminChatForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            clearTimeout(adminTypingTimeout);
-            if (adminWebSocket && adminWebSocket.readyState === WebSocket.OPEN) {
-                adminWebSocket.send(JSON.stringify({ type: 'typing', isTyping: false, targetUserId: currentAdminChatTarget }));
-            }
             const message = adminChatInput.value.trim();
             if (message && currentAdminChatTarget && adminWebSocket.readyState === WebSocket.OPEN) {
                 const timestamp = new Date();
@@ -713,16 +690,15 @@ async function setupAdminChatUI() {
                 }));
                 appendAdminMessage(currentAdminChatTarget, message, 'admin', 'text', timestamp);
 
-                // Update entri di daftar chat
-                 const userEntry = document.getElementById(`chat-user-${currentAdminChatTarget}`);
-                 if(userEntry){
-                    const previewSpan = userEntry.querySelector('.message-preview');
-                    const timeSpan = userEntry.querySelector('.timestamp');
-                    if(previewSpan) previewSpan.textContent = `Anda: ${message}`;
-                    if(timeSpan) timeSpan.textContent = timestamp.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                    // Pindahkan ke atas
-                    if(userChatListItems.firstChild !== userEntry) userChatListItems.prepend(userEntry);
-                 }
+                renderConversationEntry({
+                    conversation_id: currentAdminChatTarget,
+                    user_name: activeChatUsername.textContent,
+                    last_message: `Anda: ${message}`,
+                    last_message_type: 'text',
+                    last_message_time: timestamp,
+                    is_online: true
+                });
+
                 adminChatInput.value = '';
             }
         });
