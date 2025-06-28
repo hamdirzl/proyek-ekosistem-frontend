@@ -477,6 +477,53 @@ function setupChatBubble() {
     }
 }
 
+function appendAdminMessage(userId, content, type, messageType = 'text', timestamp) {
+    const activeChatMessages = document.getElementById('active-chat-messages');
+    if (!activeChatMessages || currentAdminChatTarget !== userId) return;
+
+    const messageDate = new Date(timestamp);
+    const timeString = messageDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+    let lastGroup = activeChatMessages.lastElementChild;
+    const senderClass = type === 'admin' ? 'admin' : 'user';
+
+    // Buat grup baru jika tidak ada grup, atau jika pengirimnya berbeda
+    if (!lastGroup || !lastGroup.classList.contains(`message-group-${senderClass}`)) {
+        lastGroup = document.createElement('div');
+        lastGroup.className = `message-group message-group-${senderClass}`;
+        activeChatMessages.appendChild(lastGroup);
+    }
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${senderClass}`;
+
+    if (messageType === 'text') {
+        messageDiv.textContent = content;
+    } else if (messageType === 'image') {
+        const img = document.createElement('img');
+        img.src = content;
+        img.alt = 'Gambar terkirim';
+        img.style.cursor = 'pointer';
+        img.onclick = () => window.open(content, '_blank');
+        img.onload = () => { activeChatMessages.scrollTop = activeChatMessages.scrollHeight; };
+        messageDiv.appendChild(img);
+    } else if (messageType === 'audio') {
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        audio.src = content;
+        messageDiv.appendChild(audio);
+    }
+
+    const metaDiv = document.createElement('div');
+    metaDiv.className = 'message-meta';
+    metaDiv.textContent = timeString;
+
+    lastGroup.appendChild(messageDiv);
+    lastGroup.appendChild(metaDiv);
+    
+    // Auto-scroll ke pesan terakhir
+    activeChatMessages.scrollTop = activeChatMessages.scrollHeight;
+}
 
 async function setupAdminChatUI() {
     const adminChatTab = document.getElementById('admin-chat-tab');
