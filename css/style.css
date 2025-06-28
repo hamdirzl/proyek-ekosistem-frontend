@@ -2769,12 +2769,59 @@ input:focus, textarea:focus, select:focus {
 .chat-form .button-pintu { border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
 /* [RESPONSIVE KHUSUS UNTUK PANEL ADMIN] */
+/* ================================================================= */
+/* ==   [PERBAIKAN FINAL V.4] RESPONSIVE KHUSUS PANEL ADMIN CHAT  == */
+/* ================================================================= */
+
+/* Aturan ini hanya berlaku untuk layar dengan lebar 768px atau kurang */
 @media (max-width: 768px) {
-    #admin-chat-container { height: 80vh; }
-    #admin-chat-container .user-chat-list, #admin-chat-container .active-chat-area { position: absolute; width: 100%; height: 100%; top: 0; left: 0; transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); background-color: var(--card-bg-color); }
-    #admin-chat-container .user-chat-list { transform: translateX(0); z-index: 2; }
-    #admin-chat-container .active-chat-area { transform: translateX(100%); z-index: 1; }
-    #admin-chat-container.chat-active .user-chat-list { transform: translateX(-100%); }
-    #admin-chat-container.chat-active .active-chat-area { transform: translateX(0); z-index: 3; }
-    #admin-chat-container #back-to-list-btn { display: flex; }
+    
+    /* Saat sebuah chat DIBUKA (class .chat-active ditambahkan oleh JS),
+       kita ubah panel chat menjadi layar penuh. */
+    #admin-chat-container.chat-active {
+        position: fixed;   /* KUNCI UTAMA: Mengangkat elemen ke atas segalanya */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;      /* Memaksa elemen menutupi seluruh layar */
+        z-index: 2000;     /* Memastikan tampil di lapisan paling atas */
+        border-radius: 0;  /* Hapus sudut melengkung di mode layar penuh */
+        border: none;
+    }
+
+    /* Ini adalah aturan untuk animasi geser antar panel di mobile.
+       Ini tidak berubah, tapi harus tetap ada di dalam media query. */
+    #admin-chat-container .user-chat-list,
+    #admin-chat-container .active-chat-area {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        background-color: var(--card-bg-color);
+    }
+
+    #admin-chat-container .user-chat-list {
+        transform: translateX(0);
+        z-index: 2;
+    }
+
+    #admin-chat-container .active-chat-area {
+        transform: translateX(100%);
+        z-index: 1;
+    }
+
+    #admin-chat-container.chat-active .user-chat-list {
+        transform: translateX(-100%);
+    }
+
+    #admin-chat-container.chat-active .active-chat-area {
+        transform: translateX(0);
+        z-index: 3;
+    }
+
+    #admin-chat-container #back-to-list-btn {
+        display: flex;
+    }
 }
