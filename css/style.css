@@ -1430,173 +1430,6 @@ input:focus, textarea:focus, select:focus {
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
 }
 
-
-/* ============================================= */
-/* ==         [BARU] GAYA UNTUK LIVE CHAT       == */
-/* ============================================= */
-
-.chat-bubble-container {
-    position: fixed;
-    bottom: var(--space-lg);
-    right: var(--space-lg);
-    width: 60px;
-    height: 60px;
-    background-color: var(--accent-color);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-    z-index: 1050;
-    transition: transform 0.3s ease, background-color 0.3s ease;
-}
-
-.chat-bubble-container:hover {
-    transform: scale(1.1);
-    background-color: var(--accent-hover);
-}
-
-.chat-window-container {
-    position: fixed;
-    bottom: calc(var(--space-lg) + 75px);
-    right: var(--space-lg);
-    width: 350px;
-    max-width: 90vw;
-    height: 500px;
-    max-height: 70vh;
-    background-color: var(--card-bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    box-shadow: var(--soft-shadow);
-    z-index: 1050;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transform-origin: bottom right;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    transform: scale(0.95);
-    opacity: 0;
-}
-
-.chat-window-container:not(.hidden) {
-    transform: scale(1);
-    opacity: 1;
-}
-
-.chat-header {
-    padding: var(--space-sm) var(--space-md);
-    background-color: var(--background-color);
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-shrink: 0;
-}
-
-.chat-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
-    color: var(--text-color);
-}
-
-#chat-status {
-    font-size: 0.8rem;
-    color: var(--text-muted-color);
-    margin-left: auto;
-    margin-right: var(--space-md);
-}
-
-#close-chat-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--text-muted-color);
-}
-
-.chat-messages {
-    flex-grow: 1;
-    padding: var(--space-md);
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.message {
-    margin-bottom: var(--space-sm);
-    padding: 0.7rem 1rem;
-    border-radius: 18px;
-    max-width: 85%;
-    line-height: 1.4;
-    word-wrap: break-word;
-}
-
-.message.user {
-    background-color: var(--accent-color);
-    color: white;
-    border-bottom-right-radius: 4px;
-    align-self: flex-end;
-}
-
-.message.admin {
-    background-color: #e9ecef;
-    color: var(--text-color);
-    border-bottom-left-radius: 4px;
-    align-self: flex-start;
-}
-
-.message.server-info {
-    font-size: 0.8rem;
-    text-align: center;
-    color: var(--text-muted-color);
-    background: none;
-    width: 100%;
-    max-width: 100%;
-    align-self: center;
-}
-
-.chat-form {
-    display: flex;
-    border-top: 1px solid var(--border-color);
-    padding: var(--space-sm);
-    flex-shrink: 0;
-}
-
-#chat-input, #admin-chat-input {
-    flex-grow: 1;
-    border: none;
-    padding: 0.5rem;
-    background-color: transparent;
-    color: var(--text-color);
-}
-#chat-input:focus, #admin-chat-input:focus {
-    outline: none;
-    box-shadow: none;
-}
-
-.chat-form button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--accent-color);
-    padding: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-#admin-chat-form button {
-    background-color: var(--accent-color);
-    color: white;
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    transition: background-color 0.2s ease;
-}
-#admin-chat-form button:hover {
-    background-color: var(--accent-hover);
-}
-
 /* ============================================= */
 /* ==   [BARU] PENYESUAIAN LIVE CHAT MOBILE   == */
 /* ============================================= */
@@ -2469,297 +2302,6 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* ============================================= */
-/* ==      GAYA BARU UNTUK LIVE CHAT ADMIN    == */
-/* ============================================= */
-
-/* Container Utama */
-#admin-chat-container {
-    display: flex;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    height: 70vh;
-    overflow: hidden;
-    background-color: var(--card-bg-color);
-    position: relative; /* Diperlukan untuk layout mobile */
-}
-
-/* Kolom Daftar Chat (Kiri) */
-.user-chat-list {
-    width: 35%;
-    max-width: 350px;
-    min-width: 280px;
-    border-right: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    transition: margin-left 0.3s ease-in-out;
-}
-
-.chat-list-header {
-    padding: var(--space-md);
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-}
-
-.chat-list-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
-}
-
-#user-chat-list-items {
-    overflow-y: auto;
-    flex-grow: 1;
-    padding: var(--space-xs);
-}
-
-/* Setiap item di daftar chat */
-.chat-user-entry {
-    display: flex;
-    align-items: center;
-    padding: var(--space-sm);
-    cursor: pointer;
-    border-radius: 8px;
-    margin: var(--space-xs);
-    transition: background-color 0.2s ease;
-    gap: var(--space-sm);
-}
-
-.chat-user-entry:hover {
-    background-color: #f1f3f5;
-}
-
-.chat-user-entry.active {
-    background-color: var(--accent-color);
-    color: white;
-}
-
-/* Avatar Pengguna */
-.chat-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background-color: var(--border-color);
-    color: var(--text-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-    flex-shrink: 0;
-    overflow: hidden;
-}
-
-.chat-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.chat-user-entry.active .chat-avatar {
-    background-color: white;
-    color: var(--accent-color);
-}
-
-/* Info Pengguna (Nama & Preview Pesan) */
-.chat-user-info {
-    flex-grow: 1;
-    overflow: hidden;
-}
-
-.chat-user-info .username {
-    font-weight: 600;
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.chat-user-entry.active .chat-user-info .username {
-    color: white;
-}
-
-.chat-user-info .message-preview {
-    font-size: 0.85rem;
-    color: var(--text-muted-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: flex;
-    align-items: center;
-}
-
-.chat-user-entry.active .chat-user-info .message-preview {
-    color: rgba(255, 255, 255, 0.8);
-}
-.typing-status {
-    font-style: italic;
-    color: var(--accent-color) !important;
-    margin-left: 4px;
-}
-.chat-user-entry.active .typing-status {
-    color: white !important;
-}
-
-
-/* Info Meta (Waktu & Unread Dot) */
-.chat-user-meta {
-    flex-shrink: 0;
-    text-align: right;
-    font-size: 0.75rem;
-    color: var(--text-muted-color);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-}
-
-.chat-user-entry.active .chat-user-meta {
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.unread-dot {
-    width: 12px;
-    height: 12px;
-    background-color: var(--accent-color);
-    border-radius: 50%;
-    align-self: flex-end;
-    transition: transform 0.2s;
-}
-.unread-dot.hidden {
-    transform: scale(0);
-}
-.chat-user-entry.active .unread-dot {
-    background-color: white;
-}
-
-
-/* Area Chat Aktif (Kanan) */
-.active-chat-area {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    width: 65%;
-}
-
-#active-chat-content {
-    display: flex;
-    flex-direction: column;
-    height: 100%; /* Pastikan kontainer ini mengisi seluruh area */
-    flex-grow: 1;
-}
-
-#active-chat-content.hidden {
-    display: none !important;
-}
-
-.active-chat-header {
-    flex-shrink: 0; /* Mencegah header mengecil */
-}
-
-#active-chat-messages {
-    flex-grow: 1; /* Membuat area pesan ini mengisi ruang kosong yang tersisa */
-    overflow-y: auto; /* HANYA area ini yang bisa di-scroll */
-}
-
-#admin-chat-form {
-    flex-shrink: 0; /* Mencegah form input mengecil */
-}
-
-#chat-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: var(--text-muted-color);
-    text-align: center;
-}
-
-/* Header di area chat aktif */
-.active-chat-header {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-md);
-    border-bottom: 1px solid var(--border-color);
-    background-color: var(--background-color);
-    flex-shrink: 0;
-}
-
-#back-to-list-btn {
-    display: none; /* Sembunyikan di desktop */
-}
-
-.active-chat-header .chat-user-profile {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-.active-chat-header #active-chat-username {
-    font-weight: 600;
-}
-.active-chat-header #active-chat-status {
-    font-size: 0.8rem;
-    color: #28a745; /* Warna hijau untuk online */
-}
-.active-chat-header #active-chat-status.offline {
-    color: var(--text-muted-color);
-}
-
-/* Area Pesan */
-#active-chat-messages {
-    flex-grow: 1;
-    padding: var(--space-md);
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem; /* Jarak antar bubble chat */
-}
-
-.message-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 0.75rem;
-}
-
-.message-group.user { align-items: flex-start; } /* Pengguna/Visitor di KIRI */
-.message-group.admin { align-items: flex-end; }   /* Admin (Anda) di KANAN */
-
-.message {
-    padding: 0.7rem 1rem;
-    border-radius: 18px;
-    max-width: 80%;
-    line-height: 1.4;
-    word-wrap: break-word;
-    margin-bottom: 2px;
-}
-
-.message.user {
-    background-color: var(--accent-color);
-    color: white;
-    border-bottom-right-radius: 4px;
-}
-
-.message.admin {
-    background-color: #e9ecef;
-    color: var(--text-color);
-    border-bottom-left-radius: 4px;
-}
-
-.message-meta {
-    font-size: 0.7rem;
-    color: var(--text-muted-color);
-    padding: 0 0.75rem;
-}
-
-/* Form Input */
-#admin-chat-form {
-    border-top: 1px solid var(--border-color);
-    padding: var(--space-sm);
-    background-color: var(--background-color);
-}
-
-
-/* ============================================= */
 /* ==         RESPONSIVE UNTUK CHAT MOBILE    == */
 /* ============================================= */
 @media (max-width: 768px) {
@@ -2835,28 +2377,173 @@ input:focus, textarea:focus, select:focus {
   padding: 0.8rem; /* Buat tombol sedikit lebih besar agar mudah di-klik */
 }
 
-/* ======================================================= */
-/* == PERBAIKAN FINAL - Penataan Chat Khusus Dasbor Admin == */
-/* ======================================================= */
+/* ================================================= */
+/* ==   BLOK CSS FINAL UNTUK SEMUA FITUR LIVE CHAT  == */
+/* ================================================= */
 
-/* 1. Atur perataan untuk grup pesan di dalam dasbor */
+/* --- Bagian 1: Gaya Umum untuk Chat Pengunjung & Admin --- */
+
+.chat-bubble-container {
+    position: fixed;
+    bottom: var(--space-lg);
+    right: var(--space-lg);
+    width: 60px;
+    height: 60px;
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    z-index: 1050;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.chat-bubble-container:hover {
+    transform: scale(1.1);
+    background-color: var(--accent-hover);
+}
+
+.chat-window-container {
+    position: fixed;
+    bottom: calc(var(--space-lg) + 75px);
+    right: var(--space-lg);
+    width: 350px;
+    max-width: 90vw;
+    height: 500px;
+    max-height: 70vh;
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--soft-shadow);
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform-origin: bottom right;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: scale(0.95);
+    opacity: 0;
+}
+
+.chat-window-container:not(.hidden) {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.chat-header {
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--background-color);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+#chat-status {
+    font-size: 0.8rem;
+    color: var(--text-muted-color);
+    margin-left: auto;
+    margin-right: var(--space-md);
+}
+
+#close-chat-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted-color);
+}
+
+#chat-start-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: var(--space-lg);
+  text-align: center;
+  gap: var(--space-md);
+}
+
+.chat-messages {
+    flex-grow: 1;
+    padding: var(--space-md);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    margin-bottom: var(--space-sm);
+    padding: 0.7rem 1rem;
+    border-radius: 18px;
+    max-width: 85%;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.chat-form {
+    display: flex;
+    border-top: 1px solid var(--border-color);
+    padding: var(--space-sm);
+    flex-shrink: 0;
+}
+
+#chat-input {
+    flex-grow: 1;
+    border: none;
+    padding: 0.5rem;
+    background-color: transparent;
+}
+#chat-input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* --- Bagian 2: Gaya Spesifik untuk Bubble Chat PENGUNJUNG --- */
+/* (Aturan ini tidak akan memengaruhi Dasbor Admin) */
+
+.chat-window-container .message.user {
+    background-color: var(--accent-color); /* Pesan Pengunjung: BIRU */
+    color: white;
+    border-bottom-right-radius: 4px;
+    align-self: flex-end; /* Posisi di KANAN */
+}
+
+.chat-window-container .message.admin {
+    background-color: #e9ecef; /* Pesan Admin: ABU-ABU */
+    color: var(--text-color);
+    border-bottom-left-radius: 4px;
+    align-self: flex-start; /* Posisi di KIRI */
+}
+
+/* --- Bagian 3: Gaya Spesifik untuk Bubble Chat di DASBOR ADMIN --- */
+/* (Aturan ini HANYA berlaku di dalam dasbor admin) */
+
 #admin-chat-container .message-group.user {
-    align-items: flex-start; /* Kiri untuk Pengguna */
+    align-items: flex-start; /* Grup pesan Pengguna di KIRI */
 }
 
 #admin-chat-container .message-group.admin {
-    align-items: flex-end; /* Kanan untuk Admin (Anda) */
+    align-items: flex-end;   /* Grup pesan Admin di KANAN */
 }
 
-/* 2. Timpa (override) aturan global untuk warna & perataan bubble HANYA di dalam dasbor */
 #admin-chat-container .message.user {
-    background-color: #e9ecef; /* Abu-abu untuk Pengguna */
+    background-color: #e9ecef;      /* Pesan Pengguna: ABU-ABU */
     color: var(--text-color);
-    align-self: auto; /* PENTING: Menonaktifkan perataan paksa dari aturan global */
+    align-self: auto;
 }
 
 #admin-chat-container .message.admin {
-    background-color: var(--accent-color); /* Biru untuk Admin */
+    background-color: var(--accent-color); /* Pesan Admin: BIRU */
     color: white;
-    align-self: auto; /* PENTING: Menonaktifkan perataan paksa dari aturan global */
+    align-self: auto;
 }
