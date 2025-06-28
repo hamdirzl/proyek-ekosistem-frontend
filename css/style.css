@@ -2768,28 +2768,24 @@ input:focus, textarea:focus, select:focus {
 #admin-chat-input:focus { outline: none; border-color: var(--accent-color); background-color: white; }
 .chat-form .button-pintu { border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-/* [RESPONSIVE KHUSUS UNTUK PANEL ADMIN] */
 /* ================================================================= */
-/* ==   [PERBAIKAN FINAL V.4] RESPONSIVE KHUSUS PANEL ADMIN CHAT  == */
+/* ==   [PERBAIKAN FINAL V.5] RESPONSIVE KHUSUS PANEL ADMIN CHAT  == */
 /* ================================================================= */
 
 /* Aturan ini hanya berlaku untuk layar dengan lebar 768px atau kurang */
 @media (max-width: 768px) {
-    
-    /* Saat sebuah chat DIBUKA (class .chat-active ditambahkan oleh JS),
-       kita ubah panel chat menjadi layar penuh. */
-    #admin-chat-container.chat-active {
-        position: fixed;   /* KUNCI UTAMA: Mengangkat elemen ke atas segalanya */
+    #admin-chat-container {
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;      /* Memaksa elemen menutupi seluruh layar */
-        z-index: 2000;     /* Memastikan tampil di lapisan paling atas */
-        border-radius: 0;  /* Hapus sudut melengkung di mode layar penuh */
+        height: 100%;
+        z-index: 2000;
+        border-radius: 0;
         border: none;
     }
 
-    /* Ini adalah aturan untuk animasi geser antar panel di mobile.
+    /* Aturan untuk animasi geser antar panel di mobile.
        Ini tidak berubah, tapi harus tetap ada di dalam media query. */
     #admin-chat-container .user-chat-list,
     #admin-chat-container .active-chat-area {
