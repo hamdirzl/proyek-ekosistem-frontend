@@ -2547,3 +2547,142 @@ input:focus, textarea:focus, select:focus {
     color: white;
     align-self: auto;
 }
+
+/* ============================================================= */
+/* == PERBAIKAN FINAL - Tampilan Daftar Percakapan Admin == */
+/* ============================================================= */
+
+/* Tata letak utama panel kiri */
+#admin-chat-container .user-chat-list {
+    width: 35%;
+    max-width: 350px;
+    min-width: 280px;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+#admin-chat-container .chat-list-header {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+#admin-chat-container .chat-list-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+#admin-chat-container #user-chat-list-items {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding: var(--space-xs);
+}
+
+/* Penataan untuk setiap item/kartu percakapan */
+#admin-chat-container .chat-user-entry {
+    display: flex;
+    align-items: center;
+    padding: var(--space-sm);
+    cursor: pointer;
+    border-radius: 8px;
+    margin: var(--space-xs);
+    transition: background-color 0.2s ease;
+    gap: var(--space-sm);
+}
+
+#admin-chat-container .chat-user-entry:hover {
+    background-color: #f1f3f5;
+}
+
+#admin-chat-container .chat-user-entry.active {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+/* Avatar (huruf inisial) */
+#admin-chat-container .chat-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+#admin-chat-container .chat-user-entry.active .chat-avatar {
+    background-color: white;
+    color: var(--accent-color);
+}
+
+/* Info (Nama & Preview Pesan) */
+#admin-chat-container .chat-user-info {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+#admin-chat-container .chat-user-info .username {
+    font-weight: 600;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#admin-chat-container .chat-user-entry.active .chat-user-info .username {
+    color: white;
+}
+
+#admin-chat-container .chat-user-info .message-preview {
+    font-size: 0.85rem;
+    color: var(--text-muted-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+}
+#admin-chat-container .chat-user-entry.active .chat-user-info .message-preview {
+    color: rgba(255, 255, 255, 0.8);
+}
+#admin-chat-container .typing-status {
+    font-style: italic;
+    color: var(--accent-color) !important;
+    margin-left: 4px;
+}
+#admin-chat-container .chat-user-entry.active .typing-status {
+    color: white !important;
+}
+
+/* Meta (Waktu & Tanda Belum Dibaca) */
+#admin-chat-container .chat-user-meta {
+    flex-shrink: 0;
+    text-align: right;
+    font-size: 0.75rem;
+    color: var(--text-muted-color);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+#admin-chat-container .chat-user-entry.active .chat-user-meta {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+#admin-chat-container .unread-dot {
+    width: 12px;
+    height: 12px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    align-self: flex-end;
+    transition: transform 0.2s;
+}
+#admin-chat-container .unread-dot.hidden {
+    transform: scale(0);
+}
+#admin-chat-container .chat-user-entry.active .unread-dot {
+    background-color: white;
+}
