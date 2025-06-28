@@ -2834,3 +2834,29 @@ input:focus, textarea:focus, select:focus {
   width: 100%;
   padding: 0.8rem; /* Buat tombol sedikit lebih besar agar mudah di-klik */
 }
+
+/* ======================================================= */
+/* == PERBAIKAN FINAL - Penataan Chat Khusus Dasbor Admin == */
+/* ======================================================= */
+
+/* 1. Atur perataan untuk grup pesan di dalam dasbor */
+#admin-chat-container .message-group.user {
+    align-items: flex-start; /* Kiri untuk Pengguna */
+}
+
+#admin-chat-container .message-group.admin {
+    align-items: flex-end; /* Kanan untuk Admin (Anda) */
+}
+
+/* 2. Timpa (override) aturan global untuk warna & perataan bubble HANYA di dalam dasbor */
+#admin-chat-container .message.user {
+    background-color: #e9ecef; /* Abu-abu untuk Pengguna */
+    color: var(--text-color);
+    align-self: auto; /* PENTING: Menonaktifkan perataan paksa dari aturan global */
+}
+
+#admin-chat-container .message.admin {
+    background-color: var(--accent-color); /* Biru untuk Admin */
+    color: white;
+    align-self: auto; /* PENTING: Menonaktifkan perataan paksa dari aturan global */
+}
