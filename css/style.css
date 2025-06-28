@@ -2768,13 +2768,58 @@ input:focus, textarea:focus, select:focus {
 #admin-chat-input:focus { outline: none; border-color: var(--accent-color); background-color: white; }
 .chat-form .button-pintu { border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-/* [RESPONSIVE KHUSUS UNTUK PANEL ADMIN] */
+/* ======================================================= */
+/* ==   [PERBAIKAN FINAL] TAMPILAN CHAT MOBILE V.3      == */
+/* ======================================================= */
+
+/* Aturan ini hanya berlaku untuk layar dengan lebar 768px atau kurang */
 @media (max-width: 768px) {
-    #admin-chat-container { height: 80vh; }
-    #admin-chat-container .user-chat-list, #admin-chat-container .active-chat-area { position: absolute; width: 100%; height: 100%; top: 0; left: 0; transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); background-color: var(--card-bg-color); }
-    #admin-chat-container .user-chat-list { transform: translateX(0); z-index: 2; }
-    #admin-chat-container .active-chat-area { transform: translateX(100%); z-index: 1; }
-    #admin-chat-container.chat-active .user-chat-list { transform: translateX(-100%); }
-    #admin-chat-container.chat-active .active-chat-area { transform: translateX(0); z-index: 3; }
-    #admin-chat-container #back-to-list-btn { display: flex; }
+
+    /* --- Memperbaiki Masalah "Kotak di dalam Kotak" --- */
+    /* Kita menargetkan panel admin secara lebih spesifik untuk menimpa gaya lama */
+    .dashboard-panel#panel-admin-chat {
+        padding: 0; /* Hapus padding dari container induk */
+        border: none;
+    }
+
+    #admin-chat-container {
+        /* Memaksa kontainer chat untuk mengisi seluruh ruang panel */
+        height: 85vh; /* Ambil lebih banyak ruang vertikal */
+        border-radius: 0;
+        border: none;
+    }
+
+    /* Memastikan area chat aktif benar-benar menutupi layar */
+    #admin-chat-container .active-chat-area {
+        padding: 0; /* Hapus padding yang tidak perlu */
+    }
+
+    /* --- Memperbaiki Perataan Pesan --- */
+    /* Kita perlu memastikan area pesan menggunakan seluruh lebar yang tersedia */
+    #active-chat-messages {
+        display: flex;
+        flex-direction: column;
+        width: 100%; /* Gunakan lebar penuh */
+        padding: var(--space-md); /* Beri padding di dalam, bukan di luar */
+    }
+    
+    /* Aturan ini memastikan grup pesan bisa rata kiri atau kanan */
+    .message-group {
+        display: flex; /* Ini penting agar align-items berfungsi */
+        flex-direction: column;
+        max-width: 80%;
+        margin-bottom: var(--space-sm);
+    }
+
+    /* Mengatur grup pesan PENGGUNA (abu-abu) ke KIRI */
+    .message-group-user {
+        align-self: flex-start;
+        align-items: flex-start;
+    }
+
+    /* Mengatur grup pesan ADMIN (biru) ke KANAN */
+    .message-group-admin {
+        align-self: flex-end;
+        align-items: flex-end;
+    }
 }
