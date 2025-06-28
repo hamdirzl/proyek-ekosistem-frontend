@@ -2473,6 +2473,156 @@ input:focus, textarea:focus, select:focus {
     background-color: white;
 }
 
+/* ================================================================= */
+/* ==   [KODE TAMBAHAN] GAYA UNTUK GELEMBUNG CHAT PENGUNJUNG     == */
+/* ================================================================= */
+
+.chat-bubble-container {
+    position: fixed;
+    bottom: var(--space-lg);
+    right: var(--space-lg);
+    width: 60px;
+    height: 60px;
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    z-index: 1050;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.chat-bubble-container:hover {
+    transform: scale(1.1);
+    background-color: var(--accent-hover);
+}
+
+.chat-window-container {
+    position: fixed;
+    bottom: calc(var(--space-lg) + 75px);
+    right: var(--space-lg);
+    width: 350px;
+    max-width: 90vw;
+    height: 500px;
+    max-height: 70vh;
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--soft-shadow);
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform-origin: bottom right;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: scale(0.95);
+    opacity: 0;
+}
+
+.chat-window-container:not(.hidden) {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.chat-header {
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--background-color);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+#chat-status {
+    font-size: 0.8rem;
+    color: var(--text-muted-color);
+    margin-left: auto;
+    margin-right: var(--space-md);
+}
+
+#close-chat-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted-color);
+}
+
+#chat-start-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: var(--space-lg);
+  text-align: center;
+  gap: var(--space-md);
+}
+
+#chat-main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chat-window-container .chat-messages {
+    flex-grow: 1;
+    padding: var(--space-md);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Aturan untuk pesan di JENDELA PENGUNJUNG */
+.chat-window-container .message {
+    margin-bottom: var(--space-sm);
+    padding: 0.7rem 1rem;
+    border-radius: 18px;
+    max-width: 85%;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.chat-window-container .message.user {
+    background-color: var(--accent-color);
+    color: white;
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+}
+
+.chat-window-container .message.admin {
+    background-color: #e9ecef;
+    color: var(--text-color);
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+}
+
+.chat-window-container .chat-form {
+    display: flex;
+    border-top: 1px solid var(--border-color);
+    padding: var(--space-sm);
+    flex-shrink: 0;
+}
+
+#chat-input {
+    flex-grow: 1;
+    border: none;
+    padding: 0.5rem;
+    background-color: transparent;
+}
+#chat-input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
 /* ======================================================== */
 /* ==   BLOK CSS FINAL UNTUK ANTARMUKA LIVE CHAT ADMIN   == */
 /* ======================================================== */
