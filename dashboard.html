@@ -235,58 +235,52 @@
                 </div>
                 
                 <div id="panel-admin-chat" class="dashboard-panel">
-    <h2 class="section-title" style="text-align: left; margin-bottom: var(--space-md);">Manajemen Live Chat</h2>
     
     <div id="admin-chat-container">
 
-        <div id="user-chat-list" class="user-chat-list">
+        <div class="user-chat-list">
             <div class="chat-list-header">
-                <h3>Percakapan</h3>
+                <h3>Percakapan Masuk</h3>
             </div>
             <div id="user-chat-list-items">
-                <p id="no-active-chats">Tidak ada percakapan aktif.</p>
+                <p id="no-active-chats" class="chat-list-placeholder">Tidak ada percakapan aktif.</p>
             </div>
         </div>
 
-        <div id="active-chat-area" class="active-chat-area">
-            <div id="chat-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="color: var(--border-hover-color);"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                <p>Pilih percakapan dari daftar untuk memulai.</p>
+        <div class="active-chat-area">
+
+            <div id="chat-placeholder" class="chat-placeholder-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <h4>Pilih percakapan dari daftar</h4>
+                <p>Mulai balas pesan dari pengunjung situs Anda di sini.</p>
             </div>
 
             <div id="active-chat-content" class="hidden">
                  <div class="active-chat-header">
-                    <button id="back-to-list-btn" class="mood-icon-button">
+                    <button id="back-to-list-btn" class="mood-icon-button" aria-label="Kembali ke daftar">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     </button>
                     <div class="chat-user-profile">
                         <div class="chat-avatar" id="active-chat-avatar"></div>
                         <div class="chat-user-info">
-                            <span id="active-chat-username"></span>
-                            <span id="active-chat-status"></span>
+                            <span id="active-chat-username" class="username"></span>
+                            <span id="active-chat-status" class="status"></span>
                         </div>
                     </div>
                 </div>
 
-                <div id="active-chat-messages">
-                    </div>
+                <div id="active-chat-messages"></div>
                 
                 <form id="admin-chat-form" class="chat-form">
-                    <label for="admin-chat-image-input" class="chat-tool-btn" aria-label="Kirim Gambar">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                    </label>
-                    <input type="file" id="admin-chat-image-input" accept="image/*" style="display: none;">
-                
-                    <button type="button" id="admin-chat-mic-btn" class="chat-tool-btn" aria-label="Rekam Suara">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+                    <input type="text" id="admin-chat-input" placeholder="Ketik balasan Anda..." autocomplete="off" required>
+                    <button type="submit" class="button-pintu" aria-label="Kirim Pesan">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     </button>
-                    
-                    <input type="text" id="admin-chat-input" placeholder="Balas pesan..." autocomplete="off" required>
-                    <button type="submit" class="button-pintu" aria-label="Kirim">Kirim</button>
                 </form>
             </div>
         </div>
     </div>
+</div>
 </div>
         </div>
     </main>
