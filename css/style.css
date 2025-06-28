@@ -2721,8 +2721,8 @@ input:focus, textarea:focus, select:focus {
     margin-bottom: 0.75rem;
 }
 
-.message-group.user { align-items: flex-end; }
-.message-group.admin { align-items: flex-start; }
+.message-group.user { align-items: flex-start; } /* Pengguna/Visitor di KIRI */
+.message-group.admin { align-items: flex-end; }   /* Admin (Anda) di KANAN */
 
 .message {
     padding: 0.7rem 1rem;
