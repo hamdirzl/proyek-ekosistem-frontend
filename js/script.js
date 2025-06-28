@@ -12,10 +12,6 @@ let currentCropCallback = null;
 // --- Variabel Global untuk Live Chat Admin ---
 let adminWebSocket = null;
 let currentAdminChatTarget = null;
-let userChatList = null;
-let activeChatMessages = null;
-let adminChatForm = null;
-let adminChatInput = null;
 const allChatHistories = {}; // Objek untuk menyimpan riwayat chat per user
 
 // === FUNGSI HELPER UPLOAD FILE CHAT ===
@@ -486,19 +482,35 @@ async function setupAdminChatUI() {
     const adminChatTab = document.getElementById('admin-chat-tab');
     if (adminChatTab) adminChatTab.classList.remove('hidden');
 
-    userChatList = document.getElementById('user-chat-list');
-    activeChatMessages = document.getElementById('active-chat-messages');
-    adminChatForm = document.getElementById('admin-chat-form');
-    adminChatInput = document.getElementById('admin-chat-input');
+    // === Deklarasi Elemen DOM ===
+    const adminChatContainer = document.getElementById('admin-chat-container');
+    const userChatListItems = document.getElementById('user-chat-list-items');
+    const activeChatMessages = document.getElementById('active-chat-messages');
+    const adminChatForm = document.getElementById('admin-chat-form');
+    const adminChatInput = document.getElementById('admin-chat-input');
+    const backToListBtn = document.getElementById('back-to-list-btn');
+    const chatPlaceholder = document.getElementById('chat-placeholder');
+    const activeChatContent = document.getElementById('active-chat-content');
+    const activeChatAvatar = document.getElementById('active-chat-avatar');
+    const activeChatUsername = document.getElementById('active-chat-username');
+    const activeChatStatus = document.getElementById('active-chat-status');
 
-    if (!userChatList) return;
+    if (!userChatListItems || !adminChatContainer) return;
 
+    // === Event Listeners UI ===
+    if (backToListBtn) {
+        backToListBtn.addEventListener('click', () => {
+            adminChatContainer.classList.remove('chat-active');
+            currentAdminChatTarget = null;
+        });
+    }
+
+    // === Logika WebSocket ===
     const accessToken = sessionStorage.getItem('jwt_access_token');
     if (!accessToken) return;
 
     const backendWsUrl = `wss://server-pribadi-hamdi-docker.onrender.com?token=${accessToken}`;
     adminWebSocket = new WebSocket(backendWsUrl);
-
     adminWebSocket.onerror = (error) => console.error("Error pada WebSocket Admin:", error);
 
     let adminTypingTimeout;
@@ -517,117 +529,125 @@ async function setupAdminChatUI() {
         });
     }
 
+    // === Fungsi Helper Internal ===
+    const updateUserEntry = (data) => {
+        const { userId, userName, content, messageType, timestamp } = data;
+        let userEntry = document.getElementById(`chat-user-${userId}`);
+        const noChatsMessage = document.getElementById('no-active-chats');
+        if (noChatsMessage) noChatsMessage.style.display = 'none';
+
+        const lastMessageContent = messageType === 'image' ? '🖼️ Gambar' : (messageType === 'audio' ? '🎤 Pesan Suara' : content);
+        const timeString = new Date(timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+        if (!userEntry) {
+            userEntry = document.createElement('div');
+            userEntry.id = `chat-user-${userId}`;
+            userEntry.className = 'chat-user-entry';
+            userChatListItems.prepend(userEntry);
+
+            userEntry.addEventListener('click', async () => {
+                document.querySelectorAll('.chat-user-entry.active').forEach(el => el.classList.remove('active'));
+                userEntry.classList.add('active');
+                currentAdminChatTarget = userId;
+
+                chatPlaceholder.classList.add('hidden');
+                activeChatContent.classList.remove('hidden');
+                adminChatContainer.classList.add('chat-active');
+                
+                const avatarInitial = userName.charAt(0).toUpperCase();
+                activeChatAvatar.textContent = avatarInitial;
+                activeChatUsername.textContent = userName;
+                activeChatStatus.textContent = 'Online';
+                activeChatStatus.className = '';
+
+                activeChatMessages.innerHTML = '<p class="message server-info">Memuat riwayat...</p>';
+                userEntry.querySelector('.unread-dot').classList.add('hidden');
+
+                try {
+                    const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/chat/history/${userId}`);
+                    if (!res.ok) throw new Error('Gagal mengambil riwayat');
+                    const history = await res.json();
+                    activeChatMessages.innerHTML = '';
+                    history.forEach(msg => {
+                        const type = (msg.sender_type === 'admin' || msg.sender === 'admin') ? 'admin' : 'user';
+                        appendAdminMessage(userId, msg.content, type, msg.message_type, msg.created_at);
+                    });
+                } catch (e) {
+                    activeChatMessages.innerHTML = '<p class="message server-info" style="color: red;">Gagal memuat riwayat.</p>';
+                }
+            });
+        }
+        
+        userEntry.innerHTML = `
+            <div class="chat-avatar">${userName.charAt(0).toUpperCase()}</div>
+            <div class="chat-user-info">
+                <span class="username">${userName}</span>
+                <span class="message-preview">${lastMessageContent}</span>
+            </div>
+            <div class="chat-user-meta">
+                <span class="timestamp">${timeString}</span>
+                <div class="unread-dot ${currentAdminChatTarget === userId || !data.isNew ? 'hidden' : ''}"></div>
+            </div>`;
+
+        if (userChatListItems.firstChild !== userEntry) {
+            userChatListItems.prepend(userEntry);
+        }
+    };
+    
     const updateUserEntryTypingStatus = (userId, isTyping) => {
         const userEntry = document.getElementById(`chat-user-${userId}`);
         if (!userEntry) return;
 
-        let typingSpan = userEntry.querySelector('.typing-status');
+        let previewSpan = userEntry.querySelector('.message-preview');
+        if (!previewSpan) return;
+
+        // Simpan teks asli jika belum disimpan
+        if (!previewSpan.dataset.originalText) {
+            previewSpan.dataset.originalText = previewSpan.textContent;
+        }
+
         if (isTyping) {
-            if (!typingSpan) {
-                typingSpan = document.createElement('span');
-                typingSpan.className = 'typing-status';
-                typingSpan.textContent = ' mengetik...';
-                typingSpan.style.fontStyle = 'italic';
-                typingSpan.style.color = 'var(--text-muted-color)';
-                const userNameSpanContainer = userEntry.querySelector('span:first-child');
-                if (userNameSpanContainer) {
-                    userNameSpanContainer.appendChild(typingSpan);
-                }
-            }
+            previewSpan.innerHTML = '<span class="typing-status">mengetik...</span>';
         } else {
-            if (typingSpan) {
-                typingSpan.remove();
-            }
+            previewSpan.textContent = previewSpan.dataset.originalText || '';
+            previewSpan.removeAttribute('data-original-text');
         }
     };
 
-    function appendAdminMessage(content, type, messageType = 'text') {
-        if (!activeChatMessages) return;
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${type}`;
-
-        if (messageType === 'text') {
-            messageDiv.textContent = content;
-        } else if (messageType === 'image') {
-            const img = document.createElement('img');
-            img.src = content;
-            img.alt = 'Gambar terkirim';
-            img.onload = () => {
-                activeChatMessages.scrollTop = activeChatMessages.scrollHeight;
-            };
-            messageDiv.appendChild(img);
-        } else if (messageType === 'audio') {
-            const audio = document.createElement('audio');
-            audio.controls = true;
-            audio.src = content;
-            messageDiv.appendChild(audio);
-        }
-
-        activeChatMessages.appendChild(messageDiv);
-        if (messageType !== 'image') {
-            activeChatMessages.scrollTop = activeChatMessages.scrollHeight;
-        }
-    }
-
+    // === Menangani Pesan dari WebSocket ===
     adminWebSocket.onmessage = async (event) => {
         const data = JSON.parse(event.data);
 
         if (data.type === 'chat') {
             const userId = data.sender;
-            const userName = data.userName || `Pengunjung ${userId.substring(0, 6)}`;
+            updateUserEntry({
+                userId: userId,
+                userName: data.userName || `Pengunjung ${userId.substring(0, 6)}`,
+                content: data.content,
+                messageType: data.messageType,
+                timestamp: new Date(),
+                isNew: true
+            });
 
-            if (!allChatHistories[userId]) allChatHistories[userId] = [];
-
-            allChatHistories[userId].push({ sender: 'user', content: data.content, message_type: data.messageType });
-            updateUserEntryTypingStatus(userId, false);
-
-            let userEntry = document.getElementById(`chat-user-${userId}`);
-            if (!userEntry) {
-                userEntry = document.createElement('div');
-                userEntry.id = `chat-user-${userId}`;
-                userEntry.className = 'chat-user-entry';
-                userEntry.innerHTML = `<span><span>${userName}</span></span><span class="unread-dot hidden"></span>`;
-                userChatList.prepend(userEntry);
-
-                userEntry.addEventListener('click', async () => {
-                    document.querySelectorAll('.chat-user-entry.active').forEach(el => el.classList.remove('active'));
-                    userEntry.classList.add('active');
-                    currentAdminChatTarget = userId;
-                    adminChatForm.style.display = 'flex';
-                    activeChatMessages.innerHTML = 'Memuat riwayat percakapan...';
-                    userEntry.querySelector('.unread-dot').classList.add('hidden');
-                    try {
-                        const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/chat/history/${userId}`);
-                        if (!res.ok) throw new Error('Gagal mengambil riwayat');
-                        const history = await res.json();
-                        allChatHistories[userId] = history;
-                        activeChatMessages.innerHTML = '';
-                        allChatHistories[userId].forEach(msg => {
-                            const type = (msg.sender_type === 'admin' || msg.sender === 'admin') ? 'admin' : 'user';
-                            appendAdminMessage(msg.content, type, msg.message_type);
-                        });
-                    } catch (e) {
-                        activeChatMessages.innerHTML = '<p style="color: red;">Gagal memuat riwayat.</p>';
-                    }
-                });
-            } else {
-                userEntry.querySelector('span > span').textContent = userName;
+            if (currentAdminChatTarget === userId) {
+                appendAdminMessage(userId, data.content, 'user', data.messageType, new Date());
             }
 
-            if (currentAdminChatTarget !== userId) {
-                userEntry.querySelector('.unread-dot').classList.remove('hidden');
-            } else {
-                appendAdminMessage(data.content, 'user', data.messageType);
-            }
         } else if (data.type === 'user_disconnected') {
             const userEntry = document.getElementById(`chat-user-${data.userId}`);
-            if (userEntry) userEntry.style.opacity = '0.5';
+            if (userEntry) userEntry.style.opacity = '0.7';
+            if(currentAdminChatTarget === data.userId) {
+                activeChatStatus.textContent = 'Offline';
+                activeChatStatus.className = 'offline';
+            }
             updateUserEntryTypingStatus(data.userId, false);
+
         } else if (data.type === 'typing') {
             updateUserEntryTypingStatus(data.userId, data.isTyping);
         }
     };
 
+    // === Event Listener Form Submit ===
     if (adminChatForm) {
         adminChatForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -637,16 +657,25 @@ async function setupAdminChatUI() {
             }
             const message = adminChatInput.value.trim();
             if (message && currentAdminChatTarget && adminWebSocket.readyState === WebSocket.OPEN) {
+                const timestamp = new Date();
                 adminWebSocket.send(JSON.stringify({
                     type: 'admin_message',
                     content: message,
                     targetUserId: currentAdminChatTarget,
                     messageType: 'text'
                 }));
-                appendAdminMessage(message, 'admin', 'text');
-                if (allChatHistories[currentAdminChatTarget]) {
-                    allChatHistories[currentAdminChatTarget].push({ sender: 'admin', content: message, message_type: 'text' });
-                }
+                appendAdminMessage(currentAdminChatTarget, message, 'admin', 'text', timestamp);
+
+                // Update entri di daftar chat
+                 const userEntry = document.getElementById(`chat-user-${currentAdminChatTarget}`);
+                 if(userEntry){
+                    const previewSpan = userEntry.querySelector('.message-preview');
+                    const timeSpan = userEntry.querySelector('.timestamp');
+                    if(previewSpan) previewSpan.textContent = `Anda: ${message}`;
+                    if(timeSpan) timeSpan.textContent = timestamp.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                    // Pindahkan ke atas
+                    if(userChatListItems.firstChild !== userEntry) userChatListItems.prepend(userEntry);
+                 }
                 adminChatInput.value = '';
             }
         });

@@ -1597,40 +1597,6 @@ input:focus, textarea:focus, select:focus {
     background-color: var(--accent-hover);
 }
 
-
-/* Admin Chat Panel Styles */
-#user-chat-list .chat-user-entry {
-    padding: var(--space-sm);
-    cursor: pointer;
-    border-bottom: 1px solid var(--border-color);
-    transition: background-color 0.2s ease;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 6px;
-    margin-bottom: var(--space-xs);
-}
-#user-chat-list .chat-user-entry:hover {
-    background-color: #f1f3f5;
-}
-#user-chat-list .chat-user-entry.active {
-    background-color: #e9f2ff;
-    font-weight: bold;
-    border-left: 4px solid var(--accent-color);
-    padding-left: calc(var(--space-sm) - 4px);
-}
-.unread-dot {
-    width: 10px;
-    height: 10px;
-    background-color: var(--accent-color);
-    border-radius: 50%;
-    flex-shrink: 0;
-    transition: transform 0.3s ease;
-}
-.unread-dot.hidden {
-    transform: scale(0);
-}
-
 /* ============================================= */
 /* ==   [BARU] PENYESUAIAN LIVE CHAT MOBILE   == */
 /* ============================================= */
@@ -2500,4 +2466,314 @@ input:focus, textarea:focus, select:focus {
 .footer-bottom-new a:hover {
     color: var(--accent-color);
     text-decoration: underline;
+}
+
+/* ============================================= */
+/* ==      GAYA BARU UNTUK LIVE CHAT ADMIN    == */
+/* ============================================= */
+
+/* Container Utama */
+#admin-chat-container {
+    display: flex;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    height: 70vh;
+    overflow: hidden;
+    background-color: var(--card-bg-color);
+    position: relative; /* Diperlukan untuk layout mobile */
+}
+
+/* Kolom Daftar Chat (Kiri) */
+.user-chat-list {
+    width: 35%;
+    max-width: 350px;
+    min-width: 280px;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+.chat-list-header {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.chat-list-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+#user-chat-list-items {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding: var(--space-xs);
+}
+
+/* Setiap item di daftar chat */
+.chat-user-entry {
+    display: flex;
+    align-items: center;
+    padding: var(--space-sm);
+    cursor: pointer;
+    border-radius: 8px;
+    margin: var(--space-xs);
+    transition: background-color 0.2s ease;
+    gap: var(--space-sm);
+}
+
+.chat-user-entry:hover {
+    background-color: #f1f3f5;
+}
+
+.chat-user-entry.active {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+/* Avatar Pengguna */
+.chat-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.chat-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.chat-user-entry.active .chat-avatar {
+    background-color: white;
+    color: var(--accent-color);
+}
+
+/* Info Pengguna (Nama & Preview Pesan) */
+.chat-user-info {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.chat-user-info .username {
+    font-weight: 600;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-user-entry.active .chat-user-info .username {
+    color: white;
+}
+
+.chat-user-info .message-preview {
+    font-size: 0.85rem;
+    color: var(--text-muted-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+}
+
+.chat-user-entry.active .chat-user-info .message-preview {
+    color: rgba(255, 255, 255, 0.8);
+}
+.typing-status {
+    font-style: italic;
+    color: var(--accent-color) !important;
+    margin-left: 4px;
+}
+.chat-user-entry.active .typing-status {
+    color: white !important;
+}
+
+
+/* Info Meta (Waktu & Unread Dot) */
+.chat-user-meta {
+    flex-shrink: 0;
+    text-align: right;
+    font-size: 0.75rem;
+    color: var(--text-muted-color);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.chat-user-entry.active .chat-user-meta {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.unread-dot {
+    width: 12px;
+    height: 12px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    align-self: flex-end;
+    transition: transform 0.2s;
+}
+.unread-dot.hidden {
+    transform: scale(0);
+}
+.chat-user-entry.active .unread-dot {
+    background-color: white;
+}
+
+
+/* Area Chat Aktif (Kanan) */
+.active-chat-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    width: 65%;
+}
+
+#chat-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted-color);
+    text-align: center;
+}
+
+/* Header di area chat aktif */
+.active-chat-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--background-color);
+    flex-shrink: 0;
+}
+
+#back-to-list-btn {
+    display: none; /* Sembunyikan di desktop */
+}
+
+.active-chat-header .chat-user-profile {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+.active-chat-header #active-chat-username {
+    font-weight: 600;
+}
+.active-chat-header #active-chat-status {
+    font-size: 0.8rem;
+    color: #28a745; /* Warna hijau untuk online */
+}
+.active-chat-header #active-chat-status.offline {
+    color: var(--text-muted-color);
+}
+
+/* Area Pesan */
+#active-chat-messages {
+    flex-grow: 1;
+    padding: var(--space-md);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem; /* Jarak antar bubble chat */
+}
+
+.message-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.75rem;
+}
+
+.message-group.user { align-items: flex-end; }
+.message-group.admin { align-items: flex-start; }
+
+.message {
+    padding: 0.7rem 1rem;
+    border-radius: 18px;
+    max-width: 80%;
+    line-height: 1.4;
+    word-wrap: break-word;
+    margin-bottom: 2px;
+}
+
+.message.user {
+    background-color: var(--accent-color);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.message.admin {
+    background-color: #e9ecef;
+    color: var(--text-color);
+    border-bottom-left-radius: 4px;
+}
+
+.message-meta {
+    font-size: 0.7rem;
+    color: var(--text-muted-color);
+    padding: 0 0.75rem;
+}
+
+/* Form Input */
+#admin-chat-form {
+    border-top: 1px solid var(--border-color);
+    padding: var(--space-sm);
+    background-color: var(--background-color);
+}
+
+
+/* ============================================= */
+/* ==         RESPONSIVE UNTUK CHAT MOBILE    == */
+/* ============================================= */
+@media (max-width: 768px) {
+    #admin-chat-container {
+        overflow: hidden;
+    }
+
+    .user-chat-list, .active-chat-area {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .user-chat-list {
+        left: 0;
+        transform: translateX(0);
+        z-index: 2;
+    }
+
+    .active-chat-area {
+        left: 0;
+        transform: translateX(100%);
+        z-index: 1;
+    }
+
+    /* State saat chat aktif di mobile */
+    #admin-chat-container.chat-active .user-chat-list {
+        transform: translateX(-100%);
+    }
+
+    #admin-chat-container.chat-active .active-chat-area {
+        transform: translateX(0);
+        z-index: 3;
+    }
+
+    #back-to-list-btn {
+        display: flex;
+    }
 }
