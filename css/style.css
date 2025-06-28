@@ -2509,3 +2509,21 @@ input:focus, textarea:focus, select:focus {
     color: var(--text-muted-color);
     min-height: 1.2rem; /* Beri ruang agar layout tidak lompat */
 }
+
+/* === [BARU] GAYA UNTUK TAUTAN LEGAL DI FOOTER === */
+.footer-bottom .footer-legal-links {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.footer-bottom .footer-legal-links a {
+    color: var(--text-muted-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    margin: 0 0.5rem;
+}
+
+.footer-bottom .footer-legal-links a:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
