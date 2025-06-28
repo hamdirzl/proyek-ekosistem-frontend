@@ -2777,3 +2777,36 @@ input:focus, textarea:focus, select:focus {
         display: flex;
     }
 }
+
+/* ============================================= */
+/* ==   [PERBAIKAN] Tampilan Form Awal Live Chat == */
+/* ============================================= */
+
+#chat-start-form {
+  /* Menggunakan Flexbox untuk menata elemen secara vertikal */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Pusatkan seluruh konten di tengah secara vertikal */
+  height: 100%; /* Ambil seluruh tinggi jendela chat yang tersedia */
+  
+  /* Beri jarak di dalam form agar tidak menempel di tepi */
+  padding: var(--space-lg);
+  text-align: center;
+  gap: var(--space-md); /* Atur jarak yang konsisten antar elemen */
+}
+
+#chat-start-form p {
+  margin: 0;
+  color: var(--text-muted-color);
+  line-height: 1.6;
+}
+
+#chat-start-form .form-group {
+  margin: 0; /* Hapus margin bawaan karena sudah diatur oleh 'gap' */
+  width: 100%;
+}
+
+#chat-start-form button {
+  width: 100%;
+  padding: 0.8rem; /* Buat tombol sedikit lebih besar agar mudah di-klik */
+}
