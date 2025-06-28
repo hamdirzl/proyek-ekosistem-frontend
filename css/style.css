@@ -2821,3 +2821,24 @@ input:focus, textarea:focus, select:focus {
         display: flex;
     }
 }
+
+/* CSS untuk tombol alat di form chat */
+.chat-tool-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted-color);
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.chat-tool-btn:hover {
+    color: var(--accent-color);
+}
+
+.chat-tool-btn.is-recording {
+    color: #dc3545; /* Warna saat merekam */
+}
