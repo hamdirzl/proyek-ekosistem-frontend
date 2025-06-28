@@ -2640,6 +2640,30 @@ input:focus, textarea:focus, select:focus {
     width: 65%;
 }
 
+#active-chat-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Pastikan kontainer ini mengisi seluruh area */
+    flex-grow: 1;
+}
+
+#active-chat-content.hidden {
+    display: none !important;
+}
+
+.active-chat-header {
+    flex-shrink: 0; /* Mencegah header mengecil */
+}
+
+#active-chat-messages {
+    flex-grow: 1; /* Membuat area pesan ini mengisi ruang kosong yang tersisa */
+    overflow-y: auto; /* HANYA area ini yang bisa di-scroll */
+}
+
+#admin-chat-form {
+    flex-shrink: 0; /* Mencegah form input mengecil */
+}
+
 #chat-placeholder {
     display: flex;
     flex-direction: column;
