@@ -1,0 +1,170 @@
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) clamp(var(--space-md), 5vw, var(--space-xl));
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.logo a {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+    line-height: 1.2;
+    display: inline-block;
+    text-align: center;
+}
+
+.logo a:hover {
+    color: var(--accent-color);
+}
+
+.logo-mobile {
+    display: none !important;
+}
+
+.logo-desktop {
+    display: inline-block !important;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.nav-links li {
+    margin-left: 0;
+}
+
+.nav-links li > a,
+.nav-links li > .nav-button {
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s, color 0.3s;
+    text-decoration: none;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: var(--text-muted-color);
+    font-weight: 500;
+}
+
+.nav-links li > a:hover,
+.nav-links li > .nav-button:hover {
+    background-color: #e9ecef;
+    color: var(--text-color);
+}
+
+.nav-links li svg {
+    width: 22px;
+    height: 22px;
+    color: var(--text-muted-color);
+    transition: color 0.3s ease;
+}
+
+.nav-links li > a:hover svg,
+.nav-links li > .nav-button:hover svg {
+    color: var(--text-color);
+}
+
+.nav-links li span {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Tombol Navigasi (untuk elemen non-link di navbar) */
+.nav-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Tombol Login */
+.login-button {
+    background-color: var(--accent-color) !important;
+    color: #ffffff !important;
+    padding: 0.6rem 1.2rem !important;
+}
+
+/* Tombol Logout (gaya pil) */
+#nav-logout .button-pintu {
+    border-radius: 50px;
+    padding: 10px 24px;
+    background-color: var(--accent-color) !important;
+    color: #ffffff !important;
+    flex-direction: row;
+    gap: 8px;
+}
+
+#nav-logout .button-pintu:hover {
+    background-color: var(--accent-hover) !important;
+}
+
+#nav-logout .button-pintu svg {
+    color: #ffffff;
+}
+
+/* Hamburger Menu */
+.hamburger {
+    display: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+}
+
+.hamburger span {
+    background-color: var(--text-color);
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px 0;
+    border-radius: 3px;
+    transition: all 0.3s ease-in-out;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Overlay Menu Mobile */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    visibility: hidden;
+}
+
+.menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}

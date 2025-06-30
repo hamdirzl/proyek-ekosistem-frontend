@@ -1,0 +1,68 @@
+/* Kontainer Autentikasi */
+.auth-container {
+    max-width: 450px;
+    margin: 0 auto;
+    padding: var(--space-lg);
+    background-color: var(--card-bg-color);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--soft-shadow);
+    text-align: center;
+}
+
+.auth-form .form-group {
+    margin-bottom: var(--space-md);
+    text-align: left;
+}
+
+.auth-form label {
+    display: block;
+    font-weight: 500;
+    color: var(--text-muted-color);
+    margin-bottom: var(--space-xs);
+}
+
+.auth-form input {
+    text-align: left;
+}
+
+.auth-form button {
+    width: 100%;
+    padding: 0.9rem;
+}
+
+.auth-toggle {
+    color: var(--text-muted-color);
+    font-size: 0.9rem;
+    margin-top: var(--space-md);
+}
+
+.auth-toggle a {
+    color: var(--accent-color);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-toggle a:hover {
+    text-decoration: underline;
+}
+
+/* Pesan Autentikasi */
+#auth-message {
+    padding: var(--space-sm);
+    border-radius: 8px;
+    margin-top: var(--space-md);
+    text-align: center;
+}
+
+#auth-message.success {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+    border: 1px solid #a3cfbb;
+}
+
+#auth-message.error {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid #f1b0b7;
+}
