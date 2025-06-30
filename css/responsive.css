@@ -1,75 +1,21 @@
 /* ==========================================================================
    RESPONSIVE STYLES
    - Semua @media query ditempatkan di sini.
-   - Urutan dari besar ke kecil (desktop-first) atau sebaliknya.
    ========================================================================== */
 
 @media (max-width: 768px) {
-    /* === NAVBAR === */
-    .navbar .logo {
-        flex-grow: 1;
-        text-align: center;
-    }
-    .navbar nav {
-        order: -1;
-        width: 50px; 
-        display: flex;
-        justify-content: center;
-    }
-    .navbar::after {
-        content: '';
-        display: block;
-        width: 50px; 
-    }
-    .hamburger {
-        margin-right: 0;
-    }
-    nav {
-        display: flex;
-    }
-    .hamburger { 
-        display: block; 
-        order: -1; 
-        margin-right: var(--space-sm);
-    }
-    .nav-links { 
-        position: fixed; 
-        top: 0; 
-        left: 0; 
-        bottom: 0; 
-        width: 85%;
-        max-width: 320px; 
-        height: 100vh;
-        background-color: rgba(248, 249, 250, 0.98); 
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        padding: var(--space-xl) 0; 
-        transform: translateX(-100%); 
-        transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-        display: flex; 
-        flex-direction: column; 
-        align-items: flex-start;
-        justify-content: flex-start;
-        gap: 0; 
-        box-shadow: 5px 0 25px rgba(0,0,0,0.1); 
-        z-index: 1000; 
-    }
-    .nav-links.active { 
-        transform: translateX(0); 
-    }
+    /* === NAVBAR MOBILE === */
+    .navbar .logo { flex-grow: 1; text-align: center; }
+    .navbar nav { order: -1; width: 50px; display: flex; justify-content: center; }
+    .navbar::after { content: ''; display: block; width: 50px; }
+    .hamburger { margin-right: 0; }
+    nav { display: flex; }
+    .hamburger { display: block; order: -1; margin-right: var(--space-sm); }
+    .nav-links { position: fixed; top: 0; left: 0; bottom: 0; width: 85%; max-width: 320px; height: 100vh; background-color: rgba(248, 249, 250, 0.98); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: var(--space-xl) 0; transform: translateX(-100%); transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1); display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 0; box-shadow: 5px 0 25px rgba(0,0,0,0.1); z-index: 1000; }
+    .nav-links.active { transform: translateX(0); }
     body.menu-open, html.menu-open { overflow: hidden; }
-    .nav-links li { 
-        margin: 0; 
-        width: 100%; 
-        text-align: left;
-        opacity: 0;
-        transform: translateX(-20px); 
-        transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    .nav-links.active li {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    .nav-links li { margin: 0; width: 100%; text-align: left; opacity: 0; transform: translateX(-20px); transition: opacity 0.4s ease, transform 0.4s ease; }
+    .nav-links.active li { opacity: 1; transform: translateX(0); }
     .nav-links.active li:nth-child(1) { transition-delay: 0.1s; }
     .nav-links.active li:nth-child(2) { transition-delay: 0.15s; }
     .nav-links.active li:nth-child(3) { transition-delay: 0.2s; }
@@ -77,43 +23,22 @@
     .nav-links.active li:nth-child(5) { transition-delay: 0.3s; }
     .nav-links.active li:nth-child(6) { transition-delay: 0.35s; }
     .nav-links.active li:nth-child(7) { transition-delay: 0.4s; }
-    .nav-links a, .nav-links .nav-button { 
-        display: flex; 
-        align-items: center;
-        gap: var(--space-md); 
-        padding: var(--space-sm) var(--space-lg);
-        width: 100%; 
-        border-radius: 0; 
-        font-size: 1.0rem;
-        font-weight: 500;
-        color: var(--text-muted-color);
-        transition: color 0.3s ease, background-color 0.3s ease;
-    }
-    .nav-links a:hover, .nav-links .nav-button:hover { 
-        background-color: rgba(0, 0, 0, 0.05);
-        color: var(--text-color); 
-    }
+    .nav-links a, .nav-links .nav-button { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-sm) var(--space-lg); width: 100%; border-radius: 0; font-size: 1.0rem; font-weight: 500; color: var(--text-muted-color); transition: color 0.3s ease, background-color 0.3s ease; }
+    .nav-links a:hover, .nav-links .nav-button:hover { background-color: rgba(0, 0, 0, 0.05); color: var(--text-color); }
     .nav-links a::after { display: none; }
-    .nav-links a svg, .nav-links .nav-button svg {
-        width: 20px;
-        height: 20px;
-        flex-shrink: 0;
-        color: var(--text-muted-color);
-        transition: color 0.3s ease;
-    }
-    .nav-links a:hover svg, .nav-links .nav-button:hover svg {
-        color: var(--text-color);
-    }
+    .nav-links a svg, .nav-links .nav-button svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--text-muted-color); transition: color 0.3s ease; }
+    .nav-links a:hover svg, .nav-links .nav-button:hover svg { color: var(--text-color); }
+
+    /* === TOMBOL LOGIN & LOGOUT DI MENU HAMBURGER === */
     .nav-links a.login-button { 
         margin: var(--space-md) var(--space-lg);
         width: calc(100% - (var(--space-lg) * 2));
         text-align: center;
         display: block; 
+        justify-content: center; /* Menengahkan teks di dalam link */
+        border-radius: 50px; /* EKSPLISIT: Pastikan bentuk kapsul untuk login */
     }
-    .nav-logout-item {
-        margin-top: auto;
-        padding: var(--space-md) var(--space-lg);
-    }
+    .nav-logout-item { margin-top: auto; padding: var(--space-md) var(--space-lg); }
     .nav-logout-item button {
         width: 100%;
         display: flex;
@@ -121,69 +46,31 @@
         align-items: center;
         gap: var(--space-sm);
         padding: 0.8rem 1.6rem;
+        border-radius: 50px; /* EKSPLISIT: Pastikan bentuk kapsul untuk logout */
     }
-    #nav-logout .button-pintu svg {
-        color: #ffffff;
-    }
-    .nav-links li > a,
-    .nav-links li > .nav-button {
-        flex-direction: row;
-        gap: var(--space-md);
-    }
+    #nav-logout .button-pintu svg { color: #ffffff; }
+    .nav-links li > a, .nav-links li > .nav-button { flex-direction: row; gap: var(--space-md); }
 
     /* === LOGO === */
-    .logo-mobile {
-        display: inline-block !important;
-        font-size: 1.5rem;
-    }
-    .logo-desktop {
-        display: none !important;
-    }
+    .logo-mobile { display: inline-block !important; font-size: 1.5rem; }
+    .logo-desktop { display: none !important; }
 
-    /* === RIWAYAT TAUTAN === */
+    /* Sisa style mobile... (tidak ada perubahan di sini) */
     .mood-item-header { flex-direction: column; align-items: flex-start; }
     .mood-item-actions { width: 100%; justify-content: flex-end; } 
     .mood-item-header strong { margin-right: 0; } 
-
-    /* === LIVE CHAT VISITOR === */
-     .chat-bubble-container {
-        width: 50px;
-        height: 50px;
-        bottom: var(--space-md);
-        right: var(--space-md);
-    }
-    .chat-bubble-container svg {
-        width: 28px;
-        height: 28px;
-    }
-    .chat-window-container {
-        top: 0; left: 0; right: 0; bottom: 0;
-        width: 100%; height: 100%;
-        max-width: 100%; max-height: 100%;
-        border-radius: 0;
-        transform-origin: bottom center;
-    }
+    .chat-bubble-container { width: 50px; height: 50px; bottom: var(--space-md); right: var(--space-md); }
+    .chat-bubble-container svg { width: 28px; height: 28px; }
+    .chat-window-container { top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; max-width: 100%; max-height: 100%; border-radius: 0; transform-origin: bottom center; }
     .chat-header h3 { font-size: 1rem; }
     .chat-window-container .chat-messages { padding-bottom: var(--space-lg); }
-
-    /* === LIVE CHAT ADMIN PANEL === */
-    #admin-chat-container {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        z-index: 2000; border-radius: 0; border: none;
-    }
-    #admin-chat-container .user-chat-list,
-    #admin-chat-container .active-chat-area {
-        position: absolute; width: 100%; height: 100%; top: 0; left: 0;
-        transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        background-color: var(--card-bg-color);
-    }
+    #admin-chat-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; border-radius: 0; border: none; }
+    #admin-chat-container .user-chat-list, #admin-chat-container .active-chat-area { position: absolute; width: 100%; height: 100%; top: 0; left: 0; transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); background-color: var(--card-bg-color); }
     #admin-chat-container .user-chat-list { transform: translateX(0); z-index: 2; }
     #admin-chat-container .active-chat-area { transform: translateX(100%); z-index: 1; }
     #admin-chat-container.chat-active .user-chat-list { transform: translateX(-100%); }
     #admin-chat-container.chat-active .active-chat-area { transform: translateX(0); z-index: 3; }
     #admin-chat-container #back-to-list-btn { display: flex; }
-
-    /* === PDF TOOL === */
     .preview-slider-wrapper { border-top: none; padding-top: 0; }
     .preview-slider-container { padding: 0; margin: 0; max-height: 400px; overflow-y: auto; overflow-x: hidden; padding-right: 5px; }
     #image-previews-container { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
@@ -195,8 +82,6 @@
     .radio-card-content svg { width: 28px; height: 28px; margin: 0 auto; }
     .radio-card-content span { font-size: 0.85rem; }
     #image-compressor-form { display: flex; flex-direction: column; gap: var(--space-md); width: 100%; }
-
-    /* PDF Tool Mobile Panel (Slide-in) */
     .pdf-tool-layout .pdf-tool-options { display: flex; flex-direction: column; position: fixed; top: 0; right: 0; width: 90%; max-width: 350px; height: 100%; background-color: var(--card-bg-color); z-index: 1101; padding: var(--space-md); box-shadow: -5px 0 20px rgba(0,0,0,0.15); transform: translateX(100%); visibility: hidden; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility 0.4s; overflow: hidden; }
     .options-content-scrollable { flex-grow: 1; overflow-y: auto; margin: 0 -8px; padding: 0 8px; }
     .pdf-tool-options .button-pintu { flex-shrink: 0; margin-top: var(--space-md); width: 100%; }
@@ -212,120 +97,52 @@
 
 
 @media (min-width: 769px) {
-    /* === NAVBAR === */
-    .nav-links li > a,
-    .nav-links li > .nav-button {
-        flex-direction: column;
-        gap: 6px;
-        padding: 8px 12px;
-        border-radius: 8px;
-    }
-    .nav-links li > a:hover,
-    .nav-links li > .nav-button:hover {
-        background-color: #e9ecef;
-        color: var(--text-color);
-    }
-    .nav-links li svg {
-        width: 22px;
-        height: 22px;
-    }
-    .nav-links li span {
-        font-size: 0.8rem;
-        font-weight: 500;
-    }
+    /* === NAVBAR DESKTOP === */
+    .nav-links li > a, .nav-links li > .nav-button { flex-direction: column; gap: 6px; padding: 8px 12px; border-radius: 8px; }
+    .nav-links li > a:hover, .nav-links li > .nav-button:hover { background-color: #e9ecef; color: var(--text-color); }
+    .nav-links li svg { width: 22px; height: 22px; }
+    .nav-links li span { font-size: 0.8rem; font-weight: 500; }
+    
+    /* EKSPLISIT: Gaya Kapsul untuk Tombol Login & Logout di Desktop */
+    .nav-links .login-button,
     #nav-logout .button-pintu {
-        border-radius: 50px;
-        padding: 10px 24px;
-        background-color: var(--accent-color) !important;
-        color: #ffffff !important;
-        flex-direction: row;
-        gap: 8px;
+        border-radius: 50px !important; 
+        padding-top: 0.7rem !important;
+        padding-bottom: 0.7rem !important;
     }
-    #nav-logout .button-pintu:hover {
-        background-color: var(--accent-hover) !important;
-    }
-    .is-homepage .nav-links li > a:hover,
-    .is-homepage .nav-links li > .nav-button:hover {
-        background-color: transparent;
-        color: #f0f0f0;
-    }
+    
+    #nav-logout .button-pintu { flex-direction: row; gap: 8px; color: #ffffff; }
+    #nav-logout .button-pintu:hover { background-color: var(--accent-hover) !important; }
+    .is-homepage .nav-links li > a:hover, .is-homepage .nav-links li > .nav-button:hover { background-color: transparent; color: #f0f0f0; }
 
-    /* === STATS GRID === */
-    .stats-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    /* === PDF TOOL === */
-    .slider-nav-btn {
-        display: block;
-    }
-    #toggle-pdf-options-btn, #back-to-previews-btn {
-        display: none !important;
-    }
-    .pdf-options-overlay {
-        display: none;
-    }
+    /* Sisa style desktop... (tidak ada perubahan di sini) */
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .slider-nav-btn { display: block; }
+    #toggle-pdf-options-btn, #back-to-previews-btn { display: none !important; }
+    .pdf-options-overlay { display: none; }
 }
 
 @media (max-width: 992px) {
-    /* === PDF TOOL === */
-    .pdf-tool-layout {
-        grid-template-columns: 1fr;
-        gap: var(--space-md);
-    }
-    .pdf-tool-options {
-        position: static;
-        top: auto;
-    }
-    .pdf-tool-previews {
-        min-height: 300px;
-    }
+    .pdf-tool-layout { grid-template-columns: 1fr; gap: var(--space-md); }
+    .pdf-tool-options { position: static; top: auto; }
+    .pdf-tool-previews { min-height: 300px; }
 }
 
 @media (max-width: 600px) {
-    /* === DASHBOARD === */
-    .dashboard-nav {
-        display: grid;
-        grid-template-columns: 1fr 1fr; 
-        gap: var(--space-sm); 
-        border-bottom: none; 
-    }
-    .dashboard-tab-button {
-        text-align: center;
-        border-bottom: 3px solid var(--border-color);
-        margin-bottom: 0;
-        padding: var(--space-sm) var(--space-xs);
-    }
-    .dashboard-tab-button.active {
-        border-bottom-color: var(--accent-color);
-    }
+    .dashboard-nav { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm); border-bottom: none; }
+    .dashboard-tab-button { text-align: center; border-bottom: 3px solid var(--border-color); margin-bottom: 0; padding: var(--space-sm) var(--space-xs); }
+    .dashboard-tab-button.active { border-bottom-color: var(--accent-color); }
 }
 
 
 @media (max-width: 550px) {
-    /* === SHORTENER FORM === */
-    #shortener-form {
-        grid-template-columns: 1fr;
-        gap: var(--space-md);
-    }
-    #shortener-form input[type="url"] {
-        grid-column: 1 / -1;
-    }
-    #shortener-form button {
-        width: 100%;
-    }
+    #shortener-form { grid-template-columns: 1fr; gap: var(--space-md); }
+    #shortener-form input[type="url"] { grid-column: 1 / -1; }
+    #shortener-form button { width: 100%; }
 }
 
 @media (max-width: 480px) {
-    /* === TOOL SELECTOR === */
     .tool-selector-button { width: 100%; }
-    .tool-buttons-container {
-        flex-direction: column;
-        gap: var(--space-sm);
-    }
-    /* === IMAGE PREVIEWS === */
-    #image-previews-container {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-sm);
-    }
+    .tool-buttons-container { flex-direction: column; gap: var(--space-sm); }
+    #image-previews-container { grid-template-columns: repeat(2, 1fr); gap: var(--space-sm); }
 }
