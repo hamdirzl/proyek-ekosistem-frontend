@@ -2669,37 +2669,36 @@ function setupAuthCallbackPage() {
 
 // ... di akhir file
 
+// Ganti seluruh fungsi lama dengan yang ini
 function setupSplitPdfPage() {
     const form = document.getElementById('pdf-split-form');
+    if (!form) return; // Keluar jika bukan halaman yang tepat
+
     const fileInput = document.getElementById('pdf-split-input');
     const fileInfo = document.getElementById('pdf-file-info');
     const previewContainer = document.getElementById('pdf-preview-container');
     const rangesInput = document.getElementById('pdf-ranges');
     const messageDiv = document.getElementById('split-pdf-message');
 
-    if (!form) return;
-
-    let pdfDoc = null;
     let selectedPages = new Set();
 
     // Fungsi untuk merender pratinjau PDF
     async function renderPDF(file) {
         previewContainer.innerHTML = '<p>Memuat pratinjau...</p>';
-        const pdfjsLib = window['pdfjs-dist/build/pdf'];
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://mozilla.github.io/pdf.js/build/pdf.worker.mjs`;
-
+        
         const reader = new FileReader();
         reader.onload = async (event) => {
             try {
+                // Gunakan pdfjsLib yang sekarang sudah tersedia secara global
                 const loadingTask = pdfjsLib.getDocument({ data: event.target.result });
-                pdfDoc = await loadingTask.promise;
+                const pdfDoc = await loadingTask.promise;
                 fileInfo.textContent = `${file.name} (${pdfDoc.numPages} halaman)`;
                 previewContainer.innerHTML = '';
-
+                
                 for (let i = 1; i <= pdfDoc.numPages; i++) {
                     const page = await pdfDoc.getPage(i);
                     const viewport = page.getViewport({ scale: 0.5 });
-
+                    
                     const previewCard = document.createElement('div');
                     previewCard.className = 'pdf-page-preview';
                     previewCard.dataset.page = i;
@@ -2708,7 +2707,7 @@ function setupSplitPdfPage() {
                     const context = canvas.getContext('2d');
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
-
+                    
                     const pageNumberLabel = document.createElement('span');
                     pageNumberLabel.className = 'page-number';
                     pageNumberLabel.textContent = `Halaman ${i}`;
@@ -2717,11 +2716,11 @@ function setupSplitPdfPage() {
                     previewCard.appendChild(pageNumberLabel);
                     previewContainer.appendChild(previewCard);
 
-                    page.render({ canvasContext: context, viewport: viewport });
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
 
                     previewCard.addEventListener('click', () => {
                         previewCard.classList.toggle('selected');
-                        const pageNum = parseInt(previewCard.dataset.page);
+                        const pageNum = parseInt(previewCard.dataset.page, 10);
                         if (selectedPages.has(pageNum)) {
                             selectedPages.delete(pageNum);
                         } else {
@@ -2731,7 +2730,9 @@ function setupSplitPdfPage() {
                     });
                 }
             } catch (error) {
-                previewContainer.innerHTML = `<p class="error">Gagal memuat pratinjau PDF: ${error.message}</p>`;
+                console.error('Error saat merender PDF:', error);
+                previewContainer.innerHTML = `<p style="color:red;">Gagal memuat pratinjau. File PDF mungkin rusak atau dilindungi password.</p>`;
+                fileInfo.textContent = 'Gagal memuat file.';
             }
         };
         reader.readAsArrayBuffer(file);
@@ -2740,12 +2741,29 @@ function setupSplitPdfPage() {
     // Fungsi untuk update input rentang berdasarkan halaman yang dipilih
     function updateRangesInput() {
         const sortedPages = Array.from(selectedPages).sort((a, b) => a - b);
+        
         if (sortedPages.length === 0) {
             rangesInput.value = '';
             return;
         }
-        // Logika sederhana untuk membuat rentang, bisa disempurnakan
-        rangesInput.value = sortedPages.join(', ');
+
+        // Logika untuk membuat rentang, contoh: 1, 2, 3, 5, 6 -> "1-3, 5-6"
+        let ranges = [];
+        let start = sortedPages[0];
+        let end = sortedPages[0];
+
+        for (let i = 1; i < sortedPages.length; i++) {
+            if (sortedPages[i] === end + 1) {
+                end = sortedPages[i];
+            } else {
+                ranges.push(start === end ? `${start}` : `${start}-${end}`);
+                start = sortedPages[i];
+                end = sortedPages[i];
+            }
+        }
+        ranges.push(start === end ? `${start}` : `${start}-${end}`);
+        
+        rangesInput.value = ranges.join(', ');
     }
 
     fileInput.addEventListener('change', () => {
@@ -2753,6 +2771,8 @@ function setupSplitPdfPage() {
         if (file && file.type === 'application/pdf') {
             selectedPages.clear();
             rangesInput.value = '';
+            messageDiv.textContent = '';
+            messageDiv.className = '';
             renderPDF(file);
         }
     });
@@ -2767,7 +2787,7 @@ function setupSplitPdfPage() {
         }
         if (!rangesInput.value.trim()) {
             messageDiv.className = 'error';
-            messageDiv.textContent = 'Silakan tentukan halaman atau rentang yang akan dipisah.';
+            messageDiv.textContent = 'Silakan pilih halaman atau tentukan rentang yang akan dipisah.';
             return;
         }
 
@@ -2776,7 +2796,7 @@ function setupSplitPdfPage() {
         formData.append('ranges', rangesInput.value);
 
         messageDiv.className = '';
-        messageDiv.textContent = 'Memproses pemisahan PDF...';
+        messageDiv.textContent = 'Memproses pemisahan PDF... Ini mungkin memerlukan waktu beberapa saat.';
         const submitButton = form.querySelector('button[type="submit"]');
         submitButton.disabled = true;
 
@@ -2794,7 +2814,7 @@ function setupSplitPdfPage() {
             const blob = await response.blob();
             const header = response.headers.get('Content-Disposition');
             const filename = header ? header.split('filename=')[1].replace(/"/g, '') : 'split.zip';
-
+            
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';
