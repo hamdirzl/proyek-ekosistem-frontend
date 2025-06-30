@@ -107,3 +107,56 @@
 .preview-page.margin-small { padding: 5%; }
 .preview-page.margin-big { padding: 10%; }
 .pdf-options-overlay, .fab-container { display: none; }
+
+/* === FITUR: PDF SPLITTER === */
+#pdf-preview-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+    padding: var(--space-md);
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    background-color: var(--background-color);
+    min-height: 150px;
+    align-content: flex-start;
+}
+
+.pdf-page-preview {
+    position: relative;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: var(--space-xs);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pdf-page-preview:hover,
+.pdf-page-preview.selected {
+    border-color: var(--accent-color);
+    transform: translateY(-3px);
+    box-shadow: var(--card-shadow);
+}
+
+.pdf-page-preview canvas {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    display: block;
+}
+
+.pdf-page-preview .page-number {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted-color);
+    margin-top: var(--space-xs);
+}
+
+.pdf-page-preview input[type="checkbox"] {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+}
