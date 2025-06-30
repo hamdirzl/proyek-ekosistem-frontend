@@ -2803,61 +2803,71 @@ async function setupSplitPdfPage() {
         }
     });
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const file = fileInput.files[0];
-        if (!file) {
-            messageDiv.className = 'error';
-            messageDiv.textContent = 'Silakan pilih file PDF terlebih dahulu.';
-            return;
+    // Di dalam fungsi setupSplitPdfPage
+// Ganti blok event listener form yang lama dengan yang ini
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const file = fileInput.files[0];
+    if (!file) {
+        messageDiv.className = 'error';
+        messageDiv.textContent = 'Silakan pilih file PDF terlebih dahulu.';
+        return;
+    }
+    if (!rangesInput.value.trim()) {
+        messageDiv.className = 'error';
+        messageDiv.textContent = 'Silakan pilih halaman atau tentukan rentang yang akan dipisah.';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('pdfFile', file);
+    formData.append('ranges', rangesInput.value);
+    
+    // --- TAMBAHKAN BARIS INI ---
+    const splitMode = form.querySelector('input[name="splitMode"]:checked').value;
+    formData.append('mode', splitMode);
+    // -------------------------
+
+    messageDiv.className = '';
+    messageDiv.textContent = 'Memproses pemisahan PDF... Ini mungkin memerlukan waktu beberapa saat.';
+    submitButton.disabled = true;
+
+    try {
+        // ... sisa kode fetch tidak perlu diubah ...
+        const response = await fetch(`${API_BASE_URL}/api/split-pdf`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Terjadi kesalahan di server.');
         }
-        if (!rangesInput.value.trim()) {
-            messageDiv.className = 'error';
-            messageDiv.textContent = 'Silakan pilih halaman atau tentukan rentang yang akan dipisah.';
-            return;
-        }
 
-        const formData = new FormData();
-        formData.append('pdfFile', file);
-        formData.append('ranges', rangesInput.value);
+        const blob = await response.blob();
+        const header = response.headers.get('Content-Disposition');
+        const filename = header ? header.split('filename=')[1].replace(/"/g, '') : 'split.zip';
+        
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
 
-        messageDiv.className = '';
-        messageDiv.textContent = 'Memproses pemisahan PDF... Ini mungkin memerlukan waktu beberapa saat.';
-        submitButton.disabled = true;
+        messageDiv.className = 'success';
+        messageDiv.textContent = 'PDF berhasil dipisah dan diunduh!';
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/split-pdf`, {
-                method: 'POST',
-                body: formData,
-            });
+    } catch (error) {
+        messageDiv.className = 'error';
+        messageDiv.textContent = `Error: ${error.message}`;
+    } finally {
+        submitButton.disabled = false;
+    }
+});
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Terjadi kesalahan di server.');
-            }
-
-            const blob = await response.blob();
-            const header = response.headers.get('Content-Disposition');
-            const filename = header ? header.split('filename=')[1].replace(/"/g, '') : 'split.zip';
-            
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            a.remove();
-
-            messageDiv.className = 'success';
-            messageDiv.textContent = 'PDF berhasil dipisah dan diunduh!';
-
-        } catch (error) {
-            messageDiv.className = 'error';
-            messageDiv.textContent = `Error: ${error.message}`;
-        } finally {
-            submitButton.disabled = false;
-        }
-    });
 }
