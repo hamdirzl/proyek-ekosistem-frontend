@@ -2665,14 +2665,17 @@ function setupAuthCallbackPage() {
     }
 }
 
-// js/script.js
 
-// ... di akhir file
-
-// Ganti seluruh fungsi lama dengan yang ini
 function setupSplitPdfPage() {
     const form = document.getElementById('pdf-split-form');
-    if (!form) return; // Keluar jika bukan halaman yang tepat
+    if (!form) return;
+
+    // --- PERBAIKAN UTAMA ADA DI SINI ---
+    // Konfigurasi path worker dipindahkan ke sini agar pasti dieksekusi terlebih dahulu.
+    if (window.pdfjsLib) {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.102/pdf.worker.min.js`;
+    }
+    // ------------------------------------
 
     const fileInput = document.getElementById('pdf-split-input');
     const fileInfo = document.getElementById('pdf-file-info');
@@ -2682,14 +2685,11 @@ function setupSplitPdfPage() {
 
     let selectedPages = new Set();
 
-    // Fungsi untuk merender pratinjau PDF
     async function renderPDF(file) {
         previewContainer.innerHTML = '<p>Memuat pratinjau...</p>';
-        
         const reader = new FileReader();
         reader.onload = async (event) => {
             try {
-                // Gunakan pdfjsLib yang sekarang sudah tersedia secara global
                 const loadingTask = pdfjsLib.getDocument({ data: event.target.result });
                 const pdfDoc = await loadingTask.promise;
                 fileInfo.textContent = `${file.name} (${pdfDoc.numPages} halaman)`;
@@ -2738,20 +2738,15 @@ function setupSplitPdfPage() {
         reader.readAsArrayBuffer(file);
     }
 
-    // Fungsi untuk update input rentang berdasarkan halaman yang dipilih
     function updateRangesInput() {
         const sortedPages = Array.from(selectedPages).sort((a, b) => a - b);
-        
         if (sortedPages.length === 0) {
             rangesInput.value = '';
             return;
         }
-
-        // Logika untuk membuat rentang, contoh: 1, 2, 3, 5, 6 -> "1-3, 5-6"
         let ranges = [];
         let start = sortedPages[0];
         let end = sortedPages[0];
-
         for (let i = 1; i < sortedPages.length; i++) {
             if (sortedPages[i] === end + 1) {
                 end = sortedPages[i];
@@ -2762,7 +2757,6 @@ function setupSplitPdfPage() {
             }
         }
         ranges.push(start === end ? `${start}` : `${start}-${end}`);
-        
         rangesInput.value = ranges.join(', ');
     }
 
