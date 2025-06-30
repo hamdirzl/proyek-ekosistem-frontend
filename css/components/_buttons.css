@@ -4,9 +4,9 @@
     display: inline-block; 
     background: var(--accent-color); 
     color: #ffffff; 
-    padding: 0.7rem 1.6rem; 
+    padding: 0.8rem 1.8rem; /* Sedikit disesuaikan untuk bentuk kapsul */ 
     border: 2px solid var(--accent-color); 
-    border-radius: 8px;
+    border-radius: 50px; /* DIUBAH: dari 8px menjadi 50px untuk bentuk kapsul */
     font-weight: 700;
     font-family: var(--font-heading); 
     text-decoration: none; 
@@ -16,7 +16,7 @@
 }
 .login-button { 
     color: #ffffff !important; 
-    padding: 0.6rem 1.2rem !important;
+    padding: 0.8rem 1.8rem !important; /* Disesuaikan agar sama dengan tombol utama */
     background-color: var(--accent-color) !important;
 }
 .button-pintu:hover, .login-button:hover { 
@@ -31,6 +31,7 @@
     color: var(--text-color) !important;
     border-color: var(--border-color) !important;
     box-shadow: none !important;
+    border-radius: 50px; /* DIUBAH: Dibuat konsisten */
 }
 
 .button-secondary:hover {
@@ -44,9 +45,9 @@
     display: inline-block;
     background: var(--accent-color);
     color: #ffffff;
-    padding: 0.5rem 1.2rem;
+    padding: 0.6rem 1.5rem; /* Disesuaikan */
     border: none;
-    border-radius: 6px;
+    border-radius: 50px; /* DIUBAH: Dibuat konsisten */
     font-weight: 600;
     font-family: var(--font-body);
     text-decoration: none;
