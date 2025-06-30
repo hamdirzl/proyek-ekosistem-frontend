@@ -1954,76 +1954,79 @@ function attachImagesToPdfListener() {
     });
 
     form.addEventListener('submit', async (event) => {
-        // ... Logika submit form (tidak ada perubahan di sini)
-        event.preventDefault();
-        if (selectedFiles.length === 0) {
-            messageDiv.className = 'error';
-            messageDiv.textContent = 'Silakan pilih setidaknya satu gambar.';
-            return;
-        }
-        const formData = new FormData();
-        selectedFiles.forEach(file => formData.append('images', file));
-        formData.append('pageSize', pageSizeSelect.value);
-        formData.append('orientation', form.querySelector('input[name="orientation"]:checked').value);
-        formData.append('marginChoice', form.querySelector('input[name="margin"]:checked').value);
-        submitButton.disabled = true;
-        messageDiv.textContent = '';
-        messageDiv.className = '';
-        progressWrapper.classList.remove('hidden');
-        const progressBarContainer = progressWrapper.querySelector('.progress-bar');
-        const progressText = progressWrapper.querySelector('.progress-bar-text');
-        progressBarContainer.classList.add('indeterminate');
-        progressText.textContent = 'Mengonversi gambar ke PDF, harap tunggu...';
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${API_BASE_URL}/api/images-to-pdf`, true);
-        xhr.responseType = 'blob';
-        xhr.onload = function() {
-            progressBarContainer.classList.remove('indeterminate');
-            if (this.status === 200) {
-                messageDiv.className = 'success';
-                progressText.textContent = 'Konversi berhasil! Mengunduh file...';
-                const header = this.getResponseHeader('Content-Disposition');
-                let filename = 'converted.pdf';
-                if(header) {
-                    const parts = header.split(';');
-                    parts.forEach(part => {
-                        if (part.trim().startsWith('filename=')) {
-                            filename = part.split('=')[1].replace(/"/g, '');
-                        }
-                    });
-                }
-                const url = window.URL.createObjectURL(this.response);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                a.remove();
-                selectedFiles = [];
-                updatePreviews();
-                form.reset();
-                updateAllPreviewsLayout();
-            } else {
-                messageDiv.className = 'error';
-                messageDiv.textContent = 'Error: Gagal membuat PDF.';
+    event.preventDefault();
+    
+    // BARIS INI DITAMBAHKAN: Otomatis menutup panel opsi saat submit
+    form.classList.remove('options-active');
+
+    if (selectedFiles.length === 0) {
+        messageDiv.className = 'error';
+        messageDiv.textContent = 'Silakan pilih setidaknya satu gambar.';
+        return;
+    }
+    const formData = new FormData();
+    selectedFiles.forEach(file => formData.append('images', file));
+    formData.append('pageSize', pageSizeSelect.value);
+    formData.append('orientation', form.querySelector('input[name="orientation"]:checked').value);
+    formData.append('marginChoice', form.querySelector('input[name="margin"]:checked').value);
+    submitButton.disabled = true;
+    messageDiv.textContent = '';
+    messageDiv.className = '';
+    progressWrapper.classList.remove('hidden');
+    const progressBarContainer = progressWrapper.querySelector('.progress-bar');
+    const progressText = progressWrapper.querySelector('.progress-bar-text');
+    progressBarContainer.classList.add('indeterminate');
+    progressText.textContent = 'Mengonversi gambar ke PDF, harap tunggu...';
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${API_BASE_URL}/api/images-to-pdf`, true);
+    xhr.responseType = 'blob';
+    xhr.onload = function() {
+        progressBarContainer.classList.remove('indeterminate');
+        if (this.status === 200) {
+            messageDiv.className = 'success';
+            progressText.textContent = 'Konversi berhasil! Mengunduh file...';
+            const header = this.getResponseHeader('Content-Disposition');
+            let filename = 'converted.pdf';
+            if(header) {
+                const parts = header.split(';');
+                parts.forEach(part => {
+                    if (part.trim().startsWith('filename=')) {
+                        filename = part.split('=')[1].replace(/"/g, '');
+                    }
+                });
             }
-            setTimeout(() => {
-                progressWrapper.classList.add('hidden');
-                messageDiv.textContent = '';
-            }, 4000);
-            submitButton.disabled = false;
-        };
-        xhr.onerror = function() {
-            progressBarContainer.classList.remove('indeterminate');
+            const url = window.URL.createObjectURL(this.response);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+            selectedFiles = [];
+            updatePreviews();
+            form.reset();
+            updateAllPreviewsLayout();
+        } else {
             messageDiv.className = 'error';
-            messageDiv.textContent = 'Error: Terjadi kesalahan jaringan.';
+            messageDiv.textContent = 'Error: Gagal membuat PDF.';
+        }
+        setTimeout(() => {
             progressWrapper.classList.add('hidden');
-            submitButton.disabled = false;
-        };
-        xhr.send(formData);
-    });
+            messageDiv.textContent = '';
+        }, 4000);
+        submitButton.disabled = false;
+    };
+    xhr.onerror = function() {
+        progressBarContainer.classList.remove('indeterminate');
+        messageDiv.className = 'error';
+        messageDiv.textContent = 'Error: Terjadi kesalahan jaringan.';
+        progressWrapper.classList.add('hidden');
+        submitButton.disabled = false;
+    };
+    xhr.send(formData);
+});
     
     const optionsPanel = form.querySelector('.pdf-tool-options');
     const backButton = document.getElementById('back-to-previews-btn');
