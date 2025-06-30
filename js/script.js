@@ -2665,21 +2665,21 @@ function setupAuthCallbackPage() {
     }
 }
 
-// Ganti seluruh fungsi lama dengan versi final yang jauh lebih tangguh ini
+// Anda bisa menambahkan fungsi helper ini di dekat bagian atas atau tepat sebelum fungsi setupSplitPdfPage
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => resolve(script);
+        script.onerror = () => reject(new Error(`Gagal memuat skrip: ${src}`));
+        document.head.appendChild(script);
+    });
+}
+
+// LALU, GANTI SELURUH FUNGSI setupSplitPdfPage YANG LAMA DENGAN VERSI FINAL INI
 async function setupSplitPdfPage() {
     const form = document.getElementById('pdf-split-form');
     if (!form) return;
-
-    // --- FUNGSI HELPER UNTUK MEMUAT SCRIPT SECARA DINAMIS ---
-    function loadScript(src) {
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = src;
-            script.onload = () => resolve(script);
-            script.onerror = () => reject(new Error(`Gagal memuat skrip: ${src}`));
-            document.head.appendChild(script);
-        });
-    }
 
     const fileInput = document.getElementById('pdf-split-input');
     const fileInfo = document.getElementById('pdf-file-info');
@@ -2696,14 +2696,14 @@ async function setupSplitPdfPage() {
     previewContainer.innerHTML = '<p>Mempersiapkan alat PDF, mohon tunggu...</p>';
 
     try {
-        // PERBAIKAN UTAMA: Muat library secara dinamis dan tunggu sampai selesai
-        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.102/pdf.min.js');
+        // Memuat library dari file lokal yang sudah Anda unduh
+        await loadScript('../js/lib/pdf.min.js'); 
         
-        // Setelah library utama dimuat, konfigurasikan worker-nya
+        // Setelah library utama dimuat, konfigurasikan worker-nya dari file lokal
         if (window.pdfjsLib) {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.102/pdf.worker.min.js`;
+            pdfjsLib.GlobalWorkerOptions.workerSrc = `../js/lib/pdf.worker.min.js`;
         } else {
-            throw new Error("Objek pdfjsLib tidak ditemukan di window.");
+            throw new Error("Objek pdfjsLib tidak ditemukan. Pastikan file pdf.min.js sudah tersimpan di js/lib/");
         }
 
         // Sekarang library sudah pasti siap, aktifkan kembali UI
@@ -2713,7 +2713,7 @@ async function setupSplitPdfPage() {
 
     } catch (error) {
         console.error("Gagal memuat komponen PDF.js:", error);
-        previewContainer.innerHTML = `<p style="color:red;">Gagal memuat komponen PDF. Silakan muat ulang halaman. Error: ${error.message}</p>`;
+        previewContainer.innerHTML = `<p style="color:red;">Gagal memuat komponen PDF. Pastikan file sudah disimpan dengan benar. Error: ${error.message}</p>`;
         return; // Hentikan eksekusi jika library gagal dimuat
     }
 
