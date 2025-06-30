@@ -165,3 +165,89 @@
     color: var(--text-muted-color);
     margin-top: var(--space-xs);
 }
+
+/* === FITUR: PDF SPLITTER - UI RENTANG BARU === */
+.split-options-container {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+    align-items: flex-start;
+}
+
+.split-mode-title, .range-selector-title {
+    display: block;
+    font-weight: 500;
+    color: var(--text-muted-color);
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.range-selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.range-selector-header .button-pintu {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+#range-inputs-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.range-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.range-group .range-label {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    flex-shrink: 0;
+}
+
+.range-group .range-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    flex-grow: 1;
+}
+
+.range-group input[type="number"] {
+    text-align: center;
+    -moz-appearance: textfield; /* Firefox */
+}
+/* Chrome, Safari, Edge, Opera */
+.range-group input::-webkit-outer-spin-button,
+.range-group input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.range-group .remove-range-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted-color);
+    padding: 5px;
+    display: flex;
+    border-radius: 50%;
+}
+.range-group .remove-range-btn:hover {
+    background-color: #f1f1f1;
+    color: #dc3545;
+}
+
+/* Penyesuaian untuk layar kecil */
+@media (max-width: 768px) {
+    .split-options-container {
+        grid-template-columns: 1fr;
+    }
+}
