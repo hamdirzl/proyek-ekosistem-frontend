@@ -1,70 +1,49 @@
-/* ==========================================================================
-   FILE: base/_global.css
-   DESKRIPSI: Pengaturan global, variabel, reset, dan gaya fondasi.
-   ========================================================================== */
-
-/* Variabel CSS (Design System) */
+/* === PENGATURAN GLOBAL: DESIGN SYSTEM === */
 :root {
-    --background-color: #f8f9fa;
-    --card-bg-color: #ffffff;
-    --text-color: #212529;
-    --text-muted-color: #6c757d;
-    --border-color: #dee2e6;
-    --accent-color: #007bff;
-    --accent-hover: #0056b3;
-    --border-hover-color: #adb5bd;
+    --background-color: #f8f9fa; 
+    --card-bg-color: #ffffff;      
+    --text-color: #212529;       
+    --text-muted-color: #6c757d;   
+    --border-color: #dee2e6;       
+    --accent-color: #007bff;       
+    --accent-hover: #0056b3;       
+    --border-hover-color: #adb5bd; 
 
     --font-heading: 'Poppins', sans-serif;
     --font-body: 'Inter', sans-serif;
 
-    --space-xs: 0.5rem;
-    --space-sm: 1rem;
-    --space-md: 1.5rem;
-    --space-lg: 2.5rem;
-    --space-xl: 4rem;
-    --space-xxl: 6rem;
+    --space-xs: 0.5rem;  
+    --space-sm: 1rem;    
+    --space-md: 1.5rem;  
+    --space-lg: 2.5rem; 
+    --space-xl: 4rem;    
+    --space-xxl: 6rem;   
 
     --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
-    --font-size-h1: clamp(2.2rem, 1.5rem + 3.5vw, 3.5rem);
-    --font-size-h2: clamp(1.8rem, 1.25rem + 2.5vw, 2.5rem);
-    --font-size-h3: clamp(1.25rem, 1.1rem + 1.5vw, 1.75rem);
-
+    --font-size-h1:   clamp(2.2rem, 1.5rem + 3.5vw, 3.5rem);
+    --font-size-h2:   clamp(1.8rem, 1.25rem + 2.5vw, 2.5rem);
+    --font-size-h3:   clamp(1.25rem, 1.1rem + 1.5vw, 1.75rem);
+    
     --soft-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
     --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
-/* Global Reset dan Gaya Fondasi */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+/* Global reset and foundational styles */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    font-family: var(--font-body);
-    background-color: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.7;
+body { 
+    font-family: var(--font-body); 
+    background-color: var(--background-color); 
+    color: var(--text-color); 
+    line-height: 1.7; 
     font-size: var(--font-size-base);
-    -webkit-font-smoothing: antialiased;
+    -webkit-font-smoothing: antialiased; 
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden; /* Mencegah scroll horizontal yang tidak diinginkan */
 }
 
-/* Kelas utilitas */
-.hidden {
-    display: none !important;
+html, body {
+    overflow-x: hidden; 
 }
 
-/* Bagian Judul Umum */
-.section-title {
-    text-align: center;
-    font-family: var(--font-heading);
-    font-size: var(--font-size-h2);
-    color: var(--text-color);
-    margin-bottom: var(--space-xl);
-}
+.hidden { display: none !important; }

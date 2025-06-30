@@ -1,78 +1,102 @@
-/* ==========================================================================
-   FILE: pages/_auth-dashboard.css
-   DESKRIPSI: Gaya untuk halaman Autentikasi dan Dashboard.
-   ========================================================================== */
+/* === HALAMAN: AUTHENTICATION & DASHBOARD === */
 
-/* Kontainer Autentikasi */
-.auth-container {
-    max-width: 450px;
-    margin: 0 auto;
-    padding: var(--space-lg);
-    background-color: var(--card-bg-color);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--soft-shadow);
-    text-align: center;
+.auth-container { 
+    max-width: 450px; 
+    margin: 0 auto; 
+    padding: var(--space-lg); 
+    background-color: var(--card-bg-color); 
+    border-radius: 12px; 
+    border: 1px solid var(--border-color); 
+    box-shadow: var(--soft-shadow); 
+    text-align: center; 
 }
-
-.auth-form .form-group {
-    margin-bottom: var(--space-md);
-    text-align: left;
+.auth-form .form-group { margin-bottom: var(--space-md); text-align: left; }
+.auth-form label { 
+    display: block; 
+    font-weight: 500; 
+    color: var(--text-muted-color); 
+    margin-bottom: var(--space-xs); 
 }
+.auth-form input { text-align: left; }
+.auth-form button { width: 100%; padding: 0.9rem; }
+.auth-toggle { color: var(--text-muted-color); font-size: 0.9rem; margin-top: var(--space-md); }
+.auth-toggle a { color: var(--accent-color); font-weight: 600; text-decoration: none; }
+.auth-toggle a:hover { text-decoration: underline; }
 
-.auth-form label {
-    display: block;
-    font-weight: 500;
-    color: var(--text-muted-color);
-    margin-bottom: var(--space-xs);
+#auth-message { padding: var(--space-sm); border-radius: 8px; margin-top: var(--space-md); text-align: center;}
+#auth-message.success { background-color: rgba(25, 135, 84, 0.1); color: #198754; border: 1px solid #a3cfbb; }
+#auth-message.error { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; border: 1px solid #f1b0b7;}
+
+/* RIWAYAT TAUTAN (LINK HISTORY) */
+.tool-section, .dashboard-header, .history-section { 
+    background-color: var(--card-bg-color); 
+    padding: var(--space-lg); 
+    border-radius: 12px; 
+    margin-bottom: var(--space-lg); 
+    border: 1px solid var(--border-color); 
 }
-
-.auth-form input {
-    text-align: left;
+#shortener-form {
+    display: grid; 
+    grid-template-columns: 1fr auto;
+    gap: var(--space-sm);
+    align-items: end;
 }
+#shortener-form input[type="url"] { grid-column: 1 / -1; }
+#shortener-form #custom-slug { flex-grow: 1; }
 
-.auth-form button {
-    width: 100%;
-    padding: 0.9rem;
+.mood-history-list { list-style: none; padding: 0; margin-top: var(--space-md); }
+.mood-item {
+    background-color: var(--card-bg-color); 
+    padding: var(--space-sm) var(--space-md); 
+    border-radius: 8px;
+    margin-bottom: var(--space-sm);
+    border: 1px solid var(--border-color); 
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    display: flex; 
+    flex-direction: column; 
+    gap: var(--space-xs); 
 }
-
-.auth-toggle {
-    color: var(--text-muted-color);
-    font-size: 0.9rem;
-    margin-top: var(--space-md);
+.mood-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    border-color: var(--accent-color); 
 }
+.mood-item-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-xs); font-weight: 500; }
+.mood-item-header strong { font-size: 0.95rem; color: var(--accent-color); word-break: break-all; flex-grow: 1; margin-right: var(--space-sm); }
+.mood-item .mood-notes { font-size: 0.85rem; color: var(--text-muted-color); margin-bottom: 0; word-break: break-all; overflow-wrap: break-word; }
+.mood-item .mood-date { font-size: 0.75rem; color: var(--text-muted-color); text-align: right; width: 100%; margin-top: var(--space-xs); }
+.mood-item-actions { display: flex; gap: 5px; flex-shrink: 0; }
+.mood-icon-button { background: var(--background-color); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; line-height: 1; }
+.mood-icon-button:hover { background-color: #e9ecef; border-color: var(--accent-color); transform: translateY(-1px); }
+.mood-icon-button svg { width: 16px; height: 16px; color: var(--text-muted-color); transition: color 0.2s ease; }
+.mood-icon-button:hover svg { color: var(--accent-color); }
+.mood-icon-button.delete-button:hover { border-color: #ff4d4d; }
+.mood-icon-button.delete-button:hover svg { color: #ff4d4d; }
 
-.auth-toggle a {
+/* PANEL ADMIN */
+.admin-management-section {
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: var(--space-lg);
+}
+.mood-notes a {
     color: var(--accent-color);
-    font-weight: 600;
     text-decoration: none;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
 }
-
-.auth-toggle a:hover {
+.mood-notes a:hover {
+    color: var(--accent-hover);
     text-decoration: underline;
 }
-
-/* Pesan Autentikasi */
-#auth-message {
-    padding: var(--space-sm);
-    border-radius: 8px;
-    margin-top: var(--space-md);
-    text-align: center;
+.mood-item-header > span {
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
 }
 
-#auth-message.success {
-    background-color: rgba(25, 135, 84, 0.1);
-    color: #198754;
-    border: 1px solid #a3cfbb;
-}
-
-#auth-message.error {
-    background-color: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
-    border: 1px solid #f1b0b7;
-}
-
-/* Dashboard Umum */
+/* DASBOR TABBED */
 .dashboard-container {
     background-color: var(--card-bg-color);
     border: 1px solid var(--border-color);
@@ -80,16 +104,6 @@
     padding: var(--space-lg);
     margin-top: var(--space-lg);
 }
-
-.dashboard-header {
-    background-color: var(--card-bg-color);
-    padding: var(--space-lg);
-    border-radius: 12px;
-    margin-bottom: var(--space-lg);
-    border: 1px solid var(--border-color);
-}
-
-/* Navigasi Tab Dashboard */
 .dashboard-nav {
     display: flex;
     flex-wrap: wrap;
@@ -97,7 +111,6 @@
     border-bottom: 2px solid var(--border-color);
     margin-bottom: var(--space-lg);
 }
-
 .dashboard-tab-button {
     padding: var(--space-sm) var(--space-md);
     font-family: var(--font-body);
@@ -111,37 +124,25 @@
     transition: all 0.3s ease;
     margin-bottom: -2px;
 }
-
 .dashboard-tab-button:hover {
     background-color: rgba(0, 0, 0, 0.03);
     color: var(--text-color);
 }
-
 .dashboard-tab-button.active {
     color: var(--accent-color);
     border-bottom-color: var(--accent-color);
 }
-
 .dashboard-panel {
     display: none;
     animation: fadeIn 0.5s ease-in-out;
 }
-
 .dashboard-panel.active {
     display: block;
 }
-
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
 .dashboard-panel .history-section,
 .dashboard-panel #user-dashboard-section,
 .dashboard-panel #account-management-section,
@@ -152,146 +153,8 @@
     border: none;
     background: none;
 }
-
-/* Grid Statistik Dashboard */
 .stats-grid {
     display: grid;
     gap: var(--space-lg);
-    grid-template-columns: 1fr;
-}
-
-/* Riwayat Tautan/Mood */
-.history-section {
-    background-color: var(--card-bg-color);
-    padding: var(--space-lg);
-    border-radius: 12px;
-    margin-bottom: var(--space-lg);
-    border: 1px solid var(--border-color);
-}
-
-.mood-history-list {
-    list-style: none;
-    padding: 0;
-    margin-top: var(--space-md);
-}
-
-.mood-item {
-    background-color: var(--card-bg-color);
-    padding: var(--space-sm) var(--space-md);
-    border-radius: 8px;
-    margin-bottom: var(--space-sm);
-    border: 1px solid var(--border-color);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-}
-
-.mood-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    border-color: var(--accent-color);
-}
-
-.mood-item-header {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--space-xs);
-    font-weight: 500;
-}
-
-.mood-item-header strong {
-    font-size: 0.95rem;
-    color: var(--accent-color);
-    word-break: break-all;
-    flex-grow: 1;
-    margin-right: var(--space-sm);
-}
-
-.mood-item .mood-notes {
-    font-size: 0.85rem;
-    color: var(--text-muted-color);
-    margin-bottom: 0;
-    word-break: break-all;
-    overflow-wrap: break-word;
-}
-
-.mood-item .mood-notes a {
-    color: var(--accent-color);
-    text-decoration: none;
-    transition: color 0.3s ease, text-decoration 0.3s ease;
-}
-
-.mood-item .mood-notes a:hover {
-    color: var(--accent-hover);
-    text-decoration: underline;
-}
-
-.mood-item .mood-date {
-    font-size: 0.75rem;
-    color: var(--text-muted-color);
-    text-align: right;
-    width: 100%;
-    margin-top: var(--space-xs);
-}
-
-.mood-item-actions {
-    display: flex;
-    gap: 5px;
-    flex-shrink: 0;
-}
-
-.mood-icon-button {
-    background: var(--background-color);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    line-height: 1;
-}
-
-.mood-icon-button:hover {
-    background-color: #e9ecef;
-    border-color: var(--accent-color);
-    transform: translateY(-1px);
-}
-
-.mood-icon-button svg {
-    width: 16px;
-    height: 16px;
-    color: var(--text-muted-color);
-    transition: color 0.2s ease;
-}
-
-.mood-icon-button:hover svg {
-    color: var(--accent-color);
-}
-
-.mood-icon-button.delete-button:hover {
-    border-color: #ff4d4d;
-}
-
-.mood-icon-button.delete-button:hover svg {
-    color: #ff4d4d;
-}
-
-.mood-item-header > span {
-    min-width: 0;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    word-break: break-word;
-}
-
-/* Admin Management Section */
-.admin-management-section {
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: var(--space-lg);
+    grid-template-columns: 1fr; 
 }

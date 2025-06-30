@@ -1,59 +1,84 @@
-/* ==========================================================================
-   FILE: components/_cards.css
-   DESKRIPSI: Gaya untuk komponen kartu umum.
-   ========================================================================== */
-.pintu,
-.portfolio-card,
-.jurnal-card,
-.game-section .portfolio-card {
-    background-color: var(--card-bg-color);
-    padding: var(--space-lg);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--card-shadow);
-    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Default untuk .pintu */
-    text-align: center; /* Default untuk .pintu */
-}
+/* === KOMPONEN: CARDS === */
 
-.pintu:hover,
-.portfolio-card:hover,
-.jurnal-card:hover,
-.game-section .portfolio-card:hover {
-    transform: translateY(-8px);
+.pintu { 
+    background-color: var(--card-bg-color); 
+    padding: var(--space-lg); 
+    border-radius: 12px; 
+    border: 1px solid var(--border-color); 
+    box-shadow: var(--card-shadow);
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s ease; 
+    text-align: center; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+}
+.pintu:hover { 
+    transform: translateY(-8px); 
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
     border-color: var(--accent-color);
 }
+.pintu-icon { margin-bottom: var(--space-md); color: var(--accent-color); }
+.pintu h3 { font-size: var(--font-size-h3); color: var(--text-color); margin-bottom: var(--space-xs); }
+.pintu p { color: var(--text-muted-color); flex-grow: 1; margin-bottom: var(--space-md); }
+.pintu .button-pintu { margin-top: auto; }
 
-.pintu-icon {
-    margin-bottom: var(--space-md);
-    color: var(--accent-color);
+
+.portfolio-card, .jurnal-card, .game-section .portfolio-card { 
+    background: var(--card-bg-color); 
+    border-radius: 12px; 
+    border: 1px solid var(--border-color); 
+    overflow: hidden; 
+    box-shadow: var(--card-shadow);
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    flex-direction: column;
+}
+.portfolio-card:hover, .jurnal-card:hover, .game-section .portfolio-card:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+.portfolio-card img, .jurnal-card img, .game-section .portfolio-card img { 
+    width: 100%; 
+    height: 220px; 
+    object-fit: cover; 
+    transition: transform 0.4s ease;
+    filter: brightness(1); 
+}
+.portfolio-card:hover img, .jurnal-card:hover img, .game-section .portfolio-card:hover img { 
+    transform: scale(1.05); 
 }
 
-.pintu h3,
-.portfolio-card h3,
-.jurnal-card h3,
-.game-section .portfolio-card h3 {
-    font-size: var(--font-size-h3);
+.portfolio-card .card-content, .jurnal-content, .game-section .card-content {
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.portfolio-card h3, .jurnal-card h3, .game-section .portfolio-card h3 { 
+    font-size: var(--font-size-h3); 
     color: var(--text-color);
     margin-bottom: var(--space-xs);
 }
-
-.pintu p,
-.portfolio-card p,
-.jurnal-card p,
-.game-section .portfolio-card p {
-    color: var(--text-muted-color);
-    flex-grow: 1;
+.portfolio-card p, .jurnal-card p, .game-section .portfolio-card p {
+    color: var(--text-muted-color); 
+    flex-grow: 1; 
     margin-bottom: var(--space-md);
 }
+.portfolio-card .button-pintu, .jurnal-card .button-pintu, .game-section .portfolio-card .button-pintu { 
+    margin-top: auto; 
+    align-self: flex-start; 
+}
 
-.pintu .button-pintu,
-.portfolio-card .button-pintu,
-.jurnal-card .button-pintu,
-.game-section .portfolio-card .button-pintu {
-    margin-top: auto;
-    align-self: flex-start; /* Override untuk kartu non-pintu */
+.jurnal-card { display: block; }
+.jurnal-content { padding: var(--space-lg); }
+
+.portfolio-link-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.portfolio-link-card:hover {
+    color: inherit; 
 }

@@ -1,34 +1,28 @@
 /* ==========================================================================
-   FILE: style.css
-   DESKRIPSI: File CSS utama. Mengimpor semua modul CSS parsial.
-   --------------------------------------------------------------------------
-   STRUKTUR IMPOR:
-   1. Base (Variabel global, reset, fondasi)
-   2. Components (Elemen UI yang dapat digunakan kembali: tombol, kartu, navbar, dll.)
-   3. Pages (Gaya spesifik untuk halaman tertentu)
-   4. Features (Gaya untuk fitur kompleks seperti live chat)
-   5. Responsive (Semua media queries)
+   MAIN STYLESHEET
+   - File ini berfungsi sebagai importir utama untuk semua partials CSS.
+   - Urutan impor SANGAT PENTING untuk menjaga cascade.
    ========================================================================== */
 
-/* 1. Base */
-@import url("base/_global.css");
+/* 1. Base Styles (Variabel, Reset, Gaya Dasar) */
+@import url('base/_global.css');
 
-/* 2. Components */
-@import url("components/_navbar.css");
-@import url("components/_buttons.css");
-@import url("components/_cards.css");
-@import url("components/_forms.css");
-@import url("components/_modal.css");
-@import url("components/_footer.css");
+/* 2. Components (Blok UI yang dapat digunakan kembali) */
+@import url('components/_buttons.css');
+@import url('components/_cards.css');
+@import url('components/_forms.css');
+@import url('components/_navbar.css');
+@import url('components/_modal.css');
+@import url('components/_footer.css');
 
-/* 3. Pages */
-@import url("pages/_home.css");
-@import url("pages/_other-pages.css");
-@import url("pages/_auth-dashboard.css");
+/* 3. Features (Fitur-fitur spesifik) */
+@import url('features/_live-chat.css');
+@import url('features/_specific-features.css');
 
-/* 4. Features */
-@import url("features/_specific-features.css");
-@import url("features/_live-chat.css");
+/* 4. Pages (Layout & Style khusus per halaman) */
+@import url('pages/_home.css');
+@import url('pages/_auth-dashboard.css');
+@import url('pages/_other-pages.css');
 
-/* 5. Responsive */
-@import url("responsive.css");
+/* 5. Responsive (Media queries, selalu di paling akhir) */
+@import url('responsive.css');
