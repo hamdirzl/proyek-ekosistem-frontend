@@ -157,15 +157,22 @@
         height: 28px;
     }
     .chat-window-container {
-        /* Properti full screen dinonaktifkan agar tidak memenuhi layar di mobile */
-        /*
-        top: 0; left: 0; right: 0; bottom: 0;
-        width: 100%; height: 100%;
-        max-width: 100%; max-height: 100%;
-        border-radius: 0;
-        */
-        transform-origin: bottom center;
-    }
+    /* MODIFIKASI BARU: Pusatkan jendela di layar mobile */
+    left: 0;
+    right: 0;
+    bottom: var(--space-lg);
+    margin-left: auto;
+    margin-right: auto;
+    
+    /* Properti full screen tetap dinonaktifkan */
+    /*
+    top: 0;
+    width: 100%; height: 100%;
+    max-width: 100%; max-height: 100%;
+    border-radius: 0;
+    */
+    transform-origin: bottom center;
+}
     .chat-header h3 { font-size: 1rem; }
     .chat-window-container .chat-messages { padding-bottom: var(--space-lg); }
 
