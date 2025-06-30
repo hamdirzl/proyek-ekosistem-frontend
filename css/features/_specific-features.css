@@ -109,19 +109,30 @@
 .pdf-options-overlay, .fab-container { display: none; }
 
 /* === FITUR: PDF SPLITTER === */
-#pdf-preview-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: var(--space-md);
-    margin-top: var(--space-lg);
-    padding: var(--space-md);
+
+/* BARU: Viewport untuk scrolling horizontal */
+.pdf-preview-viewport {
+    background-color: var(--background-color);
     border: 1px dashed var(--border-color);
     border-radius: 8px;
-    background-color: var(--background-color);
-    min-height: 150px;
-    align-content: flex-start;
+    padding: var(--space-md);
+    overflow-x: auto; /* Mengaktifkan scroll horizontal */
+    overflow-y: hidden;
+    min-height: 220px;
+    margin-top: var(--space-lg);
 }
 
+/* MODIFIKASI: Mengubah container menjadi flexbox horizontal */
+#pdf-preview-container {
+    display: flex; /* Diubah dari grid ke flex */
+    flex-wrap: nowrap; /* Memastikan semua item dalam satu baris */
+    gap: var(--space-md);
+    padding-bottom: 1rem; /* Memberi ruang untuk scrollbar */
+    min-height: 150px;
+    align-items: flex-start;
+}
+
+/* MODIFIKASI: Memberi ukuran tetap pada setiap item pratinjau */
 .pdf-page-preview {
     position: relative;
     border: 2px solid var(--border-color);
@@ -130,6 +141,8 @@
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
+    flex: 0 0 130px; /* Tidak akan membesar/menyusut, lebar tetap 130px */
+    width: 130px;
 }
 
 .pdf-page-preview:hover,
@@ -151,12 +164,4 @@
     font-weight: 600;
     color: var(--text-muted-color);
     margin-top: var(--space-xs);
-}
-
-.pdf-page-preview input[type="checkbox"] {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 18px;
-    height: 18px;
 }
