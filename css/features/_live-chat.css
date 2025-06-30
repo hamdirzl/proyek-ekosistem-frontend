@@ -1,3 +1,8 @@
+/* ==========================================================================
+   FILE: features/_live-chat.css
+   DESKRIPSI: Gaya untuk fitur Live Chat (Pengunjung & Admin).
+   ========================================================================== */
+
 /* Gelembung Chat Pengunjung */
 .chat-bubble-container {
     position: fixed;

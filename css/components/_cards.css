@@ -1,4 +1,7 @@
-/* Kartu Umum (digunakan di Pintu Utama, Portofolio, Jurnal) */
+/* ==========================================================================
+   FILE: components/_cards.css
+   DESKRIPSI: Gaya untuk komponen kartu umum.
+   ========================================================================== */
 .pintu,
 .portfolio-card,
 .jurnal-card,

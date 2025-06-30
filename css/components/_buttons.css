@@ -1,4 +1,7 @@
-/* Tombol Umum */
+/* ==========================================================================
+   FILE: components/_buttons.css
+   DESKRIPSI: Gaya untuk semua tombol umum.
+   ========================================================================== */
 .button-pintu {
     display: inline-block;
     background: var(--accent-color);

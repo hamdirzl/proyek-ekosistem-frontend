@@ -1,3 +1,39 @@
+/* ==========================================================================
+   FILE: components/_forms.css
+   DESKRIPSI: Gaya untuk formulir umum, input, dan perkakas.
+   ========================================================================== */
+
+/* Bagian Perkakas Umum */
+.tool-section {
+    background-color: var(--card-bg-color);
+    padding: var(--space-lg);
+    border-radius: 12px;
+    margin-bottom: var(--space-lg);
+    border: 1px solid var(--border-color);
+}
+
+/* Pilihan Perkakas (Tombol Selektor) */
+.tool-selection {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+}
+
+.tool-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+}
+
+.tool-selector-button {
+    min-width: 180px;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 /* Elemen Formulir Umum */
 input[type="url"],
 input[type="email"],
@@ -376,18 +412,71 @@ select:focus {
     color: var(--accent-color);
 }
 
-/* URL Shortener Form (Spesifik) */
-#shortener-form {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: var(--space-sm);
-    align-items: end;
+/* Quill.js Editor */
+.ql-toolbar.ql-snow,
+.ql-container.ql-snow {
+    border: 1px solid var(--border-color);
+    background-color: #ffffff;
+    color: var(--text-color);
 }
 
-#shortener-form input[type="url"] {
-    grid-column: 1 / -1;
+.ql-toolbar.ql-snow {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
 }
 
-#shortener-form #custom-slug {
-    flex-grow: 1;
+.ql-container.ql-snow {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.ql-editor {
+    font-family: var(--font-body);
+    font-size: var(--font-size-base);
+    line-height: 1.7;
+}
+
+#quill-editor {
+    min-height: 300px;
+}
+
+#quill-portfolio-editor {
+    min-height: 150px;
+}
+
+.ql-editor.ql-blank::before {
+    color: var(--text-muted-color);
+    font-style: normal;
+    opacity: 0.7;
+}
+
+.ql-snow .ql-stroke {
+    stroke: var(--text-color);
+}
+
+.ql-snow .ql-fill {
+    fill: var(--text-color);
+}
+
+.ql-snow .ql-picker-label:hover,
+.ql-snow .ql-picker-label.ql-active,
+.ql-snow .ql-picker-item:hover,
+.ql-snow .ql-picker-item.ql-selected,
+.ql-snow .ql-formats button:hover,
+.ql-snow .ql-formats button.ql-active {
+    color: var(--accent-color);
+}
+
+.ql-snow .ql-picker-label:hover .ql-stroke,
+.ql-snow .ql-picker-label.ql-active .ql-stroke,
+.ql-snow .ql-picker-item:hover .ql-stroke,
+.ql-snow .ql-picker-item.ql-selected .ql-stroke,
+.ql-snow .ql-formats button:hover .ql-stroke,
+.ql-snow .ql-formats button.ql-active .ql-stroke {
+    stroke: var(--accent-color);
+}
+
+.ql-container.ql-snow:focus-within {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
 }

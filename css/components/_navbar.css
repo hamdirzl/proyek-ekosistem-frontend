@@ -1,4 +1,7 @@
-/* Navbar */
+/* ==========================================================================
+   FILE: components/_navbar.css
+   DESKRIPSI: Gaya untuk Navbar dan elemen terkait.
+   ========================================================================== */
 .navbar {
     display: flex;
     justify-content: space-between;

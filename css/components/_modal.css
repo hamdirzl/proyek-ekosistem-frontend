@@ -1,4 +1,7 @@
-/* Modal (Pop-up) Tentang Saya */
+/* ==========================================================================
+   FILE: components/_modal.css
+   DESKRIPSI: Gaya untuk pop-up modal.
+   ========================================================================== */
 .modal-overlay {
     position: fixed;
     top: 0;
