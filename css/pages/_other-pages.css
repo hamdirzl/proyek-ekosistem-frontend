@@ -16,52 +16,44 @@
     border: 1px solid var(--border-color);
 }
 
-/* ========================================================= */
-/* ===== PEROMBAKAN TOTAL PERKAKAS TERPOPULER (MINIMALIS) ==== */
-/* ========================================================= */
+/* ================================================================= */
+/* ===== PEROMBAKAN TOTAL PERKAKAS TERPOPULER (MENJADI PIL) ====== */
+/* ================================================================= */
 
-/* 1. Mengatur ulang kontainer utama */
-body#tools-page .top-tools-section #top-tools-container.pintu-container {
-    display: flex !important;
+/* 1. Mengatur ulang kontainer utama menjadi flexbox */
+body#tools-page .top-tools-section #top-tools-container {
+    display: flex;
     flex-wrap: wrap; /* Izinkan item turun baris di layar kecil */
     justify-content: center; /* Pusatkan item-item */
     gap: 10px; /* Jarak antar pil */
     padding: 0 1rem; /* Beri sedikit padding horizontal */
-
-    /* Hapus gaya grid yang tidak terpakai */
-    grid-template-columns: none;
+    grid-template-columns: none; /* Hapus properti grid */
 }
 
-/* 2. Mengubah setiap item menjadi "Pil Kecil" */
-body#tools-page #top-tools-container.pintu-container a.pintu {
-    all: unset; /* Hapus semua gaya default dari link */
+/* 2. Style untuk setiap item sebagai "pil" yang dapat diklik */
+/* Selector ini akan menargetkan link yang akan kita buat di JS */
+body#tools-page #top-tools-container a.tool-pill {
+    /* Reset gaya default dari .pintu atau link */
+    all: unset;
+    box-sizing: border-box; /* Pastikan padding dihitung dengan benar */
+    
+    /* Gaya Pil */
     display: inline-block;
-    padding: 6px 14px; /* Atur ukuran pil */
-    background-color: #E9ECEF; /* Warna latar pil */
-    color: #495057; /* Warna teks */
-    font-size: 0.85rem; /* Ukuran font kecil */
+    padding: 6px 16px;
+    background-color: #E9ECEF;
+    color: #495057;
+    font-size: 0.9rem;
     font-weight: 500;
     font-family: 'Inter', sans-serif;
-    border-radius: 50px; /* Membuat bentuk pil yang sempurna */
+    border-radius: 50px;
     text-decoration: none;
-    transition: background-color 0.2s, color 0.2s;
     cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, transform 0.2s;
 }
 
-/* 3. Efek saat kursor di atas pil */
-body#tools-page #top-tools-container.pintu-container a.pintu:hover {
-    background-color: #CED4DA; /* Warna latar saat hover */
-    color: #212529; /* Warna teks saat hover */
-}
-
-/* 4. Hanya tampilkan judul di dalam pil */
-body#tools-page #top-tools-container.pintu-container a.pintu .pintu-title {
-    all: unset; /* Pastikan hanya style dari induknya yang terpakai */
-    font-size: inherit;
-    color: inherit;
-}
-
-/* 5. Sembunyikan elemen-elemen yang tidak diperlukan (ikon, deskripsi, dll) */
-body#tools-page #top-tools-container.pintu-container a.pintu > *:not(.pintu-title) {
-    display: none !important;
+/* 3. Efek hover untuk pil */
+body#tools-page #top-tools-container a.tool-pill:hover {
+    background-color: var(--accent-color);
+    color: #ffffff;
+    transform: translateY(-2px);
 }
