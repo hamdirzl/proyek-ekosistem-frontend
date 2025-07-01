@@ -71,3 +71,18 @@ body#tools-page #top-tools-container a.tool-pill:hover .tool-pill-count {
     background-color: rgba(255, 255, 255, 0.2);
     color: #ffffff;
 }
+
+/* 6. Perubahan warna badge saat pil di-hover */
+body#tools-page #top-tools-container a.tool-pill:hover .tool-pill-count {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+/* 7. PENYESUAIAN JARAK VERTIKAL (BARU) */
+body#tools-page .top-tools-section {
+    margin-bottom: var(--space-xl); /* Menambah jarak bawah dari seluruh seksi "Perkakas Terpopuler" */
+}
+
+body#tools-page .top-tools-section .section-title {
+    margin-bottom: var(--space-lg); /* Mengurangi jarak antara judul "Perkakas Terpopuler" dan barisan pil */
+}
