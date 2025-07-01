@@ -16,60 +16,67 @@
     border: 1px solid var(--border-color);
 }
 
-/* ===== Penyesuaian Tampilan Perkakas Terpopuler ===== */
+/* ================================================= */
+/* ===== OVERRIDE TAMPILAN PERKAKAS TERPOPULER ===== */
+/* ================================================= */
 
-/* Mengurangi ukuran keseluruhan section */
-.top-tools-section {
-    padding: 1.5rem 1rem; /* Mengurangi padding atas/bawah dan kiri/kanan */
-    margin-bottom: 1rem;
+/* 1. Reset Section dan Judul */
+body#tools-page .top-tools-section {
+    padding: 1.5rem 1rem !important;
+    margin-bottom: 1rem !important;
 }
 
-/* Mengecilkan judul "Perkakas Terpopuler" */
-.top-tools-section .section-title {
-    font-size: 1.25rem; /* Ukuran font lebih kecil */
-    margin-bottom: 1rem;
+body#tools-page .top-tools-section .section-title {
+    font-size: 1.2rem !important;
+    margin-bottom: 1rem !important;
 }
 
-/* Mengubah layout container dari grid menjadi flexbox yang ringkas */
-#top-tools-container.pintu-container {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap; /* Agar bisa turun baris jika tidak muat */
-    gap: 0.8rem; /* Jarak antar item */
+/* 2. Paksa Container untuk menjadi Flexbox dan hapus properti Grid */
+body#tools-page #top-tools-container.pintu-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px !important; /* Jarak antar item */
+    
+    /* Nonaktifkan layout Grid bawaan */
+    grid-template-columns: none !important;
+    grid-gap: 0 !important;
 }
 
-/* Menghapus style grid default jika ada */
-#top-tools-container.pintu-container {
-    grid-template-columns: none;
+/* 3. Ubah total tampilan setiap item perkakas di dalamnya */
+body#tools-page #top-tools-container.pintu-container > a.pintu {
+    /* Reset Ukuran dan Layout */
+    all: unset !important; /* Hapus semua style bawaan dari elemen ini */
+    
+    /* Terapkan Style Baru (Bentuk Pil) */
+    display: inline-block !important;
+    padding: 8px 16px !important;
+    background-color: #f1f1f1 !important;
+    color: #333 !important;
+    font-size: 0.9rem !important;
+    font-family: 'Inter', sans-serif !important;
+    text-decoration: none !important;
+    border-radius: 20px !important;
+    cursor: pointer !important;
+    transition: background-color 0.2s ease !important;
 }
 
-/* Menata setiap item/perkakas di dalamnya */
-#top-tools-container.pintu-container > a {
-    display: inline-block;
-    background-color: #f1f1f1;
-    color: #333;
-    padding: 0.5rem 1rem;
-    border-radius: 20px; /* Bentuk pil */
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: background-color 0.3s ease;
-    border: none;
-    box-shadow: none; /* Menghapus bayangan jika ada */
+/* 4. Atur style untuk Judul di dalam Pil */
+body#tools-page #top-tools-container.pintu-container > a.pintu .pintu-title {
+    all: unset !important; /* Hapus semua style bawaan dari judul */
+    font-size: inherit !important; /* Ikut ukuran font induknya */
+    color: inherit !important; /* Ikut warna font induknya */
 }
 
-#top-tools-container.pintu-container > a:hover {
-    background-color: #e0e0e0;
-    transform: none; /* Menghapus efek hover mengangkat */
+/* 5. Sembunyikan Ikon dan Deskripsi secara paksa */
+body#tools-page #top-tools-container.pintu-container > a.pintu .pintu-icon-container,
+body#tools-page #top-tools-container.pintu-container > a.pintu .pintu-description {
+    display: none !important;
 }
 
-/* Menyembunyikan elemen yang tidak perlu (deskripsi dan gambar) */
-#top-tools-container.pintu-container .pintu-description,
-#top-tools-container.pintu-container .pintu-icon-container {
-    display: none;
-}
-
-/* Menyesuaikan judul perkakas di dalam tag */
-#top-tools-container.pintu-container .pintu-title {
-    font-size: 0.9rem; /* Samakan dengan font-size link */
-    margin: 0;
+/* 6. Atur Efek Hover */
+body#tools-page #top-tools-container.pintu-container > a.pintu:hover {
+    background-color: #e0e0e0 !important;
+    color: #000 !important;
 }
