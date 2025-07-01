@@ -2676,20 +2676,25 @@ function loadScript(src) {
     });
 }
 
-// GANTI SELURUH FUNGSI DENGAN VERSI SUPERIOR INI
+// --------------------------------------------------------------------
+// SALIN SEMUA KODE DI BAWAH INI DAN TEMPEL DI AKHIR FILE js/script.js
+// --------------------------------------------------------------------
+
+// Fungsi helper untuk memuat skrip secara dinamis
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => resolve(script);
+        script.onerror = () => reject(new Error(`Gagal memuat skrip: ${src}`));
+        document.head.appendChild(script);
+    });
+}
+
+// Fungsi utama untuk halaman Split PDF (versi final dan paling stabil)
 async function setupSplitPdfPage() {
     const form = document.getElementById('pdf-split-form');
     if (!form) return;
-
-    function loadScript(src) {
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = src;
-            script.onload = () => resolve(script);
-            script.onerror = () => reject(new Error(`Gagal memuat skrip: ${src}`));
-            document.head.appendChild(script);
-        });
-    }
 
     const fileInput = document.getElementById('pdf-split-input');
     const fileInfo = document.getElementById('pdf-file-info');
@@ -2705,22 +2710,30 @@ async function setupSplitPdfPage() {
     // ----- UI SETUP -----
     submitButton.disabled = true;
     fileInput.disabled = true;
-    addRangeBtn.style.display = 'none';
+    if (addRangeBtn) {
+        addRangeBtn.style.display = 'none';
+    }
     previewContainer.innerHTML = '<p>Mempersiapkan alat PDF, mohon tunggu...</p>';
 
     try {
+        // Memuat library dari file lokal yang sudah Anda unduh
         await loadScript('../js/lib/pdf.min.js');
+        
+        // Setelah library utama dimuat, konfigurasikan worker-nya dari file lokal
         if (window.pdfjsLib) {
             pdfjsLib.GlobalWorkerOptions.workerSrc = `../js/lib/pdf.worker.min.js`;
         } else {
-            throw new Error("Objek pdfjsLib tidak ditemukan.");
+            throw new Error("Objek pdfjsLib tidak ditemukan. Pastikan file pdf.min.js sudah tersimpan di js/lib/");
         }
+
+        // Sekarang library sudah pasti siap, aktifkan kembali UI
         previewContainer.innerHTML = '<p>Silakan pilih file PDF untuk memulai.</p>';
         fileInput.disabled = false;
+
     } catch (error) {
         console.error("Gagal memuat komponen PDF.js:", error);
         previewContainer.innerHTML = `<p style="color:red;">Gagal memuat komponen PDF. Pastikan file sudah disimpan dengan benar. Error: ${error.message}</p>`;
-        return;
+        return; // Hentikan eksekusi jika library gagal dimuat
     }
 
     // ----- LOGIKA FUNGSI -----
@@ -2751,7 +2764,7 @@ async function setupSplitPdfPage() {
             <div class="range-input-wrapper">
                 <input type="number" class="range-from" placeholder="Dari" min="1" max="${totalPages}" value="${fromVal}">
                 <span>-</span>
-                <input type="number" class="range-to" placeholder="Ke" min="1" max="${totalPages}" value="${toVal}">
+                <input type="number" class="range-to" placeholder="Ke" min="1" max="${totalPages}" value="${toVal || fromVal}">
             </div>
             <button type="button" class="remove-range-btn" title="Hapus rentang">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -2762,19 +2775,18 @@ async function setupSplitPdfPage() {
         // Tambah event listener untuk input dan tombol hapus baru
         newRangeGroup.querySelector('.remove-range-btn').addEventListener('click', () => {
             newRangeGroup.remove();
+            // Re-label all remaining range groups
+            rangeInputsWrapper.querySelectorAll('.range-group').forEach((group, index) => {
+                group.querySelector('.range-label').textContent = `Range ${index + 1}`;
+            });
             updateFinalRangeString();
         });
         newRangeGroup.querySelectorAll('input').forEach(input => {
-            input.addEventListener('change', updateFinalRangeString);
+            input.addEventListener('input', updateFinalRangeString);
         });
         updateFinalRangeString();
     };
-
-    async function renderPDF(file) {
-        // ... (fungsi renderPDF tetap sama, tidak perlu diubah)
-    }
     
-    // (Gantilah fungsi renderPDF yang lama dengan yang ada di respons saya sebelumnya)
     async function renderPDF(file) {
         previewContainer.innerHTML = '<p>Memuat pratinjau...</p>';
         const reader = new FileReader();
@@ -2785,7 +2797,7 @@ async function setupSplitPdfPage() {
                 totalPages = pdfDoc.numPages;
                 fileInfo.textContent = `${file.name} (${totalPages} halaman)`;
                 previewContainer.innerHTML = '';
-                addRangeBtn.style.display = 'inline-flex';
+                if(addRangeBtn) addRangeBtn.style.display = 'inline-flex';
                 
                 for (let i = 1; i <= totalPages; i++) {
                     const page = await pdfDoc.getPage(i);
@@ -2814,34 +2826,39 @@ async function setupSplitPdfPage() {
                         addRangeRow(i, i);
                     });
                 }
+                // Tambahkan satu baris rentang default setelah pratinjau selesai
+                if(rangeInputsWrapper.children.length === 0){
+                    addRangeRow(1, totalPages);
+                }
             } catch (error) {
                 console.error('Error saat merender PDF:', error);
                 previewContainer.innerHTML = `<p style="color:red;">Gagal memuat pratinjau. File PDF mungkin rusak atau dilindungi password.</p>`;
                 fileInfo.textContent = 'Gagal memuat file.';
-                addRangeBtn.style.display = 'none';
+                if(addRangeBtn) addRangeBtn.style.display = 'none';
             }
         };
         reader.readAsArrayBuffer(file);
     }
 
     // ----- EVENT LISTENERS -----
-    
-    addRangeBtn.addEventListener('click', () => addRangeRow());
+    if(addRangeBtn) {
+        addRangeBtn.addEventListener('click', () => addRangeRow());
+    }
 
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
         if (file && file.type === 'application/pdf') {
-            rangeInputsWrapper.innerHTML = ''; // Kosongkan rentang lama
+            rangeInputsWrapper.innerHTML = ''; 
             messageDiv.textContent = '';
             messageDiv.className = '';
             renderPDF(file);
-            updateFinalRangeString(); // Reset string rentang
+            updateFinalRangeString();
         }
     });
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        updateFinalRangeString(); // Pastikan string final sudah ter-update
+        updateFinalRangeString(); 
         
         if (!fileInput.files[0]) {
             messageDiv.className = 'error';
@@ -2855,7 +2872,6 @@ async function setupSplitPdfPage() {
         }
 
         const formData = new FormData(form);
-        // Hapus input yang tidak perlu dikirim
         formData.delete('range-from'); 
         formData.delete('range-to');
 
