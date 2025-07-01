@@ -15,3 +15,53 @@
     margin: var(--space-md) 0;
     border: 1px solid var(--border-color);
 }
+
+/* ========================================================= */
+/* ===== PEROMBAKAN TOTAL PERKAKAS TERPOPULER (MINIMALIS) ==== */
+/* ========================================================= */
+
+/* 1. Mengatur ulang kontainer utama */
+body#tools-page .top-tools-section #top-tools-container.pintu-container {
+    display: flex !important;
+    flex-wrap: wrap; /* Izinkan item turun baris di layar kecil */
+    justify-content: center; /* Pusatkan item-item */
+    gap: 10px; /* Jarak antar pil */
+    padding: 0 1rem; /* Beri sedikit padding horizontal */
+
+    /* Hapus gaya grid yang tidak terpakai */
+    grid-template-columns: none;
+}
+
+/* 2. Mengubah setiap item menjadi "Pil Kecil" */
+body#tools-page #top-tools-container.pintu-container a.pintu {
+    all: unset; /* Hapus semua gaya default dari link */
+    display: inline-block;
+    padding: 6px 14px; /* Atur ukuran pil */
+    background-color: #E9ECEF; /* Warna latar pil */
+    color: #495057; /* Warna teks */
+    font-size: 0.85rem; /* Ukuran font kecil */
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    border-radius: 50px; /* Membuat bentuk pil yang sempurna */
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+    cursor: pointer;
+}
+
+/* 3. Efek saat kursor di atas pil */
+body#tools-page #top-tools-container.pintu-container a.pintu:hover {
+    background-color: #CED4DA; /* Warna latar saat hover */
+    color: #212529; /* Warna teks saat hover */
+}
+
+/* 4. Hanya tampilkan judul di dalam pil */
+body#tools-page #top-tools-container.pintu-container a.pintu .pintu-title {
+    all: unset; /* Pastikan hanya style dari induknya yang terpakai */
+    font-size: inherit;
+    color: inherit;
+}
+
+/* 5. Sembunyikan elemen-elemen yang tidak diperlukan (ikon, deskripsi, dll) */
+body#tools-page #top-tools-container.pintu-container a.pintu > *:not(.pintu-title) {
+    display: none !important;
+}
