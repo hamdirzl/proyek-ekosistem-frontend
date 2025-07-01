@@ -89,7 +89,7 @@ async function fetchWithAuth(url, options = {}) {
                 forceLogout();
             }
         } catch (error) {
-            forceLogout();
+            // Optional: handle error if needed
         }
     }
 
