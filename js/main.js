@@ -1,120 +1,109 @@
 // js/main.js
-// Titik masuk utama aplikasi. Mengimpor modul dan menjalankan fungsi setup berdasarkan halaman yang aktif.
-
-// Import Konfigurasi & Utilitas
 import { API_BASE_URL } from './config.js';
-import { fetchWithAuth, forceLogout } from './utils/auth.js';
-import { setupMobileMenu, setupAllPasswordToggles } from './utils/ui.js';
-import { setupCropModal } from './utils/cropping.js';
-
-// Import Modul Fitur
+import { setupAuthEventListeners } from './modules/auth-pages.js';
+import { setupPublicPageEventListeners } from './modules/public-pages.js';
+import { setupDashboard } from './modules/dashboard.js';
+import { setupToolHandlers } from './modules/tools.js';
 import { setupChatBubble } from './modules/chat.js';
-import { setupDashboardPage } from './modules/dashboard.js';
-import { setupAuthPage, setupAuthCallbackPage } from './modules/auth-pages.js';
-import { setupPortfolioPage, setupProjectDetailPage, setupJurnalPage, setupJurnalDetailPage } from './modules/public-pages.js';
-import {
-    setupToolsPage,
-    setupUrlShortenerPage,
-    setupMediaConverterPage,
-    attachQrCodeGeneratorListener,
-    setupImageCompressorPage,
-    attachImagesToPdfListener,
-    setupSplitPdfPage
-} from './modules/tools.js';
+import { checkLoginStatus, logout } from './utils/auth.js';
+import { showModal } from './utils/ui.js';
 
+// Fungsi untuk menginisialisasi navigasi dan event listener umum
+const initializeApp = () => {
+    const hamburger = document.getElementById('hamburger');
+    const mobileNavLinks = document.getElementById('mobile-nav-links');
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // --- Logika Otentikasi & Navbar (Berjalan di semua halaman) ---
-    const navDasbor = document.getElementById('nav-dasbor');
-    const navLogin = document.getElementById('nav-login');
-    const navLogout = document.getElementById('nav-logout');
-    const logoutButtonNav = document.getElementById('logout-button-nav');
-    const refreshToken = localStorage.getItem('jwt_refresh_token');
+    if (hamburger && mobileNavLinks) {
+        hamburger.addEventListener('click', () => {
+            mobileNavLinks.classList.toggle('active');
+            hamburger.classList.toggle('is-active');
+        });
+    }
+    updateNavUI();
+    setupChatBubble();
+};
 
-    if (refreshToken) {
-        if (navDasbor) navDasbor.style.display = 'list-item';
-        if (navLogin) navLogin.style.display = 'none';
-        if (navLogout) navLogout.style.display = 'list-item';
+// Fungsi untuk memperbarui UI navigasi berdasarkan status login
+const updateNavUI = () => {
+    const isLoggedIn = checkLoginStatus();
+    const navLinks = document.getElementById('nav-links');
+    const mobileNavLinks = document.getElementById('mobile-nav-links');
 
-        if (logoutButtonNav) {
-            logoutButtonNav.addEventListener('click', async () => {
-                try {
-                    await fetchWithAuth(`${API_BASE_URL}/api/logout`, { method: 'POST' });
-                } catch (e) {
-                    console.error("Gagal logout di server, tapi tetap lanjut logout di client.", e);
-                } finally {
-                    forceLogout();
-                    const indexPath = window.location.href.includes('github.io') ? '/hrportof/' : '/';
-                    window.location.href = indexPath;
-                }
+    if (isLoggedIn) {
+        if (navLinks) {
+            navLinks.innerHTML = `
+                <li><a href="/index.html">Beranda</a></li>
+                <li><a href="/portfolio.html">Portfolio</a></li>
+                <li><a href="/jurnal.html">Jurnal</a></li>
+                <li><a href="/tools.html">Tools</a></li>
+                <li><a href="/dashboard.html" class="btn btn-primary">Dasbor</a></li>
+                <li><a href="#" id="logout-link" class="btn btn-outline-primary">Logout</a></li>
+            `;
+            // Listener untuk logout di navigasi desktop
+            document.getElementById('logout-link')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                logout();
+            });
+        }
+        if (mobileNavLinks) {
+            mobileNavLinks.innerHTML = `
+                <li><a href="/index.html">Beranda</a></li>
+                <li><a href="/portfolio.html">Portfolio</a></li>
+                <li><a href="/jurnal.html">Jurnal</a></li>
+                <li><a href="/tools.html">Tools</a></li>
+                <li><a href="/dashboard.html">Dasbor</a></li>
+                <li><a href="#" id="mobile-logout-link" class="btn btn-primary btn-pill">Logout</a></li>
+            `;
+            // Listener untuk logout di navigasi mobile
+            document.getElementById('mobile-logout-link')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                logout();
             });
         }
     } else {
-        if (navDasbor) navDasbor.style.display = 'none';
-        if (navLogin) navLogin.style.display = 'list-item';
-        if (navLogout) navLogout.style.display = 'none';
-    }
-
-    // Coba refresh access token jika ada refresh token tapi tidak ada access token
-    if (refreshToken && !sessionStorage.getItem('jwt_access_token')) {
-        try {
-            const refreshResponse = await fetch(`${API_BASE_URL}/api/refresh-token`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token: refreshToken })
-            });
-
-            if (refreshResponse.ok) {
-                const data = await refreshResponse.json();
-                sessionStorage.setItem('jwt_access_token', data.accessToken);
-                // Jika setelah refresh kita ada di halaman dashboard, panggil setup-nya
-                if (document.body.contains(document.getElementById('dashboard-main'))) {
-                    await setupDashboardPage();
-                }
-            } else {
-                forceLogout();
-            }
-        } catch (error) {
-            forceLogout();
+        if (navLinks) {
+            navLinks.innerHTML = `
+                <li><a href="/index.html">Beranda</a></li>
+                <li><a href="/portfolio.html">Portfolio</a></li>
+                <li><a href="/jurnal.html">Jurnal</a></li>
+                <li><a href="/tools.html">Tools</a></li>
+                <li><a href="auth.html" class="btn btn-primary">Login</a></li>
+            `;
+        }
+        if (mobileNavLinks) {
+            // !!! [PERBAIKAN] Menambahkan kelas ke tombol Login di menu mobile !!!
+            mobileNavLinks.innerHTML = `
+                <li><a href="/index.html">Beranda</a></li>
+                <li><a href="/portfolio.html">Portfolio</a></li>
+                <li><a href="/jurnal.html">Jurnal</a></li>
+                <li><a href="/tools.html">Tools</a></li>
+                <li><a href="auth.html" class="btn btn-primary btn-pill">Login</a></li>
+            `;
         }
     }
+};
 
-    // --- Router Pemuatan Halaman Spesifik ---
-    const pageTitle = document.title;
+
+// Router sederhana berbasis path
+const router = () => {
+    const path = window.location.pathname;
     
-    if (document.body.contains(document.getElementById('dashboard-main'))) {
-        await setupDashboardPage();
-        setupCropModal(); // Modal cropping hanya diperlukan di dasbor
-    } else if (pageTitle.includes("Portofolio - HAMDI RIZAL")) {
-        setupPortfolioPage();
-    } else if (pageTitle.includes("Detail Proyek")) {
-        setupProjectDetailPage();
-    } else if (pageTitle.includes("Detail Jurnal")) {
-        setupJurnalDetailPage();
-    } else if (pageTitle.includes("Jurnal - HAMDI RIZAL")) {
-        setupJurnalPage();
-    } else if (document.body.id === 'tools-page') {
-        setupToolsPage();
-    } else if (pageTitle.includes("URL Shortener")) {
-        setupUrlShortenerPage();
-    } else if (pageTitle.includes("Media Converter")) {
-        setupMediaConverterPage();
-    } else if (pageTitle.includes("QR Code Generator")) {
-        attachQrCodeGeneratorListener();
-    } else if (pageTitle.includes("Image Compressor")) {
-        setupImageCompressorPage();
-    } else if (pageTitle.includes("Images to PDF")) {
-        attachImagesToPdfListener();
-    } else if (pageTitle.includes("Split PDF")) {
-        setupSplitPdfPage();
-    } else if (document.getElementById('login-form')) {
-        setupAuthPage();
-    } else if (pageTitle.includes("Logging In...")) {
-        setupAuthCallbackPage();
-    }
+    // Inisialisasi komponen yang ada di semua halaman
+    initializeApp();
 
-    // --- Setup Global (Berjalan di hampir semua halaman) ---
-    setupMobileMenu();
-    setupAllPasswordToggles();
-    setupChatBubble(); // Chat bubble tidak akan muncul di dashboard karena ada pengecekan di dalam fungsinya
-});
+    // Routing untuk halaman spesifik
+    if (path.endsWith('/') || path.endsWith('/index.html')) {
+        setupPublicPageEventListeners();
+    } else if (path.includes('auth.html') || path.includes('forgot-password.html') || path.includes('reset-password.html') || path.includes('auth-callback.html')) {
+        setupAuthEventListeners();
+    } else if (path.includes('dashboard.html')) {
+        setupDashboard();
+    } else if (path.includes('/tools/')) {
+        setupToolHandlers(path);
+    } else if (path.includes('portfolio.html') || path.includes('jurnal.html') || path.includes('project-detail.html') || path.includes('jurnal-detail.html')) {
+        setupPublicPageEventListeners();
+    }
+};
+
+// Eksekusi ketika DOM sudah siap
+document.addEventListener('DOMContentLoaded', router);
