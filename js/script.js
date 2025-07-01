@@ -170,6 +170,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupJurnalDetailPage();
     } else if (pageTitle.includes("Jurnal - HAMDI RIZAL")) {
         setupJurnalPage();
+    } else if (pageTitle.includes("Tools - HAMDI RIZAL")) {
+    setupToolsPage();
     } else if (pageTitle.includes("URL Shortener")) {
         setupUrlShortenerPage();
     } else if (pageTitle.includes("Media Converter")) {
