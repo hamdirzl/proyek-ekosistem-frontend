@@ -2918,7 +2918,6 @@ async function setupSplitPdfPage() {
     });
 }
 
-// TAMBAHKAN FUNGSI BARU INI DI AKHIR FILE script.js
 async function setupToolsPage() {
     const container = document.getElementById('top-tools-container');
     if (!container) return;
@@ -2938,57 +2937,15 @@ async function setupToolsPage() {
         }
 
         topTools.forEach(tool => {
-            const toolCard = document.createElement('div');
-            toolCard.className = 'pintu';
-            
-            // Membuat kartu bisa diklik dan mengarah ke halaman tool
             const toolLink = document.createElement('a');
             toolLink.href = tool.href;
-            toolLink.style.textDecoration = 'none';
-            toolLink.style.color = 'inherit';
-            
+            toolLink.className = 'tool-pill';
+
+            // INI BAGIAN KRITISNYA: Harus menggunakan innerHTML
             toolLink.innerHTML = `
-                <div class="pintu-icon" style="font-size: 48px;">${tool.icon || '⭐'}</div>
-                <h3>${tool.name}</h3>
-                <p style="font-size: 1.5rem; font-weight: 700; color: var(--accent-color); margin-bottom: 0;">${tool.count.toLocaleString('id-ID')}</p>
-                <p style="color: var(--text-muted-color); margin-top: 0;">kali digunakan</p>
+                <span class="tool-pill-name">${tool.name}</span>
+                <span class="tool-pill-count">${tool.count.toLocaleString('id-ID')}</span>
             `;
-            
-            toolCard.appendChild(toolLink);
-            container.appendChild(toolCard);
-        });
-
-    } catch (error) {
-        console.error('Error fetching top tools:', error);
-        container.innerHTML = `<p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted-color);">${error.message}</p>`;
-    }
-}
-
-// TAMBAHKAN FUNGSI BARU INI DI AKHIR FILE script.js
-async function setupToolsPage() {
-    const container = document.getElementById('top-tools-container');
-    if (!container) return;
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/tools/stats`);
-        if (!response.ok) {
-            throw new Error('Gagal memuat data statistik dari server.');
-        }
-
-        const topTools = await response.json();
-        container.innerHTML = ''; // Kosongkan pesan "Memuat..."
-
-        if (topTools.length === 0) {
-            container.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted-color);">Belum ada data penggunaan tool. Coba gunakan beberapa tool terlebih dahulu.</p>';
-            return;
-        }
-
-        topTools.forEach(tool => {
-            // Langsung buat elemen <a> sebagai pil
-            const toolLink = document.createElement('a');
-            toolLink.href = tool.href;
-            toolLink.className = 'tool-pill'; // Menggunakan class baru yang spesifik
-            toolLink.textContent = tool.name; // Hanya menampilkan nama
             
             container.appendChild(toolLink);
         });

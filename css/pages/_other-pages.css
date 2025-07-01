@@ -23,23 +23,21 @@
 /* 1. Mengatur ulang kontainer utama menjadi flexbox */
 body#tools-page .top-tools-section #top-tools-container {
     display: flex;
-    flex-wrap: wrap; /* Izinkan item turun baris di layar kecil */
-    justify-content: center; /* Pusatkan item-item */
-    gap: 10px; /* Jarak antar pil */
-    padding: 0 1rem; /* Beri sedikit padding horizontal */
-    grid-template-columns: none; /* Hapus properti grid */
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 1rem;
+    grid-template-columns: none;
 }
 
 /* 2. Style untuk setiap item sebagai "pil" yang dapat diklik */
-/* Selector ini akan menargetkan link yang akan kita buat di JS */
 body#tools-page #top-tools-container a.tool-pill {
-    /* Reset gaya default dari .pintu atau link */
     all: unset;
-    box-sizing: border-box; /* Pastikan padding dihitung dengan benar */
-    
-    /* Gaya Pil */
-    display: inline-block;
-    padding: 6px 16px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px 6px 16px;
     background-color: #E9ECEF;
     color: #495057;
     font-size: 0.9rem;
@@ -56,4 +54,20 @@ body#tools-page #top-tools-container a.tool-pill:hover {
     background-color: var(--accent-color);
     color: #ffffff;
     transform: translateY(-2px);
+}
+
+/* 4. Gaya untuk BADGE HITUNGAN di dalam pil */
+body#tools-page .tool-pill-count {
+    background-color: rgba(0, 0, 0, 0.08);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #343A40;
+}
+
+/* 5. Perubahan warna badge saat pil di-hover */
+body#tools-page #top-tools-container a.tool-pill:hover .tool-pill-count {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
 }
