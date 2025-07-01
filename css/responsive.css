@@ -344,8 +344,8 @@
 /* ===== HALAMAN TOOLS - TAMPILAN MOBILE ===== */
 /* ============================================= */
 @media (max-width: 768px) {
-    /* [PERBAIKAN] Menggunakan selector yang lebih spesifik agar bisa menimpa aturan desktop */
-    body#tools-page .top-tools-section #top-tools-container {
+    /* Membuat kontainer pil populer menjadi scrollable horizontal */
+    body#tools-page #top-tools-container {
         flex-wrap: nowrap;          /* Mencegah pil turun baris */
         overflow-x: auto;          /* Mengaktifkan scroll horizontal */
         justify-content: flex-start; /* Menjaga item mulai dari kiri */
@@ -357,7 +357,7 @@
         scrollbar-width: none;       /* Firefox */
     }
 
-    body#tools-page .top-tools-section #top-tools-container::-webkit-scrollbar {
+    body#tools-page #top-tools-container::-webkit-scrollbar {
         display: none; /* Chrome, Safari, Opera */
     }
 }
