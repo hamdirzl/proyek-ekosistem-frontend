@@ -15,3 +15,61 @@
     margin: var(--space-md) 0;
     border: 1px solid var(--border-color);
 }
+
+/* ===== Penyesuaian Tampilan Perkakas Terpopuler ===== */
+
+/* Mengurangi ukuran keseluruhan section */
+.top-tools-section {
+    padding: 1.5rem 1rem; /* Mengurangi padding atas/bawah dan kiri/kanan */
+    margin-bottom: 1rem;
+}
+
+/* Mengecilkan judul "Perkakas Terpopuler" */
+.top-tools-section .section-title {
+    font-size: 1.25rem; /* Ukuran font lebih kecil */
+    margin-bottom: 1rem;
+}
+
+/* Mengubah layout container dari grid menjadi flexbox yang ringkas */
+#top-tools-container.pintu-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Agar bisa turun baris jika tidak muat */
+    gap: 0.8rem; /* Jarak antar item */
+}
+
+/* Menghapus style grid default jika ada */
+#top-tools-container.pintu-container {
+    grid-template-columns: none;
+}
+
+/* Menata setiap item/perkakas di dalamnya */
+#top-tools-container.pintu-container > a {
+    display: inline-block;
+    background-color: #f1f1f1;
+    color: #333;
+    padding: 0.5rem 1rem;
+    border-radius: 20px; /* Bentuk pil */
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+    border: none;
+    box-shadow: none; /* Menghapus bayangan jika ada */
+}
+
+#top-tools-container.pintu-container > a:hover {
+    background-color: #e0e0e0;
+    transform: none; /* Menghapus efek hover mengangkat */
+}
+
+/* Menyembunyikan elemen yang tidak perlu (deskripsi dan gambar) */
+#top-tools-container.pintu-container .pintu-description,
+#top-tools-container.pintu-container .pintu-icon-container {
+    display: none;
+}
+
+/* Menyesuaikan judul perkakas di dalam tag */
+#top-tools-container.pintu-container .pintu-title {
+    font-size: 0.9rem; /* Samakan dengan font-size link */
+    margin: 0;
+}
