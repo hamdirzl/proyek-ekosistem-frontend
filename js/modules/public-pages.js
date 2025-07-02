@@ -1,6 +1,3 @@
-// js/modules/public-pages.js
-// Logika untuk halaman publik seperti Portofolio dan Jurnal.
-
 import { API_BASE_URL } from '../config.js';
 
 export function setupPortfolioPage() {
