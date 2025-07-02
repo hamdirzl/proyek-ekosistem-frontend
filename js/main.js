@@ -12,15 +12,15 @@ import { setupChatBubble } from './modules/chat.js';
 import { setupDashboardPage } from './modules/dashboard.js';
 import { setupAuthPage, setupAuthCallbackPage } from './modules/auth-pages.js';
 import { setupPortfolioPage, setupProjectDetailPage, setupJurnalPage, setupJurnalDetailPage } from './modules/public-pages.js';
-import {
-    setupToolsPage,
-    setupUrlShortenerPage,
-    setupMediaConverterPage,
-    attachQrCodeGeneratorListener,
-    setupImageCompressorPage,
-    attachImagesToPdfListener,
-    setupSplitPdfPage
-} from './modules/tools.js';
+
+// Import Modul Tools yang sudah dipecah
+import { setupToolsPage } from './modules/tools/main-tools-page.js';
+import { setupUrlShortenerPage } from './modules/tools/url-shortener.js';
+import { setupMediaConverterPage } from './modules/tools/media-converter.js';
+import { attachQrCodeGeneratorListener } from './modules/tools/qr-code-generator.js';
+import { setupImageCompressorPage } from './modules/tools/image-compressor.js';
+import { attachImagesToPdfListener } from './modules/tools/images-to-pdf.js';
+import { setupSplitPdfPage } from './modules/tools/split-pdf.js';
 
 
 document.addEventListener('DOMContentLoaded', async () => {
