@@ -1,33 +1,42 @@
+/* =================================================================== */
+/* ==   V12: FINAL STYLE - LIGHT, PROFESSIONAL, MINIMALIST THEME  == */
+/* =================================================================== */
+
 /* === PENGATURAN GLOBAL: DESIGN SYSTEM === */
 :root {
-    --background-color: #f8f9fa; 
-    --card-bg-color: #ffffff;      
-    --text-color: #212529;       
-    --text-muted-color: #6c757d;   
-    --border-color: #dee2e6;       
-    --accent-color: #007bff;       
-    --accent-hover: #0056b3;       
-    --border-hover-color: #adb5bd; 
+    /* Palet Warna - TEMA TERANG BARU */
+    --background-color: #f8f9fa; /* Abu-abu sangat terang */
+    --card-bg-color: #ffffff;      /* Putih bersih untuk kartu */
+    --text-color: #212529;         /* Hitam pekat untuk teks */
+    --text-muted-color: #6c757d;   /* Abu-abu untuk teks sekunder */
+    --border-color: #dee2e6;       /* Abu-abu terang untuk border */
+    --accent-color: #007bff;       /* Biru profesional sebagai aksen */
+    --accent-hover: #0056b3;       /* Biru lebih gelap untuk hover */
+    --border-hover-color: #adb5bd; /* Abu-abu lebih gelap untuk hover border */
 
+    /* Font (tetap sama, sudah bagus) */
     --font-heading: 'Poppins', sans-serif;
     --font-body: 'Inter', sans-serif;
 
-    --space-xs: 0.5rem;  
-    --space-sm: 1rem;     
-    --space-md: 1.5rem;  
-    --space-lg: 2.5rem; 
-    --space-xl: 4rem;     
-    --space-xxl: 6rem;   
+    /* Skala Spasi (tetap sama) */
+    --space-xs: 0.5rem;   /* 8px */
+    --space-sm: 1rem;     /* 16px */
+    --space-md: 1.5rem;   /* 24px */
+    --space-lg: 2.5rem;   /* 40px */
+    --space-xl: 4rem;     /* 64px */
+    --space-xxl: 6rem;    /* 96px */
 
+    /* Ukuran font responsif (tetap sama) */
     --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
     --font-size-h1:   clamp(2.2rem, 1.5rem + 3.5vw, 3.5rem);
     --font-size-h2:   clamp(1.8rem, 1.25rem + 2.5vw, 2.5rem);
     --font-size-h3:   clamp(1.25rem, 1.1rem + 1.5vw, 1.75rem);
     
- 
+    /* Bayangan (disesuaikan untuk latar belakang terang) */
     --soft-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
     --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
+
 
 /* Global reset and foundational styles */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,7 +50,7 @@ body {
     font-size: var(--font-size-base);
     -webkit-font-smoothing: antialiased; 
     -moz-osx-font-smoothing: grayscale;
-   
+    /* background-image dihapus untuk tampilan minimalis */
 }
 
 html, body {
@@ -60,10 +69,10 @@ html, body {
     top: 0; 
     z-index: 1000; 
     transition: background-color 0.3s ease;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.5); /* Latar belakang putih transparan */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-color); 
+    border-bottom: 1px solid var(--border-color); /* Menggunakan variabel border baru */
 }
 
 .logo a { 
@@ -71,7 +80,7 @@ html, body {
     font-size: 1.5rem; 
     font-weight: 700; 
     text-decoration: none; 
-    color: var(--text-color); 
+    color: var(--text-color); /* Menggunakan variabel teks utama */
     transition: color 0.3s ease; 
 }
 .logo a:hover { color: var(--accent-color); }
@@ -102,7 +111,7 @@ html, body {
 .button-pintu { 
     display: inline-block; 
     background: var(--accent-color); 
-    color: #ffffff; 
+    color: #ffffff; /* Warna teks diubah menjadi putih agar kontras dengan biru */
     padding: 0.7rem 1.6rem; 
     border: 2px solid var(--accent-color); 
     border-radius: 8px;
@@ -114,7 +123,7 @@ html, body {
     cursor: pointer;
 }
 .login-button { 
-    color: #ffffff !important; 
+    color: #ffffff !important; /* Warna teks diubah menjadi putih */
     padding: 0.6rem 1.2rem !important;
     background-color: var(--accent-color) !important;
 }
@@ -138,6 +147,78 @@ html, body {
     border-color: var(--accent-color) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+
+footer {
+    padding: var(--space-xl) clamp(var(--space-md), 5vw, var(--space-xl));
+    margin-top: var(--space-xxl);
+    background-color: var(--card-bg-color);
+    color: var(--text-muted-color);
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.footer-logo, .footer-links, .footer-social {
+    flex: 1;
+    min-width: 220px;
+}
+
+.footer-logo a {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--text-color);
+    line-height: 1.2;
+    transition: color 0.3s ease;
+}
+.footer-logo a:hover {
+    color: var(--accent-color);
+}
+
+.footer-links h4, .footer-social h4 {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    color: var(--text-color);
+    margin-bottom: var(--space-md);
+    font-weight: 600;
+}
+
+.footer-links ul {
+    list-style: none;
+}
+
+.footer-links ul li {
+    margin-bottom: var(--space-xs);
+}
+
+.footer-links ul a {
+    color: var(--text-muted-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links ul a:hover {
+    color: var(--accent-color);
+}
+
+.footer-social .social-icons {
+    justify-content: flex-start;
+}
+
+.footer-bottom {
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    padding-top: var(--space-md);
+    font-size: 0.9rem;
 }
 
 /* === HALAMAN UTAMA === */
@@ -332,7 +413,7 @@ input:focus, textarea:focus, select:focus {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    margin-bottom: var(--space-md); 
+    margin-bottom: var(--space-md); /* Consistent with form-group margin */
 }
 
 .custom-file-input-wrapper input[type="file"] {
@@ -343,13 +424,13 @@ input:focus, textarea:focus, select:focus {
     height: 100%;
     opacity: 0;
     cursor: pointer;
-    z-index: 10; 
+    z-index: 10; /* Ensure it's clickable */
 }
 
 .custom-file-button {
-    display: inline-flex; 
+    display: inline-flex; /* Use flex to align icon and text */
     align-items: center;
-    justify-content: center;
+    justify-content: center; /* Center content horizontally */
     background-color: var(--card-bg-color);
     color: var(--text-color);
     padding: 0.7rem 1.2rem;
@@ -357,8 +438,8 @@ input:focus, textarea:focus, select:focus {
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    flex-shrink: 0; 
-    gap: 8px; 
+    flex-shrink: 0; /* Prevent button from shrinking */
+    gap: 8px; /* Space between icon and text */
     font-weight: 500;
 }
 
@@ -374,12 +455,12 @@ input:focus, textarea:focus, select:focus {
 }
 
 .custom-file-label {
-    flex-grow: 1; 
+    flex-grow: 1; /* Allow label to take remaining space */
     color: var(--text-muted-color);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 0.7rem 0; 
+    padding: 0.7rem 0; /* Align vertically with button */
     font-size: var(--font-size-base);
 }
 
@@ -497,7 +578,7 @@ input:focus, textarea:focus, select:focus {
 
 .navbar nav {
     order: -1;
-    width: 50px; 
+    width: 50px; /* Beri lebar tetap untuk simetri */
     display: flex;
     justify-content: center;
 }
@@ -505,7 +586,7 @@ input:focus, textarea:focus, select:focus {
 .navbar::after {
     content: '';
     display: block;
-    width: 50px; 
+    width: 50px; /* Lebarnya HARUS SAMA dengan elemen <nav> di atas */
 }
 
 .hamburger {
@@ -528,18 +609,18 @@ input:focus, textarea:focus, select:focus {
         bottom: 0; 
         width: 85%;
         max-width: 320px; 
-        height: 100vh;
+        height: 100vh; /* Pastikan tinggi penuh */
         background-color: rgba(248, 249, 250, 0.98); 
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        padding: var(--space-xl) 0; 
+        padding: var(--space-xl) 0; /* Ubah padding vertikal */
         transform: translateX(-100%); 
         transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-        display: flex; 
-        flex-direction: column; 
+        display: flex; /* Aktifkan flexbox */
+        flex-direction: column; /* Atur item secara vertikal */
         align-items: flex-start;
         justify-content: flex-start;
-        gap: 0; 
+        gap: 0; /* Hapus gap utama, atur di item */
         box-shadow: 5px 0 25px rgba(0,0,0,0.1); 
         z-index: 1000; 
     }
@@ -572,9 +653,9 @@ input:focus, textarea:focus, select:focus {
 
     /* Ganti gaya untuk link dan tombol di menu */
     .nav-links a, .nav-links .nav-button { 
-        display: flex; 
+        display: flex; /* Gunakan flex untuk ikon dan teks */
         align-items: center;
-        gap: var(--space-md); 
+        gap: var(--space-md); /* Jarak antara ikon dan teks */
         padding: var(--space-sm) var(--space-lg);
         width: 100%; 
         border-radius: 0; 
@@ -591,10 +672,11 @@ input:focus, textarea:focus, select:focus {
 
     .nav-links a::after { display: none; }
     
+    /* Atur ikon di dalam link */
     .nav-links a svg, .nav-links .nav-button svg {
         width: 20px;
         height: 20px;
-        flex-shrink: 0;
+        flex-shrink: 0; /* Mencegah ikon menyusut */
         color: var(--text-muted-color);
         transition: color 0.3s ease;
     }
@@ -608,12 +690,12 @@ input:focus, textarea:focus, select:focus {
         margin: var(--space-md) var(--space-lg);
         width: calc(100% - (var(--space-lg) * 2));
         text-align: center;
-        display: block; 
+        display: block; /* Kembalikan ke block karena tidak ada ikon */
     }
     
     /* CSS BARU UNTUK TOMBOL LOGOUT */
     .nav-logout-item {
-        margin-top: auto;
+        margin-top: auto; /* INI KUNCINYA: Mendorong item ini ke bawah */
         padding: var(--space-md) var(--space-lg);
     }
     
@@ -626,15 +708,12 @@ input:focus, textarea:focus, select:focus {
         padding: 0.8rem 1.6rem;
     }
 
-    #nav-logout .button-pintu svg {
-    color: #ffffff;
-}
-
     .mood-item-header { flex-direction: column; align-items: flex-start; }
     .mood-item-actions { width: 100%; justify-content: flex-end; } 
     .mood-item-header strong { margin-right: 0; } 
 }
 
+/* Penyesuaian form URL shortener di mobile */
 @media (max-width: 550px) {
     #shortener-form {
         grid-template-columns: 1fr;
@@ -651,6 +730,11 @@ input:focus, textarea:focus, select:focus {
 @media (max-width: 480px) {
     .tool-selector-button { width: 100%; }
 }
+
+/* === IKON SOSIAL DI FOOTER === */
+.social-icons { display: flex; justify-content: center; gap: var(--space-md); margin-bottom: var(--space-md); }
+.social-icons a svg { color: var(--text-muted-color); transition: all 0.3s ease; }
+.social-icons a:hover svg { color: var(--accent-color); transform: translateY(-4px); }
 
 /* === TOMBOL NAVIGASI BARU === */
 .nav-button {
@@ -718,34 +802,6 @@ input:focus, textarea:focus, select:focus {
     gap: var(--space-md); margin-top: var(--space-md);
 }
 .tool-selector-button { min-width: 180px; padding: 1rem 1.5rem; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
-
-/* === [BARU] Tata Letak Opsi PDF untuk Desktop === */
-
-/* Mengatur grup pilihan "Page Orientation" menjadi 2 kolom */
-.pdf-tool-options .form-group:has(input[name="orientation"]) .radio-card-group {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-sm);
-}
-
-/* Mengatur grup pilihan "Margin" menjadi 3 kolom */
-.pdf-tool-options .form-group:has(input[name="margin"]) .radio-card-group {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-sm);
-}
-
-/* Memastikan konten di dalam kartu pilihan tetap rapi */
-.radio-card-content {
-    display: flex;
-    /* Ubah dari column ke row untuk desktop */
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start; /* Rata kiri */
-    text-align: left;
-    gap: 12px;
-    padding: var(--space-sm);
-}
 
 /* === QR CODE GENERATOR LAYOUT & SYMMETRY === */
 #qr-generator-wrapper .tool-section {
@@ -952,6 +1008,141 @@ input:focus, textarea:focus, select:focus {
     box-shadow: 0 6px 20px rgba(0, 123, 255, 0.25);
 }
 
+/* === AUDIO CUTTER LAYOUT & SYMMETRY === */
+#audio-cutter-wrapper .tool-section {
+    max-width: 700px;
+    margin: var(--space-lg) auto;
+    padding: var(--space-lg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg-color);
+    box-shadow: var(--card-shadow);
+}
+#audio-cutter-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+}
+#audio-cutter-form .form-group {
+    margin-bottom: 0;
+}
+#audio-cutter-form label {
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-xs);
+    color: var(--text-muted-color);
+    font-weight: 500;
+}
+#audio-cutter-form input[type="file"],
+#audio-cutter-form input[type="number"] {
+    width: 100%;
+    padding: var(--space-sm);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: var(--text-color);
+    font-size: var(--font-size-base);
+    font-family: var(--font-body);
+}
+#audio-file-info {
+    font-size: 0.9em;
+    color: var(--text-muted-color);
+    margin-top: var(--space-xs);
+    margin-bottom: 0;
+    text-align: left;
+}
+#waveform {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #f1f3f5;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+}
+#audio-cutter-form .button-pintu {
+    grid-column: auto;
+    width: auto;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+#waveform-play-pause-button, #waveform-stop-button {
+    margin-top: 0;
+}
+#waveform-play-pause-button {
+    background-color: var(--text-muted-color);
+    border-color: var(--text-muted-color);
+    color: #ffffff;
+}
+#waveform-play-pause-button:hover {
+    background-color: #5a6268;
+    border-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(160, 160, 160, 0.25);
+}
+#waveform-stop-button {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #ffffff;
+}
+#waveform-stop-button:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.25);
+}
+#audio-cutter-message {
+    text-align: center;
+    margin-top: var(--space-md);
+    padding: var(--space-sm);
+    border-radius: 8px;
+}
+#audio-cutter-message.success {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+    border: 1px solid #a3cfbb;
+}
+#audio-cutter-message.error {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid #f1b0b7;
+}
+#audio-player-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+}
+#cut-audio-preview {
+    width: 100%;
+    max-width: 400px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 5px;
+    box-shadow: var(--card-shadow);
+}
+#download-cut-audio-button {
+    padding: 0.7rem 1.6rem;
+    border: 2px solid var(--accent-color);
+    border-radius: 8px;
+    background: none;
+    color: var(--accent-color);
+    font-weight: 700;
+    font-family: var(--font-heading);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+}
+#download-cut-audio-button:hover {
+    background: var(--accent-color);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.25);
+}
+@media (max-width: 480px) {
+    #audio-cutter-form {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* === Gaya BARU untuk kerapian Panel Admin === */
 .admin-management-section {
     max-width: 700px;
@@ -972,8 +1163,9 @@ input:focus, textarea:focus, select:focus {
     text-decoration: underline;
 }
 
+/* === Perbaikan untuk Teks Panjang (Overflow) di Panel Admin === */
 .mood-item-header > span {
-    min-width: 0;
+    min-width: 0; /* Memungkinkan item flex untuk menyusut */
     overflow-wrap: break-word;
     word-wrap: break-word;
     word-break: break-word;
@@ -982,14 +1174,20 @@ input:focus, textarea:focus, select:focus {
 /* ================================================= */
 /* == BLOK FINAL HEADER (DESKTOP & MOBILE) - V3   == */
 /* ================================================= */
+
+/* [GLOBAL] Mengatur logo menjadi dua baris */
 .logo a {
     line-height: 1.2;
     display: inline-block;
     text-align: center;
 }
+
+/* [GLOBAL] Menghapus efek garis bawah nav-link lama */
 .nav-links a::after {
     display: none;
 }
+
+/* [UMUM] Aturan dasar untuk semua elemen interaktif di navigasi */
 .nav-links li > a,
 .nav-links li > .nav-button {
     display: flex;
@@ -998,7 +1196,9 @@ input:focus, textarea:focus, select:focus {
     text-decoration: none;
 }
 
+/* [DESKTOP] Aturan untuk header di layar lebar (769px ke atas) */
 @media (min-width: 769px) {
+    /* Mengatur item nav menjadi vertikal (ikon di atas, teks di bawah) */
     .nav-links li > a,
     .nav-links li > .nav-button {
         flex-direction: column;
@@ -1023,17 +1223,7 @@ input:focus, textarea:focus, select:focus {
         font-weight: 500;
     }
 
-    /* === [TAMBAHKAN INI] GAYA KHUSUS UNTUK TOMBOL LOGOUT PIL === */
-#nav-logout .button-pintu {
-    border-radius: 50px; /* Membuat bentuk pil */
-    padding: 10px 24px;  /* Padding disesuaikan untuk teks saja */
-    background-color: var(--accent-color) !important;
-    color: #ffffff !important;
-}
-
-#nav-logout .button-pintu:hover {
-    background-color: var(--accent-hover) !important;
-}
+    /* Pengaturan tombol logout di desktop */
     #nav-logout .button-pintu {
         flex-direction: row;
         gap: 8px;
@@ -1043,7 +1233,10 @@ input:focus, textarea:focus, select:focus {
     }
 }
 
+
+/* [MOBILE] Aturan untuk menu hamburger (768px ke bawah) */
 @media (max-width: 768px) {
+    /* Mengatur item nav menjadi horizontal (ikon di samping teks) di dalam sidebar */
     .nav-links li > a,
     .nav-links li > .nav-button {
         flex-direction: row;
@@ -1054,24 +1247,59 @@ input:focus, textarea:focus, select:focus {
 /* ================================================= */
 /* == BLOK FINAL V6 UNTUK LOGO (DESKTOP & MOBILE) == */
 /* ================================================= */
+
+/* Aturan untuk menyembunyikan logo mobile di layar besar (DESKTOP) */
 .logo-mobile {
     display: none !important;
 }
+
+/* Aturan untuk menampilkan logo desktop di layar besar (DESKTOP) */
 .logo-desktop {
     display: inline-block !important;
     line-height: 1.2;
     text-align: center;
 }
 
+/* Aturan untuk layar kecil (MOBILE) */
 @media (max-width: 768px) {
+    /* Tampilkan logo mobile dan atur gayanya */
     .logo-mobile {
         display: inline-block !important;
         font-size: 1.5rem;
     }
+
+    /* SEMBUNYIKAN logo desktop */
     .logo-desktop {
         display: none !important;
     }
 }
+
+/* Penyesuaian Footer untuk Mobile */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: var(--space-lg);
+    }
+
+    .footer-logo,
+    .footer-links,
+    .footer-social {
+        width: 100%;
+        max-width: 320px;
+        text-align: center;
+    }
+
+    .footer-links ul {
+        padding: 0;
+    }
+
+    .footer-social .social-icons {
+        justify-content: center;
+    }
+}
+
 /* ============================================= */
 /* ==      GAYA BARU UNTUK DASBOR TABBED      == */
 /* ============================================= */
@@ -1086,7 +1314,7 @@ input:focus, textarea:focus, select:focus {
 
 .dashboard-nav {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Agar tombol turun ke bawah di mobile */
     gap: var(--space-xs);
     border-bottom: 2px solid var(--border-color);
     margin-bottom: var(--space-lg);
@@ -1103,7 +1331,7 @@ input:focus, textarea:focus, select:focus {
     border-bottom: 3px solid transparent;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-bottom: -2px;
+    margin-bottom: -2px; /* Agar border bawah menimpa border container */
 }
 
 .dashboard-tab-button:hover {
@@ -1117,14 +1345,15 @@ input:focus, textarea:focus, select:focus {
 }
 
 .dashboard-panel {
-    display: none;
+    display: none; /* Semua panel disembunyikan secara default */
     animation: fadeIn 0.5s ease-in-out;
 }
 
 .dashboard-panel.active {
-    display: block;
+    display: block; /* Hanya panel aktif yang ditampilkan */
 }
 
+/* Animasi fade-in sederhana untuk panel */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -1136,6 +1365,7 @@ input:focus, textarea:focus, select:focus {
     }
 }
 
+/* Hilangkan styling berlebih dari section lama di dalam tab */
 .dashboard-panel .history-section,
 .dashboard-panel #user-dashboard-section,
 .dashboard-panel #account-management-section,
@@ -1155,20 +1385,20 @@ input:focus, textarea:focus, select:focus {
 @media (max-width: 600px) {
     .dashboard-nav {
         display: grid;
-        grid-template-columns: 1fr 1fr; 
-        gap: var(--space-sm); 
-        border-bottom: none; 
+        grid-template-columns: 1fr 1fr; /* Paksa menjadi 2 kolom sama lebar */
+        gap: var(--space-sm); /* Beri sedikit jarak antar tombol */
+        border-bottom: none; /* Hapus garis bawah dari container */
     }
 
     .dashboard-tab-button {
-        text-align: center;
-        border-bottom: 3px solid var(--border-color);
+        text-align: center; /* Ini akan membuat teks di dalam tombol menjadi rata tengah */
+        border-bottom: 3px solid var(--border-color); /* Pindahkan garis ke masing-masing tombol */
         margin-bottom: 0;
-        padding: var(--space-sm) var(--space-xs);
+        padding: var(--space-sm) var(--space-xs); /* Sedikit mengurangi padding horizontal untuk teks panjang */
     }
 
     .dashboard-tab-button.active {
-        border-bottom-color: var(--accent-color);
+        border-bottom-color: var(--accent-color); /* Garis bawah aktif */
     }
 }
 
@@ -1292,6 +1522,10 @@ input:focus, textarea:focus, select:focus {
 /* ============================================= */
 /* == [BARU] PENYESUAIAN TEMA UNTUK TINYMCE   == */
 /* ============================================= */
+/* Dikosongkan agar menggunakan tema default (terang) dari TinyMCE */
+
+
+/* KODE UNTUK MEMBUAT HEADER MELAYANG DI HALAMAN UTAMA */
 .is-homepage .navbar {
     position: absolute;
     width: 100%;
@@ -1305,20 +1539,24 @@ input:focus, textarea:focus, select:focus {
 /* ==   PERBAIKAN WARNA HEADER DI HOMEPAGE      == */
 /* ================================================= */
 .is-homepage .navbar {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.3); /* Latar belakang gelap transparan */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Garis batas tipis */
 }
 .is-homepage .logo a,
 .is-homepage .nav-links li > a,
 .is-homepage .nav-links li > .nav-button {
-    color: #ffffff;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    color: #ffffff; /* Warna teks putih */
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5); /* Bayangan agar mudah terbaca */
 }
+
+/* Mengubah warna ikon SVG di navigasi menjadi putih */
 .is-homepage .nav-links li svg {
     color: #ffffff;
 }
+
+/* Mengembalikan warna tombol Login agar tetap menonjol */
 .is-homepage .login-button {
     background-color: var(--accent-color) !important;
     border-color: var(--accent-color) !important;
@@ -1328,78 +1566,100 @@ input:focus, textarea:focus, select:focus {
     background-color: var(--accent-hover) !important;
     border-color: var(--accent-hover) !important;
 }
+
+/* Menghilangkan efek latar belakang saat hover di menu desktop (khusus homepage) */
 @media (min-width: 769px) {
     .is-homepage .nav-links li > a:hover,
     .is-homepage .nav-links li > .nav-button:hover {
         background-color: transparent;
-        color: #f0f0f0;
+        color: #f0f0f0; /* Sedikit redup saat hover untuk feedback */
     }
 }
+/* Penambahan: Mengubah warna ikon hamburger di homepage menjadi putih */
 .is-homepage .hamburger span {
     background-color: #ffffff;
 }
+
+/* PERBAIKAN: Mengubah warna ikon 'X' di menu mobile homepage agar terlihat */
 .is-homepage .hamburger.active span {
     background-color: var(--text-color);
 }
+
+/* PERBAIKAN BARU: Mengubah warna ikon menu di sidebar homepage agar terlihat */
 .is-homepage .nav-links.active li svg {
     color: var(--text-muted-color);
 }
+
+/* 1. Mengubah warna ikon 'X' hamburger saat menu aktif */
 .is-homepage .hamburger.active span {
     background-color: var(--text-color);
 }
+
+/* 2. Mengubah warna ikon dan tulisan di dalam sidebar saat menu aktif */
 .is-homepage .nav-links.active li > a,
 .is-homepage .nav-links.active li > .nav-button {
-    color: var(--text-muted-color);
-    text-shadow: none;
+    color: var(--text-muted-color); /* Mengembalikan warna tulisan menjadi abu-abu */
+    text-shadow: none; /* Menghapus bayangan teks */
 }
+
 .is-homepage .nav-links.active li svg {
-    color: var(--text-muted-color);
+    color: var(--text-muted-color); /* Mengembalikan warna ikon menjadi abu-abu */
 }
+
+/* 3. (Opsional) Efek hover agar konsisten dengan halaman lain */
 .is-homepage .nav-links.active li > a:hover,
 .is-homepage .nav-links.active li > .nav-button:hover {
-    color: var(--text-color);
+    color: var(--text-color); /* Membuat tulisan menjadi hitam saat disentuh */
 }
 .is-homepage .nav-links.active li a:hover svg,
 .is-homepage .nav-links.active li .nav-button:hover svg {
-    color: var(--text-color);
+    color: var(--text-color); /* Membuat ikon menjadi hitam saat disentuh */
 }
 
 /* ============================================= */
 /* ==         GAYA UNTUK QUILL.JS             == */
 /* ============================================= */
 
+/* Atur warna border dan background untuk toolbar dan container */
 .ql-toolbar.ql-snow,
 .ql-container.ql-snow {
     border: 1px solid var(--border-color);
-    background-color: #ffffff;
+    background-color: #ffffff; /* Latar belakang putih */
     color: var(--text-color);
 }
 
+/* Bulatkan sudut toolbar (atas) */
 .ql-toolbar.ql-snow {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
 }
 
+/* Bulatkan sudut container editor (bawah) */
 .ql-container.ql-snow {
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
 }
 
+/* Atur font di dalam editor agar konsisten */
 .ql-editor {
     font-family: var(--font-body);
     font-size: var(--font-size-base);
     line-height: 1.7;
 }
 
+/* Beri tinggi minimal berbeda untuk setiap editor jika perlu */
 #quill-editor { min-height: 300px; }
 #quill-portfolio-editor { min-height: 150px; }
 
+
+/* Atur warna placeholder */
 .ql-editor.ql-blank::before {
     color: var(--text-muted-color);
     font-style: normal;
     opacity: 0.7;
 }
 
+/* Atur warna ikon di toolbar */
 .ql-snow .ql-stroke {
     stroke: var(--text-color);
 }
@@ -1407,6 +1667,7 @@ input:focus, textarea:focus, select:focus {
     fill: var(--text-color);
 }
 
+/* Warna ikon saat aktif atau di-hover */
 .ql-snow .ql-picker-label:hover,
 .ql-snow .ql-picker-label.ql-active,
 .ql-snow .ql-picker-item:hover,
@@ -1425,1057 +1686,16 @@ input:focus, textarea:focus, select:focus {
     stroke: var(--accent-color);
 }
 
+/* Fokus pada editor */
 .ql-container.ql-snow:focus-within {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+    border-color: var(--accent-color); 
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); 
 }
+
 
 /* ============================================= */
-/* ==   [BARU] PENYESUAIAN LIVE CHAT MOBILE   == */
+/* ==         [BARU] GAYA UNTUK LIVE CHAT       == */
 /* ============================================= */
-
-@media (max-width: 768px) {
-    .chat-bubble-container {
-        width: 50px;
-        height: 50px;
-        bottom: var(--space-md);
-        right: var(--space-md);
-    }
-
-    .chat-bubble-container svg {
-        width: 28px;
-        height: 28px;
-    }
-
-    .chat-window-container {
-        width: auto;
-        left: var(--space-sm);
-        right: var(--space-sm);
-        bottom: calc(var(--space-md) + 50px + var(--space-xs));
-        max-height: 80vh;
-    }
-}
-
-/* === [BARU] GAYA UNTUK TOMBOL ALAT CHAT === */
-.chat-tool-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-muted-color);
-    padding: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s ease;
-}
-
-.chat-tool-btn:hover {
-    color: var(--accent-color);
-}
-
-.chat-tool-btn.is-recording {
-    color: #dc3545;
-}
-
-/* === [BARU] GAYA UNTUK KONTEN PESAN MEDIA === */
-.message img {
-    max-width: 100%;
-    border-radius: 12px;
-    cursor: pointer;
-    margin-top: 5px;
-}
-
-.message audio {
-    width: 100%;
-    max-width: 250px;
-    height: 40px;
-    margin-top: 5px;
-}
-
-/* Penyesuaian audio player agar lebih rapi */
-.message audio::-webkit-media-controls-panel {
-    background-color: #e9ecef;
-}
-.message.user audio::-webkit-media-controls-panel {
-    background-color: var(--accent-hover);
-}
-
-/* === [IMPROVEMENT] Custom Form Elements === */
-.form-group label {
-    display: block;
-    font-weight: 500;
-    color: var(--text-muted-color);
-    margin-bottom: var(--space-sm);
-}
-
-/* Custom Select Dropdown */
-.custom-select-wrapper {
-    position: relative;
-}
-
-.custom-select-wrapper select {
-    display: none; /* Sembunyikan select asli */
-}
-
-.select-trigger {
-    width: 100%;
-    padding: var(--space-sm);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background-color: var(--card-bg-color);
-    color: var(--text-color);
-    font-size: var(--font-size-base);
-    font-family: var(--font-body);
-    text-align: left;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.select-trigger:focus, .custom-select-wrapper.active .select-trigger {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
-}
-
-.select-trigger::after {
-    content: '';
-    display: block;
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid var(--text-muted-color);
-    transition: transform 0.3s ease;
-}
-
-.custom-select-wrapper.active .select-trigger::after {
-    transform: rotate(180deg);
-}
-
-.select-options {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    right: 0;
-    background-color: var(--card-bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    box-shadow: var(--soft-shadow);
-    z-index: 10;
-    list-style: none;
-    max-height: 200px;
-    overflow-y: auto;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
-}
-
-.custom-select-wrapper.active .select-options {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-.select-options li {
-    padding: var(--space-sm);
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.select-options li:hover {
-    background-color: var(--background-color);
-}
-
-.select-options li.selected {
-    background-color: var(--accent-color);
-    color: #ffffff;
-    font-weight: 500;
-}
-
-/* === [BARU] GAYA UNTUK PROGRESS BAR === */
-.progress-wrapper {
-    margin-top: var(--space-md);
-}
-
-.progress-bar-text {
-    font-size: 0.9rem;
-    color: var(--text-muted-color);
-    margin-bottom: var(--space-xs);
-    text-align: center;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 10px;
-    background-color: #e9ecef;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.progress-bar-inner {
-    height: 100%;
-    width: 0%;
-    background-color: var(--accent-color);
-    border-radius: 5px;
-    transition: width 0.3s ease;
-}
-
-/* === [VERSI FINAL] GAYA UNTUK SLIDER PRATINJAU GAMBAR === */
-
-.preview-slider-wrapper {
-    position: relative;
-    width: 100%;
-    margin-top: var(--space-lg);
-    border-top: 1px solid var(--border-color);
-    padding-top: var(--space-lg);
-}
-
-.preview-slider-container {
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-behavior: smooth;
-    
-    /* [PERBAIKAN] Tambahkan padding untuk memberi ruang pada shadow dan tombol 'X' */
-    padding: 15px 20px; 
-    
-    /* [PERBAIKAN] Mengatasi masalah clipping pada Safari/Chrome dengan margin negatif */
-    margin: -15px -20px;
-
-    /* Sembunyikan scrollbar */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.preview-slider-container::-webkit-scrollbar {
-    display: none;
-}
-
-#image-previews-container {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: var(--space-lg);
-    /* [PERBAIKAN] Padding ini sekarang berada di parent-nya */
-    padding: 0; 
-}
-
-.image-preview-card {
-    position: relative;
-    flex: 0 0 calc(50% - 12px);
-    max-width: calc(50% - 12px);
-}
-
-.slider-nav-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 20;
-    background-color: rgba(255, 255, 255, 0.9);
-    border: 1px solid var(--border-color);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    transition: all 0.2s ease;
-    display: none;
-}
-
-.slider-nav-btn:hover {
-    background-color: var(--accent-color);
-    color: white;
-    border-color: var(--accent-color);
-}
-
-.slider-nav-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-/* [PERBAIKAN] Pindahkan tombol navigasi agar tidak terpotong */
-#prev-preview-btn {
-    left: 10px;
-}
-
-#next-preview-btn {
-    right: 10px;
-}
-
-/* Aturan untuk Desktop (lebar lebih dari 768px) */
-@media (min-width: 769px) {
-    .slider-nav-btn {
-        display: block;
-    }
-}
-
-/* Aturan untuk Mobile (lebar 768px atau kurang) */
-@media (max-width: 768px) {
-    .preview-slider-wrapper {
-        border-top: none;
-        padding-top: 0;
-    }
-    /* [PERBAIKAN] Hapus padding pada container di mobile */
-    .preview-slider-container {
-        padding: 0;
-        margin: 0;
-    }
-    #image-previews-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: var(--space-md);
-    }
-    .preview-slider-container {
-        max-height: 400px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding-right: 5px;
-    }
-    .image-preview-card {
-        max-width: 100%;
-        flex-basis: auto;
-    }
-}
-
-/* Aturan untuk Desktop (lebar lebih dari 768px) */
-@media (min-width: 769px) {
-    .slider-nav-btn {
-        display: block; /* Tampilkan tombol navigasi di desktop */
-    }
-}
-
-/* Aturan untuk Mobile (lebar 768px atau kurang) */
-@media (max-width: 768px) {
-    .preview-slider-wrapper {
-        border-top: none;
-        padding-top: 0;
-    }
-    #image-previews-container {
-        display: grid; /* Kembali ke grid di mobile */
-        grid-template-columns: 1fr 1fr; /* 2 kolom */
-        gap: var(--space-md);
-        padding: 0;
-    }
-
-    .preview-slider-container {
-        max-height: 400px; /* Tentukan tinggi maksimal area scroll */
-        overflow-y: auto; /* Aktifkan scroll vertikal */
-        overflow-x: hidden;
-        padding-right: 5px; /* Ruang untuk scrollbar */
-    }
-
-    .image-preview-card {
-        max-width: 100%; /* Lebar penuh sesuai kolom grid */
-        flex-basis: auto;
-    }
-}
-
-/* [BARU] Gaya untuk halaman virtual di dalam kartu */
-.preview-page {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    padding: 0; /* Margin akan diatur oleh kelas modifier */
-}
-
-/* [BARU] Atur gambar di dalam halaman virtual */
-.preview-page img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* PENTING: agar gambar pas tanpa terpotong */
-}
-
-.image-preview-card .remove-btn {
-    position: absolute;
-    top: -8px; /* Posisikan di luar sedikit */
-    right: -8px;
-    z-index: 10;
-    background-color: #343a40;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    font-size: 18px;
-    line-height: 24px;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
-}
-
-.image-preview-card .remove-btn:hover {
-    background-color: #dc3545;
-    transform: scale(1.1);
-}
-
-/* [BARU] Kelas modifier untuk layout halaman */
-.preview-page.portrait {
-    aspect-ratio: 210 / 297; /* A4 Portrait */
-}
-.preview-page.landscape {
-    aspect-ratio: 297 / 210; /* A4 Landscape */
-}
-/* Anda bisa menambahkan ukuran lain di sini, contoh: */
-.preview-page.size-Letter.portrait { aspect-ratio: 8.5 / 11; }
-.preview-page.size-Letter.landscape { aspect-ratio: 11 / 8.5; }
-
-
-/* [BARU] Kelas modifier untuk margin */
-.preview-page.margin-small {
-    padding: 5%; /* Simulasi margin kecil */
-}
-.preview-page.margin-big {
-    padding: 10%; /* Simulasi margin besar */
-}
-
-/* [BARU] GAYA UNTUK TATA LETAK 2 KOLOM PDF TOOL */
-.pdf-tool-layout {
-    display: grid;
-    /* Kolom kiri (preview) 1.5 bagian, kolom kanan (opsi) 2 bagian */
-    grid-template-columns: 1.5fr 2fr;
-    gap: var(--space-lg);
-    align-items: flex-start;
-}
-
-.pdf-tool-previews {
-    background-color: var(--background-color);
-    border: 1px dashed var(--border-color);
-    border-radius: 12px;
-    padding: var(--space-md);
-    min-height: 420px; /* Beri tinggi minimal */
-}
-
-.pdf-tool-options {
-    background-color: var(--card-bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: var(--space-lg);
-    position: sticky; /* Membuat panel opsi tetap terlihat saat scroll */
-    top: 100px; /* Sesuaikan dengan tinggi navbar Anda */
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg);
-}
-
-.pdf-tool-options .options-title {
-    font-family: var(--font-heading);
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0;
-    text-align: center;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: var(--space-sm);
-    margin-bottom: var(--space-sm);
-}
-
-.pdf-tool-options .form-group {
-    margin: 0;
-}
-
-.pdf-tool-options label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: var(--space-xs);
-}
-
-/* Pindahkan tombol Convert ke bagian bawah panel opsi */
-.pdf-tool-options .button-pintu {
-    width: 100%;
-    margin-top: auto; /* Mendorong tombol ke bawah */
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    font-size: 1.1rem;
-}
-
-/* Penyesuaian ikon di dalam radio card */
-.radio-card-content svg {
-    width: 28px;
-    height: 28px;
-}
-.radio-card-content span {
-    font-size: 0.9rem;
-}
-
-/* ===================================================== */
-/* == BLOK FINAL & LENGKAP UNTUK RESPONSIVE PDF TOOL == */
-/* ===================================================== */
-
-/* Untuk layar tablet dan di bawahnya (lebar maks 992px) */
-@media (max-width: 992px) {
-    /* Layout utama PDF tool menjadi 1 kolom */
-    .pdf-tool-layout {
-        grid-template-columns: 1fr;
-        gap: var(--space-md);
-    }
-
-    /* Panel opsi tidak lagi "menempel" di samping */
-    .pdf-tool-options {
-        position: static;
-        top: auto;
-    }
-
-    /* Area pratinjau tidak terlalu tinggi di mobile */
-    .pdf-tool-previews {
-        min-height: 300px;
-    }
-}
-
-/* Untuk layar ponsel (lebar maks 768px) - KODE PERBAIKAN UTAMA DI SINI */
-@media (max-width: 768px) {
-
-    /* Memastikan container utama tidak pernah meluber ke kanan */
-    .page-container {
-        width: 100%;
-        overflow-x: hidden; /* Mencegah scroll horizontal paksa */
-    }
-
-    /* Mengganti layout grid menjadi flexbox kolom untuk kepastian */
-    .pdf-tool-layout {
-        display: flex;
-        flex-direction: column; /* Paksa jadi satu kolom */
-        width: 100%;
-        gap: var(--space-md);
-    }
-
-    /* Memastikan setiap bagian di dalamnya tidak meluber */
-    .pdf-tool-previews, .pdf-tool-options {
-        width: 100%;
-        max-width: 100%; /* Menjamin tidak akan lebih lebar dari parent */
-        min-width: 0; /* Mengizinkan elemen untuk mengecil */
-    }
-
-    /* Aturan untuk radio card group agar tetap rapi */
-    .radio-card-group {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-        gap: var(--space-sm);
-    }
-
-    /* Perbaikan untuk Image Compressor agar tidak meluber juga */
-    #image-compressor-form {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-md);
-        width: 100%;
-    }
-
-    /* 1. Paksa grup kartu menjadi 2 kolom yang rapi */
-.radio-card-group {
-    display: grid;
-    /* Gunakan auto-fit agar kolom menyesuaikan secara otomatis */
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    gap: var(--space-sm);
-}
-
-/* 2. Atur ulang konten di dalam setiap kartu agar lebih ringkas */
-.radio-card-content {
-    flex-direction: column; /* Susun ikon di ATAS teks, bukan di samping */
-    gap: 6px;               /* Beri sedikit jarak antara ikon dan teks */
-    padding: var(--space-sm) var(--space-xs); /* Atur ulang padding (tinggi, lebar) */
-    text-align: center;
-    height: 100%; /* Pastikan semua kartu sama tinggi */
-    justify-content: center;
-}
-
-/* 3. Sedikit perkecil ukuran ikon di dalam kartu */
-.radio-card-content svg {
-    width: 28px;
-    height: 28px;
-    margin: 0 auto; /* Pastikan ikon berada di tengah */
-}
-
-/* 4. Sedikit perkecil ukuran teks di dalam kartu */
-.radio-card-content span {
-    font-size: 0.85rem;
-}
-/* Tambahkan ini di dalam @media (max-width: 768px) */
-.pdf-tool-previews, .pdf-tool-options {
-    border: none;
-    background-color: transparent;
-    padding: 0;
-    box-shadow: none;
-}
-
-.pdf-tool-previews {
-    /* Tambahkan garis pemisah agar tetap jelas */
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: var(--space-lg);
-}
-
-}
-
-/* Untuk layar ponsel yang sangat kecil (lebar maks 480px) */
-@media (max-width: 480px) {
-    /* Tombol pilihan tool menjadi satu kolom penuh */
-    .tool-buttons-container {
-        flex-direction: column;
-        gap: var(--space-sm);
-    }
-
-    /* Pratinjau gambar dibuat 2 kolom agar tidak terlalu kecil */
-    #image-previews-container {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-sm);
-    }
-}
-
-/* === [BARU] GAYA UNTUK PROGRESS BAR INDETERMINATE === */
-.progress-bar.indeterminate > .progress-bar-inner {
-    /* Gunakan seluruh lebar untuk animasi */
-    width: 100% !important; 
-    
-    /* Efek garis-garis (barber pole) */
-    background-image: linear-gradient(
-        45deg, 
-        rgba(255,255,255,.15) 25%, 
-        transparent 25%, 
-        transparent 50%, 
-        rgba(255,255,255,.15) 50%, 
-        rgba(255,255,255,.15) 75%, 
-        transparent 75%, 
-        transparent
-    );
-    background-size: 40px 40px;
-    
-    /* Animasi pergerakan garis-garis */
-    animation: progress-bar-stripes 1s linear infinite;
-}
-
-@keyframes progress-bar-stripes {
-  from { background-position: 40px 0; }
-  to { background-position: 0 0; }
-}
-
-/* Default state for mobile-only PDF tool elements */
-.pdf-options-overlay,
-.fab-container {
-    display: none;
-}
-
-/* === [FINAL LENGKAP] GAYA UNTUK PDF TOOL MOBILE (Slide-in Panel) === */
-@media (max-width: 768px) {
-    /* Mengatur panel opsi utama */
-    .pdf-tool-layout .pdf-tool-options {
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        top: 0;
-        right: 0;
-        width: 90%;
-        max-width: 350px;
-        height: 100%;
-        background-color: var(--card-bg-color);
-        z-index: 1101;
-        padding: var(--space-md);
-        box-shadow: -5px 0 20px rgba(0,0,0,0.15);
-        transform: translateX(100%);
-        visibility: hidden;
-        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility 0.4s;
-        overflow: hidden; /* Mencegah seluruh panel ter-scroll */
-    }
-
-    /* Membuat area konten (opsi) bisa di-scroll */
-    .options-content-scrollable {
-        flex-grow: 1;
-        overflow-y: auto;
-        margin: 0 -8px;
-        padding: 0 8px;
-    }
-
-    /* Mengatur agar tombol Convert selalu di bawah */
-    .pdf-tool-options .button-pintu {
-        flex-shrink: 0;
-        margin-top: var(--space-md);
-        width: 100%;
-    }
-
-    /* Latar belakang gelap (overlay) */
-    .pdf-options-overlay {
-        display: block;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1100;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.4s ease, visibility 0.4s;
-    }
-
-    /* Aturan saat panel aktif */
-    #images-to-pdf-form.options-active .pdf-tool-options {
-        transform: translateX(0);
-        visibility: visible;
-    }
-    #images-to-pdf-form.options-active .pdf-options-overlay {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    /* Tombol roda gigi (FAB) */
-    .fab-container {
-        display: block;
-        position: fixed;
-        bottom: 400px; /* [DIUBAH] Dinaikkan dari 150px menjadi 180px */
-        right: var(--space-md);
-        z-index: 1050;
-    }
-
-    .fab {
-        width: 44px;   /* [DIUBAH] Dikecilkan dari 48px */
-        height: 44px;  /* [DIUBAH] Dikecilkan dari 48px */
-        background-color: var(--accent-color);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        cursor: pointer;
-        transition: transform 0.2s ease;
-    }
-
-
-    .fab:hover {
-        transform: scale(1.1);
-    }
-    
-    /* Header di dalam panel opsi */
-    .options-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: var(--space-md);
-        margin-bottom: var(--space-lg);
-    }
-    .options-header h3 { margin: 0; font-size: 1.2rem; }
-    .back-btn { background: none; border: none; padding: 0; cursor: pointer; }
-    .back-btn svg { color: var(--text-color); }
-}
-
-/* ===================================================== */
-/* == PERBAIKAN TAMPILAN DESKTOP PDF TOOL           == */
-/* ===================================================== */
-
-/* Aturan ini hanya berlaku untuk layar besar (desktop) */
-@media (min-width: 769px) {
-
-    /* Sembunyikan tombol roda gigi dan tombol kembali 
-      karena tidak digunakan di desktop.
-    */
-    #toggle-pdf-options-btn,
-    #back-to-previews-btn {
-        display: none !important;
-    }
-
-    /* Sembunyikan juga overlay gelap yang hanya untuk 
-      panel mobile.
-    */
-    .pdf-options-overlay {
-        display: none;
-    }
-}
-
-/* === [BARU] GAYA UNTUK TOMBOL PILIH FILE YANG BARU === */
-
-.file-select-button {
-    display: inline-block; /* Membuatnya bisa diatur margin auto */
-    max-width: 300px;
-    width: 100%;
-    margin: 0 auto; /* Tengah secara horizontal */
-    padding: 0.9rem 1.5rem;
-    cursor: pointer; /* Penting untuk label */
-    color: #ffffff !important; /* [DITAMBAHKAN] Paksa warna font menjadi putih */
-}
-
-.file-count-info {
-    margin-top: var(--space-sm);
-    font-size: 0.9rem;
-    color: var(--text-muted-color);
-    min-height: 1.2rem; /* Beri ruang agar layout tidak lompat */
-}
-
-/* === GAYA FOOTER PROFESIONAL BARU === */
-.site-footer {
-    background-color: var(--card-bg-color);
-    color: var(--text-muted-color);
-    padding: var(--space-xl) clamp(var(--space-md), 5vw, var(--space-xl));
-    border-top: 1px solid var(--border-color);
-    margin-top: var(--space-xxl);
-}
-
-.footer-main {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: var(--space-lg);
-    padding-bottom: var(--space-lg);
-    margin-bottom: var(--space-lg);
-    border-bottom: 1px solid var(--border-color);
-}
-
-.footer-about .footer-logo-main {
-    font-family: var(--font-heading);
-    font-size: 1.8rem;
-    font-weight: 700;
-    text-decoration: none;
-    color: var(--text-color);
-    line-height: 1.2;
-    display: inline-block;
-    margin-bottom: var(--space-sm);
-}
-
-.footer-about .footer-tagline {
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
-.footer-nav-col h4 {
-    font-family: var(--font-heading);
-    font-size: 1.1rem;
-    color: var(--text-color);
-    margin-bottom: var(--space-md);
-    font-weight: 600;
-}
-
-.footer-nav-col ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.footer-nav-col ul li {
-    margin-bottom: var(--space-xs);
-}
-
-.footer-nav-col ul a {
-    color: var(--text-muted-color);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.footer-nav-col ul a:hover {
-    color: var(--accent-color);
-    text-decoration: underline;
-}
-
-.footer-social-links {
-    display: flex;
-    gap: var(--space-md);
-    align-items: center;
-}
-
-.footer-social-links a svg {
-    color: var(--text-muted-color);
-    transition: all 0.3s ease;
-}
-
-.footer-social-links a:hover svg {
-    color: var(--accent-color);
-    transform: translateY(-3px);
-}
-
-.footer-bottom-new {
-    text-align: center;
-    font-size: 0.9rem;
-}
-
-.footer-bottom-new a {
-    color: var(--text-muted-color);
-    text-decoration: none;
-}
-
-.footer-bottom-new a:hover {
-    color: var(--accent-color);
-    text-decoration: underline;
-}
-
-/* ============================================= */
-/* ==   [PERBAIKAN] Tampilan Form Awal Live Chat == */
-/* ============================================= */
-
-#chat-start-form {
-  /* Menggunakan Flexbox untuk menata elemen secara vertikal */
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Pusatkan seluruh konten di tengah secara vertikal */
-  height: 100%; /* Ambil seluruh tinggi jendela chat yang tersedia */
-  
-  /* Beri jarak di dalam form agar tidak menempel di tepi */
-  padding: var(--space-lg);
-  text-align: center;
-  gap: var(--space-md); /* Atur jarak yang konsisten antar elemen */
-}
-
-#chat-start-form p {
-  margin: 0;
-  color: var(--text-muted-color);
-  line-height: 1.6;
-}
-
-#chat-start-form .form-group {
-  margin: 0; /* Hapus margin bawaan karena sudah diatur oleh 'gap' */
-  width: 100%;
-}
-
-#chat-start-form button {
-  width: 100%;
-  padding: 0.8rem; /* Buat tombol sedikit lebih besar agar mudah di-klik */
-}
-
-/* ============================================================= */
-/* == PERBAIKAN FINAL - Tampilan Daftar Percakapan Admin == */
-/* ============================================================= */
-
-/* Tata letak utama panel kiri */
-#admin-chat-container .user-chat-list {
-    width: 35%;
-    max-width: 350px;
-    min-width: 280px;
-    border-right: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-}
-
-#admin-chat-container .chat-list-header {
-    padding: var(--space-md);
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-}
-
-#admin-chat-container .chat-list-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
-}
-
-#admin-chat-container #user-chat-list-items {
-    overflow-y: auto;
-    flex-grow: 1;
-    padding: var(--space-xs);
-}
-
-/* Penataan untuk setiap item/kartu percakapan */
-#admin-chat-container .chat-user-entry {
-    display: flex;
-    align-items: center;
-    padding: var(--space-sm);
-    cursor: pointer;
-    border-radius: 8px;
-    margin: var(--space-xs);
-    transition: background-color 0.2s ease;
-    gap: var(--space-sm);
-}
-
-#admin-chat-container .chat-user-entry:hover {
-    background-color: #f1f3f5;
-}
-
-#admin-chat-container .chat-user-entry.active {
-    background-color: var(--accent-color);
-    color: white;
-}
-
-/* Avatar (huruf inisial) */
-#admin-chat-container .chat-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background-color: var(--border-color);
-    color: var(--text-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-    flex-shrink: 0;
-}
-#admin-chat-container .chat-user-entry.active .chat-avatar {
-    background-color: white;
-    color: var(--accent-color);
-}
-
-/* Info (Nama & Preview Pesan) */
-#admin-chat-container .chat-user-info {
-    flex-grow: 1;
-    overflow: hidden;
-}
-
-#admin-chat-container .chat-user-info .username {
-    font-weight: 600;
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-#admin-chat-container .chat-user-entry.active .chat-user-info .username {
-    color: white;
-}
-
-#admin-chat-container .chat-user-info .message-preview {
-    font-size: 0.85rem;
-    color: var(--text-muted-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: flex;
-    align-items: center;
-}
-#admin-chat-container .chat-user-entry.active .chat-user-info .message-preview {
-    color: rgba(255, 255, 255, 0.8);
-}
-#admin-chat-container .typing-status {
-    font-style: italic;
-    color: var(--accent-color) !important;
-    margin-left: 4px;
-}
-#admin-chat-container .chat-user-entry.active .typing-status {
-    color: white !important;
-}
-
-/* Meta (Waktu & Tanda Belum Dibaca) */
-#admin-chat-container .chat-user-meta {
-    flex-shrink: 0;
-    text-align: right;
-    font-size: 0.75rem;
-    color: var(--text-muted-color);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-}
-#admin-chat-container .chat-user-entry.active .chat-user-meta {
-    color: rgba(255, 255, 255, 0.8);
-}
-
-#admin-chat-container .unread-dot {
-    width: 12px;
-    height: 12px;
-    background-color: var(--accent-color);
-    border-radius: 50%;
-    align-self: flex-end;
-    transition: transform 0.2s;
-}
-#admin-chat-container .unread-dot.hidden {
-    transform: scale(0);
-}
-#admin-chat-container .chat-user-entry.active .unread-dot {
-    background-color: white;
-}
-
-/* ================================================================= */
-/* ==   [KODE TAMBAHAN] GAYA UNTUK GELEMBUNG CHAT PENGUNJUNG     == */
-/* ================================================================= */
 
 .chat-bubble-container {
     position: fixed;
@@ -2540,6 +1760,7 @@ input:focus, textarea:focus, select:focus {
 .chat-header h3 {
     margin: 0;
     font-size: 1.1rem;
+    color: var(--text-color);
 }
 
 #chat-status {
@@ -2557,23 +1778,7 @@ input:focus, textarea:focus, select:focus {
     color: var(--text-muted-color);
 }
 
-#chat-start-form {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
-  padding: var(--space-lg);
-  text-align: center;
-  gap: var(--space-md);
-}
-
-#chat-main {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.chat-window-container .chat-messages {
+.chat-messages {
     flex-grow: 1;
     padding: var(--space-md);
     overflow-y: auto;
@@ -2581,8 +1786,7 @@ input:focus, textarea:focus, select:focus {
     flex-direction: column;
 }
 
-/* Aturan untuk pesan di JENDELA PENGUNJUNG */
-.chat-window-container .message {
+.message {
     margin-bottom: var(--space-sm);
     padding: 0.7rem 1rem;
     border-radius: 18px;
@@ -2591,238 +1795,134 @@ input:focus, textarea:focus, select:focus {
     word-wrap: break-word;
 }
 
-.chat-window-container .message.user {
+.message.user {
     background-color: var(--accent-color);
     color: white;
     border-bottom-right-radius: 4px;
     align-self: flex-end;
 }
 
-.chat-window-container .message.admin {
+.message.admin {
     background-color: #e9ecef;
     color: var(--text-color);
     border-bottom-left-radius: 4px;
     align-self: flex-start;
 }
 
-.chat-window-container .chat-form {
+.message.server-info {
+    font-size: 0.8rem;
+    text-align: center;
+    color: var(--text-muted-color);
+    background: none;
+    width: 100%;
+    max-width: 100%;
+    align-self: center;
+}
+
+.chat-form {
     display: flex;
     border-top: 1px solid var(--border-color);
     padding: var(--space-sm);
     flex-shrink: 0;
 }
 
-#chat-input {
+#chat-input, #admin-chat-input {
     flex-grow: 1;
     border: none;
     padding: 0.5rem;
     background-color: transparent;
+    color: var(--text-color);
 }
-#chat-input:focus {
+#chat-input:focus, #admin-chat-input:focus {
     outline: none;
     box-shadow: none;
 }
 
-/* ==================================================================== */
-/* ==   [BLOK FINAL & GABUNGAN] SEMUA GAYA UNTUK FITUR LIVE CHAT   == */
-/* ==================================================================== */
-
-/* --- Bagian A: Gaya untuk Gelembung Chat Pengunjung (di index.html, dll) --- */
-
-.chat-bubble-container {
-    position: fixed;
-    bottom: var(--space-lg);
-    right: var(--space-lg);
-    width: 60px;
-    height: 60px;
-    background-color: var(--accent-color);
-    color: white;
-    border-radius: 50%;
+.chat-form button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--accent-color);
+    padding: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-    z-index: 1050;
-    transition: transform 0.3s ease, background-color 0.3s ease;
 }
-
-.chat-bubble-container:hover {
-    transform: scale(1.1);
+#admin-chat-form button {
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.2s ease;
+}
+#admin-chat-form button:hover {
     background-color: var(--accent-hover);
 }
 
-.chat-window-container {
-    position: fixed;
-    bottom: calc(var(--space-lg) + 75px);
-    right: var(--space-lg);
-    width: 350px;
-    max-width: 90vw;
-    height: 500px;
-    max-height: 70vh;
-    background-color: var(--card-bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    box-shadow: var(--soft-shadow);
-    z-index: 1050;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transform-origin: bottom right;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    transform: scale(0.95);
-    opacity: 0;
-}
 
-.chat-window-container:not(.hidden) {
-    transform: scale(1);
-    opacity: 1;
-}
-
-.chat-header {
-    padding: var(--space-sm) var(--space-md);
-    background-color: var(--background-color);
+/* Admin Chat Panel Styles */
+#user-chat-list .chat-user-entry {
+    padding: var(--space-sm);
+    cursor: pointer;
     border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-radius: 6px;
+    margin-bottom: var(--space-xs);
+}
+#user-chat-list .chat-user-entry:hover {
+    background-color: #f1f3f5;
+}
+#user-chat-list .chat-user-entry.active {
+    background-color: #e9f2ff;
+    font-weight: bold;
+    border-left: 4px solid var(--accent-color);
+    padding-left: calc(var(--space-sm) - 4px);
+}
+.unread-dot {
+    width: 10px;
+    height: 10px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
     flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+.unread-dot.hidden {
+    transform: scale(0);
 }
 
-.chat-header h3 { margin: 0; font-size: 1.1rem; }
-#chat-status { font-size: 0.8rem; color: var(--text-muted-color); margin-left: auto; margin-right: var(--space-md); }
-#close-chat-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted-color); }
-#chat-start-form { display: flex; flex-direction: column; justify-content: center; height: 100%; padding: var(--space-lg); text-align: center; gap: var(--space-md); }
-#chat-main { display: flex; flex-direction: column; height: 100%; }
-.chat-window-container .chat-messages { flex-grow: 1; padding: var(--space-md); overflow-y: auto; display: flex; flex-direction: column; }
-.chat-window-container .message { margin-bottom: var(--space-sm); padding: 0.7rem 1rem; border-radius: 18px; max-width: 85%; line-height: 1.4; word-wrap: break-word; }
-.chat-window-container .message.user { background-color: var(--accent-color); color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
-.chat-window-container .message.admin { background-color: #e9ecef; color: var(--text-color); border-bottom-left-radius: 4px; align-self: flex-start; }
-.chat-window-container .chat-form { display: flex; border-top: 1px solid var(--border-color); padding: var(--space-sm); flex-shrink: 0; }
-#chat-input { flex-grow: 1; border: none; padding: 0.5rem; background-color: transparent; }
-#chat-input:focus { outline: none; box-shadow: none; }
+/* ============================================= */
+/* ==   [BARU] PENYESUAIAN LIVE CHAT MOBILE   == */
+/* ============================================= */
 
-/* [PERBAIKAN MOBILE LAYAR PENUH UNTUK PENGUNJUNG] */
 @media (max-width: 768px) {
+    /* 1. Perkecil balon chat dan posisikan lebih dekat ke tepi */
+    .chat-bubble-container {
+        width: 50px;
+        height: 50px;
+        bottom: var(--space-md); /* Jarak dari bawah: 1.5rem */
+        right: var(--space-md);  /* Jarak dari kanan: 1.5rem */
+    }
+
+    /* Perkecil ikon di dalam balon chat agar proporsional */
+    .chat-bubble-container svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    /* 2. Atur ulang posisi dan ukuran jendela chat agar simetris */
     .chat-window-container {
-        top: 0; left: 0; right: 0; bottom: 0;
-        width: 100%; height: 100%;
-        max-width: 100%; max-height: 100%;
-        border-radius: 0;
-        transform-origin: bottom center;
-    }
-    .chat-bubble-container { width: 50px; height: 50px; bottom: var(--space-md); right: var(--space-md); }
-    .chat-bubble-container svg { width: 28px; height: 28px; }
-    .chat-header h3 { font-size: 1rem; }
-    .chat-window-container .chat-messages { padding-bottom: var(--space-lg); }
-}
-
-
-/* --- Bagian B: Gaya untuk Panel Chat Admin (di dashboard.html) --- */
-
-#admin-chat-container { display: flex; height: 75vh; min-height: 550px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--card-bg-color); overflow: hidden; position: relative; }
-.user-chat-list { width: 340px; flex-shrink: 0; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; background-color: var(--background-color); }
-.chat-list-header { padding: var(--space-md); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
-.chat-list-header h3 { margin: 0; font-size: 1.2rem; font-family: var(--font-heading); }
-#user-chat-list-items { flex-grow: 1; overflow-y: auto; padding: var(--space-xs); }
-.chat-list-placeholder { text-align: center; padding: var(--space-lg); color: var(--text-muted-color); }
-.chat-user-entry { display: flex; align-items: center; padding: var(--space-sm); cursor: pointer; border-radius: 8px; margin: var(--space-xs); transition: background-color 0.2s ease; gap: var(--space-md); }
-.chat-user-entry:hover { background-color: #e9ecef; }
-.chat-user-entry.active { background-color: var(--accent-color); color: white; }
-.chat-user-entry.active:hover { background-color: var(--accent-hover); }
-.chat-avatar { width: 48px; height: 48px; border-radius: 50%; background-color: var(--border-color); color: var(--text-color); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; text-transform: uppercase; flex-shrink: 0; }
-.chat-user-entry.active .chat-avatar { background-color: rgba(255, 255, 255, 0.9); color: var(--accent-color); }
-.chat-user-info { flex-grow: 1; overflow: hidden; }
-.chat-user-info .username { font-weight: 600; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chat-user-entry.active .chat-user-info .username { color: white; }
-.chat-user-info .message-preview { font-size: 0.9rem; color: var(--text-muted-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chat-user-entry.active .chat-user-info .message-preview { color: rgba(255, 255, 255, 0.85); }
-.chat-user-meta { flex-shrink: 0; text-align: right; font-size: 0.8rem; color: var(--text-muted-color); display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-.chat-user-entry.active .chat-user-meta { color: rgba(255, 255, 255, 0.85); }
-.unread-dot { width: 10px; height: 10px; background-color: var(--accent-color); border: 2px solid var(--background-color); border-radius: 50%; transition: transform 0.2s; }
-.unread-dot.hidden { transform: scale(0); height: 0; width: 0; margin-top: 10px; }
-.chat-user-entry.active .unread-dot { background-color: white; border-color: var(--accent-color); }
-.active-chat-area { flex-grow: 1; display: flex; flex-direction: column; }
-.chat-placeholder-container { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--text-muted-color); }
-.chat-placeholder-container svg { color: var(--border-hover-color); margin-bottom: var(--space-md); }
-.chat-placeholder-container h4 { font-size: 1.3rem; color: var(--text-color); margin: 0; }
-#active-chat-content { display: flex; flex-direction: column; width: 100%; height: 100%; }
-.active-chat-header { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-sm) var(--space-md); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
-#back-to-list-btn { display: none; }
-.active-chat-header .chat-user-profile { display: flex; align-items: center; gap: var(--space-md); }
-.active-chat-header .username { font-weight: 600; }
-.active-chat-header .status { font-size: 0.85rem; color: var(--text-muted-color); }
-.active-chat-header .status.online { color: #198754; font-weight: 500; }
-.active-chat-header .status.offline { color: #6c757d; }
-#active-chat-messages { flex-grow: 1; overflow-y: auto; padding: var(--space-lg); display: flex; flex-direction: column; gap: 4px; }
-.message-group { display: flex; flex-direction: column; max-width: 80%; margin-bottom: var(--space-sm); }
-#admin-chat-container .message { padding: 0.8rem 1.2rem; border-radius: 18px; line-height: 1.5; word-wrap: break-word; }
-#admin-chat-container .message img, #admin-chat-container .message audio { margin-top: 8px; max-width: 100%; border-radius: 8px; }
-.message-meta { font-size: 0.75rem; color: var(--text-muted-color); padding: 4px 12px 0; }
-.message-group-user { align-self: flex-start; align-items: flex-start; }
-.message-group-user .message { background-color: #e9ecef; color: var(--text-color); border-bottom-left-radius: 4px; }
-.message-group-admin { align-self: flex-end; align-items: flex-end; }
-.message-group-admin .message { background-color: var(--accent-color); color: white; border-bottom-right-radius: 4px; }
-.chat-form { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); border-top: 1px solid var(--border-color); flex-shrink: 0; }
-#admin-chat-input { flex-grow: 1; border: 1px solid var(--background-color); border-radius: 20px; padding: 0.6rem 1rem; background-color: var(--background-color); transition: border-color 0.2s, background-color 0.2s; }
-#admin-chat-input:focus { outline: none; border-color: var(--accent-color); background-color: white; }
-.chat-form .button-pintu { border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
-/* ================================================================= */
-/* ==   [PERBAIKAN FINAL V.5] RESPONSIVE KHUSUS PANEL ADMIN CHAT  == */
-/* ================================================================= */
-
-/* Aturan ini hanya berlaku untuk layar dengan lebar 768px atau kurang */
-@media (max-width: 768px) {
-    #admin-chat-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 2000;
-        border-radius: 0;
-        border: none;
-    }
-
-    /* Aturan untuk animasi geser antar panel di mobile.
-       Ini tidak berubah, tapi harus tetap ada di dalam media query. */
-    #admin-chat-container .user-chat-list,
-    #admin-chat-container .active-chat-area {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        background-color: var(--card-bg-color);
-    }
-
-    #admin-chat-container .user-chat-list {
-        transform: translateX(0);
-        z-index: 2;
-    }
-
-    #admin-chat-container .active-chat-area {
-        transform: translateX(100%);
-        z-index: 1;
-    }
-
-    #admin-chat-container.chat-active .user-chat-list {
-        transform: translateX(-100%);
-    }
-
-    #admin-chat-container.chat-active .active-chat-area {
-        transform: translateX(0);
-        z-index: 3;
-    }
-
-    #admin-chat-container #back-to-list-btn {
-        display: flex;
+        width: auto; /* Biarkan lebar diatur oleh properti left & right */
+        left: var(--space-sm);  /* Jarak dari kiri layar: 1rem */
+        right: var(--space-sm); /* Jarak dari kanan layar: 1rem */
+        bottom: calc(var(--space-md) + 50px + var(--space-xs)); /* Posisikan di atas balon baru */
+        max-height: 80vh; /* Izinkan jendela chat mengambil lebih banyak ruang vertikal di mobile */
     }
 }
 
-/* CSS untuk tombol alat di form chat */
+/* === [BARU] GAYA UNTUK TOMBOL ALAT CHAT === */
 .chat-tool-btn {
     background: none;
     border: none;
@@ -2840,5 +1940,28 @@ input:focus, textarea:focus, select:focus {
 }
 
 .chat-tool-btn.is-recording {
-    color: #dc3545; /* Warna saat merekam */
+    color: #dc3545; /* Merah saat merekam */
+}
+
+/* === [BARU] GAYA UNTUK KONTEN PESAN MEDIA === */
+.message img {
+    max-width: 100%;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.message audio {
+    width: 100%;
+    max-width: 250px;
+    height: 40px;
+    margin-top: 5px;
+}
+
+/* Penyesuaian audio player agar lebih rapi */
+.message audio::-webkit-media-controls-panel {
+    background-color: #e9ecef;
+}
+.message.user audio::-webkit-media-controls-panel {
+    background-color: var(--accent-hover);
 }

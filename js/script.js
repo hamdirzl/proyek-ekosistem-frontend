@@ -1,5 +1,7 @@
-// VERSI FINAL (PERBAIKAN 2) - Logika Pemuatan Halaman Diperbaiki
+// VERSI FINAL (PERBAIKAN) - DENGAN RICH TEXT EDITOR, CROPPING, & FITUR CHAT GAMBAR/SUARA
 const API_BASE_URL = 'https://server-pribadi-hamdi-docker.onrender.com';
+
+console.log(`Ekosistem Digital (Client Final) dimuat! Menghubungi API di: ${API_BASE_URL}`);
 
 // --- Variabel Global untuk Fitur Cropping & Editor ---
 let cropper = null;
@@ -12,9 +14,13 @@ let currentCropCallback = null;
 // --- Variabel Global untuk Live Chat Admin ---
 let adminWebSocket = null;
 let currentAdminChatTarget = null;
+let userChatList = null;
+let activeChatMessages = null;
+let adminChatForm = null;
+let adminChatInput = null;
 const allChatHistories = {}; // Objek untuk menyimpan riwayat chat per user
 
-// === FUNGSI HELPER UPLOAD FILE CHAT ===
+// === [BARU] FUNGSI HELPER UPLOAD FILE CHAT ===
 async function uploadChatFile(file, type) {
     const formData = new FormData();
     formData.append('file', file);
@@ -40,18 +46,17 @@ async function uploadChatFile(file, type) {
 function forceLogout() {
     localStorage.removeItem('jwt_refresh_token');
     sessionStorage.removeItem('jwt_access_token');
-    localStorage.removeItem('chatSession');
-    const authPath = window.location.href.includes('github.io') ? '/hrportof/auth.html' : '/auth.html';
+    localStorage.removeItem('chatSession'); 
     if (!window.location.pathname.endsWith('auth.html')) {
         alert('Sesi Anda telah berakhir. Silakan login kembali.');
-        window.location.href = authPath;
+        window.location.href = 'auth.html';
     }
 }
 
 async function fetchWithAuth(url, options = {}) {
     let accessToken = sessionStorage.getItem('jwt_access_token');
 
-    options.headers = { ...options.headers };
+    options.headers = { ...options.headers }; 
     if (accessToken) {
         options.headers['Authorization'] = `Bearer ${accessToken}`;
     }
@@ -65,6 +70,7 @@ async function fetchWithAuth(url, options = {}) {
     let response = await fetch(url, options);
 
     if (response.status === 401 || response.status === 403) {
+        console.log("Access Token kedaluwarsa atau tidak valid, mencoba refresh...");
         const refreshToken = localStorage.getItem('jwt_refresh_token');
 
         if (!refreshToken) {
@@ -82,6 +88,7 @@ async function fetchWithAuth(url, options = {}) {
             if (refreshResponse.ok) {
                 const data = await refreshResponse.json();
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
+                console.log("Refresh berhasil, mengulangi permintaan...");
 
                 options.headers['Authorization'] = `Bearer ${data.accessToken}`;
                 response = await fetch(url, options);
@@ -89,6 +96,7 @@ async function fetchWithAuth(url, options = {}) {
                 forceLogout();
             }
         } catch (error) {
+            console.error("Error saat proses refresh token:", error);
             forceLogout();
         }
     }
@@ -96,8 +104,7 @@ async function fetchWithAuth(url, options = {}) {
     return response;
 }
 
-// GANTI SELURUH BLOK DOMContentLoaded ANDA DENGAN INI
-
+/* === FUNGSI GLOBAL === */
 document.addEventListener('DOMContentLoaded', async () => {
     // Logika autentikasi navbar
     const navDasbor = document.getElementById('nav-dasbor');
@@ -120,8 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.error("Gagal logout di server, tapi tetap lanjut logout di client.", e);
                 } finally {
                     forceLogout();
-                    const indexPath = window.location.href.includes('github.io') ? '/hrportof/' : '/';
-                    window.location.href = indexPath;
+                    window.location.href = 'index.html';
                 }
             });
         }
@@ -131,8 +137,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (navLogin) navLogin.style.display = 'list-item';
         if (navLogout) navLogout.style.display = 'none';
     }
-
+    
     if (refreshToken && !sessionStorage.getItem('jwt_access_token')) {
+        console.log("Sesi baru, mencoba mendapatkan access token...");
         try {
             const refreshResponse = await fetch(`${API_BASE_URL}/api/refresh-token`, {
                 method: 'POST',
@@ -143,6 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (refreshResponse.ok) {
                 const data = await refreshResponse.json();
                 sessionStorage.setItem('jwt_access_token', data.accessToken);
+                console.log("Access token berhasil didapatkan untuk sesi ini.");
                 if (document.body.contains(document.getElementById('dashboard-main'))) {
                     await setupDashboardPage();
                 }
@@ -150,45 +158,33 @@ document.addEventListener('DOMContentLoaded', async () => {
                 forceLogout();
             }
         } catch (error) {
+            console.error("Gagal mendapatkan access token saat load:", error);
             forceLogout();
         }
     }
 
-    // =================================================================
-    // == [PERBAIKAN UTAMA] Logika Pemuatan Halaman yang Lebih Spesifik ==
-    // =================================================================
-    const pageTitle = document.title;
-    
+    // Panggil fungsi setup berdasarkan halaman
     if (document.body.contains(document.getElementById('dashboard-main'))) {
         await setupDashboardPage();
         setupCropModal();
-    } else if (pageTitle.includes("Portofolio - HAMDI RIZAL")) {
+    } else if (document.title.includes("Portofolio - HAMDI RIZAL")) {
         setupPortfolioPage();
-    } else if (pageTitle.includes("Detail Proyek")) {
+    } else if (document.title.includes("Detail Proyek")) {
         setupProjectDetailPage();
-    } else if (pageTitle.includes("Detail Jurnal")) {
+    } else if (document.title.includes("Detail Jurnal")) {
         setupJurnalDetailPage();
-    } else if (pageTitle.includes("Jurnal - HAMDI RIZAL")) {
+    } else if (document.title.includes("Jurnal - HAMDI RIZAL")) {
         setupJurnalPage();
-    } else if (pageTitle.includes("URL Shortener")) {
-        setupUrlShortenerPage();
-    } else if (pageTitle.includes("Media Converter")) {
-        setupMediaConverterPage();
-    } else if (pageTitle.includes("QR Code Generator")) {
-        attachQrCodeGeneratorListener();
-    } else if (pageTitle.includes("Image Compressor")) {
-        setupImageCompressorPage();
-    } else if (pageTitle.includes("Images to PDF")) {
-        attachImagesToPdfListener();
+    } else if (document.title.includes("Tools")) {
+        setupToolsPage();
     } else if (document.getElementById('login-form')) {
         setupAuthPage();
-    } else if (pageTitle.includes("Logging In...")) {
-        setupAuthCallbackPage();
     }
 
+    setupAboutModal();
     setupMobileMenu();
     setupAllPasswordToggles();
-    setupChatBubble();
+    setupChatBubble(); // Panggil fungsi live chat
     setupAccountManagement();
     setupDashboardTabs();
 });
@@ -201,10 +197,9 @@ function decodeJwt(token) {
 function setupChatBubble() {
     const chatBubble = document.getElementById('chat-bubble');
     const chatWindow = document.getElementById('chat-window');
-    if (!chatBubble || !chatWindow) return;
-
     const closeChatBtn = document.getElementById('close-chat-btn');
     const chatStatus = document.getElementById('chat-status');
+
     const chatStartForm = document.getElementById('chat-start-form');
     const chatUserNameInput = document.getElementById('chat-user-name');
     const chatMain = document.getElementById('chat-main');
@@ -212,6 +207,8 @@ function setupChatBubble() {
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
     const typingIndicator = document.getElementById('typing-indicator');
+
+    // === [BARU] Variabel untuk Tombol dan Media Recorder ===
     const imageInput = document.getElementById('chat-image-input');
     const micBtn = document.getElementById('chat-mic-btn');
     let mediaRecorder;
@@ -219,16 +216,18 @@ function setupChatBubble() {
     let isRecording = false;
 
     if (window.location.pathname.includes('dashboard.html')) {
-        chatBubble.style.display = 'none';
-        chatWindow.style.display = 'none';
-        return;
+        if(chatBubble) chatBubble.style.display = 'none';
+        if(chatWindow) chatWindow.style.display = 'none';
+        return; 
     }
+    
+    if (!chatBubble || !chatWindow) return;
 
     let ws = null;
     let isConnecting = false;
     const backendWsUrl = 'wss://server-pribadi-hamdi-docker.onrender.com';
-    let typingTimeout;
 
+    let typingTimeout;
     const showTypingIndicator = (show) => {
         if (typingIndicator) {
             typingIndicator.textContent = show ? 'Admin sedang mengetik...' : '';
@@ -249,6 +248,7 @@ function setupChatBubble() {
         });
     }
 
+    // === [MODIFIKASI] appendMessage menjadi lebih canggih ===
     const appendMessage = (content, type, messageType = 'text') => {
         if (!chatMessages) return;
         const messageDiv = document.createElement('div');
@@ -260,7 +260,9 @@ function setupChatBubble() {
             const img = document.createElement('img');
             img.src = content;
             img.alt = 'Gambar terkirim';
-            img.onload = () => { chatMessages.scrollTop = chatMessages.scrollHeight; };
+            img.onload = () => { // Scroll setelah gambar dimuat
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            };
             messageDiv.appendChild(img);
         } else if (messageType === 'audio') {
             const audio = document.createElement('audio');
@@ -268,18 +270,19 @@ function setupChatBubble() {
             audio.src = content;
             messageDiv.appendChild(audio);
         } else if (messageType === 'info-upload') {
-            messageDiv.className = 'message server-info';
+            // Gaya khusus untuk pesan info upload
+            messageDiv.className = 'message server-info'
             messageDiv.style.fontStyle = 'italic';
             messageDiv.style.color = 'var(--text-muted-color)';
             messageDiv.textContent = content;
         }
-
+        
         chatMessages.appendChild(messageDiv);
-        if (messageType !== 'image') {
+        if (messageType !== 'image') { // scroll langsung jika bukan gambar
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     };
-
+    
     const updateStatus = (status) => {
         if (!chatStatus) return;
         if (status === 'terhubung') {
@@ -289,8 +292,8 @@ function setupChatBubble() {
             chatStatus.textContent = 'Sedang menghubungi admin...';
             chatStatus.style.color = 'var(--text-muted-color)';
         } else {
-            chatStatus.textContent = 'Koneksi terputus';
-            chatStatus.style.color = '#dc3545';
+             chatStatus.textContent = 'Koneksi terputus';
+             chatStatus.style.color = '#dc3545';
         }
     };
 
@@ -301,14 +304,16 @@ function setupChatBubble() {
             const response = await fetch(`${API_BASE_URL}/api/chat/history/${userId}`);
             if (!response.ok) throw new Error('Gagal memuat riwayat');
             const history = await response.json();
-            chatMessages.innerHTML = '';
+            
+            chatMessages.innerHTML = ''; 
             if (history.length > 0) {
-                appendMessage('Ini adalah riwayat percakapan Anda sebelumnya.', 'server-info');
+                 appendMessage('Ini adalah riwayat percakapan Anda sebelumnya.', 'server-info');
             } else {
-                const session = JSON.parse(localStorage.getItem('chatSession'));
-                const welcomeName = session ? session.userName : 'Pengunjung';
-                appendMessage(`Halo ${welcomeName}! Ada yang bisa kami bantu?`, 'admin');
+                 const session = JSON.parse(localStorage.getItem('chatSession'));
+                 const welcomeName = session ? session.userName : 'Pengunjung';
+                 appendMessage(`Halo ${welcomeName}! Ada yang bisa kami bantu?`, 'admin');
             }
+
             history.forEach(msg => {
                 appendMessage(msg.content, msg.sender_type, msg.message_type);
             });
@@ -317,17 +322,24 @@ function setupChatBubble() {
             appendMessage('Gagal memuat riwayat percakapan.', 'server-info');
         }
     };
-
+    
     const connect = () => {
         const session = JSON.parse(localStorage.getItem('chatSession'));
-        if (isConnecting || (ws && ws.readyState === WebSocket.OPEN) || !session) return;
+        if (isConnecting || (ws && ws.readyState === WebSocket.OPEN) || !session) {
+            return;
+        }
+
         isConnecting = true;
         updateStatus('menghubungi');
+
         ws = new WebSocket(backendWsUrl);
+
         ws.onopen = () => {
             isConnecting = false;
+            console.log('Terhubung ke WebSocket. Mengidentifikasi sesi...');
             ws.send(JSON.stringify({ type: 'identify', session: session }));
         };
+
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             switch (data.type) {
@@ -346,26 +358,33 @@ function setupChatBubble() {
                     break;
             }
         };
+
         ws.onclose = () => {
             isConnecting = false;
+            console.log('Koneksi WebSocket terputus.');
             updateStatus('offline');
             ws = null;
             setTimeout(connect, 3000);
         };
+
         ws.onerror = (error) => {
             isConnecting = false;
-            if (ws) ws.close();
+            console.error('WebSocket error:', error);
+            if(ws) ws.close();
         };
     };
 
     chatBubble.addEventListener('click', () => {
         chatWindow.classList.remove('hidden');
         const session = JSON.parse(localStorage.getItem('chatSession'));
+
         if (session && session.userId && session.userName) {
             chatStartForm.style.display = 'none';
             chatMain.classList.remove('hidden');
             chatMain.style.display = 'flex';
-            if (!ws || ws.readyState !== WebSocket.OPEN) connect();
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                connect();
+            }
         } else {
             chatStartForm.style.display = 'flex';
             chatMain.classList.add('hidden');
@@ -375,18 +394,24 @@ function setupChatBubble() {
     closeChatBtn.addEventListener('click', () => {
         chatWindow.classList.add('hidden');
     });
-
+    
     if (chatStartForm) {
         chatStartForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const userName = chatUserNameInput.value.trim();
-            if (!userName) return alert('Nama tidak boleh kosong.');
-            const newSession = { userId: crypto.randomUUID(), userName: userName };
+            if (!userName) {
+                alert('Nama tidak boleh kosong.');
+                return;
+            }
+            const newSession = {
+                userId: crypto.randomUUID(),
+                userName: userName
+            };
             localStorage.setItem('chatSession', JSON.stringify(newSession));
             chatStartForm.style.display = 'none';
             chatMain.classList.remove('hidden');
             chatMain.style.display = 'flex';
-            await loadChatHistory(newSession.userId);
+            await loadChatHistory(newSession.userId); 
             connect();
         });
     }
@@ -410,12 +435,16 @@ function setupChatBubble() {
         });
     }
 
+    // === [BARU] Event Listener untuk Tombol Gambar ===
     if (imageInput) {
         imageInput.addEventListener('change', async () => {
             const file = imageInput.files[0];
             if (!file) return;
+
             appendMessage('Mengunggah gambar...', 'server-info', 'info-upload');
+
             const result = await uploadChatFile(file, 'gambar');
+
             if (result.success) {
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify({ type: 'user_message', content: result.url, messageType: 'image' }));
@@ -424,41 +453,54 @@ function setupChatBubble() {
             } else {
                 appendMessage(`Gagal: ${result.message}`, 'server-info', 'info-upload');
             }
-            imageInput.value = '';
+            imageInput.value = ''; // Reset input file
         });
     }
 
+    // === [BARU] Event Listener untuk Tombol Mikrofon ===
     if (micBtn) {
         micBtn.addEventListener('click', async () => {
             if (isRecording) {
+                // Berhenti merekam
                 mediaRecorder.stop();
                 micBtn.classList.remove('is-recording');
                 isRecording = false;
             } else {
+                // Mulai merekam
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     mediaRecorder = new MediaRecorder(stream);
                     audioChunks = [];
-                    mediaRecorder.addEventListener("dataavailable", event => { audioChunks.push(event.data); });
+
+                    mediaRecorder.addEventListener("dataavailable", event => {
+                        audioChunks.push(event.data);
+                    });
+
                     mediaRecorder.addEventListener("stop", async () => {
                         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                         const audioFile = new File([audioBlob], `pesan_suara_${Date.now()}.webm`, { type: 'audio/webm' });
+
                         appendMessage('Mengunggah suara...', 'server-info', 'info-upload');
                         const result = await uploadChatFile(audioFile, 'audio');
+
                         if (result.success) {
                             if (ws && ws.readyState === WebSocket.OPEN) {
                                 ws.send(JSON.stringify({ type: 'user_message', content: result.url, messageType: 'audio' }));
                                 appendMessage(result.url, 'user', 'audio');
                             }
                         } else {
-                            appendMessage(`Gagal: ${result.message}`, 'server-info', 'info-upload');
+                             appendMessage(`Gagal: ${result.message}`, 'server-info', 'info-upload');
                         }
+                        // Matikan track audio untuk mematikan ikon rekam di browser
                         stream.getTracks().forEach(track => track.stop());
                     });
+
                     mediaRecorder.start();
                     isRecording = true;
                     micBtn.classList.add('is-recording');
+
                 } catch (err) {
+                    console.error("Error accessing microphone:", err);
                     alert("Tidak dapat mengakses mikrofon. Pastikan Anda telah memberikan izin.");
                 }
             }
@@ -467,8 +509,8 @@ function setupChatBubble() {
 
     const existingSession = JSON.parse(localStorage.getItem('chatSession'));
     if (existingSession && existingSession.userId) {
-        if (chatStartForm) chatStartForm.style.display = 'none';
-        if (chatMain) {
+        if(chatStartForm) chatStartForm.style.display = 'none';
+        if(chatMain) {
             chatMain.classList.remove('hidden');
             chatMain.style.display = 'flex';
         }
@@ -477,234 +519,188 @@ function setupChatBubble() {
     }
 }
 
-function appendAdminMessage(userId, content, type, messageType = 'text', timestamp) {
-    const activeChatMessages = document.getElementById('active-chat-messages');
-    if (!activeChatMessages || currentAdminChatTarget !== userId) return;
-
-    const messageDate = new Date(timestamp);
-    const timeString = messageDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-
-    let lastGroup = activeChatMessages.lastElementChild;
-    const senderClass = type === 'admin' ? 'admin' : 'user';
-
-    // Buat grup baru jika tidak ada grup, atau jika pengirimnya berbeda
-    if (!lastGroup || !lastGroup.classList.contains(`message-group-${senderClass}`)) {
-        lastGroup = document.createElement('div');
-        lastGroup.className = `message-group message-group-${senderClass}`;
-        activeChatMessages.appendChild(lastGroup);
-    }
-    
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${senderClass}`;
-
-    if (messageType === 'text') {
-        messageDiv.textContent = content;
-    } else if (messageType === 'image') {
-        const img = document.createElement('img');
-        img.src = content;
-        img.alt = 'Gambar terkirim';
-        img.style.cursor = 'pointer';
-        img.onclick = () => window.open(content, '_blank');
-        img.onload = () => { activeChatMessages.scrollTop = activeChatMessages.scrollHeight; };
-        messageDiv.appendChild(img);
-    } else if (messageType === 'audio') {
-        const audio = document.createElement('audio');
-        audio.controls = true;
-        audio.src = content;
-        messageDiv.appendChild(audio);
-    }
-
-    const metaDiv = document.createElement('div');
-    metaDiv.className = 'message-meta';
-    metaDiv.textContent = timeString;
-
-    lastGroup.appendChild(messageDiv);
-    lastGroup.appendChild(metaDiv);
-    
-    // Auto-scroll ke pesan terakhir
-    activeChatMessages.scrollTop = activeChatMessages.scrollHeight;
-}
 
 async function setupAdminChatUI() {
     const adminChatTab = document.getElementById('admin-chat-tab');
     if (adminChatTab) adminChatTab.classList.remove('hidden');
 
-    const adminChatContainer = document.getElementById('admin-chat-container');
-    const userChatListItems = document.getElementById('user-chat-list-items');
-    const activeChatMessages = document.getElementById('active-chat-messages');
-    const adminChatForm = document.getElementById('admin-chat-form');
-    const adminChatInput = document.getElementById('admin-chat-input');
-    const backToListBtn = document.getElementById('back-to-list-btn');
-    const chatPlaceholder = document.getElementById('chat-placeholder');
-    const activeChatContent = document.getElementById('active-chat-content');
-    const activeChatAvatar = document.getElementById('active-chat-avatar');
-    const activeChatUsername = document.getElementById('active-chat-username');
-    const activeChatStatus = document.getElementById('active-chat-status');
-    const noChatsMessage = document.getElementById('no-active-chats');
+    userChatList = document.getElementById('user-chat-list');
+    activeChatMessages = document.getElementById('active-chat-messages');
+    adminChatForm = document.getElementById('admin-chat-form');
+    adminChatInput = document.getElementById('admin-chat-input');
 
-    if (!userChatListItems || !adminChatContainer) return;
+    if (!userChatList) return; 
 
-    if (backToListBtn) {
-        backToListBtn.addEventListener('click', () => {
-            adminChatContainer.classList.remove('chat-active');
-            currentAdminChatTarget = null;
+    const accessToken = sessionStorage.getItem('jwt_access_token');
+    if (!accessToken) return;
+
+    const backendWsUrl = `wss://server-pribadi-hamdi-docker.onrender.com?token=${accessToken}`;
+    adminWebSocket = new WebSocket(backendWsUrl);
+    
+    adminWebSocket.onopen = () => console.log("Koneksi WebSocket Admin berhasil dibuka.");
+    adminWebSocket.onclose = () => console.log("Koneksi WebSocket Admin ditutup.");
+    adminWebSocket.onerror = (error) => console.error("Error pada WebSocket Admin:", error);
+
+    let adminTypingTimeout;
+    if (adminChatInput) {
+        adminChatInput.addEventListener('input', () => {
+            if (!currentAdminChatTarget) return;
+            clearTimeout(adminTypingTimeout);
+            if (adminWebSocket && adminWebSocket.readyState === WebSocket.OPEN) {
+                adminWebSocket.send(JSON.stringify({ type: 'typing', isTyping: true, targetUserId: currentAdminChatTarget }));
+            }
+            adminTypingTimeout = setTimeout(() => {
+                if (adminWebSocket && adminWebSocket.readyState === WebSocket.OPEN) {
+                    adminWebSocket.send(JSON.stringify({ type: 'typing', isTyping: false, targetUserId: currentAdminChatTarget }));
+                }
+            }, 2000);
         });
     }
 
-    // Fungsi untuk merender satu entri percakapan
-    const renderConversationEntry = (convo) => {
-        let userEntry = document.getElementById(`chat-user-${convo.conversation_id}`);
-        if (noChatsMessage) noChatsMessage.style.display = 'none';
+    const updateUserEntryTypingStatus = (userId, isTyping) => {
+        const userEntry = document.getElementById(`chat-user-${userId}`);
+        if (!userEntry) return;
 
-        const lastMessageContent = convo.last_message_type === 'image' ? '🖼️ Gambar' : (convo.last_message_type === 'audio' ? '🎤 Pesan Suara' : convo.last_message);
-        const timeString = convo.last_message_time ? new Date(convo.last_message_time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
-        const statusClass = convo.is_online ? 'online' : 'offline';
-        const statusText = convo.is_online ? 'Online' : 'Offline';
-
-        if (!userEntry) {
-            userEntry = document.createElement('div');
-            userEntry.id = `chat-user-${convo.conversation_id}`;
-            userEntry.className = 'chat-user-entry';
-            userChatListItems.appendChild(userEntry);
-
-            userEntry.addEventListener('click', async () => {
-                document.querySelectorAll('.chat-user-entry.active').forEach(el => el.classList.remove('active'));
-                userEntry.classList.add('active');
-                currentAdminChatTarget = convo.conversation_id;
-
-                chatPlaceholder.style.display = 'none';
-                activeChatContent.classList.remove('hidden');
-                adminChatContainer.classList.add('chat-active');
-                
-                activeChatAvatar.textContent = convo.user_name.charAt(0).toUpperCase();
-                activeChatUsername.textContent = convo.user_name;
-                activeChatStatus.textContent = statusText;
-                activeChatStatus.className = statusClass;
-
-                activeChatMessages.innerHTML = '<p class="message server-info">Memuat riwayat...</p>';
-                const unreadDot = userEntry.querySelector('.unread-dot');
-                if(unreadDot) unreadDot.classList.add('hidden');
-
-                try {
-                    const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/chat/history/${convo.conversation_id}`);
-                    if (!res.ok) throw new Error('Gagal mengambil riwayat');
-                    const history = await res.json();
-                    activeChatMessages.innerHTML = '';
-                    history.forEach(msg => {
-                        const type = (msg.sender_type === 'admin') ? 'admin' : 'user';
-                        appendAdminMessage(convo.conversation_id, msg.content, type, msg.message_type, msg.created_at);
-                    });
-                } catch (e) {
-                    activeChatMessages.innerHTML = '<p class="message server-info" style="color: red;">Gagal memuat riwayat.</p>';
+        let typingSpan = userEntry.querySelector('.typing-status');
+        if (isTyping) {
+            if (!typingSpan) {
+                typingSpan = document.createElement('span');
+                typingSpan.className = 'typing-status';
+                typingSpan.textContent = ' mengetik...';
+                typingSpan.style.fontStyle = 'italic';
+                typingSpan.style.color = 'var(--text-muted-color)';
+                const userNameSpanContainer = userEntry.querySelector('span:first-child');
+                if (userNameSpanContainer) {
+                    userNameSpanContainer.appendChild(typingSpan);
                 }
-            });
-        }
-        
-        userEntry.innerHTML = `
-            <div class="chat-avatar">${convo.user_name.charAt(0).toUpperCase()}</div>
-            <div class="chat-user-info">
-                <span class="username">${convo.user_name}</span>
-                <span class="message-preview">${lastMessageContent || 'Belum ada pesan'}</span>
-            </div>
-            <div class="chat-user-meta">
-                <span class="timestamp">${timeString}</span>
-                <div class="unread-dot hidden"></div>
-            </div>
-        `;
-
-        if (userChatListItems.firstChild !== userEntry) {
-            userChatListItems.prepend(userEntry);
-        }
-    };
-    
-    // Fungsi untuk mengambil dan merender semua percakapan saat dasbor dimuat
-    const fetchAndRenderConversations = async () => {
-        try {
-            const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/chat/conversations`);
-            if (!res.ok) throw new Error('Gagal memuat daftar percakapan');
-            const conversations = await res.json();
-            
-            if (conversations.length > 0) {
-                userChatListItems.innerHTML = ''; 
-                conversations.forEach(renderConversationEntry);
-            } else {
-                if (noChatsMessage) noChatsMessage.style.display = 'block';
             }
-        } catch (error) {
-            console.error(error);
-            if (noChatsMessage) noChatsMessage.textContent = 'Gagal memuat percakapan.';
+        } else {
+            if (typingSpan) {
+                typingSpan.remove();
+            }
         }
     };
     
-    await fetchAndRenderConversations();
-    
-    // Logika WebSocket
-    const accessToken = sessionStorage.getItem('jwt_access_token');
-    if (!accessToken) return;
-    const backendWsUrl = `wss://server-pribadi-hamdi-docker.onrender.com?token=${accessToken}`;
-    adminWebSocket = new WebSocket(backendWsUrl);
+    // === [MODIFIKASI] appendAdminMessage menjadi lebih canggih ===
+    function appendAdminMessage(content, type, messageType = 'text') {
+        if (!activeChatMessages) return;
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}`;
+
+        if (messageType === 'text') {
+            messageDiv.textContent = content;
+        } else if (messageType === 'image') {
+            const img = document.createElement('img');
+            img.src = content;
+            img.alt = 'Gambar terkirim';
+            img.onload = () => {
+                activeChatMessages.scrollTop = activeChatMessages.scrollHeight;
+            };
+            messageDiv.appendChild(img);
+        } else if (messageType === 'audio') {
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.src = content;
+            messageDiv.appendChild(audio);
+        }
+
+        activeChatMessages.appendChild(messageDiv);
+        if (messageType !== 'image') {
+            activeChatMessages.scrollTop = activeChatMessages.scrollHeight;
+        }
+    }
 
     adminWebSocket.onmessage = async (event) => {
         const data = JSON.parse(event.data);
-
+        
         if (data.type === 'chat') {
-             renderConversationEntry({
-                conversation_id: data.sender,
-                user_name: data.userName,
-                last_message: data.content,
-                last_message_type: data.messageType,
-                last_message_time: new Date(),
-                is_online: true
-            });
+            const userId = data.sender;
+            const userName = data.userName || `Pengunjung ${userId.substring(0, 6)}`;
+            
+            if (!allChatHistories[userId]) allChatHistories[userId] = [];
+            
+            allChatHistories[userId].push({ sender: 'user', content: data.content, message_type: data.messageType });
+            updateUserEntryTypingStatus(userId, false);
 
-            if (currentAdminChatTarget === data.sender) {
-                appendAdminMessage(data.sender, data.content, 'user', data.messageType, new Date());
+            let userEntry = document.getElementById(`chat-user-${userId}`);
+            if (!userEntry) {
+                userEntry = document.createElement('div');
+                userEntry.id = `chat-user-${userId}`;
+                userEntry.className = 'chat-user-entry';
+                userEntry.innerHTML = `<span><span>${userName}</span></span><span class="unread-dot hidden"></span>`;
+                userChatList.prepend(userEntry);
+                
+                userEntry.addEventListener('click', async () => {
+                    document.querySelectorAll('.chat-user-entry.active').forEach(el => el.classList.remove('active'));
+                    userEntry.classList.add('active');
+                    currentAdminChatTarget = userId;
+                    adminChatForm.style.display = 'flex';
+                    activeChatMessages.innerHTML = 'Memuat riwayat percakapan...';
+                    userEntry.querySelector('.unread-dot').classList.add('hidden');
+                    try {
+                        const res = await fetchWithAuth(`${API_BASE_URL}/api/admin/chat/history/${userId}`);
+                        if (!res.ok) throw new Error('Gagal mengambil riwayat');
+                        const history = await res.json();
+                        allChatHistories[userId] = history;
+                        activeChatMessages.innerHTML = '';
+                        allChatHistories[userId].forEach(msg => {
+                            const type = (msg.sender_type === 'admin' || msg.sender === 'admin') ? 'admin' : 'user';
+                            appendAdminMessage(msg.content, type, msg.message_type);
+                        });
+                    } catch(e) { 
+                        console.error("Gagal fetch riwayat chat:", e); 
+                        activeChatMessages.innerHTML = '<p style="color: red;">Gagal memuat riwayat.</p>';
+                    }
+                });
             } else {
-                const userEntry = document.getElementById(`chat-user-${data.sender}`);
-                if (userEntry) {
-                    const unreadDot = userEntry.querySelector('.unread-dot');
-                    if(unreadDot) unreadDot.classList.remove('hidden');
-                }
+                userEntry.querySelector('span > span').textContent = userName;
+            }
+            
+            if (currentAdminChatTarget !== userId) {
+                 userEntry.querySelector('.unread-dot').classList.remove('hidden');
+            } else {
+                appendAdminMessage(data.content, 'user', data.messageType);
             }
         } else if (data.type === 'user_disconnected') {
-            const userEntry = document.getElementById(`chat-user-${data.userId}`);
-            if (userEntry) userEntry.style.opacity = '0.7'; 
-            if(currentAdminChatTarget === data.userId) {
-                activeChatStatus.textContent = 'Offline';
-                activeChatStatus.className = 'offline';
-            }
+             const userEntry = document.getElementById(`chat-user-${data.userId}`);
+             if (userEntry) userEntry.style.opacity = '0.5';
+             updateUserEntryTypingStatus(data.userId, false);
+        } else if (data.type === 'typing') {
+            updateUserEntryTypingStatus(data.userId, data.isTyping);
         }
     };
 
     if (adminChatForm) {
         adminChatForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            clearTimeout(adminTypingTimeout);
+            if (adminWebSocket && adminWebSocket.readyState === WebSocket.OPEN) {
+                adminWebSocket.send(JSON.stringify({ type: 'typing', isTyping: false, targetUserId: currentAdminChatTarget }));
+            }
             const message = adminChatInput.value.trim();
             if (message && currentAdminChatTarget && adminWebSocket.readyState === WebSocket.OPEN) {
-                const timestamp = new Date();
-                adminWebSocket.send(JSON.stringify({
-                    type: 'admin_message',
-                    content: message,
-                    targetUserId: currentAdminChatTarget,
-                    messageType: 'text'
-                }));
-                appendAdminMessage(currentAdminChatTarget, message, 'admin', 'text', timestamp);
-
-                renderConversationEntry({
-                    conversation_id: currentAdminChatTarget,
-                    user_name: activeChatUsername.textContent,
-                    last_message: `Anda: ${message}`,
-                    last_message_type: 'text',
-                    last_message_time: timestamp,
-                    is_online: true
-                });
-
-                adminChatInput.value = '';
+                 adminWebSocket.send(JSON.stringify({
+                     type: 'admin_message',
+                     content: message,
+                     targetUserId: currentAdminChatTarget,
+                     messageType: 'text' // Admin untuk saat ini hanya mengirim teks
+                 }));
+                 appendAdminMessage(message, 'admin', 'text');
+                 if (allChatHistories[currentAdminChatTarget]) {
+                    allChatHistories[currentAdminChatTarget].push({ sender: 'admin', content: message, message_type: 'text' });
+                 }
+                 adminChatInput.value = '';
             }
         });
     }
 }
 
+
+// Sisa kode dari sini ke bawah tetap sama, tidak perlu diubah.
+// ... (seluruh fungsi lainnya dari setupDashboardPage sampai akhir)
+// ===================================
+// FUNGSI-FUNGSI UNTUK CROPPING GAMBAR
+// ===================================
 function setupCropModal() {
     cropModal = document.getElementById('crop-modal');
     imageToCropElement = document.getElementById('image-to-crop');
@@ -779,34 +775,38 @@ async function uploadCroppedImageForEditor(blob, successCallback, failureCallbac
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Gagal mengunggah gambar');
-
+        
         successCallback(data.location);
 
     } catch (error) {
+        console.error(error);
         failureCallback(`Gagal unggah: ${error.message}`);
     }
 }
 
+// ===================================
+// === LOGIKA HALAMAN DASHBOARD    ===
+// ===================================
 async function setupDashboardPage() {
     const refreshToken = localStorage.getItem('jwt_refresh_token');
-    const authPath = window.location.href.includes('github.io') ? '/hrportof/auth.html' : '/auth.html';
     if (!refreshToken) {
-        window.location.href = authPath;
+        window.location.href = 'auth.html';
         return;
     }
-
+    
     const accessToken = sessionStorage.getItem('jwt_access_token');
     if (!accessToken) {
-        return;
+        console.log("Menunggu access token dari proses refresh...");
+        return; 
     }
 
     const decodedToken = decodeJwt(accessToken);
     populateUserInfo(decodedToken);
-    populateUserDashboard();
-
+    populateUserDashboard(); 
+    
     if (decodedToken && decodedToken.role === 'admin') {
         setupAdminPanels();
-        await setupAdminChatUI();
+        await setupAdminChatUI(); // Panggil UI Admin Chat
     }
 }
 
@@ -827,9 +827,9 @@ async function populateUserDashboard() {
     try {
         const statsResponse = await fetchWithAuth(`${API_BASE_URL}/api/user/dashboard-stats`);
         if (!statsResponse.ok) throw new Error('Gagal memuat data statistik.');
-
+        
         const stats = await statsResponse.json();
-
+        
         statsLinkCountEl.textContent = stats.linkCount;
         if (stats.lastLogin) {
             statsLastLoginEl.innerHTML = `${stats.lastLogin.time}<br><small style="font-weight: 400; color: var(--text-muted-color);">${stats.lastLogin.ip}</small>`;
@@ -837,6 +837,7 @@ async function populateUserDashboard() {
             statsLastLoginEl.textContent = 'Belum ada data.';
         }
     } catch (error) {
+        console.error('Gagal memuat statistik dasbor:', error);
         statsLinkCountEl.textContent = 'Error';
         statsLastLoginEl.textContent = 'Gagal memuat';
     }
@@ -844,14 +845,14 @@ async function populateUserDashboard() {
     const historyList = document.getElementById('user-links-list');
     const loadingMessage = document.getElementById('loading-user-links');
     if (!historyList || !loadingMessage) return;
-
+    
     loadingMessage.textContent = 'Memuat riwayat tautan...';
     try {
         const linksResponse = await fetchWithAuth(`${API_BASE_URL}/api/user/links`);
         if (!linksResponse.ok) throw new Error('Gagal memuat riwayat tautan.');
 
         const links = await linksResponse.json();
-
+        
         historyList.innerHTML = '';
         if (links.length === 0) {
             loadingMessage.textContent = 'Anda belum pernah membuat tautan pendek.';
@@ -872,10 +873,10 @@ function setupAdminPanels() {
     document.getElementById('admin-jurnal-tab')?.classList.remove('hidden');
     document.getElementById('admin-links-tab')?.classList.remove('hidden');
     document.getElementById('admin-users-tab')?.classList.remove('hidden');
-
+    
     setupAdminPortfolioPanel();
     setupAdminJurnalPanel();
-
+    
     const adminSection = document.getElementById('admin-section');
     if (adminSection) {
         const linkSearchInput = document.getElementById('link-search-input');
@@ -902,6 +903,7 @@ function setupAdminPanels() {
     }
 }
 
+// === LOGIKA MANAJEMEN PORTOFOLIO ADMIN (SAMA SEPERTI JURNAL) ===
 function setupAdminPortfolioPanel() {
     const form = document.getElementById('portfolio-form');
     if (!form) return;
@@ -918,7 +920,7 @@ function setupAdminPortfolioPanel() {
     const toolbarOptions = [
         [{ 'header': [1, 2, 3, false] }],
         ['bold', 'italic', 'underline'],
-        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
         ['link', 'image', 'video'],
         ['clean']
     ];
@@ -975,11 +977,11 @@ function setupAdminPortfolioPanel() {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-
+        
         const id = hiddenId.value;
         const title = titleInput.value;
         const description = portfolioQuill.root.innerHTML;
-
+        
         if (!title || portfolioQuill.getLength() <= 1) {
             messageDiv.className = 'error';
             messageDiv.textContent = 'Error: Judul dan deskripsi tidak boleh kosong.';
@@ -993,8 +995,8 @@ function setupAdminPortfolioPanel() {
         const method = id ? 'PUT' : 'POST';
 
         try {
-            const response = await fetchWithAuth(url, {
-                method,
+            const response = await fetchWithAuth(url, { 
+                method, 
                 body: JSON.stringify({ title, description })
             });
             const result = await response.json();
@@ -1002,7 +1004,7 @@ function setupAdminPortfolioPanel() {
 
             messageDiv.className = 'success';
             messageDiv.textContent = id ? 'Proyek berhasil diperbarui!' : 'Proyek berhasil ditambahkan!';
-
+            
             resetPortfolioForm();
             fetchAndDisplayPortfolioAdmin();
         } catch (error) {
@@ -1014,86 +1016,8 @@ function setupAdminPortfolioPanel() {
     fetchAndDisplayPortfolioAdmin();
 }
 
-async function fetchAndDisplayPortfolioAdmin() {
-    const listContainer = document.getElementById('portfolio-list-admin');
-    const loadingMessage = document.getElementById('loading-portfolio-admin');
-    if (!listContainer || !loadingMessage) return;
 
-    loadingMessage.style.display = 'block';
-    listContainer.innerHTML = '';
-
-    try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio`);
-        const projects = await response.json();
-        if (!response.ok) throw new Error(projects.error || 'Gagal memuat proyek.');
-
-        loadingMessage.style.display = 'none';
-
-        if (projects.length === 0) {
-            listContainer.innerHTML = '<li><p>Belum ada proyek ditambahkan.</p></li>';
-            return;
-        }
-
-        projects.forEach(project => renderAdminPortfolioItem(project, listContainer));
-    } catch (error) {
-        loadingMessage.textContent = `Error: ${error.message}`;
-    }
-}
-
-function renderAdminPortfolioItem(project, container) {
-    const listItem = document.createElement('li');
-    listItem.className = 'mood-item';
-    listItem.id = `portfolio-item-${project.id}`;
-    const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
-
-    const strippedDescription = project.description.replace(/<[^>]+>/g, ' ');
-
-    listItem.innerHTML = `
-        <div class="mood-item-header">
-            <span><strong>${project.title}</strong></span>
-            <div class="mood-item-actions">
-                <button class="mood-icon-button edit-portfolio-btn" data-id="${project.id}" aria-label="Edit Proyek">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                </button>
-                <button class="mood-icon-button delete-portfolio-btn delete-button" data-id="${project.id}" aria-label="Hapus Proyek">
-                    ${trashIconSvg}
-                </button>
-            </div>
-        </div>
-        <p class="mood-notes">${strippedDescription.substring(0, 100)}...</p>
-        <small class="mood-date">Dibuat: ${new Date(project.created_at).toLocaleString('id-ID')}</small>
-    `;
-    container.appendChild(listItem);
-
-    listItem.querySelector('.edit-portfolio-btn').addEventListener('click', async () => {
-        document.getElementById('portfolio-form-title').textContent = 'Edit Proyek';
-        document.getElementById('portfolio-id').value = project.id;
-        document.getElementById('portfolio-title').value = project.title;
-
-        const editorDiv = document.getElementById('quill-portfolio-editor');
-        if (editorDiv && editorDiv.__quill) {
-            editorDiv.__quill.root.innerHTML = project.description;
-        }
-
-        document.getElementById('portfolio-form').scrollIntoView({ behavior: 'smooth' });
-    });
-
-    listItem.querySelector('.delete-portfolio-btn').addEventListener('click', async () => {
-        if (!confirm(`Yakin ingin menghapus proyek "${project.title}"?`)) return;
-
-        try {
-            const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio/${project.id}`, { method: 'DELETE' });
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error);
-
-            alert('Proyek berhasil dihapus.');
-            fetchAndDisplayPortfolioAdmin();
-        } catch (error) {
-            alert(`Error: ${error.message}`);
-        }
-    });
-}
-
+// === LOGIKA MANAJEMEN JURNAL ADMIN (DENGAN EDITOR QUILL.JS) ===
 function setupAdminJurnalPanel() {
     const form = document.getElementById('jurnal-form');
     if (!form) return;
@@ -1110,7 +1034,7 @@ function setupAdminJurnalPanel() {
     const toolbarOptions = [
         [{ 'header': [1, 2, 3, false] }],
         ['bold', 'italic', 'underline'],
-        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
         ['link', 'image', 'video'],
         ['clean']
     ];
@@ -1170,17 +1094,17 @@ function setupAdminJurnalPanel() {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-
+        
         const id = hiddenId.value;
         const title = titleInput.value;
         const content = quill.root.innerHTML;
-
+        
         if (!title || quill.getLength() <= 1) {
             messageDiv.className = 'error';
             messageDiv.textContent = 'Error: Judul dan konten tidak boleh kosong.';
             return;
         }
-
+        
         messageDiv.className = '';
         messageDiv.textContent = "Menyimpan postingan...";
 
@@ -1188,8 +1112,8 @@ function setupAdminJurnalPanel() {
         const method = id ? 'PUT' : 'POST';
 
         try {
-            const response = await fetchWithAuth(url, {
-                method,
+            const response = await fetchWithAuth(url, { 
+                method, 
                 body: JSON.stringify({ title, content })
             });
             const result = await response.json();
@@ -1197,7 +1121,7 @@ function setupAdminJurnalPanel() {
 
             messageDiv.className = 'success';
             messageDiv.textContent = id ? 'Postingan berhasil diperbarui!' : 'Postingan berhasil ditambahkan!';
-
+            
             resetJurnalForm();
             fetchAndDisplayJurnalAdmin();
         } catch (error) {
@@ -1205,8 +1129,89 @@ function setupAdminJurnalPanel() {
             messageDiv.textContent = `Error: ${error.message}`;
         }
     });
-
+    
     fetchAndDisplayJurnalAdmin();
+}
+
+
+async function fetchAndDisplayPortfolioAdmin() {
+    const listContainer = document.getElementById('portfolio-list-admin');
+    const loadingMessage = document.getElementById('loading-portfolio-admin');
+    if (!listContainer || !loadingMessage) return;
+
+    loadingMessage.style.display = 'block';
+    listContainer.innerHTML = '';
+    
+    try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio`);
+        const projects = await response.json();
+        if (!response.ok) throw new Error(projects.error || 'Gagal memuat proyek.');
+        
+        loadingMessage.style.display = 'none';
+
+        if (projects.length === 0) {
+            listContainer.innerHTML = '<li><p>Belum ada proyek ditambahkan.</p></li>';
+            return;
+        }
+
+        projects.forEach(project => renderAdminPortfolioItem(project, listContainer));
+    } catch (error) {
+        loadingMessage.textContent = `Error: ${error.message}`;
+    }
+}
+
+function renderAdminPortfolioItem(project, container) {
+    const listItem = document.createElement('li');
+    listItem.className = 'mood-item';
+    listItem.id = `portfolio-item-${project.id}`;
+    const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+
+    const strippedDescription = project.description.replace(/<[^>]+>/g, ' ');
+
+    listItem.innerHTML = `
+        <div class="mood-item-header">
+            <span><strong>${project.title}</strong></span>
+            <div class="mood-item-actions">
+                <button class="mood-icon-button edit-portfolio-btn" data-id="${project.id}" aria-label="Edit Proyek">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                </button>
+                <button class="mood-icon-button delete-portfolio-btn delete-button" data-id="${project.id}" aria-label="Hapus Proyek">
+                    ${trashIconSvg}
+                </button>
+            </div>
+        </div>
+        <p class="mood-notes">${strippedDescription.substring(0, 100)}...</p>
+        <small class="mood-date">Dibuat: ${new Date(project.created_at).toLocaleString('id-ID')}</small>
+    `;
+    container.appendChild(listItem);
+
+    listItem.querySelector('.edit-portfolio-btn').addEventListener('click', async () => {
+        document.getElementById('portfolio-form-title').textContent = 'Edit Proyek';
+        document.getElementById('portfolio-id').value = project.id;
+        document.getElementById('portfolio-title').value = project.title;
+        
+        const editorDiv = document.getElementById('quill-portfolio-editor');
+        if (editorDiv && editorDiv.__quill) {
+            editorDiv.__quill.root.innerHTML = project.description;
+        }
+
+        document.getElementById('portfolio-form').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    listItem.querySelector('.delete-portfolio-btn').addEventListener('click', async () => {
+        if (!confirm(`Yakin ingin menghapus proyek "${project.title}"?`)) return;
+        
+        try {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/portfolio/${project.id}`, { method: 'DELETE' });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error);
+            
+            alert('Proyek berhasil dihapus.');
+            fetchAndDisplayPortfolioAdmin();
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        }
+    });
 }
 
 async function fetchAndDisplayJurnalAdmin() {
@@ -1216,12 +1221,12 @@ async function fetchAndDisplayJurnalAdmin() {
 
     loadingMessage.style.display = 'block';
     listContainer.innerHTML = '';
-
+    
     try {
         const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal`);
         const posts = await response.json();
         if (!response.ok) throw new Error(posts.error || 'Gagal memuat postingan.');
-
+        
         loadingMessage.style.display = 'none';
 
         if (posts.length === 0) {
@@ -1240,7 +1245,7 @@ function renderAdminJurnalItem(post, container) {
     listItem.className = 'mood-item';
     listItem.id = `jurnal-item-${post.id}`;
     const trashIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
-    const strippedContent = post.content.replace(/<[^>]+>/g, ' ');
+    const strippedContent = post.content.replace(/<[^>]+>/g, ' '); 
 
     listItem.innerHTML = `
         <div class="mood-item-header">
@@ -1263,23 +1268,23 @@ function renderAdminJurnalItem(post, container) {
         document.getElementById('jurnal-form-title').textContent = 'Edit Postingan';
         document.getElementById('jurnal-id').value = post.id;
         document.getElementById('jurnal-title').value = post.title;
-
+        
         const editorDiv = document.getElementById('quill-editor');
         if (editorDiv && editorDiv.__quill) {
             editorDiv.__quill.root.innerHTML = post.content;
         }
-
+        
         document.getElementById('jurnal-form').scrollIntoView({ behavior: 'smooth' });
     });
 
     listItem.querySelector('.delete-jurnal-btn').addEventListener('click', async () => {
         if (!confirm(`Yakin ingin menghapus postingan "${post.title}"?`)) return;
-
+        
         try {
             const response = await fetchWithAuth(`${API_BASE_URL}/api/admin/jurnal/${post.id}`, { method: 'DELETE' });
             const result = await response.json();
             if (!response.ok) throw new Error(result.error);
-
+            
             alert('Postingan berhasil dihapus.');
             fetchAndDisplayJurnalAdmin();
         } catch (error) {
@@ -1315,6 +1320,7 @@ async function fetchAndDisplayLinks(searchQuery = '') {
             const listItem = document.createElement('li');
             listItem.className = 'mood-item';
             listItem.id = `link-${link.slug}`;
+            // [FIX] Hapus backslash `\` sebelum backtick
             listItem.innerHTML = `
                 <div class="mood-item-header">
                     <span><strong>Slug:</strong> ${link.slug}</span>
@@ -1336,6 +1342,7 @@ async function fetchAndDisplayLinks(searchQuery = '') {
 
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
+        console.error(error);
     }
 }
 async function fetchAndDisplayUsers(searchQuery = '') {
@@ -1388,6 +1395,7 @@ async function fetchAndDisplayUsers(searchQuery = '') {
 
     } catch (error) {
         loadingMessage.textContent = `Error: ${error.message}`;
+        console.error(error);
     }
 }
 async function handleDeleteLink(event) {
@@ -1406,6 +1414,7 @@ async function handleDeleteLink(event) {
 
     } catch (error) {
         alert(`Error: ${error.message}`);
+        console.error(error);
     }
 }
 async function toggleUserRole(event) {
@@ -1431,6 +1440,7 @@ async function toggleUserRole(event) {
         }
     } catch (error) {
         alert(`Error: ${error.message}`);
+        console.error(error);
     }
 }
 async function deleteUser(event) {
@@ -1449,8 +1459,10 @@ async function deleteUser(event) {
 
     } catch (error) {
         alert(`Error: ${error.message}`);
+        console.error(error);
     }
 }
+// === LOGIKA HALAMAN PUBLIK (PORTOFOLIO, JURNAL, DLL) ===
 function setupPortfolioPage() {
     const portfolioGrid = document.querySelector('.portfolio-grid');
     if (!portfolioGrid) return;
@@ -1461,7 +1473,7 @@ function setupPortfolioPage() {
             if (!response.ok) throw new Error('Gagal memuat data portofolio.');
 
             const projects = await response.json();
-            portfolioGrid.innerHTML = '';
+            portfolioGrid.innerHTML = ''; 
 
             if (projects.length === 0) {
                 portfolioGrid.innerHTML = '<p style="text-align: center; color: var(--text-muted-color);">Belum ada proyek portofolio untuk ditampilkan.</p>';
@@ -1469,13 +1481,13 @@ function setupPortfolioPage() {
             }
 
             projects.forEach(project => {
-                const projectCard = document.createElement('a');
+                const projectCard = document.createElement('a'); 
                 projectCard.className = 'portfolio-card portfolio-link-card';
                 projectCard.href = `project-detail.html?id=${project.id}`;
                 projectCard.setAttribute('data-aos', 'fade-up');
 
-                const projectImage = project.image_url || 'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=500&q=80';
-
+                const projectImage = project.image_url || 'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=500&q=80'; 
+                
                 const projectLinkButton = `<span class="button-pintu">Lihat Detail</span>`;
 
                 projectCard.innerHTML = `
@@ -1532,9 +1544,9 @@ function setupProjectDetailPage() {
                 imageElement.alt = `Gambar utama untuk ${project.title}`;
                 imageElement.style.display = 'block';
             } else {
-                imageElement.style.display = 'none';
+                 imageElement.style.display = 'none';
             }
-
+            
             contentElement.innerHTML = project.description;
 
             if (project.project_link) {
@@ -1548,6 +1560,7 @@ function setupProjectDetailPage() {
             mainContent.style.display = 'block';
 
         } catch (error) {
+            console.error(error);
             loadingIndicator.innerHTML = `<p style="color: #ff4d4d;">Error: ${error.message}</p>`;
         }
     }
@@ -1575,10 +1588,10 @@ function setupJurnalPage() {
                 const postCard = document.createElement('article');
                 postCard.className = 'jurnal-card';
                 postCard.setAttribute('data-aos', 'fade-up');
-
+                
                 const firstImageMatch = post.content.match(/<img[^>]+src="([^">]+)"/);
                 const postImage = post.image_url || (firstImageMatch ? firstImageMatch[1] : 'https://images.unsplash.com/photo-1489549132488-d00b7d8818e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80');
-
+                
                 const strippedContent = post.content.replace(/<[^>]+>/g, ' ');
                 const excerpt = strippedContent.substring(0, 150).trim() + (strippedContent.length > 150 ? '...' : '');
 
@@ -1630,10 +1643,10 @@ function setupJurnalDetailPage() {
             document.title = `${post.title} - Detail Jurnal`;
             titleElement.textContent = post.title;
             metaElement.textContent = `Dipublikasikan pada ${new Date(post.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
-
+            
             const firstImageMatch = post.content.match(/<img[^>]+src="([^">]+)"/);
             const mainImage = post.image_url || (firstImageMatch ? firstImageMatch[1] : null);
-
+            
             if (mainImage) {
                 imageElement.src = mainImage;
                 imageElement.alt = `Gambar untuk ${post.title}`;
@@ -1641,406 +1654,101 @@ function setupJurnalDetailPage() {
             } else {
                 imageElement.style.display = 'none';
             }
-
+            
             contentElement.innerHTML = post.content;
 
             loadingIndicator.style.display = 'none';
             mainContent.style.display = 'block';
 
         } catch (error) {
+            console.error(error);
             loadingIndicator.innerHTML = `<p style="color: #ff4d4d;">Error: ${error.message}</p>`;
         }
     }
     fetchJurnalDetails();
 }
 
-function setupCustomFileInputs() {
-    // Media Converter
-    const converterInput = document.getElementById('file-input');
-    const converterLabel = document.getElementById('file-count-label');
-    if (converterInput && converterLabel) {
-        converterInput.addEventListener('change', () => {
-            if (converterInput.files.length > 0) {
-                converterLabel.textContent = `${converterInput.files[0].name} dipilih.`;
-            } else {
-                converterLabel.textContent = '';
-            }
-        });
-    }
+// === LOGIKA HALAMAN TOOLS ===
+function setupToolsPage() {
+    const wrappers = [
+        document.getElementById('shortener-wrapper'), document.getElementById('history-section'),
+        document.getElementById('converter-wrapper'), document.getElementById('image-merger-wrapper'),
+        document.getElementById('qr-generator-wrapper'), document.getElementById('image-compressor-wrapper')
+    ];
+    const loginPrompt = document.getElementById('login-prompt');
+    const toolSelectionSection = document.querySelector('.tool-selection');
 
-    // Image Compressor
-    const compressorInput = document.getElementById('image-compress-input');
-    const compressorLabel = document.getElementById('compress-file-count-label');
-    if (compressorInput && compressorLabel) {
-        compressorInput.addEventListener('change', () => {
-            if (compressorInput.files.length > 0) {
-                compressorLabel.textContent = `${compressorInput.files[0].name} dipilih.`;
-            } else {
-                compressorLabel.textContent = '';
-            }
-        });
-    }
-}
+    wrappers.forEach(el => el && el.classList.add('hidden'));
 
-
-function setupCustomDropdowns() {
-    document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
-        const select = wrapper.querySelector('select');
-        if (!select) return;
-
-        wrapper.querySelector('.select-trigger')?.remove();
-        wrapper.querySelector('.select-options')?.remove();
-
-        const trigger = document.createElement('div');
-        trigger.className = 'select-trigger';
-        
-        const optionsList = document.createElement('ul');
-        optionsList.className = 'select-options';
-
-        [...select.options].forEach(option => {
-            const listItem = document.createElement('li');
-            listItem.textContent = option.textContent;
-            listItem.dataset.value = option.value;
-            if (option.selected) {
-                trigger.textContent = option.textContent;
-                listItem.classList.add('selected');
-            }
-            optionsList.appendChild(listItem);
-
-            listItem.addEventListener('click', (e) => {
-                e.stopPropagation();
-                optionsList.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
-                listItem.classList.add('selected');
-                
-                trigger.textContent = listItem.textContent;
-                select.value = listItem.dataset.value;
-                wrapper.classList.remove('active');
-                
-                select.dispatchEvent(new Event('change'));
-            });
-        });
-
-        wrapper.appendChild(trigger);
-        wrapper.appendChild(optionsList);
-
-        trigger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.querySelectorAll('.custom-select-wrapper.active').forEach(openWrapper => {
-                if (openWrapper !== wrapper) {
-                    openWrapper.classList.remove('active');
-                }
-            });
-            wrapper.classList.toggle('active');
-        });
-    });
-
-    window.addEventListener('click', () => {
-        document.querySelectorAll('.custom-select-wrapper.active').forEach(wrapper => {
-            wrapper.classList.remove('active');
-        });
-    });
-}
-
-function setupUrlShortenerPage() {
-    attachShortenerListener();
     if (localStorage.getItem('jwt_refresh_token')) {
-        const historySection = document.getElementById('history-section');
-        if (historySection) {
-            historySection.classList.remove('hidden');
-            fetchUserLinkHistory();
-        }
-    }
-}
+        if (loginPrompt) loginPrompt.classList.add('hidden');
+        if (toolSelectionSection) toolSelectionSection.classList.remove('hidden');
 
-function setupMediaConverterPage() {
-    attachConverterListener();
-    setupCustomFileInputs(); // Cukup panggil ini
-    setupCustomDropdowns();
-    
+        document.getElementById('show-shortener')?.addEventListener('click', () => showToolSection('shortener-wrapper'));
+        document.getElementById('show-converter')?.addEventListener('click', () => showToolSection('converter-wrapper'));
+        document.getElementById('show-image-merger')?.addEventListener('click', () => showToolSection('image-merger-wrapper'));
+        document.getElementById('show-qr-generator')?.addEventListener('click', () => showToolSection('qr-generator-wrapper'));
+        document.getElementById('show-image-compressor')?.addEventListener('click', () => showToolSection('image-compressor-wrapper'));
+
+        attachShortenerListener();
+        attachConverterListener();
+        attachImageMergerListener();
+        attachQrCodeGeneratorListener();
+        attachImageCompressorListener();
+
+    } else {
+        if (loginPrompt) loginPrompt.classList.remove('hidden');
+        if (toolSelectionSection) toolSelectionSection.classList.add('hidden');
+    }
+
     const fileInput = document.getElementById('file-input');
     const outputFormatSelect = document.getElementById('output-format');
-
-    const conversionOptions = {
-        'default': [
-            { value: 'pdf', text: 'PDF' },
-            { value: 'docx', text: 'DOCX (Word Document)' },
-        ],
-        'pdf': [
-            { value: 'docx', text: 'DOCX (Word - Kualitas Terbaik)' },
-            { value: 'txt', text: 'TXT (Teks Polos)' },
-            { value: 'jpg', text: 'JPG (Setiap halaman jadi gambar)' }
-        ],
-        'docx': [{ value: 'pdf', text: 'PDF' }, { value: 'txt', text: 'TXT' }],
-        'pptx': [{ value: 'pdf', text: 'PDF' }],
-        'jpg': [{ value: 'png', text: 'PNG' }, { value: 'pdf', text: 'PDF' }],
-        'png': [{ value: 'jpg', text: 'JPG' }, { value: 'pdf', text: 'PDF' }]
-    };
 
     if (fileInput && outputFormatSelect) {
         fileInput.addEventListener('change', () => {
             if (!fileInput.files || fileInput.files.length === 0) return;
             const fileName = fileInput.files[0].name.toLowerCase();
-            const extension = fileName.split('.').pop();
-            const options = conversionOptions[extension] || conversionOptions['default'];
-            
-            outputFormatSelect.innerHTML = '';
-            options.forEach(opt => {
-                const optionElement = document.createElement('option');
-                optionElement.value = opt.value;
-                optionElement.textContent = opt.text;
-                outputFormatSelect.appendChild(optionElement);
-            });
-            
-            // Re-initialize custom dropdown setelah opsi diubah
-            setupCustomDropdowns();
+            const docxOption = outputFormatSelect.querySelector('option[value="docx"]');
+            if (fileName.endsWith('.pdf')) {
+                if (docxOption) {
+                    docxOption.disabled = true;
+                    if (outputFormatSelect.value === 'docx') outputFormatSelect.value = 'pdf';
+                }
+            } else {
+                if (docxOption) docxOption.disabled = false;
+            }
         });
     }
 }
+function showToolSection(sectionIdToShow) {
+    const allToolSections = [
+        document.getElementById('shortener-wrapper'), document.getElementById('converter-wrapper'),
+        document.getElementById('image-merger-wrapper'), document.getElementById('qr-generator-wrapper'),
+        document.getElementById('image-compressor-wrapper')
+    ];
+    const historySection = document.getElementById('history-section');
 
-function setupImageCompressorPage() {
-    attachImageCompressorListener();
-    setupCustomFileInputs(); // Cukup panggil ini
-    setupCustomDropdowns();
-}
+    allToolSections.forEach(section => {
+        if (section && section.id === sectionIdToShow) section.classList.remove('hidden');
+        else section?.classList.add('hidden');
+    });
 
-function setupImagesToPdfPage() {
-    attachImagesToPdfListener();
-    setupCustomFileInputs();
-    setupCustomDropdowns();
-}
-
-function attachImagesToPdfListener() {
-    const form = document.getElementById('images-to-pdf-form');
-    if (!form) return;
-
-    const previewsContainer = document.getElementById('image-previews-container');
-    const prevBtn = document.getElementById('prev-preview-btn');
-    const nextBtn = document.getElementById('next-preview-btn');
-    const sliderContainer = document.querySelector('.preview-slider-container');
-    const fabButton = document.getElementById('toggle-pdf-options-btn');
-
-    const imageInput = document.getElementById('images-to-pdf-input');
-    const fileCountLabel = document.getElementById('file-count-label'); // [MODIFIKASI] Menggunakan ID baru
-    const messageDiv = document.getElementById('images-to-pdf-message');
-    const progressWrapper = document.getElementById('images-to-pdf-progress-wrapper');
-    const submitButton = form.querySelector('button[type="submit"]');
-    const pageSizeSelect = document.getElementById('page-size');
-
-    let selectedFiles = [];
-    let currentSlideIndex = 0;
-
-    if (fabButton) {
-        fabButton.classList.add('hidden');
+    if (historySection) {
+        if (sectionIdToShow === 'shortener-wrapper') {
+            historySection.classList.remove('hidden');
+            fetchUserLinkHistory();
+        } else {
+            historySection.classList.add('hidden');
+        }
     }
 
-    const updateAllPreviewsLayout = () => {
-        const orientation = form.querySelector('input[name="orientation"]:checked').value;
-        const marginChoice = form.querySelector('input[name="margin"]:checked').value;
-        document.querySelectorAll('.preview-page').forEach(page => {
-            page.classList.remove('portrait', 'landscape', 'margin-small', 'margin-big');
-            page.classList.add(orientation);
-            if (marginChoice === 'small') page.classList.add('margin-small');
-            else if (marginChoice === 'big') page.classList.add('margin-big');
-        });
-    };
-
-    form.querySelectorAll('input[name="orientation"], input[name="margin"]').forEach(radio => radio.addEventListener('change', updateAllPreviewsLayout));
-    if (pageSizeSelect) pageSizeSelect.addEventListener('change', updateAllPreviewsLayout);
-
-    const updateNavButtons = () => {
-        if (!prevBtn || !nextBtn) return;
-        if (selectedFiles.length <= 2 || window.innerWidth <= 768) {
-            prevBtn.classList.add('hidden');
-            nextBtn.classList.add('hidden');
-            return;
-        }
-
-        prevBtn.classList.remove('hidden');
-        nextBtn.classList.remove('hidden');
-        prevBtn.disabled = currentSlideIndex === 0;
-        nextBtn.disabled = currentSlideIndex >= selectedFiles.length - 2;
-    };
-
-    const goToSlide = (index) => {
-        if (!previewsContainer.firstChild || !sliderContainer) return;
-
-        const firstCard = previewsContainer.querySelector('.image-preview-card');
-        if (!firstCard) return;
-
-        const gapStyle = window.getComputedStyle(previewsContainer).getPropertyValue('gap');
-        const gap = parseFloat(gapStyle) || 24;
-        const slideWidth = firstCard.offsetWidth + gap;
-        
-        sliderContainer.scrollLeft = index * slideWidth;
-        currentSlideIndex = index;
-        updateNavButtons();
-    };
-
-    const updatePreviews = () => {
-        previewsContainer.innerHTML = '';
-        
-        // [MODIFIKASI] Logika untuk menampilkan jumlah file di elemen <p>
-        if (fileCountLabel) {
-            if (selectedFiles.length > 0) {
-                fileCountLabel.textContent = `${selectedFiles.length} gambar telah dipilih.`;
-            } else {
-                fileCountLabel.textContent = ''; // Kosongkan jika tidak ada file
-            }
-        }
-        
-        if (fabButton) {
-            if (selectedFiles.length > 0) {
-                fabButton.classList.remove('hidden');
-            } else {
-                fabButton.classList.add('hidden');
-            }
-        }
-        
-        if (selectedFiles.length === 0) {
-            goToSlide(0);
-            return;
-        }
-
-        const currentOrientation = form.querySelector('input[name="orientation"]:checked').value;
-        const currentMargin = form.querySelector('input[name="margin"]:checked').value;
-        let pageClasses = `preview-page ${currentOrientation}`;
-        if (currentMargin === 'small') pageClasses += ' margin-small';
-        else if (currentMargin === 'big') pageClasses += ' margin-big';
-
-        let loadedImages = 0;
-        selectedFiles.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const previewCard = document.createElement('div');
-                previewCard.className = 'image-preview-card';
-                previewCard.innerHTML = `
-                    <div class="${pageClasses}">
-                        <img src="${e.target.result}" alt="${file.name}">
-                    </div>
-                    <button type="button" class="remove-btn" data-index="${index}" title="Hapus gambar">&times;</button>
-                `;
-                previewsContainer.appendChild(previewCard);
-                previewCard.querySelector('.remove-btn').addEventListener('click', (event) => {
-                    const idxToRemove = parseInt(event.target.dataset.index, 10);
-                    selectedFiles.splice(idxToRemove, 1);
-                    updatePreviews();
-                });
-                
-                loadedImages++;
-                if (loadedImages === selectedFiles.length) {
-                    goToSlide(0);
-                }
-            };
-            reader.readAsDataURL(file);
-        });
-    };
-
-    imageInput.addEventListener('change', () => {
-        selectedFiles.push(...Array.from(imageInput.files));
-        imageInput.value = '';
-        updatePreviews();
-    });
-
-    if(nextBtn) nextBtn.addEventListener('click', () => {
-        if (currentSlideIndex < selectedFiles.length - 2) {
-            goToSlide(currentSlideIndex + 1);
-        }
-    });
-
-    if(prevBtn) prevBtn.addEventListener('click', () => {
-        if (currentSlideIndex > 0) {
-            goToSlide(currentSlideIndex - 1);
-        }
-    });
-
-    form.addEventListener('submit', async (event) => {
-        // ... Logika submit form (tidak ada perubahan di sini)
-        event.preventDefault();
-        if (selectedFiles.length === 0) {
-            messageDiv.className = 'error';
-            messageDiv.textContent = 'Silakan pilih setidaknya satu gambar.';
-            return;
-        }
-        const formData = new FormData();
-        selectedFiles.forEach(file => formData.append('images', file));
-        formData.append('pageSize', pageSizeSelect.value);
-        formData.append('orientation', form.querySelector('input[name="orientation"]:checked').value);
-        formData.append('marginChoice', form.querySelector('input[name="margin"]:checked').value);
-        submitButton.disabled = true;
-        messageDiv.textContent = '';
-        messageDiv.className = '';
-        progressWrapper.classList.remove('hidden');
-        const progressBarContainer = progressWrapper.querySelector('.progress-bar');
-        const progressText = progressWrapper.querySelector('.progress-bar-text');
-        progressBarContainer.classList.add('indeterminate');
-        progressText.textContent = 'Mengonversi gambar ke PDF, harap tunggu...';
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${API_BASE_URL}/api/images-to-pdf`, true);
-        xhr.responseType = 'blob';
-        xhr.onload = function() {
-            progressBarContainer.classList.remove('indeterminate');
-            if (this.status === 200) {
-                messageDiv.className = 'success';
-                progressText.textContent = 'Konversi berhasil! Mengunduh file...';
-                const header = this.getResponseHeader('Content-Disposition');
-                let filename = 'converted.pdf';
-                if(header) {
-                    const parts = header.split(';');
-                    parts.forEach(part => {
-                        if (part.trim().startsWith('filename=')) {
-                            filename = part.split('=')[1].replace(/"/g, '');
-                        }
-                    });
-                }
-                const url = window.URL.createObjectURL(this.response);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                a.remove();
-                selectedFiles = [];
-                updatePreviews();
-                form.reset();
-                updateAllPreviewsLayout();
-            } else {
-                messageDiv.className = 'error';
-                messageDiv.textContent = 'Error: Gagal membuat PDF.';
-            }
-            setTimeout(() => {
-                progressWrapper.classList.add('hidden');
-                messageDiv.textContent = '';
-            }, 4000);
-            submitButton.disabled = false;
-        };
-        xhr.onerror = function() {
-            progressBarContainer.classList.remove('indeterminate');
-            messageDiv.className = 'error';
-            messageDiv.textContent = 'Error: Terjadi kesalahan jaringan.';
-            progressWrapper.classList.add('hidden');
-            submitButton.disabled = false;
-        };
-        xhr.send(formData);
-    });
-    
-    const optionsPanel = form.querySelector('.pdf-tool-options');
-    const backButton = document.getElementById('back-to-previews-btn');
-    const overlay = form.querySelector('.pdf-options-overlay');
-    
-    const openOptions = () => form.classList.add('options-active');
-    const closeOptions = () => form.classList.remove('options-active');
-
-    if (fabButton) fabButton.addEventListener('click', openOptions);
-    if (backButton) backButton.addEventListener('click', closeOptions);
-    if (overlay) overlay.addEventListener('click', closeOptions);
+    const targetSection = document.getElementById(sectionIdToShow);
+    if (targetSection) targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-
 function attachShortenerListener() {
     const form = document.getElementById('shortener-form');
     if (!form) return;
-    
+
     const longUrlInput = document.getElementById('long-url');
     const customSlugInput = document.getElementById('custom-slug');
     const resultBox = document.getElementById('result');
@@ -2056,9 +1764,8 @@ function attachShortenerListener() {
         copyButton.style.display = 'none';
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/shorten`, {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/shorten`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ original_url: longUrlInput.value, custom_slug: customSlugInput.value }),
             });
             const data = await response.json();
@@ -2069,10 +1776,7 @@ function attachShortenerListener() {
             resultText.textContent = data.short_url;
             longUrlInput.value = '';
             customSlugInput.value = '';
-
-            if (localStorage.getItem('jwt_refresh_token')) {
-                fetchUserLinkHistory();
-            }
+            fetchUserLinkHistory();
 
         } catch (error) {
             resultText.textContent = 'Gagal: ' + error.message;
@@ -2089,7 +1793,6 @@ function attachShortenerListener() {
         });
     }
 }
-
 function attachConverterListener() {
     const form = document.getElementById('converter-form');
     if (!form) return;
@@ -2099,75 +1802,92 @@ function attachConverterListener() {
         const formData = new FormData(form);
         const submitButton = form.querySelector('button');
         const messageDiv = document.getElementById('converter-message');
-        const progressWrapper = document.getElementById('converter-progress-wrapper');
-        const progressBarContainer = document.getElementById('converter-progress-wrapper').querySelector('.progress-bar');
-        const progressText = progressWrapper.querySelector('.progress-bar-text');
-
-        messageDiv.textContent = '';
+        messageDiv.textContent = 'Mengunggah dan mengonversi file, harap tunggu...';
         messageDiv.className = '';
-        progressWrapper.classList.remove('hidden');
         submitButton.disabled = true;
 
-        progressBarContainer.classList.add('indeterminate');
-        progressText.textContent = 'Uploading file, please wait...';
+        try {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/convert`, {
+                method: 'POST', body: formData
+            });
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${API_BASE_URL}/api/convert`, true);
-        xhr.responseType = 'blob';
-
-        xhr.onload = function () {
-            progressBarContainer.classList.remove('indeterminate');
-
-            if (this.status === 200) {
-                progressText.textContent = 'Konversi berhasil! File sedang diunduh.';
-                const contentDisposition = xhr.getResponseHeader('content-disposition');
-                let fileName = contentDisposition?.match(/filename="(.+)"/)?.[1] || 'converted-file';
-
-                const blob = this.response;
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none'; a.href = url; a.download = fileName;
-                document.body.appendChild(a); a.click();
-                window.URL.revokeObjectURL(url); a.remove();
-
-                form.reset();
-                const fileLabel = form.querySelector('.file-upload-label');
-                if (fileLabel) fileLabel.textContent = 'Tidak ada file yang dipilih';
-
-            } else {
-                try {
-                    const reader = new FileReader();
-                    reader.onload = function() {
-                       const errorResult = JSON.parse(this.result);
-                       messageDiv.textContent = `Error: ${errorResult.error || 'Gagal memproses file.'}`;
-                       messageDiv.className = 'error';
-                    }
-                    reader.readAsText(this.response);
-                } catch (e) {
-                     messageDiv.textContent = `Error: Terjadi kesalahan pada server (Status: ${this.status}).`;
-                     messageDiv.className = 'error';
-                }
+            if (!response.ok) {
+                let errorData = await response.json().catch(() => ({ error: response.statusText }));
+                throw new Error(errorData.error || 'Gagal memproses file.');
             }
 
-            setTimeout(() => progressWrapper.classList.add('hidden'), 3000);
-            submitButton.disabled = false;
-        };
+            const blob = await response.blob();
+            const contentDisposition = response.headers.get('content-disposition');
+            let fileName = contentDisposition?.match(/filename="(.+)"/)?.[1] || 'converted-file';
 
-        xhr.onerror = function () {
-            progressBarContainer.classList.remove('indeterminate');
-            messageDiv.textContent = 'Error: Terjadi kesalahan jaringan.';
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none'; a.href = url; a.download = fileName;
+            document.body.appendChild(a); a.click();
+            window.URL.revokeObjectURL(url); a.remove();
+
+            messageDiv.textContent = 'Konversi berhasil! File sedang diunduh.';
+            messageDiv.className = 'success';
+            form.reset();
+        } catch (error) {
+            messageDiv.textContent = `Error: ${error.message}`;
             messageDiv.className = 'error';
-            progressWrapper.classList.add('hidden');
+        } finally {
             submitButton.disabled = false;
-        };
+        }
+    });
+}
+function attachImageMergerListener() {
+    const form = document.getElementById('image-merger-form');
+    if (!form) return;
 
-        xhr.send(formData);
+    const messageDiv = document.getElementById('image-merger-message');
+    const fileInput = document.getElementById('image-files-input');
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (fileInput.files.length === 0) {
+            messageDiv.textContent = 'Error: Silakan pilih setidaknya satu gambar.';
+            messageDiv.className = 'error';
+            return;
+        }
+
+        const formData = new FormData(form);
+        const submitButton = form.querySelector('button');
+        messageDiv.textContent = 'Mengunggah dan menggabungkan gambar...';
+        messageDiv.className = '';
+        submitButton.disabled = true;
+
+        try {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/convert/images-to-pdf`, {
+                method: 'POST', body: formData
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Gagal memproses file.');
+            }
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none'; a.href = url; a.download = 'hasil-gabungan.pdf';
+            document.body.appendChild(a); a.click();
+            window.URL.revokeObjectURL(url); a.remove();
+
+            messageDiv.textContent = 'Berhasil! PDF Anda sedang diunduh.';
+            messageDiv.className = 'success';
+            form.reset();
+        } catch (error) {
+            messageDiv.textContent = `Error: ${error.message}`;
+            messageDiv.className = 'error';
+        } finally {
+            submitButton.disabled = false;
+        }
     });
 }
 function attachQrCodeGeneratorListener() {
     const form = document.getElementById('qr-generator-form');
     if (!form) return;
-    
+
     const qrText = document.getElementById('qr-text');
     const qrErrorLevel = document.getElementById('qr-error-level');
     const qrColorDark = document.getElementById('qr-color-dark');
@@ -2184,9 +1904,8 @@ function attachQrCodeGeneratorListener() {
         downloadQrButton.style.display = 'none';
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/generate-qr`, {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/generate-qr`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     text: qrText.value,
                     level: qrErrorLevel.value,
@@ -2222,7 +1941,7 @@ function attachQrCodeGeneratorListener() {
 function attachImageCompressorListener() {
     const form = document.getElementById('image-compressor-form');
     if (!form) return;
-    
+
     const imageInput = document.getElementById('image-compress-input');
     const qualityInput = document.getElementById('compress-quality');
     const qualityValueSpan = document.getElementById('compress-quality-value');
@@ -2259,7 +1978,7 @@ function attachImageCompressorListener() {
         formData.append('format', formatSelect.value);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/compress-image`, {
+            const response = await fetchWithAuth(`${API_BASE_URL}/api/compress-image`, {
                 method: 'POST',
                 body: formData
             });
@@ -2389,26 +2108,6 @@ function setupAuthPage() {
     const showLoginLink = document.getElementById('show-login');
     const authMessage = document.getElementById('auth-message');
     const authTitle = document.getElementById('auth-title');
-    const googleLoginBtn = document.getElementById('google-login-btn');
-    const googleRegisterBtn = document.getElementById('google-register-btn');
-
-    const startGoogleAuth = () => {
-        window.location.href = `${API_BASE_URL}/api/auth/google`;
-    };
-
-    if (googleLoginBtn) {
-        googleLoginBtn.addEventListener('click', startGoogleAuth);
-    }
-
-    if (googleRegisterBtn) {
-        googleRegisterBtn.addEventListener('click', startGoogleAuth);
-    }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('error')) {
-        authMessage.textContent = 'Error: Gagal login dengan Google. Silakan coba lagi.';
-        authMessage.className = 'error';
-    }
 
     if (showRegisterLink) {
         showRegisterLink.addEventListener('click', (e) => {
@@ -2416,22 +2115,18 @@ function setupAuthPage() {
             loginSection.classList.add('hidden');
             registerSection.classList.remove('hidden');
             if (authTitle) authTitle.textContent = 'Registrasi';
-            authMessage.textContent = '';
-            authMessage.className = '';
+            authMessage.textContent = ''; authMessage.className = '';
         });
     }
-
     if (showLoginLink) {
         showLoginLink.addEventListener('click', (e) => {
             e.preventDefault();
             registerSection.classList.add('hidden');
             loginSection.classList.remove('hidden');
             if (authTitle) authTitle.textContent = 'Login';
-            authMessage.textContent = '';
-            authMessage.className = '';
+            authMessage.textContent = ''; authMessage.className = '';
         });
     }
-
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -2451,7 +2146,6 @@ function setupAuthPage() {
             }
         });
     }
-
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -2476,7 +2170,6 @@ function setupAuthPage() {
         });
     }
 }
-
 const forgotForm = document.getElementById('forgot-form');
 if (forgotForm) {
     forgotForm.addEventListener('submit', async (e) => {
@@ -2608,9 +2301,9 @@ function setupMobileMenu() {
     const menuOverlay = document.getElementById('menu-overlay');
 
     const toggleMenu = () => {
-        if (hamburger) hamburger.classList.toggle('active');
-        if (navLinks) navLinks.classList.toggle('active');
-        if (menuOverlay) menuOverlay.classList.toggle('active');
+        if(hamburger) hamburger.classList.toggle('active');
+        if(navLinks) navLinks.classList.toggle('active');
+        if(menuOverlay) menuOverlay.classList.toggle('active');
         document.body.classList.toggle('menu-open');
         document.documentElement.classList.toggle('menu-open');
     };
@@ -2618,7 +2311,18 @@ function setupMobileMenu() {
     if (hamburger) hamburger.addEventListener('click', toggleMenu);
     if (menuOverlay) menuOverlay.addEventListener('click', toggleMenu);
 }
-
+function setupAboutModal() {
+    const aboutButtons = document.querySelectorAll('#about-button');
+    const modalOverlay = document.getElementById('about-modal');
+    if (!modalOverlay) return;
+    const modalCloseButton = modalOverlay.querySelector('.modal-close');
+    const openModal = () => modalOverlay.classList.remove('hidden');
+    const closeModal = () => modalOverlay.classList.add('hidden');
+    aboutButtons.forEach(button => button.addEventListener('click', e => { e.preventDefault(); openModal(); }));
+    if (modalCloseButton) modalCloseButton.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) closeModal(); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); });
+}
 function setupAllPasswordToggles() {
     const eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
     const eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
@@ -2634,26 +2338,8 @@ function setupAllPasswordToggles() {
             });
         }
     };
-
     setupPasswordToggle('toggle-login-password', 'login-password');
     setupPasswordToggle('toggle-register-password', 'register-password');
     setupPasswordToggle('toggle-reset-password', 'reset-password');
     setupPasswordToggle('toggle-confirm-password', 'confirm-password');
-}
-
-function setupAuthCallbackPage() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const accessToken = urlParams.get('accessToken');
-    const refreshToken = urlParams.get('refreshToken');
-    const indexPath = window.location.href.includes('github.io') ? '/hrportof/' : '/';
-    const authPath = window.location.href.includes('github.io') ? '/hrportof/auth.html?error=token-missing' : '/auth.html?error=token-missing';
-
-
-    if (accessToken && refreshToken) {
-        sessionStorage.setItem('jwt_access_token', accessToken);
-        localStorage.setItem('jwt_refresh_token', refreshToken);
-        window.location.href = indexPath;
-    } else {
-        window.location.href = authPath;
-    }
 }
